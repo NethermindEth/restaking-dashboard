@@ -25,3 +25,27 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+.chart {
+  width: 500px;
+  margin: 20px;
+  border-style: solid;
+  border-color: white;
+}
+.chart-2 {
+  width: 700px;
+  margin: 20px;
+  border-style: solid;
+  border-color: white;
+}
+.staking-dashboard {
+  display:flex;
+  width:100%;
+  flex-direction: row;
+  margin-top: 80px;
+}
+
+.deposits-cards{
+width: max-content;
+flex-direction: row;
+margin-top: 40px;
+}

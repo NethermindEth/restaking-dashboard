@@ -1,0 +1,28 @@
+import React from "react";
+import "chart.js/auto";
+import { Pie } from "react-chartjs-2";
+const dataConfig = {
+  labels: [],
+  datasets: [
+    {
+      data: [],
+
+      backgroundColor: [
+        "rgba(255, 99, 132, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(255, 206, 86, 1)",
+      ],
+      hoverBackgroundColor: [
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(255, 206, 86, 0.2)",
+      ],
+    },
+  ],
+};
+
+export default (data: any) => {
+  dataConfig.datasets[0].data = data.data.amounts;
+  dataConfig.labels = data.data.labels;
+  return <Pie data={dataConfig} width={"100%"} />;
+};
