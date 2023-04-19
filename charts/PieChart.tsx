@@ -1,5 +1,5 @@
+"use client";
 import { useMemo } from "react";
-import "chart.js/auto";
 import { Pie } from "react-chartjs-2";
 
 const dataConfig = {

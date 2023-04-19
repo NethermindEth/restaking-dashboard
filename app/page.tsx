@@ -1,10 +1,7 @@
-"use client";
-
-import Image from "next/image";
 import { Inter } from "next/font/google";
+import LineChart from "../charts/LineChart";
 import PieChart from "../charts/PieChart";
 import StackedBar from "../charts/stackedBar";
-import LineChart from "../charts/LineChart";
 
 const inter = Inter({ subsets: ["latin"] });
 
