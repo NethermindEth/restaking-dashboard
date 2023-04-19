@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "typechain --target ethers-v6 --out-dir typechain abi/*.json"
+    "postinstall": "yarn update-submodules",
+    "install-foundry": "curl -L https://foundry.paradigm.xyz | bash; foundryup",
+    "update-submodules": "git submodule update --init --recursive",
+    "typechain-generate": "forge build --root contracts/eigenlayer && typechain --target ethers-v6 --out-dir typechain contracts/eigenlayer/out/**/*.json",
+    "vercel-build": "yarn update-submodules && yarn install-foundry && yarn typechain-generate && yarn build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.20.0",
