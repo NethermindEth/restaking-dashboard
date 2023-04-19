@@ -1,3 +1,0 @@
-[submodule "contracts/eigenlayer"]
-	path = contracts/eigenlayer
-	url = https://github.com/Layr-Labs/eigenlayer-contracts
