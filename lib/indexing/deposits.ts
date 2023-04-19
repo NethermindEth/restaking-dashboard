@@ -10,6 +10,9 @@ import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
 import { DepositEvent, StrategyManager } from "../../typechain/StrategyManager";
 import { TransferEvent } from "../../typechain/IERC20";
 
+// serialization polyfill
+import "./utils/bigint";
+
 interface Deposit {
   block: number;
   depositor: string;
@@ -205,5 +208,7 @@ export async function indexDeposits() {
   const startingBlock = (lastRow.data !== null)? lastRow.data[0].block + 1 : 0;
   const currentBlock = await provider.getBlockNumber();
 
-  return await indexDepositsRange(startingBlock, currentBlock, 10_000);
+  const results = await indexDepositsRange(startingBlock, currentBlock, 10_000);
+
+  await supabase.from("_Deposits").insert(results);
 }

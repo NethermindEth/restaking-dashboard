@@ -4,6 +4,9 @@ import { chunkMap } from "./utils/chunk";
 import { STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { StrategyManager__factory } from "../../typechain";
 
+// serialization polyfill
+import "./utils/bigint";
+
 interface Withdrawal {
   block: number;
   // (depositor, nonce) should be replaced by queued withdrawal ID
@@ -42,5 +45,7 @@ export async function indexWithdrawals() {
   const startingBlock = (lastRow.data !== null)? lastRow.data[0].block + 1 : 0;
   const currentBlock = await provider.getBlockNumber();
 
-  return await indexWithdrawalsRange(startingBlock, currentBlock, 10_000);
+  const results = await indexWithdrawalsRange(startingBlock, currentBlock, 10_000);
+
+  await supabase.from("_Withdrawals").insert(results);
 }
