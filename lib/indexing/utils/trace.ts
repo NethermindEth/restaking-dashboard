@@ -17,6 +17,11 @@ export interface TraceResult {
   calls?: TraceResult[];
 }
 
+/**
+ * Walks through trace calls, iterating individually as if they were a single array.
+ * @param trace Initial trace.
+ * @param cb Callback to be executed on each trace.
+ */
 export function traceCallWalk(trace: TraceResult, cb: (trace: Readonly<TraceResult>) => void) {
   cb(trace);
   (trace.calls || []).forEach(call => traceCallWalk(call, cb));
