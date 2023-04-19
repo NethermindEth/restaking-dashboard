@@ -6,7 +6,7 @@ export async function stEthSharesExchangeRate(): Promise<bigint> {
   const strategy = IStrategy__factory.connect(STETH_STRATEGY_ADDRESS, provider);
   const stEth = StEth__factory.connect(STETH_ADDRESS, provider);
 
-  return (await strategy.sharesToUnderlyingView(BigInt(1e18)) * await stEth.getTotalPooledEther() / await stEth.getTotalShares()) * BigInt(1e18);
+  return await strategy.sharesToUnderlyingView(BigInt(1e18)) * await stEth.getTotalPooledEther() / await stEth.getTotalShares();
 }
 
 export async function rEthSharesExchangeRate(): Promise<bigint> {
