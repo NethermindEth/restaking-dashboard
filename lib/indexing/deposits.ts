@@ -202,7 +202,7 @@ export async function indexDeposits() {
     .select("block")
     .order("block", { ascending: false })
     .limit(1);
-  const startingBlock = (lastRow.data !== null)? lastRow.data[0].block : 0;
+  const startingBlock = (lastRow.data !== null)? lastRow.data[0].block + 1 : 0;
   const currentBlock = await provider.getBlockNumber();
 
   return await indexDepositsRange(startingBlock, currentBlock, 10_000);
