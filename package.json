@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "yarn update-submodules",
-    "install-foundry": "command -v forge >/dev/null 2>&1 || { curl -L https://foundry.paradigm.xyz | bash; foundryup; }",
+    "install-foundry": "command -v forge >/dev/null 2>&1 || { curl -L https://foundry.paradigm.xyz | bash; $HOME/.foundry/bin/foundryup; }",
     "update-submodules": "git submodule update --init --recursive",
     "typechain-generate": "forge build --root contracts/eigenlayer && typechain --target ethers-v6 --out-dir typechain contracts/eigenlayer/out/**/*.json",
     "vercel-build": "yarn update-submodules && yarn install-foundry && yarn typechain-generate && yarn build"
