@@ -149,7 +149,7 @@ async function indexDepositsRange(
       ].map(el => strategyManager.getFunction(el).fragment);
 
       await Promise.all(traceRequests.map((traceRequest, idx) => traceRequest.request.then((txTrace) => {
-        traceCallWalk(txTrace.result, trace => {
+        traceCallWalk(txTrace.result, true, trace => {
           const fragment = depositFragments.find(el => el.selector === trace.input.slice(0, 10));
 
           if (addressEq(trace.to, STRATEGY_MANAGER_ADDRESS) && fragment) {

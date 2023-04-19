@@ -14,6 +14,8 @@ export interface TraceResult {
   gasUsed: string;
   input: string;
   output: string;
+  error: string;
+  revertReason: string;
   calls?: TraceResult[];
 }
 
@@ -22,7 +24,13 @@ export interface TraceResult {
  * @param trace Initial trace.
  * @param cb Callback to be executed on each trace.
  */
-export function traceCallWalk(trace: TraceResult, cb: (trace: Readonly<TraceResult>) => void) {
+export function traceCallWalk(
+  trace: TraceResult,
+  ignoreRevertedCalls: boolean,
+  cb: (trace: Readonly<TraceResult>) => void
+) {
+  if (ignoreRevertedCalls && (trace.error || trace.revertReason)) return;
+  
   cb(trace);
-  (trace.calls || []).forEach(call => traceCallWalk(call, cb));
+  (trace.calls || []).forEach(call => traceCallWalk(call, ignoreRevertedCalls, cb));
 }
