@@ -1,4 +1,4 @@
-import React from "react";
+import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
 
@@ -69,15 +69,19 @@ const dataConfig = {
   ],
 };
 
-export default (data: any) => {
-  dataConfig.labels = data.data.timestamps;
-  dataConfig.datasets.forEach((dataset, index) => {
-    dataset.data = data.data.amounts[index];
-  });
-  console.log(dataConfig, data.data);
+const LineChart = (data: any) => {
+  const chartData = useMemo(() => {
+    const internalChartData = dataConfig;
+    internalChartData.labels = data.data.timestamps;
+    internalChartData.datasets.forEach((dataset, index) => {
+      dataset.data = data.data.amounts[index];
+    });
+    return internalChartData;
+  }, [data]);
+
   return (
     <Line
-      data={dataConfig}
+      data={chartData}
       title={data.title}
       options={{
         maintainAspectRatio: false,
@@ -86,3 +90,5 @@ export default (data: any) => {
     />
   );
 };
+
+export default LineChart;

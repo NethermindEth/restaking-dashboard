@@ -1,6 +1,7 @@
-import React from "react";
+import { useMemo } from "react";
 import "chart.js/auto";
 import { Pie } from "react-chartjs-2";
+
 const dataConfig = {
   labels: [],
   datasets: [
@@ -21,8 +22,15 @@ const dataConfig = {
   ],
 };
 
-export default (data: any) => {
-  dataConfig.datasets[0].data = data.data.amounts;
-  dataConfig.labels = data.data.labels;
-  return <Pie data={dataConfig} width={"100%"} />;
+const PieChart = (data: any) => {
+  const chartData = useMemo(() => {
+    const internalChartData = dataConfig;
+    internalChartData.datasets[0].data = data.data.amounts;
+    internalChartData.labels = data.data.labels;
+    return internalChartData;
+  }, [data]);
+
+  return <Pie data={chartData} width={"100%"} />;
 };
+
+export default PieChart;

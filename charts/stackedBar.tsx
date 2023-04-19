@@ -1,4 +1,4 @@
-import React from "react";
+import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 
 const dataConfig = {
@@ -31,13 +31,20 @@ const dataConfig = {
 };
 
 export default (data: any) => {
-  dataConfig.labels = data.data.labels;
-  dataConfig.datasets.forEach((dataset, index) => {
-    dataset.data = data.data.amounts[index];
-  });
+  const chartData = useMemo(() => {
+    const internalChartData = dataConfig;
+
+    internalChartData.labels = data.data.labels;
+    internalChartData.datasets.forEach((dataset, index) => {
+      dataset.data = data.data.amounts[index];
+    });
+
+    return internalChartData;
+  }, [data]);
+
   return (
     <Bar
-      data={dataConfig}
+      data={chartData}
       options={{
         maintainAspectRatio: false,
         scales: {

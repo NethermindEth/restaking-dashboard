@@ -4,17 +4,18 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
+  --accent-color: #1a0c6d;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -25,27 +26,39 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
-.chart {
+
+/* .staking-dashboard {
+  width: 100%;
+} */
+
+/* .charts-homepage {
+  max-width: 50%;
+  margin: 0 25%;
+} */
+
+/* .chart {
   width: 500px;
   margin: 20px;
   border-style: solid;
   border-color: white;
 }
+
 .chart-2 {
   width: 700px;
   margin: 20px;
   border-style: solid;
   border-color: white;
-}
-.staking-dashboard {
-  display:flex;
-  width:100%;
+} */
+
+/* .staking-dashboard {
+  display: flex;
+  width: 100%;
   flex-direction: row;
   margin-top: 80px;
-}
-
-.deposits-cards{
-width: max-content;
-flex-direction: row;
-margin-top: 40px;
-}
+} */
+/* 
+.deposits-cards {
+  width: max-content;
+  flex-direction: row;
+  margin-top: 40px;
+} */
