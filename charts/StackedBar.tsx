@@ -1,4 +1,5 @@
 "use client";
+import "chart.js/auto";
 import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 
@@ -6,23 +7,23 @@ const dataConfig = {
   labels: [],
 
   datasets: [
-    {
-      label: "Stacked ETH",
-      data: [],
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
+    // {
+    //   label: "Staked ETH",
+    //   data: [],
+    //   backgroundColor: "rgba(255, 99, 132, 0.2)",
 
-      borderColor: ["rgba(255, 99, 132, 1)"],
-      borderWidth: 1,
-    },
+    //   borderColor: ["rgba(255, 99, 132, 1)"],
+    //   borderWidth: 1,
+    // },
     {
-      label: "Stacked StEth",
+      label: "Staked StEth",
       data: [],
       backgroundColor: ["rgba(75, 192, 192, 0.2)"],
       borderColor: ["rgba(75, 192, 192, 1)"],
       borderWidth: 1,
     },
     {
-      label: "Stacked REth",
+      label: "Staked REth",
       data: [],
       backgroundColor: ["rgba(255, 206, 86, 0.2)"],
       borderColor: ["rgba(255, 206, 86, 1)"],
@@ -48,8 +49,9 @@ export default (data: any) => {
       data={chartData}
       options={{
         maintainAspectRatio: false,
+        normalized: true,
         scales: {
-          x: { stacked: true, min: 0, max: 7 },
+          x: { stacked: true, min: 0, max: 30 },
           y: { stacked: true },
         },
       }}
