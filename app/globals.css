@@ -41,7 +41,7 @@ body {
 
 .data-card-eth {
   color: var(--whitish);
-  background-color: var(--secondary-accent-color);
+  background-color: var(--tertiary-accent-color);
 }
 
 h3 {
