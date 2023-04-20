@@ -65,6 +65,15 @@ function formatDate(inputDate: string): string {
   return `${month}/${day}/${year}`;
 }
 
+function formatDateToStandard(inputDate: string): string {
+  const date = new Date(inputDate);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString().slice(-2);
+
+  return `${day}/${month}/${year}`;
+}
+
 function fillMissingDates(...arrays: BlockData[][]): BlockData[][] {
   const combinedDates = new Set(
     arrays.flatMap((arr) =>
@@ -164,7 +173,8 @@ function extractAmountsAndTimestamps(...arrays: BlockData[][]): {
 
   const filledArrays = arrays.map((arr) => filledArray(arr, combinedDates));
 
-  const timestamps = Array.from(combinedDates).sort();
+  let timestamps = Array.from(combinedDates).sort();
+  timestamps = timestamps.map((timestamp) => formatDateToStandard(timestamp));
   const amounts = filledArrays.map((arr) =>
     arr.map((item) => item.total_amount)
   );
@@ -209,7 +219,8 @@ function extractAmountsAndTimestampsWithPrevious(...arrays: BlockData[][]): {
 
   const filledArrays = arrays.map((arr) => filledArray(arr, combinedDates));
 
-  const timestamps = Array.from(combinedDates).sort();
+  let timestamps = Array.from(combinedDates).sort();
+  timestamps = timestamps.map((date) => formatDateToStandard(date));
   const amounts = filledArrays.map((arr) =>
     arr.map((item) => item.total_amount)
   );

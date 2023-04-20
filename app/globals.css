@@ -9,8 +9,9 @@
   --whitish: rgba(235, 235, 235, 1);
   --accent-color: rgb(26, 12, 109);
   --secondary-accent-color: rgb(255, 184, 0);
+  --tertiary-accent-color: rgb(0, 153, 153);
   --alternative-bg: rgb(202, 223, 255);
-  --tertiary-bg: rgb(14, 170, 0);
+  --tertiary-bg-rgb: rgb(254, 156, 147);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -36,6 +37,11 @@ body {
 .data-card-reth {
   color: var(--accent-color);
   background-color: var(--secondary-accent-color);
+}
+
+.data-card-eth {
+  color: var(--accent-color);
+  background-color: var(--tertiary-bg-rgb);
 }
 
 h3 {
