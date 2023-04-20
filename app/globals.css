@@ -4,24 +4,76 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: rgb(255, 255, 255);
+  --whitish: rgba(235, 235, 235, 1);
+  --accent-color: rgb(26, 12, 109);
+  --secondary-accent-color: rgb(255, 184, 0);
+  --alternative-bg: rgb(202, 223, 255);
+  --tertiary-bg: rgb(14, 170, 0);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: Abcreprovariable, sans-serif;
+  color: rgb(var(--accent-color)) !important;
+  background: linear-gradient(to bottom, transparent, var(--background-end-rgb))
+    var(--alternative-bg);
 }
+
+.data-card-steth {
+  color: var(--whitish);
+  background-color: var(--accent-color);
+}
+
+.data-card-reth {
+  color: var(--accent-color);
+  background-color: var(--secondary-accent-color);
+}
+
+h3 {
+  color: var(--accent-color);
+}
+
+/* .staking-dashboard {
+  width: 100%;
+} */
+
+/* .charts-homepage {
+  max-width: 50%;
+  margin: 0 25%;
+} */
+
+/* .chart {
+  width: 500px;
+  margin: 20px;
+  border-style: solid;
+  border-color: white;
+}
+
+.chart-2 {
+  width: 700px;
+  margin: 20px;
+  border-style: solid;
+  border-color: white;
+} */
+
+/* .staking-dashboard {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  margin-top: 80px;
+} */
+/* 
+.deposits-cards {
+  width: max-content;
+  flex-direction: row;
+  margin-top: 40px;
+} */
