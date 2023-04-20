@@ -8,8 +8,10 @@ import { ethers } from "ethers";
 interface Validator {
   index: number;
   balance: bigint;
+  effectiveBalance: bigint;
   withdrawalAddress: string;
 }
+
 export async function indexValidators() {
   const limiter = new Bottleneck({
     maxConcurrent: 1,
@@ -37,6 +39,7 @@ export async function indexValidators() {
       .map(validator => ({
         index: validator.validatorindex,
         balance: BigInt(validator.balance),
+        effectiveBalance: BigInt(validator.effectivebalance),
         withdrawalAddress: ethers.getAddress("0x" + validator.withdrawalcredentials.slice(-40)),
       }));
 
