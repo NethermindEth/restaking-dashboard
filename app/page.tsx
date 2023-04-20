@@ -53,6 +53,8 @@ export default async function Home() {
     stakersStethConverted,
     groupedStakers,
     rEthRate,
+    chartDataBeaconStakesDaily,
+    chartDataBeaconStakesCumulative,
   } = await getDeposits();
 
   return (
@@ -140,7 +142,7 @@ export default async function Home() {
                 title: "Cumulative deposited tokens by day",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
-                namedLabels: ["stETH", "rETH", "Beacon Chain ETH"],
+                namedLabels: ["stETH", "rETH"],
               }}
             />
           </div>
@@ -152,9 +154,9 @@ export default async function Home() {
               data={{
                 amounts: chartDataDepositsDaily.amounts,
                 labels: chartDataDepositsDaily.timestamps,
-                namedLabels: ["stETH", "rETH", "Beacon Chain ETH"],
+                namedLabels: ["stETH", "rETH"],
               }}
-              title="Staked tokens by day"
+              title="Deposited tokens by day"
             />
           </div>
         </div>
@@ -183,6 +185,38 @@ export default async function Home() {
                 amounts: chartDataWithdrawalsDaily.amounts,
                 labels: chartDataWithdrawalsDaily.timestamps,
                 namedLabels: ["stETH", "rETH"],
+              }}
+              title="Token Withdrawals by day"
+            />
+          </div>
+        </div>
+
+        <div className="charts-homepage mt-16">
+          <h3 className="text-center text-xl">
+            Cumulative Beacon Chain ETH in EigenPod by day
+          </h3>
+          <div className="chart-2">
+            <LineChart
+              data={{
+                title: "Cumulative Token Withdrawals by day",
+                amounts: chartDataBeaconStakesCumulative.amounts,
+                timestamps: chartDataBeaconStakesCumulative.timestamps,
+                namedLabels: ["ETH"],
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="charts-homepage mt-16">
+          <h3 className="text-center text-xl">
+            Beacon Chain ETH Restaking by day
+          </h3>
+          <div className="chart-staked-lst-date">
+            <StackedBar
+              data={{
+                amounts: chartDataBeaconStakesDaily.amounts,
+                labels: chartDataBeaconStakesDaily.timestamps,
+                namedLabels: ["ETH"],
               }}
               title="Token Withdrawals by day"
             />
@@ -300,6 +334,14 @@ async function getDeposits() {
   let chartDataDepositsCumulative = extractAmountsAndTimestampsWithPrevious(
     cummulativestEthDeposits,
     cummulativerEthDeposits,
+    cummulativeBeaconChainStakes
+  );
+
+  let chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
+    beaconChainStakes as BlockData[]
+  );
+
+  let chartDataBeaconStakesCumulative = extractAmountsAndTimestampsWithPrevious(
     cummulativeBeaconChainStakes
   );
 
@@ -446,5 +488,7 @@ async function getDeposits() {
     stakersStethConverted,
     groupedStakers,
     rEthRate,
+    chartDataBeaconStakesDaily,
+    chartDataBeaconStakesCumulative,
   };
 }
