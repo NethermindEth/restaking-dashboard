@@ -125,12 +125,12 @@ export default async function Home() {
 
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Cumulative deposited withdrawn tokens
+            Cumulative Token Withdrawals by day
           </h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cumulative withdrawn tokens",
+                title: "Cumulative Token Withdrawals by day",
                 amounts: chartDataWithdrawalsCumulative.amounts,
                 timestamps: chartDataWithdrawalsCumulative.timestamps,
                 namedLabels: ["stETH", "rETH"],
@@ -140,7 +140,7 @@ export default async function Home() {
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Withdrawn tokens by day</h3>
+          <h3 className="text-center text-xl">Token Withdrawals by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
@@ -148,7 +148,7 @@ export default async function Home() {
                 labels: chartDataWithdrawalsDaily.timestamps,
                 namedLabels: ["stETH", "rETH"],
               }}
-              title="Withdrawn tokens by day"
+              title="Token Withdrawals by day"
             />
           </div>
         </div>
@@ -189,7 +189,7 @@ export default async function Home() {
                 totalrEthDeposits - totalrEthWithdrawals,
                 totalBeaconChainStakes,
               ],
-              labels: ["stETH", "RETH", "Beacon Chain ETH"],
+              labels: ["stETH", "rETH", "Beacon Chain ETH"],
             }}
           />
         </div>
