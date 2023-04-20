@@ -42,7 +42,7 @@ export async function indexWithdrawals() {
     .select("block")
     .order("block", { ascending: false })
     .limit(1);
-  const startingBlock = (lastRow.data !== null)? lastRow.data[0].block + 1 : 0;
+  const startingBlock = (lastRow.data !== null && lastRow.data.length !== 0)? lastRow.data[0].block + 1 : 0;
   const currentBlock = await provider.getBlockNumber();
 
   const results = await indexWithdrawalsRange(startingBlock, currentBlock, 10_000);
