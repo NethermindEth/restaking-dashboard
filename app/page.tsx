@@ -96,12 +96,12 @@ export default async function Home() {
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Cummulative deposited tokens by day
+            Cumulative deposited tokens by day
           </h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cummulative deposited tokens by day",
+                title: "Cumulative deposited tokens by day",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
                 namedLabels: ["stETH", "rETH", "Beacon Chain ETH"],
@@ -124,11 +124,13 @@ export default async function Home() {
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Deposited withdrawn tokens</h3>
+          <h3 className="text-center text-xl">
+            Cumulative deposited withdrawn tokens
+          </h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cummulative withdrawn tokens",
+                title: "Cumulative withdrawn tokens",
                 amounts: chartDataWithdrawalsCumulative.amounts,
                 timestamps: chartDataWithdrawalsCumulative.timestamps,
                 namedLabels: ["stETH", "rETH"],
