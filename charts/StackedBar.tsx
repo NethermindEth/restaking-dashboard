@@ -53,7 +53,7 @@ export default (data: any) => {
     <Bar
       data={chartData}
       options={{
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
         normalized: true,
         scales: {
           x: { stacked: true, min: 0, max: 30 },

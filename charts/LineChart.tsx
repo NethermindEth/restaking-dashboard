@@ -85,14 +85,13 @@ const LineChart = (data: any) => {
     return internalChartData;
   }, [data]);
 
-  console.log(chartData);
-
   return (
     <Line
       data={chartData}
       title={data.title}
       options={{
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
+
         responsive: true,
         color: "rgb(26, 12, 109)",
       }}

@@ -38,36 +38,29 @@ export default async function Home() {
     chartDataSumREth,
   } = await getDeposits();
 
-  console.log(
-    "Withdrawals",
-    chartDataWithdrawalsDaily,
-    chartDataWithdrawalsCumulative
-  );
-  console.log("Deposits", chartDataDepositsDaily, chartDataDepositsCumulative);
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
-        <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none">
+        <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none lgmb-12">
           <Image
             src={"/logo.png"}
             alt="EigenLayer Logo"
-            width={32}
-            height={36}
+            width={64}
+            height={72}
           />
-          <p className="ml-4">EigenLayer Stats</p>
+          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats</p>
         </div>
       </div>
       <div className="my-8 flex ">
-        <div className="data-card data-card-steth py-8 px-12 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <p className="">Staked stEth</p>
-          <p className="">
+        <div className="data-card data-card-steth py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+          <p className="text-sm md:text-base pb-2 md:pb-5">Staked stEth</p>
+          <p className="md:text-xl">
             {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
           </p>
         </div>
-        <div className="data-card data-card-reth py-8 px-12 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <p className="">Staked rETH</p>
-          <p className="">
+        <div className="data-card data-card-reth py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+          <p className="text-sm md:text-base pb-2 md:pb-5">Staked rETH</p>
+          <p className="md:text-xl">
             {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
           </p>
         </div>
@@ -92,7 +85,20 @@ export default async function Home() {
         </div> */}
 
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
-        <div className="charts-homepage">
+        <div className="charts-homepage mt-16">
+          <h3>Cummulative staked tokens by day</h3>
+          <div className="chart-2">
+            <LineChart
+              data={{
+                title: "Cummulative staked tokens by day",
+                amounts: chartDataDepositsCumulative.amounts,
+                timestamps: chartDataDepositsCumulative.timestamps,
+                namedLabels: ["stEth", "rEth"],
+              }}
+            />
+          </div>
+        </div>
+        <div className="charts-homepage mt-16">
           <h3>Staked tokens by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
@@ -105,14 +111,15 @@ export default async function Home() {
             />
           </div>
         </div>
+
         <div className="charts-homepage mt-16">
-          <h3>Cummulative staked tokens by day</h3>
+          <h3>Cummulative withdrawn tokens</h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cummulative staked tokens by day",
-                amounts: chartDataDepositsCumulative.amounts,
-                timestamps: chartDataDepositsCumulative.timestamps,
+                title: "Cummulative withdrawn tokens",
+                amounts: chartDataWithdrawalsCumulative.amounts,
+                timestamps: chartDataWithdrawalsCumulative.timestamps,
                 namedLabels: ["stEth", "rEth"],
               }}
             />
@@ -129,19 +136,6 @@ export default async function Home() {
                 namedLabels: ["stEth", "rEth"],
               }}
               title="Withdrawn tokens by day"
-            />
-          </div>
-        </div>
-        <div className="charts-homepage mt-16">
-          <h3>Cummulative withdrawn tokens</h3>
-          <div className="chart-2">
-            <LineChart
-              data={{
-                title: "Cummulative withdrawn tokens",
-                amounts: chartDataWithdrawalsCumulative.amounts,
-                timestamps: chartDataWithdrawalsCumulative.timestamps,
-                namedLabels: ["stEth", "rEth"],
-              }}
             />
           </div>
         </div>
@@ -310,13 +304,3 @@ async function getDeposits() {
     chartDataSumREth,
   };
 }
-// async function getLastDeposits() {
-//   let { data } = await supabase
-//     .from("Deposits")
-//     .select("*")
-//     .order("created_at", { ascending: false })
-//     .limit(1);
-
-//   // console.log(data);
-//   return data ? data[0] : {};
-// }

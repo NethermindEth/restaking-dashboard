@@ -7,7 +7,6 @@ const dataConfig = {
   datasets: [
     {
       data: [],
-
       backgroundColor: [
         "rgba(26, 12, 109, 1)",
         "rgba(255, 184, 0, 1)",
