@@ -36,6 +36,9 @@ export default async function Home() {
     chartDataWithdrawalsCumulative,
     chartDataSumStEth,
     chartDataSumREth,
+    beaconChainStakes,
+    totalBeaconChainStakes,
+    cummulativeBeaconChainStakes,
   } = await getDeposits();
 
   return (
@@ -62,6 +65,12 @@ export default async function Home() {
           <p className="text-sm md:text-base pb-2 md:pb-5">Staked rETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
+          </p>
+        </div>
+        <div className="data-card data-card-eth py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+          <p className="text-sm md:text-base pb-2 md:pb-5">Beacon Chain ETH</p>
+          <p className="md:text-xl">
+            {roundToDecimalPlaces(totalBeaconChainStakes)}
           </p>
         </div>
       </div>
@@ -218,6 +227,15 @@ async function getDeposits() {
     stEthDeposits as BlockData[]
   );
 
+  let { data: beaconChainStakes } = await supabase
+    .from("consumablebeaconchainstakeseth")
+    .select("*");
+  beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
+  let totalBeaconChainStakes = sumTotalAmounts(beaconChainStakes as BlockData[]);
+  let cummulativeBeaconChainStakes = accumulateAmounts(
+    beaconChainStakes as BlockData[]
+  );
+
   // Deposits prepared for charts.
   let chartDataDepositsDaily = extractAmountsAndTimestamps(
     stEthDeposits as BlockData[],
@@ -304,5 +322,8 @@ async function getDeposits() {
     chartDataWithdrawalsCumulative,
     chartDataSumStEth,
     chartDataSumREth,
+    beaconChainStakes,
+    totalBeaconChainStakes,
+    cummulativeBeaconChainStakes,
   };
 }
