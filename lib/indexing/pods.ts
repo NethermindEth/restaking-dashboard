@@ -56,5 +56,3 @@ export async function indexPods() {
 
   await supabase.from("_Pods").insert(results);
 }
-
-indexPods();
