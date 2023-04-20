@@ -62,7 +62,7 @@ function formatDate(inputDate: string): string {
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear().toString().slice(-2);
 
-  return `${day}/${month}/${year}`;
+  return `${month}/${day}/${year}`;
 }
 
 function fillMissingDates(...arrays: BlockData[][]): BlockData[][] {
@@ -217,6 +217,43 @@ function extractAmountsAndTimestampsWithPrevious(...arrays: BlockData[][]): {
   return { amounts, timestamps };
 }
 
+function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
+  const combinedDates = new Set([
+    ...arr1.map((item) => formatDate(item.block_chunk_date)),
+    ...arr2.map((item) => formatDate(item.block_chunk_date)),
+  ]);
+
+  const dateMap = (arr: BlockData[]): Map<string, BlockData> =>
+    arr.reduce(
+      (acc, item) => acc.set(formatDate(item.block_chunk_date), item),
+      new Map<string, BlockData>()
+    );
+
+  const dateMap1 = dateMap(arr1);
+  const dateMap2 = dateMap(arr2);
+
+  return Array.from(combinedDates)
+    .sort()
+    .map((date) => {
+      const item1 = dateMap1.get(date) || {
+        total_amount: 0,
+        block_chunk: 0,
+        block_chunk_date: formatDate(date),
+      };
+      const item2 = dateMap2.get(date) || {
+        total_amount: 0,
+        block_chunk: 0,
+        block_chunk_date: formatDate(date),
+      };
+
+      return {
+        total_amount: item1.total_amount - item2.total_amount,
+        block_chunk: item1.block_chunk - item2.block_chunk,
+        block_chunk_date: date,
+      };
+    });
+}
+
 export type { BlockData };
 
 export {
@@ -229,4 +266,5 @@ export {
   fillMissingDatesWithPrevious,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
+  subtractArrays,
 };

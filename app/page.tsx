@@ -13,8 +13,10 @@ import {
   extractAmountsAndTimestampsWithPrevious,
   mergeBlockChunks,
   roundToDecimalPlaces,
+  subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
+import Image from "next/image";
 
 export default async function Home() {
   // const { deposits } = await getDeposits();
@@ -28,32 +30,48 @@ export default async function Home() {
     cummulativestEthDeposits,
     chartDataDepositsDaily,
     chartDataDepositsCumulative,
+    stEthWithdrawals,
+    totalstEthWithdrawals,
+    totalrEthWithdrawals,
+    cummulativestEthWithdrawals,
     chartDataWithdrawalsDaily,
     chartDataWithdrawalsCumulative,
+    chartDataSumStEth,
+    chartDataSumREth,
   } = await getDeposits();
 
+  console.log(
+    "Withdrawals",
+    chartDataWithdrawalsDaily,
+    chartDataWithdrawalsCumulative
+  );
+  console.log("Deposits", chartDataDepositsDaily, chartDataDepositsCumulative);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24 font-semibold">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          EigenLayer / Nethermind
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <p>Logo / Credits</p>
+        <div className="fixed bottom-0 left-0 h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none">
+          <Image
+            src={"/logo.png"}
+            alt="EigenLayer Logo"
+            width={32}
+            height={36}
+          />
+          <p className="ml-4">EigenLayer Stats</p>
         </div>
       </div>
-      <div className="my-8 flex">
-        <div className="p-6 mx-4 shadow-md rounded-md">
-          <div>
-            <div className="">Once staked rETH</div>
-            <div className="">{roundToDecimalPlaces(totalrEthDeposits)}</div>
-          </div>
+      <div className="my-8 flex ">
+        <div className="p-6 mx-4 shadow-md rounded-md text-center data-on-top">
+          <p className="">Staked rETH</p>
+          <p className="">
+            {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
+          </p>
         </div>
-        <div className="p-6 mx-4 shadow-md rounded-md">
-          <div>
-            <div className="">Once staked stEth</div>
-            <div className="">{roundToDecimalPlaces(totalstEthDeposits)}</div>
-          </div>
+        <div className="p-6 mx-4 shadow-md rounded-md text-center data-on-top">
+          <p className="">Staked stEth</p>
+          <p className="">
+            {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
+          </p>
         </div>
       </div>
       {/* <div className="p-6 mx-4 shadow-md rounded-md">
@@ -78,12 +96,12 @@ export default async function Home() {
       <div className="staking-dashboard w-full">
         <div className="charts-homepage">
           <h3>Staked LSTs by date</h3>
-
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
                 amounts: chartDataDepositsDaily.amounts,
                 labels: chartDataDepositsDaily.timestamps,
+                namedLabels: ["stEth", "rEth"],
               }}
               title="Staked LSTs by date"
             />
@@ -97,18 +115,20 @@ export default async function Home() {
                 title: "Cummulative staked LSTs",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
+                namedLabels: ["stEth", "rEth"],
               }}
             />
           </div>
         </div>
+
         <div className="charts-homepage mt-6">
           <h3>Withdrawn LSTs by date</h3>
-
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
                 amounts: chartDataWithdrawalsDaily.amounts,
                 labels: chartDataWithdrawalsDaily.timestamps,
+                namedLabels: ["stEth", "rEth"],
               }}
               title="Withdrawn LSTs by date"
             />
@@ -122,10 +142,39 @@ export default async function Home() {
                 title: "Cummulative withdrawn LSTs",
                 amounts: chartDataWithdrawalsCumulative.amounts,
                 timestamps: chartDataWithdrawalsCumulative.timestamps,
+                namedLabels: ["stEth", "rEth"],
               }}
             />
           </div>
         </div>
+
+        {/* <div className="charts-homepage mt-6">
+          <h3>Staking and withdrawing of StEth</h3>
+          <div className="chart-staked-lst-date">
+            <StackedBar
+              data={{
+                amounts: chartDataSumStEth.amounts,
+                labels: chartDataSumStEth.timestamps,
+                namedLabels: ["Staked - Withdrawn"],
+              }}
+              title="Staking and withdrawing of StEth"
+            />
+          </div>
+        </div>
+        <div className="charts-homepage mt-6">
+          <h3>Staking and withdrawing of rEth</h3>
+          <div className="chart-2">
+            <LineChart
+              data={{
+                title: "Staking and withdrawing of rEth",
+                amounts: chartDataSumREth.amounts,
+                timestamps: chartDataSumREth.timestamps,
+                namedLabels: ["Staked - Withdrawn"],
+              }}
+            />
+          </div>
+        </div> */}
+
         {/* <div className="charts-homepage pie-chart-deposits w-1/2 mx-auto">
           <h3>PieChart of restaked tokens</h3>
           <PieChart
@@ -205,6 +254,34 @@ async function getDeposits() {
     cummulativerEthWithdrawals
   );
 
+  let sumStEth = subtractArrays(
+    stEthDeposits as BlockData[],
+    stEthWithdrawals as BlockData[]
+  );
+
+  let sumREth = subtractArrays(
+    rEthDeposits as BlockData[],
+    rEthWithdrawals as BlockData[]
+  );
+
+  let chartDataSumStEth = extractAmountsAndTimestamps(
+    subtractArrays(sumStEth, sumREth)
+  );
+
+  // let chartDataStEthCumulative = extractAmountsAndTimestampsWithPrevious(
+  //   cummulativestEthDeposits,
+  //   cummulativerEthDeposits
+  // );
+
+  let chartDataSumREth = extractAmountsAndTimestamps(
+    subtractArrays(sumREth, sumStEth)
+  );
+
+  // let chartDataREthCumulative = extractAmountsAndTimestampsWithPrevious(
+  //   cummulativerEthDeposits,
+  //   cummulativestEthDeposits
+  // );
+
   return {
     rEthDeposits,
     totalrEthDeposits,
@@ -214,8 +291,14 @@ async function getDeposits() {
     cummulativestEthDeposits,
     chartDataDepositsDaily,
     chartDataDepositsCumulative,
+    stEthWithdrawals,
+    totalstEthWithdrawals,
+    totalrEthWithdrawals,
+    cummulativestEthWithdrawals,
     chartDataWithdrawalsDaily,
     chartDataWithdrawalsCumulative,
+    chartDataSumStEth,
+    chartDataSumREth,
   };
 }
 // async function getLastDeposits() {

@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
+import { cloneDeep } from "lodash";
 
 const dataConfig = {
   labels: [],
@@ -27,7 +28,7 @@ const dataConfig = {
     //   data: [],
     // },
     {
-      label: "Stacked StEth",
+      label: "stEth",
       fill: false,
       lineTension: 0.1,
       pointStyle: "rect",
@@ -47,7 +48,7 @@ const dataConfig = {
       data: [],
     },
     {
-      label: "Stacked REth",
+      label: "rEth",
       fill: false,
       lineTension: 0.1,
       pointStyle: "rect",
@@ -71,13 +72,20 @@ const dataConfig = {
 
 const LineChart = (data: any) => {
   const chartData = useMemo(() => {
-    const internalChartData = dataConfig;
+    const internalChartData = cloneDeep(dataConfig);
     internalChartData.labels = data.data.timestamps;
     internalChartData.datasets.forEach((dataset, index) => {
       dataset.data = data.data.amounts[index];
+      dataset.label = data.data.namedLabels[index];
     });
+    // Todo: change dataset generation
+    if (data.data.namedLabels.length === 1) {
+      internalChartData.datasets.pop();
+    }
     return internalChartData;
   }, [data]);
+
+  console.log(chartData);
 
   return (
     <Line
