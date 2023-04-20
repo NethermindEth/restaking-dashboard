@@ -19,15 +19,15 @@ const dataConfig = {
     {
       label: "stEth",
       data: [],
-      backgroundColor: ["rgba(75, 192, 192, 0.2)"],
-      borderColor: ["rgba(75, 192, 192, 1)"],
+      backgroundColor: ["rgba(26, 12, 109, 0.6)"],
+      borderColor: ["rgba(26, 12, 109, 1)"],
       borderWidth: 1,
     },
     {
       label: "rEth",
       data: [],
-      backgroundColor: ["rgba(255, 206, 86, 0.2)"],
-      borderColor: ["rgba(255, 206, 86, 1)"],
+      backgroundColor: ["rgba(255, 184, 0, 0.6)"],
+      borderColor: ["rgba(255, 184, 0, 1)"],
       borderWidth: 1,
     },
   ],
@@ -59,6 +59,7 @@ export default (data: any) => {
           x: { stacked: true, min: 0, max: 30 },
           y: { stacked: true },
         },
+        color: "rgb(26, 12, 109)",
       }}
     />
   );

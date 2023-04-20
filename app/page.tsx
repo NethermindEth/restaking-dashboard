@@ -19,8 +19,6 @@ import {
 import Image from "next/image";
 
 export default async function Home() {
-  // const { deposits } = await getDeposits();
-  // const latestDeposits = await getLastDeposits();
   const {
     rEthDeposits,
     totalrEthDeposits,
@@ -48,9 +46,9 @@ export default async function Home() {
   console.log("Deposits", chartDataDepositsDaily, chartDataDepositsCumulative);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 font-semibold">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <div className="fixed bottom-0 left-0 h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none">
+    <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
+      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
+        <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none">
           <Image
             src={"/logo.png"}
             alt="EigenLayer Logo"
@@ -61,16 +59,16 @@ export default async function Home() {
         </div>
       </div>
       <div className="my-8 flex ">
-        <div className="p-6 mx-4 shadow-md rounded-md text-center data-on-top">
-          <p className="">Staked rETH</p>
-          <p className="">
-            {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
-          </p>
-        </div>
-        <div className="p-6 mx-4 shadow-md rounded-md text-center data-on-top">
+        <div className="data-card data-card-steth py-8 px-12 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <p className="">Staked stEth</p>
           <p className="">
             {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
+          </p>
+        </div>
+        <div className="data-card data-card-reth py-8 px-12 md:px-24 mx-4 shadow-lg rounded-md text-center">
+          <p className="">Staked rETH</p>
+          <p className="">
+            {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
           </p>
         </div>
       </div>
@@ -93,7 +91,7 @@ export default async function Home() {
           </div>
         </div> */}
 
-      <div className="staking-dashboard w-full">
+      <div className="staking-dashboard w-full md:w-2/3">
         <div className="charts-homepage">
           <h3>Staked LSTs by date</h3>
           <div className="chart-staked-lst-date">
@@ -107,7 +105,7 @@ export default async function Home() {
             />
           </div>
         </div>
-        <div className="charts-homepage mt-6">
+        <div className="charts-homepage mt-10">
           <h3>Cummulative staked LSTs</h3>
           <div className="chart-2">
             <LineChart
@@ -121,7 +119,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="charts-homepage mt-6">
+        <div className="charts-homepage mt-10">
           <h3>Withdrawn LSTs by date</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
@@ -134,7 +132,7 @@ export default async function Home() {
             />
           </div>
         </div>
-        <div className="charts-homepage mt-6">
+        <div className="charts-homepage mt-10">
           <h3>Cummulative withdrawn LSTs</h3>
           <div className="chart-2">
             <LineChart
@@ -175,19 +173,18 @@ export default async function Home() {
           </div>
         </div> */}
 
-        {/* <div className="charts-homepage pie-chart-deposits w-1/2 mx-auto">
+        <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-10">
           <h3>PieChart of restaked tokens</h3>
           <PieChart
             data={{
               amounts: [
-                latestDeposits.amountNative,
-                latestDeposits.amountStEth,
-                latestDeposits.amountREth,
+                totalstEthDeposits - totalstEthWithdrawals,
+                totalrEthDeposits - totalrEthWithdrawals,
               ],
-              labels: ["restaked ETH", "restaked StEth", "restaked REth"],
+              labels: ["Restaked StEth", "Restaked REth"],
             }}
           />
-        </div> */}
+        </div>
       </div>
     </main>
   );

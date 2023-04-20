@@ -6,6 +6,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
+  --whitish: rgba(235, 235, 235, 1);
   --accent-color: rgb(26, 12, 109);
   --secondary-accent-color: rgb(255, 184, 0);
 }
@@ -19,6 +20,7 @@
 } */
 
 body {
+  font-family: Abcreprovariable, sans-serif;
   color: rgb(var(--accent-color)) !important;
   background: linear-gradient(
       to bottom,
@@ -28,9 +30,18 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-.data-on-top {
-  color: rgb(var(--foreground-rgb));
-  background-color: rgb(var(--accent-color));
+.data-card-steth {
+  color: var(--whitish);
+  background-color: var(--accent-color);
+}
+
+.data-card-reth {
+  color: var(--accent-color);
+  background-color: var(--secondary-accent-color);
+}
+
+h3 {
+  color: var(--accent-color);
 }
 
 /* .staking-dashboard {
