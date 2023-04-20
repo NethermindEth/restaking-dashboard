@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "typechain --target ethers-v6 --out-dir typechain abi/*.json"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.20.0",
@@ -29,6 +30,8 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
+    "@typechain/ethers-v6": "^0.3.0",
+    "typechain": "^8.1.1",
     "@types/lodash": "^4.14.194",
     "encoding": "^0.1.13"
   }
