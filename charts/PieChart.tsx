@@ -7,15 +7,14 @@ const dataConfig = {
   datasets: [
     {
       data: [],
-
       backgroundColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(75, 192, 192, 1)",
+        "rgba(26, 12, 109, 1)",
+        "rgba(255, 184, 0, 1)",
         "rgba(255, 206, 86, 1)",
       ],
       hoverBackgroundColor: [
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
+        "rgba(26, 12, 109, 0.6)",
+        "rgba(255, 184, 0, 0.6)",
         "rgba(255, 206, 86, 0.2)",
       ],
     },
