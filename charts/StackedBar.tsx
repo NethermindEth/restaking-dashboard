@@ -25,9 +25,9 @@ const dataConfig = {
     {
       label: "Beacon Chain Eth",
       data: [],
-      backgroundColor: "rgba(14, 170, 0, 0.2)",
+      backgroundColor: "rgba(254, 156, 147, 0.6)",
 
-      borderColor: ["rgba(14, 170, 0, 1)"],
+      borderColor: ["rgba(254, 156, 147, 1)"],
       borderWidth: 1,
     },
   ],

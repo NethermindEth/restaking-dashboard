@@ -43,7 +43,7 @@ export default async function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
+      <div className="z-10 max-w-5xl items-center justify-between font-mono text-sm">
         <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none lgmb-12">
           <Image
             src={"/logo.png"}
@@ -54,20 +54,20 @@ export default async function Home() {
           <p className="text-lg md:text-2xl ml-4">EigenLayer Stats</p>
         </div>
       </div>
-      <div className="my-8 flex ">
-        <div className="data-card data-card-steth py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <p className="text-sm md:text-base pb-2 md:pb-5">Staked stEth</p>
+      <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
+        <div className="data-card data-card-steth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+          <p className="text-sm md:text-base pb-2 md:pb-5">Staked stETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
           </p>
         </div>
-        <div className="data-card data-card-reth py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+        <div className="data-card data-card-reth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <p className="text-sm md:text-base pb-2 md:pb-5">Staked rETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
           </p>
         </div>
-        <div className="data-card data-card-eth py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+        <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <p className="text-sm md:text-base pb-2 md:pb-5">Beacon Chain ETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalBeaconChainStakes)}
@@ -96,27 +96,27 @@ export default async function Home() {
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Cummulative staked tokens by day
+            Cummulative deposited tokens by day
           </h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cummulative staked tokens by day",
+                title: "Cummulative deposited tokens by day",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
-                namedLabels: ["stEth", "rEth", "Beacon Chain ETH"],
+                namedLabels: ["stETH", "rETH", "Beacon Chain ETH"],
               }}
             />
           </div>
         </div>
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Staked tokens by day</h3>
+          <h3 className="text-center text-xl">Deposited tokens by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
                 amounts: chartDataDepositsDaily.amounts,
                 labels: chartDataDepositsDaily.timestamps,
-                namedLabels: ["stEth", "rEth", "Beacon Chain ETH"],
+                namedLabels: ["stETH", "rETH", "Beacon Chain ETH"],
               }}
               title="Staked tokens by day"
             />
@@ -124,14 +124,14 @@ export default async function Home() {
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Cummulative withdrawn tokens</h3>
+          <h3 className="text-center text-xl">Deposited withdrawn tokens</h3>
           <div className="chart-2">
             <LineChart
               data={{
                 title: "Cummulative withdrawn tokens",
                 amounts: chartDataWithdrawalsCumulative.amounts,
                 timestamps: chartDataWithdrawalsCumulative.timestamps,
-                namedLabels: ["stEth", "rEth"],
+                namedLabels: ["stETH", "rETH"],
               }}
             />
           </div>
@@ -144,7 +144,7 @@ export default async function Home() {
               data={{
                 amounts: chartDataWithdrawalsDaily.amounts,
                 labels: chartDataWithdrawalsDaily.timestamps,
-                namedLabels: ["stEth", "rEth"],
+                namedLabels: ["stETH", "rETH"],
               }}
               title="Withdrawn tokens by day"
             />
@@ -179,7 +179,7 @@ export default async function Home() {
         </div> */}
 
         <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
-          <h3 className="text-center text-xl">PieChart of restaked tokens</h3>
+          <h3 className="text-center text-xl">Deposited tokens</h3>
           <PieChart
             data={{
               amounts: [
@@ -187,11 +187,7 @@ export default async function Home() {
                 totalrEthDeposits - totalrEthWithdrawals,
                 totalBeaconChainStakes,
               ],
-              labels: [
-                "Restaked StEth",
-                "Restaked REth",
-                "Restaked Beacon Chain ETH",
-              ],
+              labels: ["stETH", "RETH", "Beacon Chain ETH"],
             }}
           />
         </div>
