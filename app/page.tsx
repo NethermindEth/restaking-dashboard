@@ -197,7 +197,7 @@ export default async function Home() {
                 (totalrEthDeposits - totalrEthWithdrawals) * rEthRate,
                 totalBeaconChainStakes,
               ],
-              labels: ["stETH", "rETH", "Beacon Chain ETH"],
+              labels: ["stETH", "rETH (as ETH)", "Beacon Chain ETH"],
             }}
           />
         </div>
