@@ -5,10 +5,12 @@
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
+  --background-end-rgb: rgb(255, 255, 255);
   --whitish: rgba(235, 235, 235, 1);
   --accent-color: rgb(26, 12, 109);
   --secondary-accent-color: rgb(255, 184, 0);
+  --alternative-bg: rgb(202, 223, 255);
+  --tertiary-bg: rgb(14, 170, 0);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -22,12 +24,8 @@
 body {
   font-family: Abcreprovariable, sans-serif;
   color: rgb(var(--accent-color)) !important;
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: linear-gradient(to bottom, transparent, var(--background-end-rgb))
+    var(--alternative-bg);
 }
 
 .data-card-steth {
