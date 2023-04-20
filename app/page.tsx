@@ -56,19 +56,38 @@ export default async function Home() {
       </div>
       <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
         <div className="data-card data-card-steth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <p className="text-sm md:text-base pb-2 md:pb-5">Staked stETH</p>
+          <span className="inline-block">
+            <Image
+              src={"/steth_logo.webp"}
+              alt="stETH"
+              width={48}
+              height={48}
+            />
+          </span>
+          <p className="text-sm md:text-base">Staked stETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
           </p>
         </div>
         <div className="data-card data-card-reth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <p className="text-sm md:text-base pb-2 md:pb-5">Staked rETH</p>
+          <span className="inline-block ">
+            <Image src={"/reth.webp"} alt="rETH" width={48} height={48} />
+          </span>
+          <p className="text-sm md:text-base">Staked rETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
           </p>
         </div>
         <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <p className="text-sm md:text-base pb-2 md:pb-5">Beacon Chain ETH</p>
+          <span className="inline-block">
+            <Image
+              src={"/beaconChainETH.png"}
+              alt="ETH"
+              width={48}
+              height={48}
+            />
+          </span>
+          <p className="text-sm md:text-base">Beacon Chain ETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalBeaconChainStakes)}
           </p>
