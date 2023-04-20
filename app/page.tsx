@@ -51,7 +51,7 @@ export default async function Home() {
             width={64}
             height={72}
           />
-          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats</p>
+          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats on Testnet</p>
         </div>
       </div>
       <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
