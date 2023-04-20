@@ -91,9 +91,9 @@ export default async function Home() {
           </div>
         </div> */}
 
-      <div className="staking-dashboard w-full md:w-2/3">
+      <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage">
-          <h3>Staked LSTs by date</h3>
+          <h3>Staked tokens by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
@@ -101,16 +101,16 @@ export default async function Home() {
                 labels: chartDataDepositsDaily.timestamps,
                 namedLabels: ["stEth", "rEth"],
               }}
-              title="Staked LSTs by date"
+              title="Staked tokens by day"
             />
           </div>
         </div>
-        <div className="charts-homepage mt-10">
-          <h3>Cummulative staked LSTs</h3>
+        <div className="charts-homepage mt-16">
+          <h3>Cummulative staked tokens by day</h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cummulative staked LSTs",
+                title: "Cummulative staked tokens by day",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
                 namedLabels: ["stEth", "rEth"],
@@ -119,8 +119,8 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="charts-homepage mt-10">
-          <h3>Withdrawn LSTs by date</h3>
+        <div className="charts-homepage mt-16">
+          <h3>Withdrawn tokens by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
@@ -128,16 +128,16 @@ export default async function Home() {
                 labels: chartDataWithdrawalsDaily.timestamps,
                 namedLabels: ["stEth", "rEth"],
               }}
-              title="Withdrawn LSTs by date"
+              title="Withdrawn tokens by day"
             />
           </div>
         </div>
-        <div className="charts-homepage mt-10">
-          <h3>Cummulative withdrawn LSTs</h3>
+        <div className="charts-homepage mt-16">
+          <h3>Cummulative withdrawn tokens</h3>
           <div className="chart-2">
             <LineChart
               data={{
-                title: "Cummulative withdrawn LSTs",
+                title: "Cummulative withdrawn tokens",
                 amounts: chartDataWithdrawalsCumulative.amounts,
                 timestamps: chartDataWithdrawalsCumulative.timestamps,
                 namedLabels: ["stEth", "rEth"],
@@ -173,7 +173,7 @@ export default async function Home() {
           </div>
         </div> */}
 
-        <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-10">
+        <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
           <h3>PieChart of restaked tokens</h3>
           <PieChart
             data={{
@@ -185,6 +185,18 @@ export default async function Home() {
             }}
           />
         </div>
+      </div>
+      <div className="mt-32">
+        <p className="flex items-center">
+          <span className="pr-2">Made with ❤️ at Nethermind </span>
+          <Image
+            src={"/nethermind.png"}
+            width={32}
+            height={32}
+            alt={"Nethermind logo"}
+            style={{ display: "inline-block" }}
+          />
+        </p>
       </div>
     </main>
   );
