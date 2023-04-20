@@ -54,6 +54,7 @@ export default (data: any) => {
       data={chartData}
       options={{
         maintainAspectRatio: true,
+        responsive: true,
         normalized: true,
         scales: {
           x: { stacked: true, min: 0, max: 30 },

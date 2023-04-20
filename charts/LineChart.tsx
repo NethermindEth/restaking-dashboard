@@ -91,8 +91,8 @@ const LineChart = (data: any) => {
       title={data.title}
       options={{
         maintainAspectRatio: true,
-
         responsive: true,
+        normalized: true,
         color: "rgb(26, 12, 109)",
       }}
     />

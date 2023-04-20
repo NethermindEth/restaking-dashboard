@@ -86,7 +86,9 @@ export default async function Home() {
 
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage mt-16">
-          <h3>Cummulative staked tokens by day</h3>
+          <h3 className="text-center text-xl">
+            Cummulative staked tokens by day
+          </h3>
           <div className="chart-2">
             <LineChart
               data={{
@@ -99,7 +101,7 @@ export default async function Home() {
           </div>
         </div>
         <div className="charts-homepage mt-16">
-          <h3>Staked tokens by day</h3>
+          <h3 className="text-center text-xl">Staked tokens by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
@@ -113,7 +115,7 @@ export default async function Home() {
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3>Cummulative withdrawn tokens</h3>
+          <h3 className="text-center text-xl">Cummulative withdrawn tokens</h3>
           <div className="chart-2">
             <LineChart
               data={{
@@ -127,7 +129,7 @@ export default async function Home() {
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3>Withdrawn tokens by day</h3>
+          <h3 className="text-center text-xl">Withdrawn tokens by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
@@ -168,7 +170,7 @@ export default async function Home() {
         </div> */}
 
         <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
-          <h3>PieChart of restaked tokens</h3>
+          <h3 className="text-center text-xl">PieChart of restaked tokens</h3>
           <PieChart
             data={{
               amounts: [
