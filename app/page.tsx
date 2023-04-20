@@ -104,7 +104,7 @@ export default async function Home() {
                 title: "Cummulative staked tokens by day",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
-                namedLabels: ["stEth", "rEth"],
+                namedLabels: ["stEth", "rEth", "Beacon Chain ETH"],
               }}
             />
           </div>
@@ -116,7 +116,7 @@ export default async function Home() {
               data={{
                 amounts: chartDataDepositsDaily.amounts,
                 labels: chartDataDepositsDaily.timestamps,
-                namedLabels: ["stEth", "rEth"],
+                namedLabels: ["stEth", "rEth", "Beacon Chain ETH"],
               }}
               title="Staked tokens by day"
             />
@@ -185,8 +185,13 @@ export default async function Home() {
               amounts: [
                 totalstEthDeposits - totalstEthWithdrawals,
                 totalrEthDeposits - totalrEthWithdrawals,
+                totalBeaconChainStakes,
               ],
-              labels: ["Restaked StEth", "Restaked REth"],
+              labels: [
+                "Restaked StEth",
+                "Restaked REth",
+                "Restaked Beacon Chain ETH",
+              ],
             }}
           />
         </div>
@@ -231,7 +236,9 @@ async function getDeposits() {
     .from("consumablebeaconchainstakeseth")
     .select("*");
   beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
-  let totalBeaconChainStakes = sumTotalAmounts(beaconChainStakes as BlockData[]);
+  let totalBeaconChainStakes = sumTotalAmounts(
+    beaconChainStakes as BlockData[]
+  );
   let cummulativeBeaconChainStakes = accumulateAmounts(
     beaconChainStakes as BlockData[]
   );
@@ -239,12 +246,14 @@ async function getDeposits() {
   // Deposits prepared for charts.
   let chartDataDepositsDaily = extractAmountsAndTimestamps(
     stEthDeposits as BlockData[],
-    rEthDeposits as BlockData[]
+    rEthDeposits as BlockData[],
+    beaconChainStakes as BlockData[]
   );
 
   let chartDataDepositsCumulative = extractAmountsAndTimestampsWithPrevious(
     cummulativestEthDeposits,
-    cummulativerEthDeposits
+    cummulativerEthDeposits,
+    cummulativeBeaconChainStakes
   );
 
   // Withdrawals

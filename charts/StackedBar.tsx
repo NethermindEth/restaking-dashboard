@@ -8,14 +8,6 @@ const dataConfig = {
   labels: [],
 
   datasets: [
-    // {
-    //   label: "Staked ETH",
-    //   data: [],
-    //   backgroundColor: "rgba(255, 99, 132, 0.2)",
-
-    //   borderColor: ["rgba(255, 99, 132, 1)"],
-    //   borderWidth: 1,
-    // },
     {
       label: "stEth",
       data: [],
@@ -28,6 +20,14 @@ const dataConfig = {
       data: [],
       backgroundColor: ["rgba(255, 184, 0, 0.6)"],
       borderColor: ["rgba(255, 184, 0, 1)"],
+      borderWidth: 1,
+    },
+    {
+      label: "Beacon Chain Eth",
+      data: [],
+      backgroundColor: "rgba(14, 170, 0, 0.2)",
+
+      borderColor: ["rgba(14, 170, 0, 1)"],
       borderWidth: 1,
     },
   ],
@@ -44,6 +44,10 @@ export default (data: any) => {
     });
     // Todo: change dataset generation
     if (data.data.namedLabels.length === 1) {
+      internalChartData.datasets.pop();
+      internalChartData.datasets.pop();
+    }
+    if (data.data.namedLabels.length === 2) {
       internalChartData.datasets.pop();
     }
     return internalChartData;
