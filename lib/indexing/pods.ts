@@ -2,7 +2,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
 import { EigenPodManager__factory } from "../../typechain";
 
 // serialization polyfill

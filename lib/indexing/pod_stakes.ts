@@ -3,7 +3,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
 import { EigenPod__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
 import { EigenPodStakedEvent } from "../../typechain/EigenPod";

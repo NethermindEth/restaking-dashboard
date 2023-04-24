@@ -2,7 +2,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
 import { StrategyManager__factory } from "../../typechain";
 
 // serialization polyfill

@@ -4,7 +4,7 @@ import { supabase } from "../supabaseClient";
 import { addressEq } from "./utils/address";
 import { rangeChunkMap } from "./utils/chunk";
 import { TransactionTrace, traceCallWalk } from "./utils/trace";
-import { getIndexingEndBlock, getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
