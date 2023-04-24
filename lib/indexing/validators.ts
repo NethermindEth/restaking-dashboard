@@ -1,9 +1,9 @@
+import { ethers } from "ethers";
 import Bottleneck from "bottleneck";
 import { supabase } from "../supabaseClient";
 
 // serialization polyfill
 import "./utils/bigint";
-import { ethers } from "ethers";
 
 interface Validator {
   index: number;
