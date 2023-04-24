@@ -30,7 +30,7 @@ interface QueuedShareWithdrawal {
   // caller: string;
 }
 
-async function indexQueuedWithdrawalsRange(startingBlock: number, endBlock: number, chunkSize: number) {
+async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number, chunkSize: number) {
   const index: { withdrawals: QueuedWithdrawal[], shareWithdrawals: QueuedShareWithdrawal[] } = {
     withdrawals: [],
     shareWithdrawals: []
@@ -39,7 +39,7 @@ async function indexQueuedWithdrawalsRange(startingBlock: number, endBlock: numb
   const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
   
   await Promise.all(
-    rangeChunkMap(startingBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
       const [withdrawalLogs, shareWithdrawalLogs] = await Promise.all([
         strategyManager.queryFilter(strategyManager.getEvent("WithdrawalQueued"), fromBlock, toBlock),
         strategyManager.queryFilter(strategyManager.getEvent("ShareWithdrawalQueued"), fromBlock, toBlock),
@@ -79,10 +79,10 @@ async function indexQueuedWithdrawalsRange(startingBlock: number, endBlock: numb
 }
 
 export async function indexQueuedWithdrawals() {
-  const startingBlock = await getIndexingStartBlock("QueuedWithdrawals");
+  const startBlock = await getIndexingStartBlock("QueuedWithdrawals");
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexQueuedWithdrawalsRange(startingBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  const results = await indexQueuedWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await Promise.all([
     supabase.from("_QueuedWithdrawals").insert(results.withdrawals),

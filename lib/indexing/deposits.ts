@@ -108,7 +108,7 @@ function isStraightforwardDeposit(
 }
 
 async function indexDepositsRange(
-  startingBlock: number,
+  startBlock: number,
   endBlock: number,
   chunkSize: number
 ): Promise<Deposit[]> {
@@ -120,7 +120,7 @@ async function indexDepositsRange(
   const beaconChainStrategy = await strategyManager.beaconChainETHStrategy();
 
   await Promise.all(
-    rangeChunkMap(startingBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
       const txLogs = await getTransactionDepositsAndTransfers(strategyManager, fromBlock, toBlock);
       const traceRequests: { block: number, request: Promise<TransactionTrace> }[] = [];
 
@@ -201,10 +201,10 @@ async function indexDepositsRange(
 }
 
 export async function indexDeposits() {
-  const startingBlock = await getIndexingStartBlock("Deposits");
+  const startBlock = await getIndexingStartBlock("Deposits");
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexDepositsRange(startingBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  const results = await indexDepositsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Deposits").insert(results);
   await setIndexingStartBlock("Deposits", endBlock);

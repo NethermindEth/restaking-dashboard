@@ -15,13 +15,13 @@ interface Withdrawal {
   nonce: bigint;
 }
 
-async function indexWithdrawalsRange(startingBlock: number, endBlock: number, chunkSize: number) {
+async function indexWithdrawalsRange(startBlock: number, endBlock: number, chunkSize: number) {
   const index: Withdrawal[] = [];
 
   const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
   
   await Promise.all(
-    rangeChunkMap(startingBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
       const withdrawalLogs = await strategyManager.queryFilter(strategyManager.getEvent("WithdrawalCompleted"), fromBlock, toBlock);
 
       withdrawalLogs.forEach(log => {
@@ -38,10 +38,10 @@ async function indexWithdrawalsRange(startingBlock: number, endBlock: number, ch
 }
 
 export async function indexWithdrawals() {
-  const startingBlock = await getIndexingStartBlock("Withdrawals");
+  const startBlock = await getIndexingStartBlock("Withdrawals");
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexWithdrawalsRange(startingBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  const results = await indexWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Withdrawals").insert(results);
   await setIndexingStartBlock("Withdrawals", endBlock);

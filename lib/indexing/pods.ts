@@ -15,7 +15,7 @@ interface Pod {
 }
 
 async function indexPodsRange(
-  startingBlock: number,
+  startBlock: number,
   endBlock: number,
   chunkSize: number
 ): Promise<Pod[]> {
@@ -24,7 +24,7 @@ async function indexPodsRange(
   const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_MANAGER_ADDRESS, provider);
 
   await Promise.all(
-    rangeChunkMap(startingBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
       const deployedPodsLogs = await eigenPodManager.queryFilter(
         eigenPodManager.getEvent("PodDeployed"),
         fromBlock,
@@ -45,10 +45,10 @@ async function indexPodsRange(
 }
 
 export async function indexPods() {
-  const startingBlock = await getIndexingStartBlock("Pods");
+  const startBlock = await getIndexingStartBlock("Pods");
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexPodsRange(startingBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  const results = await indexPodsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Pods").insert(results);
   await setIndexingStartBlock("Pods", endBlock);
