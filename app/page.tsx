@@ -229,7 +229,12 @@ export default async function Home() {
         </div>
 
         <LeaderBoard
-          boardData={groupedStakers as any}
+          boardData={{
+            ethStakers: groupedStakers,
+            stethStakers: stakersSteth,
+            rethStakers: stakersReth,
+            beaconchainethStakers: stakersBeaconChainEth,
+          }}
           title="Leader Board (total Staked ETH)"
         />
       </div>
@@ -385,8 +390,7 @@ async function getDeposits() {
         : acc.push(cur);
       return acc;
     }, [] as UserData[])
-    .sort((a, b) => b.total_deposits - a.total_deposits)
-    .slice(0, 20);
+    .sort((a, b) => b.total_deposits - a.total_deposits);
 
   return {
     rEthDeposits,

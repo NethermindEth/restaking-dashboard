@@ -48,6 +48,19 @@ h3 {
   color: var(--accent-color);
 }
 
+.button-active {
+  color: var(--whitish);
+  background-color: var(--accent-color);
+  
+}
+.button-inactive{
+  color: var(--accent-color);
+  background-color:var(--alternative-bg);
+}
+button:hover{
+  background-color: var(--accent-color);
+  color: var(--whitish);
+}
 /* .staking-dashboard {
   width: 100%;
 } */
