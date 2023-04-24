@@ -3,7 +3,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
-import { getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
 import { EigenPod__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
 import { EigenPodStakedEvent } from "../../typechain/EigenPod";
@@ -27,7 +27,7 @@ type EigenPodStakedLog = TypedEventLog<
 
 async function indexPodStakesRange(
   startingBlock: number,
-  currentBlock: number,
+  endBlock: number,
   chunkSize: number
 ): Promise<PodStake[]> {
   const index: PodStake[] = [];
@@ -35,7 +35,7 @@ async function indexPodStakesRange(
   const eigenPod = EigenPod__factory.createInterface();
 
   await Promise.all(
-    rangeChunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startingBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
       const stakeLogs = (await provider.getLogs({
         topics: [
           eigenPod.getEvent("EigenPodStaked").topicHash,
@@ -66,10 +66,10 @@ async function indexPodStakesRange(
 
 export async function indexPodStakes() {
   const startingBlock = await getIndexingStartBlock("PodStakes");
-  const currentBlock = await provider.getBlockNumber();
+  const endBlock = await getIndexingEndBlock();
 
-  const results = await indexPodStakesRange(startingBlock, currentBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  const results = await indexPodStakesRange(startingBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_PodStakes").insert(results);
-  await setIndexingStartBlock("PodStakes", currentBlock);
+  await setIndexingStartBlock("PodStakes", endBlock);
 }

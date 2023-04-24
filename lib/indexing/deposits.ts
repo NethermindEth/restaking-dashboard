@@ -3,8 +3,8 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { addressEq } from "./utils/address";
 import { rangeChunkMap } from "./utils/chunk";
-import { getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
 import { TransactionTrace, traceCallWalk } from "./utils/trace";
+import { getIndexingEndBlock, getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
@@ -109,7 +109,7 @@ function isStraightforwardDeposit(
 
 async function indexDepositsRange(
   startingBlock: number,
-  currentBlock: number,
+  endBlock: number,
   chunkSize: number
 ): Promise<Deposit[]> {
   const index: Deposit[] = [];
@@ -120,7 +120,7 @@ async function indexDepositsRange(
   const beaconChainStrategy = await strategyManager.beaconChainETHStrategy();
 
   await Promise.all(
-    rangeChunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startingBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
       const txLogs = await getTransactionDepositsAndTransfers(strategyManager, fromBlock, toBlock);
       const traceRequests: { block: number, request: Promise<TransactionTrace> }[] = [];
 
@@ -202,10 +202,10 @@ async function indexDepositsRange(
 
 export async function indexDeposits() {
   const startingBlock = await getIndexingStartBlock("Deposits");
-  const currentBlock = await provider.getBlockNumber();
+  const endBlock = await getIndexingEndBlock();
 
-  const results = await indexDepositsRange(startingBlock, currentBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  const results = await indexDepositsRange(startingBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Deposits").insert(results);
-  await setIndexingStartBlock("Deposits", currentBlock);
+  await setIndexingStartBlock("Deposits", endBlock);
 }

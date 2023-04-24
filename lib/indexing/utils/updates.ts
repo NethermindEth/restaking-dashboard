@@ -1,3 +1,4 @@
+import { provider } from "../../provider";
 import { supabase } from "../../supabaseClient";
 import { INDEXING_START_BLOCK } from "./constants";
 
@@ -11,6 +12,16 @@ export async function getIndexingStartBlock(key: UpdateKey): Promise<number> {
   return (entry.data !== null && entry.data.length !== 0)
     ? entry.data[0].block + 1
     : INDEXING_START_BLOCK;
+}
+
+export async function getIndexingEndBlock() {
+  const finalizedBlockNumber = (await provider.getBlock("finalized"))?.number;
+
+  if (!finalizedBlockNumber) {
+    throw new Error("Failed while fetching finalized block number");
+  }
+
+  return finalizedBlockNumber;
 }
 
 export async function setIndexingStartBlock(key: UpdateKey, block: number) {
