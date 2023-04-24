@@ -22,13 +22,15 @@ export async function indexValidators() {
   for (let i = 0; ; i += chunkSize) {
     console.log(`Indexing validator ${i}-${i + chunkSize - 1}`);
 
-    const request = await limiter.schedule(() => fetch(
-      "https://goerli.beaconcha.in/api/v1/validator/"
-        + Array.from({ length: chunkSize }).map((_, idx) => `${i + idx}`).join("%2C"),
-      {
+    const validatorList = Array.from({ length: chunkSize })
+      .map((_, idx) => `${i + idx}`)
+      .join(",");
+
+    const request = await limiter.schedule(() => {
+      return fetch("https://goerli.beaconcha.in/api/v1/validator/" + validatorList, {
         method: "POST"
-      }
-    ));
+      });
+    });
 
     const result: { status: string; data: any[] } = await request.json();
 
