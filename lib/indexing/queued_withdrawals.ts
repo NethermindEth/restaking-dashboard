@@ -1,7 +1,7 @@
 import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { chunkMap } from "./utils/chunk";
-import { STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
+import { INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
 
 // serialization polyfill
@@ -83,7 +83,9 @@ export async function indexQueuedWithdrawals() {
     .select("block")
     .order("block", { ascending: false })
     .limit(1);
-  const startingBlock = (lastRow.data !== null && lastRow.data.length !== 0)? lastRow.data[0].block + 1 : 0;
+  const startingBlock = (lastRow.data !== null && lastRow.data.length !== 0)
+    ? lastRow.data[0].block + 1
+    : INDEXING_START_BLOCK;
   const currentBlock = await provider.getBlockNumber();
 
   const results = await indexQueuedWithdrawalsRange(startingBlock, currentBlock, 10_000);

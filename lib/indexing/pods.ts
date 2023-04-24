@@ -2,7 +2,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { chunkMap } from "./utils/chunk";
 import { EigenPodManager__factory } from "../../typechain";
-import { EIGEN_POD_ADDRESS } from "./utils/constants";
+import { EIGEN_POD_ADDRESS, INDEXING_START_BLOCK } from "./utils/constants";
 
 // serialization polyfill
 import "./utils/bigint";
@@ -49,7 +49,9 @@ export async function indexPods() {
     .select("block")
     .order("block", { ascending: false })
     .limit(1);
-  const startingBlock = (lastRow.data !== null && lastRow.data.length !== 0)? lastRow.data[0].block + 1 : 8705851;
+  const startingBlock = (lastRow.data !== null && lastRow.data.length !== 0)
+    ? lastRow.data[0].block + 1
+    : INDEXING_START_BLOCK;
   const currentBlock = await provider.getBlockNumber();
 
   const results = await indexPodsRange(startingBlock, currentBlock, 2_000);
