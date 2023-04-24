@@ -42,5 +42,9 @@ export async function getIndexingEndBlock() {
  * @param block Last indexed block height.
  */
 export async function setLastIndexedBlock(key: UpdateKey, block: number) {
-  await supabase.from("LastIndexedBlocks").upsert({ key, block });
+  const resp = await supabase
+    .from("LastIndexedBlocks")
+    .upsert({ key, block }, { onConflict: "key" });
+
+  if (resp.error) throw resp.error;
 }
