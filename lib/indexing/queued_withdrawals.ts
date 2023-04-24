@@ -1,7 +1,8 @@
 import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
-import { INDEXING_BLOCK_CHUNK_SIZE, INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
+import { getIndexingStartBlock, setIndexingStartBlock } from "./utils/updates";
+import { INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
 
 // serialization polyfill
@@ -78,14 +79,7 @@ async function indexQueuedWithdrawalsRange(startingBlock: number, currentBlock: 
 }
 
 export async function indexQueuedWithdrawals() {
-  const lastRow = await supabase
-    .from("_QueuedWithdrawals")
-    .select("block")
-    .order("block", { ascending: false })
-    .limit(1);
-  const startingBlock = (lastRow.data !== null && lastRow.data.length !== 0)
-    ? lastRow.data[0].block + 1
-    : INDEXING_START_BLOCK;
+  const startingBlock = await getIndexingStartBlock("QueuedWithdrawals");
   const currentBlock = await provider.getBlockNumber();
 
   const results = await indexQueuedWithdrawalsRange(startingBlock, currentBlock, INDEXING_BLOCK_CHUNK_SIZE);
@@ -94,4 +88,5 @@ export async function indexQueuedWithdrawals() {
     supabase.from("_QueuedWithdrawals").insert(results.withdrawals),
     supabase.from("_QueuedShareWithdrawals").insert(results.shareWithdrawals),
   ]);
+  await setIndexingStartBlock("QueuedWithdrawals", currentBlock);
 }
