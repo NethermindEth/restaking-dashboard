@@ -3,7 +3,10 @@ type BlockData = {
   block_chunk: number;
   block_chunk_date: string;
 };
-
+type UserData = {
+  depositor: string;
+  total_deposits: number;
+};
 function mergeBlockChunks(data: BlockData[]): BlockData[] {
   const mergedData: BlockData[] = [];
 
@@ -265,7 +268,7 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
     });
 }
 
-export type { BlockData };
+export type { BlockData, UserData };
 
 export {
   mergeBlockChunks,

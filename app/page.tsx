@@ -1,13 +1,15 @@
 import { Inter } from "next/font/google";
-import LineChart from "../charts/LineChart";
-import PieChart from "../charts/PieChart";
-import StackedBar from "../charts/StackedBar";
+import LineChart from "./components/charts/LineChart";
+import PieChart from "./components/charts/PieChart";
+import StackedBar from "./components/charts/StackedBar";
+import LeaderBoard from "./components/leaderboard";
 
 const inter = Inter({ subsets: ["latin"] });
 
 import { supabase } from "../lib/supabaseClient";
 import {
   BlockData,
+  UserData,
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
@@ -39,6 +41,10 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
+    stakersBeaconChainEth,
+    stakersReth,
+    stakersSteth,
+    groupedStakers,
   } = await getDeposits();
 
   return (
@@ -51,9 +57,12 @@ export default async function Home() {
             width={64}
             height={72}
           />
-          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats on Testnet</p>
+          <p className="text-lg md:text-2xl ml-4">
+            EigenLayer Stats on Testnet
+          </p>
         </div>
       </div>
+
       <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
         <div className="data-card data-card-steth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block">
@@ -212,6 +221,11 @@ export default async function Home() {
             }}
           />
         </div>
+
+        <LeaderBoard
+          boardData={groupedStakers as any}
+          title="Leader Board (total Staked ETH)"
+        />
       </div>
       <div className="mt-32">
         <p className="flex items-center">
@@ -331,6 +345,41 @@ async function getDeposits() {
   //   cummulativestEthDeposits
   // );
 
+  // LeaderBoard
+  let { data: stakersBeaconChainEth } = await supabase
+    .from("stakers_beaconchaineth_deposits_view")
+    .select("*");
+  let { data: stakersReth } = await supabase
+    .from("stakers_reth_deposits_view")
+    .select("*");
+  let { data: stakersSteth } = await supabase
+    .from("stakers_steth_deposits_view")
+    .select("*");
+
+  // Prepare data for final leaderboard
+  let rate = 1;
+  const stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+    depositor: d.depositor,
+    total_deposits: d.total_deposits / rate,
+  }));
+
+  const groupedStakers = [
+    ...(stakersBeaconChainEth as UserData[]),
+    ...(stakersRethConverted as UserData[]),
+    ...(stakersSteth as UserData[]),
+  ]
+    .reduce((acc, cur) => {
+      const existingDepositor = acc.find(
+        (d: UserData) => d.depositor === cur.depositor
+      );
+      existingDepositor
+        ? (existingDepositor.total_deposits += cur.total_deposits)
+        : acc.push(cur);
+      return acc;
+    }, [] as UserData[])
+    .sort((a, b) => b.total_deposits - a.total_deposits)
+    .slice(0, 20);
+
   return {
     rEthDeposits,
     totalrEthDeposits,
@@ -351,5 +400,9 @@ async function getDeposits() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
+    stakersBeaconChainEth,
+    stakersReth,
+    stakersSteth,
+    groupedStakers,
   };
 }
