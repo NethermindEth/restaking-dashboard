@@ -50,10 +50,8 @@ export default async function Home() {
     stakersReth,
     stakersSteth,
     groupedStakers,
+    rEthRate,
   } = await getDeposits();
-
-  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
-  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
@@ -252,6 +250,9 @@ export default async function Home() {
 }
 
 async function getDeposits() {
+  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
+  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
+
   // Move to promise.all
 
   // Deposits
@@ -365,10 +366,9 @@ async function getDeposits() {
     .select("*");
 
   // Prepare data for final leaderboard
-  let rate = 1;
   const stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits / rate,
+    total_deposits: d.total_deposits * rEthRate,
   }));
 
   const groupedStakers = [
@@ -412,5 +412,6 @@ async function getDeposits() {
     stakersReth,
     stakersSteth,
     groupedStakers,
+    rEthRate,
   };
 }
