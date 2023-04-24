@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
-import { chunkMap } from "./utils/chunk";
+import { rangeChunkMap } from "./utils/chunk";
 import { addressEq } from "./utils/address";
 import { TransactionTrace, traceCallWalk } from "./utils/trace";
 import { EIGEN_POD_ADDRESS, INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
@@ -119,7 +119,7 @@ async function indexDepositsRange(
   const beaconChainStrategy = await strategyManager.beaconChainETHStrategy();
 
   await Promise.all(
-    chunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
       const txLogs = await getTransactionDepositsAndTransfers(strategyManager, fromBlock, toBlock);
       const traceRequests: { block: number, request: Promise<TransactionTrace> }[] = [];
 

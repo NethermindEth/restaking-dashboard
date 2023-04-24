@@ -1,6 +1,6 @@
 import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
-import { chunkMap } from "./utils/chunk";
+import { rangeChunkMap } from "./utils/chunk";
 import { INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
 
@@ -38,7 +38,7 @@ async function indexQueuedWithdrawalsRange(startingBlock: number, currentBlock: 
   const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
   
   await Promise.all(
-    chunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
       const [withdrawalLogs, shareWithdrawalLogs] = await Promise.all([
         strategyManager.queryFilter(strategyManager.getEvent("WithdrawalQueued"), fromBlock, toBlock),
         strategyManager.queryFilter(strategyManager.getEvent("ShareWithdrawalQueued"), fromBlock, toBlock),

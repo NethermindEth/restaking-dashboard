@@ -1,6 +1,6 @@
 import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
-import { chunkMap } from "./utils/chunk";
+import { rangeChunkMap } from "./utils/chunk";
 import { EigenPodManager__factory } from "../../typechain";
 import { EIGEN_POD_ADDRESS, INDEXING_START_BLOCK } from "./utils/constants";
 
@@ -23,7 +23,7 @@ async function indexPodsRange(
   const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_ADDRESS, provider);
 
   await Promise.all(
-    chunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
+    rangeChunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
       const deployedPodsLogs = await eigenPodManager.queryFilter(
         eigenPodManager.getEvent("PodDeployed"),
         fromBlock,
