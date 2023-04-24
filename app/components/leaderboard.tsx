@@ -11,9 +11,7 @@ export default function LeaderBoard(data: {
     <div className="mt-16">
       <h3 className="text-center text-xl">{data.title}</h3>
       {boardData?.length ? (
-        <p className="py-4 px-6 text-left text-sm">
-          Showing {boardData.length} top stakers
-        </p>
+        <p />
       ) : (
         <p className="py-4 px-6 text-left text-sm">No staker yet</p>
       )}
@@ -23,7 +21,7 @@ export default function LeaderBoard(data: {
           <table className="table-auto w-full border-collapse   shadow-md rounded-md mt-8">
             <thead className=" text-base">
               <tr>
-                <th className="py-4 px-6 text-left"> </th>
+                <th className="py-4 px-6 text-left"> Rank</th>
                 <th className="py-4 px-6 text-left">Staker address</th>
                 <th className="py-4 px-6 text-left text-sm md:text-base">
                   Total Staked
