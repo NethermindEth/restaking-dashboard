@@ -51,5 +51,5 @@ export async function indexPods() {
   const results = await indexPodsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Pods").insert(results);
-  await setIndexingStartBlock("Pods", endBlock);
+  await setLastIndexedBlock("Pods", endBlock);
 }

@@ -44,5 +44,5 @@ export async function indexWithdrawals() {
   const results = await indexWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Withdrawals").insert(results);
-  await setIndexingStartBlock("Withdrawals", endBlock);
+  await setLastIndexedBlock("Withdrawals", endBlock);
 }

@@ -41,6 +41,6 @@ export async function getIndexingEndBlock() {
  * @param key Key used in the LastIndexedBlocks DB table.
  * @param block Last indexed block height.
  */
-export async function setIndexingStartBlock(key: UpdateKey, block: number) {
+export async function setLastIndexedBlock(key: UpdateKey, block: number) {
   await supabase.from("LastIndexedBlocks").upsert({ key, block });
 }

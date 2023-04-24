@@ -71,5 +71,5 @@ export async function indexPodStakes() {
   const results = await indexPodStakesRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_PodStakes").insert(results);
-  await setIndexingStartBlock("PodStakes", endBlock);
+  await setLastIndexedBlock("PodStakes", endBlock);
 }

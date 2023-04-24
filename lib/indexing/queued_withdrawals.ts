@@ -88,5 +88,5 @@ export async function indexQueuedWithdrawals() {
     supabase.from("_QueuedWithdrawals").insert(results.withdrawals),
     supabase.from("_QueuedShareWithdrawals").insert(results.shareWithdrawals),
   ]);
-  await setIndexingStartBlock("QueuedWithdrawals", endBlock);
+  await setLastIndexedBlock("QueuedWithdrawals", endBlock);
 }
