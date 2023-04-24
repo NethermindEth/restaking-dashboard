@@ -7,6 +7,7 @@ declare global {
   }
 }
 
+// "polyfill" BigInt toJSON
 BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
