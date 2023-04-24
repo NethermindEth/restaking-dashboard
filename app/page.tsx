@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { Inter } from "next/font/google";
 import LineChart from "../charts/LineChart";
 import PieChart from "../charts/PieChart";
@@ -16,7 +17,11 @@ import {
   subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
+import { RocketTokenRETH__factory } from "@/typechain";
 import Image from "next/image";
+
+const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
+const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
 
 export default async function Home() {
   const {
@@ -40,6 +45,9 @@ export default async function Home() {
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
   } = await getDeposits();
+
+  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
+  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
@@ -205,10 +213,10 @@ export default async function Home() {
             data={{
               amounts: [
                 totalstEthDeposits - totalstEthWithdrawals,
-                totalrEthDeposits - totalrEthWithdrawals,
+                (totalrEthDeposits - totalrEthWithdrawals) * rEthRate,
                 totalBeaconChainStakes,
               ],
-              labels: ["stETH", "rETH", "Beacon Chain ETH"],
+              labels: ["stETH", "rETH (as ETH)", "Beacon Chain ETH"],
             }}
           />
         </div>
