@@ -4,7 +4,7 @@ import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { addressEq } from "./utils/address";
 import { TransactionTrace, traceCallWalk } from "./utils/trace";
-import { EIGEN_POD_ADDRESS, INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
+import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
 import { DepositEvent, StrategyManager } from "../../typechain/StrategyManager";
@@ -114,7 +114,7 @@ async function indexDepositsRange(
   const index: Deposit[] = [];
 
   const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
-  const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_ADDRESS, provider);
+  const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_MANAGER_ADDRESS, provider);
 
   const beaconChainStrategy = await strategyManager.beaconChainETHStrategy();
 

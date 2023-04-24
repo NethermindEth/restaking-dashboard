@@ -2,7 +2,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { EigenPodManager__factory } from "../../typechain";
-import { EIGEN_POD_ADDRESS, INDEXING_START_BLOCK } from "./utils/constants";
+import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_START_BLOCK } from "./utils/constants";
 
 // serialization polyfill
 import "./utils/bigint";
@@ -20,7 +20,7 @@ async function indexPodsRange(
 ): Promise<Pod[]> {
   const index: Pod[] = [];
 
-  const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_ADDRESS, provider);
+  const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_MANAGER_ADDRESS, provider);
 
   await Promise.all(
     rangeChunkMap(startingBlock, currentBlock, chunkSize, async (fromBlock, toBlock) => {
