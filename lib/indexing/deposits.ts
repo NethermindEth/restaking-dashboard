@@ -4,7 +4,7 @@ import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { addressEq } from "./utils/address";
 import { TransactionTrace, traceCallWalk } from "./utils/trace";
-import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
+import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, INDEXING_START_BLOCK, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
 import { DepositEvent, StrategyManager } from "../../typechain/StrategyManager";
@@ -210,7 +210,7 @@ export async function indexDeposits() {
     : INDEXING_START_BLOCK;
   const currentBlock = await provider.getBlockNumber();
 
-  const results = await indexDepositsRange(startingBlock, currentBlock, 2_000);
+  const results = await indexDepositsRange(startingBlock, currentBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Deposits").insert(results);
 }

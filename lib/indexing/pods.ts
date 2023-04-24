@@ -2,7 +2,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { EigenPodManager__factory } from "../../typechain";
-import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_START_BLOCK } from "./utils/constants";
+import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, INDEXING_START_BLOCK } from "./utils/constants";
 
 // serialization polyfill
 import "./utils/bigint";
@@ -54,7 +54,7 @@ export async function indexPods() {
     : INDEXING_START_BLOCK;
   const currentBlock = await provider.getBlockNumber();
 
-  const results = await indexPodsRange(startingBlock, currentBlock, 2_000);
+  const results = await indexPodsRange(startingBlock, currentBlock, INDEXING_BLOCK_CHUNK_SIZE);
 
   await supabase.from("_Pods").insert(results);
 }

@@ -8,3 +8,7 @@ export const STETH_ADDRESS = "0x1643E812aE58766192Cf7D2Cf9567dF2C37e9B7F";
 
 // from https://github.com/Layr-Labs/eigenlayer-contracts/blob/master/script/output/M1_deployment_goerli_2023_3_23.json
 export const INDEXING_START_BLOCK = 8705851;
+
+// this depends on the provider's own limits for getLogs, but 2k seems like a
+// good value to agnostically avoid any limit issues
+export const INDEXING_BLOCK_CHUNK_SIZE = 2_000;
