@@ -11,12 +11,24 @@ export async function stEthSharesExchangeRate(
   return await strategy.sharesToUnderlyingView(BigInt(1e18));
 }
 
+export async function stEthSharesExchangeRateAsNumber(
+  provider: ethers.Provider = clientProvider,
+): Promise<number> {
+  return Number(await stEthSharesExchangeRate(provider)) / 1e18;
+}
+
 export async function rEthSharesExchangeRate(
   provider: ethers.Provider = clientProvider,
 ): Promise<bigint> {
   const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
 
   return await rEth.getExchangeRate();
+}
+
+export async function rEthSharesExchangeRateAsNumber(
+  provider: ethers.Provider = clientProvider,
+): Promise<number> {
+  return Number(await rEthSharesExchangeRate(provider)) / 1e18;
 }
 
 export function sharesToEth(shares: bigint, rate: bigint): bigint {
