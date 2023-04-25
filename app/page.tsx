@@ -235,7 +235,7 @@ export default async function Home() {
             rethStakers: stakersReth,
             beaconchainethStakers: stakersBeaconChainEth,
           }}
-          title="Leader Board (total Staked ETH)"
+          title="Staking Leaderboard"
         />
       </div>
       <div className="mt-32">

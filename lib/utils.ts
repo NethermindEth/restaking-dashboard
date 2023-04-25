@@ -268,6 +268,9 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
     });
 }
 
+function getGoerliUrl(address: string): string {
+  return `https://goerli.etherscan.io/address/${address}`;
+}
 export type { BlockData, UserData };
 
 export {
@@ -281,4 +284,5 @@ export {
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
   subtractArrays,
+  getGoerliUrl,
 };

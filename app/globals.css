@@ -61,6 +61,17 @@ button:hover{
   background-color: var(--accent-color);
   color: var(--whitish);
 }
+.table-container{
+  height: 620px;
+}
+tr:hover{
+  background-color:var(--alternative-bg);
+}
+th{
+  background-color: var(--accent-color);
+  color: var(--whitish);
+}
+
 /* .staking-dashboard {
   width: 100%;
 } */
