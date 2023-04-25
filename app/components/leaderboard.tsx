@@ -72,7 +72,7 @@ export default function LeaderBoard(data: any) {
                 .slice(0, 15)
                 .map((userData, index) => (
                   <tr key={index}>
-                    <td className="py-4 px-4 text-left">{index + 1}</td>
+                    <td className="py-4 px-4 text-left text-md">{index + 1}</td>
                     <td
                       className="py-4 px-4 text-left text-sm"
                       style={{ cursor: "pointer" }}
