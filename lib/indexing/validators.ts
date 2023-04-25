@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import Bottleneck from "bottleneck";
 import { supabase } from "../supabaseClient";
+import { getNewValidators } from "./utils/beaconProvider";
 
 // serialization polyfill
 import "./utils/bigint";
@@ -13,40 +13,16 @@ interface Validator {
 }
 
 export async function indexValidators() {
-  const limiter = new Bottleneck({
-    maxConcurrent: 1,
-    minTime: (60000 / 10) + 500,
-  });
-  const chunkSize = 800;
+  const validators: Validator[] = (
+    await getNewValidators(0, 1200, 20)
+  ).filter(el => {
+    return el.validator.withdrawalCredentials.startsWith("0x01");
+  }).map(el => ({
+    index: el.index,
+    balance: el.balance,
+    effectiveBalance: el.validator.effectiveBalance,
+    withdrawalAddress: ethers.getAddress("0x" + el.validator.withdrawalCredentials.slice(-40)),
+  }));
 
-  for (let i = 0; ; i += chunkSize) {
-    console.log(`Indexing validator ${i}-${i + chunkSize - 1}`);
-
-    const validatorList = Array.from({ length: chunkSize })
-      .map((_, idx) => `${i + idx}`)
-      .join(",");
-
-    const request = await limiter.schedule(() => {
-      return fetch("https://goerli.beaconcha.in/api/v1/validator/" + validatorList, {
-        method: "POST"
-      });
-    });
-
-    const result: { status: string; data: any[] } = await request.json();
-
-    if (result.data.length === 0) break;
-
-    const validators: Validator[] = result.data
-      .filter(validator => validator.withdrawalcredentials.startsWith("0x01"))
-      .map(validator => ({
-        index: validator.validatorindex,
-        balance: BigInt(validator.balance),
-        effectiveBalance: BigInt(validator.effectivebalance),
-        withdrawalAddress: ethers.getAddress("0x" + validator.withdrawalcredentials.slice(-40)),
-      }));
-
-    if (validators.length) {
-      await supabase.from("_Validators").upsert(validators);
-    }
-  }
+  await supabase.from("_Validators").upsert(validators);
 }
