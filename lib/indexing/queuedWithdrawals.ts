@@ -1,7 +1,14 @@
 import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
-import { INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
+import {
+  INDEXING_BLOCK_CHUNK_SIZE,
+  STRATEGY_MANAGER_ADDRESS,
+  STETH_STRATEGY_ADDRESS,
+  STETH_ADDRESS,
+  RETH_STRATEGY_ADDRESS,
+  RETH_ADDRESS,
+} from "./utils/constants";
 import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
 import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
 
@@ -37,6 +44,10 @@ async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number,
   };
 
   const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
+  const strategyUnderlyingToken: Record<string, string | Promise<string>> = {
+    [STETH_STRATEGY_ADDRESS]: STETH_ADDRESS,
+    [RETH_STRATEGY_ADDRESS]: RETH_ADDRESS,
+  };
   
   await Promise.all(
     rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
@@ -56,22 +67,25 @@ async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number,
         });
       });
 
-      const strategies = Array.from(new Set(shareWithdrawalLogs.map(el => el.args.strategy)));
-      const underlyingTokens = await Promise.all(strategies.map(strategy => IStrategy__factory.connect(strategy, provider).underlyingToken()));
-      const strategyUnderlyingToken = strategies.reduce((acc, strategy, idx) => {
-        acc[strategy] = underlyingTokens[idx];
-        return acc;
-      }, {} as Record<string, string>);
-
       shareWithdrawalLogs.forEach(log => {
-        index.shareWithdrawals.push({
-          depositor: log.args.depositor,
-          nonce: log.args.nonce,
-          token: strategyUnderlyingToken[log.args.strategy],
-          strategy: log.args.strategy,
-          shares: log.args.shares,
-        });
+        const strategy = log.args.strategy;
+
+        if (!strategyUnderlyingToken[strategy]) {
+          strategyUnderlyingToken[strategy] = IStrategy__factory.connect(strategy, provider).underlyingToken();
+        }
       });
+
+      await Promise.all(
+        shareWithdrawalLogs.map(async log => {
+          index.shareWithdrawals.push({
+            depositor: log.args.depositor,
+            nonce: log.args.nonce,
+            token: await strategyUnderlyingToken[log.args.strategy],
+            strategy: log.args.strategy,
+            shares: log.args.shares,
+          });
+        })
+      );
     })
   );
 
