@@ -2,15 +2,24 @@
 
 import { UserData, getGoerliUrl, roundToDecimalPlaces } from "@/lib/utils";
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function LeaderBoard(data: any) {
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleToggleContent = (data: UserData[], index: number) => {
     setActiveData(data);
     setActiveButton(index);
   };
+
+  const PAGE_SIZE = 10;
+  const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
   return (
     <div className="mt-16 w-full">
@@ -20,7 +29,10 @@ export default function LeaderBoard(data: any) {
           className={`${
             activeButton === 0 ? "button-active" : "button-inactive-steth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
-          onClick={() => handleToggleContent(data.boardData.ethStakers, 0)}
+          onClick={() => {
+            handleToggleContent(data.boardData.ethStakers, 0);
+            setCurrentPage(1);
+          }}
         >
           Total staked
         </button>
@@ -28,7 +40,10 @@ export default function LeaderBoard(data: any) {
           className={`${
             activeButton === 3 ? "data-card-steth" : "button-inactive-steth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
-          onClick={() => handleToggleContent(data.boardData.stethStakers, 3)}
+          onClick={() => {
+            handleToggleContent(data.boardData.stethStakers, 3);
+            setCurrentPage(1);
+          }}
         >
           stETH
         </button>
@@ -36,7 +51,10 @@ export default function LeaderBoard(data: any) {
           className={`${
             activeButton === 2 ? "data-card-reth" : "button-inactive-reth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
-          onClick={() => handleToggleContent(data.boardData.rethStakers, 2)}
+          onClick={() => {
+            handleToggleContent(data.boardData.rethStakers, 2);
+            setCurrentPage(1);
+          }}
         >
           rETH
         </button>
@@ -44,9 +62,10 @@ export default function LeaderBoard(data: any) {
           className={`${
             activeButton === 1 ? "data-card-eth" : "button-inactive-eth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
-          onClick={() =>
-            handleToggleContent(data.boardData.beaconchainethStakers, 1)
-          }
+          onClick={() => {
+            handleToggleContent(data.boardData.beaconchainethStakers, 1);
+            setCurrentPage(1);
+          }}
         >
           Beacon Chain ETH
         </button>
@@ -69,10 +88,12 @@ export default function LeaderBoard(data: any) {
             </thead>
             <tbody>
               {(activeData as UserData[])
-                .slice(0, 15)
+                .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
                 .map((userData, index) => (
                   <tr key={index}>
-                    <td className="py-4 px-4 text-left text-md">{index + 1}</td>
+                    <td className="py-4 px-4 text-left text-md">
+                      {(currentPage - 1) * PAGE_SIZE + index + 1}
+                    </td>
                     <td
                       className="py-4 px-4 text-left text-sm"
                       style={{ cursor: "pointer" }}
@@ -89,6 +110,28 @@ export default function LeaderBoard(data: any) {
                 ))}
             </tbody>
           </table>
+
+          <div className=" pagination flex justify-center items-center mt-4">
+            <button
+              className={`${currentPage === 1 ? "disabled-arrow" : ""}`}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+            <p className="mx-4">
+              Page {currentPage} of {totalPages}
+            </p>
+            <button
+              className={`${
+                currentPage === totalPages ? "disabled-arrow" : ""
+              }`}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
         </div>
       )}
     </div>

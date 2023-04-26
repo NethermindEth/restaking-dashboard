@@ -14,6 +14,7 @@ import {
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
+  getENSNameIfExist,
   mergeBlockChunks,
   roundToDecimalPlaces,
   subtractArrays,
@@ -46,9 +47,9 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
-    stakersReth,
-    stakersSteth,
+    stakersBeaconChainConverted,
+    stakersRethConverted,
+    stakersStethConverted,
     groupedStakers,
     rEthRate,
   } = await getDeposits();
@@ -231,11 +232,11 @@ export default async function Home() {
         <LeaderBoard
           boardData={{
             ethStakers: groupedStakers,
-            stethStakers: stakersSteth,
-            rethStakers: stakersReth,
-            beaconchainethStakers: stakersBeaconChainEth,
+            stethStakers: stakersStethConverted,
+            rethStakers: stakersRethConverted,
+            beaconchainethStakers: stakersBeaconChainConverted.slice(0, 50),
           }}
-          title="Staking Leaderboard"
+          title="Restaking Leaderboard"
         />
       </div>
       <div className="mt-32">
@@ -370,16 +371,28 @@ async function getDeposits() {
     .from("stakers_steth_deposits_view")
     .select("*");
 
-  // Prepare data for final leaderboard
-  const stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
-    depositor: d.depositor,
-    total_deposits: d.total_deposits * rEthRate,
-  }));
-
+  const stakersRethConverted = await Promise.all(
+    (stakersReth as UserData[]).map(async (d) => ({
+      depositor: await getENSNameIfExist(d.depositor, provider),
+      total_deposits: d.total_deposits,
+    }))
+  );
+  const stakersStethConverted = await Promise.all(
+    (stakersSteth as UserData[]).map(async (d) => ({
+      depositor: await getENSNameIfExist(d.depositor, provider),
+      total_deposits: d.total_deposits * rEthRate,
+    }))
+  );
+  const stakersBeaconChainConverted = await Promise.all(
+    (stakersBeaconChainEth as UserData[]).map(async (d) => ({
+      depositor: await getENSNameIfExist(d.depositor, provider),
+      total_deposits: d.total_deposits,
+    }))
+  );
   const groupedStakers = [
-    ...(stakersBeaconChainEth as UserData[]),
+    ...(stakersBeaconChainConverted as UserData[]),
     ...(stakersRethConverted as UserData[]),
-    ...(stakersSteth as UserData[]),
+    ...(stakersStethConverted as UserData[]),
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
@@ -412,9 +425,9 @@ async function getDeposits() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
-    stakersReth,
-    stakersSteth,
+    stakersBeaconChainConverted,
+    stakersRethConverted,
+    stakersStethConverted,
     groupedStakers,
     rEthRate,
   };

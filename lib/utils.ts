@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 type BlockData = {
   total_amount: number;
   block_chunk: number;
@@ -272,6 +274,16 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
 function getGoerliUrl(address: string): string {
   return `https://goerli.etherscan.io/address/${address}`;
 }
+
+async function getENSNameIfExist(
+  address: string,
+  provider: ethers.JsonRpcProvider
+) {
+  //const name = await provider.lookupAddress(address);
+  // return name ? name : address;
+  return address;
+}
+
 export type { BlockData, UserData };
 
 export {
@@ -286,4 +298,5 @@ export {
   extractAmountsAndTimestampsWithPrevious,
   subtractArrays,
   getGoerliUrl,
+  getENSNameIfExist,
 };

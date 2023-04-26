@@ -81,7 +81,7 @@ h3 {
   background-color: var(--secondary-accent-color);
 }
 .table-container{
-  height: 620px;
+  height: 650px;
 }
 
 td{
@@ -96,6 +96,9 @@ th{
   color: var(--whitish);
 }
 
+.pagination {
+  color:var(--accent-color);
+}
 /* .staking-dashboard {
   width: 100%;
 } */
