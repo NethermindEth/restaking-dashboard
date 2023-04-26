@@ -120,7 +120,9 @@ export async function getAllValidators(
       })
     );
 
-    if (!validators.reduce((acc, el) => acc + el.length, 0)) break;
+    const responseCount = validators.reduce((acc, el) => acc + el.length, 0);
+    
+    if (responseCount < chunkSize * concurrentChunks) break;
 
     chunks.push(...validators);
   }
