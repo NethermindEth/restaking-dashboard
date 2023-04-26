@@ -23,10 +23,10 @@ export default function LeaderBoard(data: any) {
 
   useEffect(() => {
     async function fetchEnsNames() {
-      // const cachedEnsNames = localStorage.getItem("ensNames");
-      //   if (cachedEnsNames) {
-      //     setEnsNames(JSON.parse(cachedEnsNames));
-      //   }
+      const cachedEnsNames = localStorage.getItem("ensNames");
+      if (cachedEnsNames) {
+        setEnsNames(JSON.parse(cachedEnsNames));
+      }
 
       const newEnsNames: { [key: string]: string } = {};
       let namesPromises = [];
@@ -43,7 +43,7 @@ export default function LeaderBoard(data: any) {
       });
 
       setEnsNames((prevEnsNames) => ({ ...prevEnsNames, ...newEnsNames }));
-      // localStorage.setItem("ensNames", JSON.stringify(ensNames));
+      localStorage.setItem("ensNames", JSON.stringify(ensNames));
     }
     fetchEnsNames();
   }, [activeData]);

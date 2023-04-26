@@ -373,19 +373,19 @@ async function getDeposits() {
 
   const stakersRethConverted = await Promise.all(
     (stakersReth as UserData[]).map(async (d) => ({
-      depositor: await getENSNameIfExist(d.depositor, provider),
+      depositor: d.depositor,
       total_deposits: d.total_deposits,
     }))
   );
   const stakersStethConverted = await Promise.all(
     (stakersSteth as UserData[]).map(async (d) => ({
-      depositor: await getENSNameIfExist(d.depositor, provider),
+      depositor: d.depositor,
       total_deposits: d.total_deposits * rEthRate,
     }))
   );
   const stakersBeaconChainConverted = await Promise.all(
     (stakersBeaconChainEth as UserData[]).map(async (d) => ({
-      depositor: await getENSNameIfExist(d.depositor, provider),
+      depositor: d.depositor,
       total_deposits: d.total_deposits,
     }))
   );
