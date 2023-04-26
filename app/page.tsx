@@ -25,6 +25,7 @@ import Image from "next/image";
 
 const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
 const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
+const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
   const {
@@ -47,8 +48,8 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainConverted,
-    stakersRethConverted,
+    stakersBeaconChainEth,
+    stakersReth,
     stakersStethConverted,
     groupedStakers,
     rEthRate,
@@ -231,10 +232,10 @@ export default async function Home() {
 
         <LeaderBoard
           boardData={{
-            ethStakers: groupedStakers.slice(0, 50),
-            stethStakers: stakersStethConverted.slice(0, 50),
-            rethStakers: stakersRethConverted.slice(0, 50),
-            beaconchainethStakers: stakersBeaconChainConverted.slice(0, 50),
+            ethStakers: groupedStakers,
+            stethStakers: stakersStethConverted,
+            rethStakers: stakersReth,
+            beaconchainethStakers: stakersBeaconChainEth,
           }}
           title="Restaking Leaderboard"
         />
@@ -361,37 +362,26 @@ async function getDeposits() {
   // );
 
   // LeaderBoard
-  let { data: stakersBeaconChainEth } = await supabase
+  let { data: stakersBeaconChainEth } = (await supabase
     .from("stakers_beaconchaineth_deposits_view")
-    .select("*");
-  let { data: stakersReth } = await supabase
+    .select("*")) as { data: UserData[] };
+  let { data: stakersReth } = (await supabase
     .from("stakers_reth_deposits_view")
-    .select("*");
-  let { data: stakersSteth } = await supabase
+    .select("*")) as { data: UserData[] };
+  let { data: stakersSteth } = (await supabase
     .from("stakers_steth_deposits_view")
-    .select("*");
+    .select("*")) as { data: UserData[] };
 
-  const stakersRethConverted = await Promise.all(
-    (stakersReth as UserData[]).map(async (d) => ({
-      depositor: d.depositor,
-      total_deposits: d.total_deposits,
-    }))
-  );
-  const stakersStethConverted = await Promise.all(
+  let stakersStethConverted = await Promise.all(
     (stakersSteth as UserData[]).map(async (d) => ({
       depositor: d.depositor,
       total_deposits: d.total_deposits * rEthRate,
     }))
   );
-  const stakersBeaconChainConverted = await Promise.all(
-    (stakersBeaconChainEth as UserData[]).map(async (d) => ({
-      depositor: d.depositor,
-      total_deposits: d.total_deposits,
-    }))
-  );
-  const groupedStakers = [
-    ...(stakersBeaconChainConverted as UserData[]),
-    ...(stakersRethConverted as UserData[]),
+
+  let groupedStakers = [
+    ...(stakersBeaconChainEth as UserData[]),
+    ...(stakersReth as UserData[]),
     ...(stakersStethConverted as UserData[]),
   ]
     .reduce((acc, cur) => {
@@ -404,6 +394,32 @@ async function getDeposits() {
       return acc;
     }, [] as UserData[])
     .sort((a, b) => b.total_deposits - a.total_deposits);
+
+  stakersReth = stakersReth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersStethConverted = stakersStethConverted.slice(0, MAX_LEADERBOARD_SIZE);
+  groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
+
+  const allData = [
+    ...stakersReth,
+    ...stakersBeaconChainEth,
+    ...stakersStethConverted,
+    ...groupedStakers,
+  ];
+
+  const allDepositors = Array.from(
+    new Set(allData.map(({ depositor }) => depositor))
+  );
+
+  const lookupPromises = allDepositors.map((depositor) =>
+    provider.lookupAddress(depositor)
+  );
+  const resolvedAddresses = await Promise.all(lookupPromises);
+
+  allData.map(
+    (data, index) =>
+      (data.depositor = resolvedAddresses[index] ?? data.depositor)
+  );
 
   return {
     rEthDeposits,
@@ -425,8 +441,8 @@ async function getDeposits() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainConverted,
-    stakersRethConverted,
+    stakersBeaconChainEth,
+    stakersReth,
     stakersStethConverted,
     groupedStakers,
     rEthRate,
