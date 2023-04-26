@@ -27,10 +27,6 @@ const beaconEthLogo = fetch(
   new URL("../../public/beaconChainETH.png", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
-// const font = fetch(
-//   new URL("../../public/ABCReproVariable.ttf", import.meta.url)
-// ).then((res) => res.arrayBuffer());
-
 export default async function () {
   const {
     totalrEthDeposits,
@@ -41,11 +37,6 @@ export default async function () {
   } = await getDeposits();
   const [logoData, stEthLogoData, rEthLogoData, beaconEthLogoData] =
     await Promise.all([logo, stEthLogo, rEthLogo, beaconEthLogo]);
-  // const logoData = await logo;
-  // const stEthLogoData = await stEthLogo;
-  // const rEthLogoData = await rEthLogo;
-  // const beaconEthLogoData = await beaconEthLogo;
-  // const fontData = await font;
 
   return new ImageResponse(
     (
@@ -157,13 +148,9 @@ export default async function () {
     {
       width: 1200,
       height: 600,
-      // fonts: [
-      //   {
-      //     name: "Abcreprovariable",
-      //     data: fontData,
-      //     style: "normal",
-      //   },
-      // ],
+      headers: {
+        "Cache-Control": "public, max-age=1800",
+      },
     }
   );
 }
