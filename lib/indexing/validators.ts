@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { supabase } from "../supabaseClient";
-import { getNewValidators } from "./utils/beaconProvider";
+import { getAllValidators } from "./utils/beaconProvider";
 
 // serialization polyfill
 import "./utils/bigint";
@@ -14,7 +14,7 @@ interface Validator {
 
 export async function indexValidators() {
   const validators: Validator[] = (
-    await getNewValidators(0, 1200, 20)
+    await getAllValidators(1200, 20)
   ).filter(el => {
     return el.validator.withdrawalCredentials.startsWith("0x01");
   }).map(el => ({
