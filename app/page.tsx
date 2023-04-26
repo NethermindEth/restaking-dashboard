@@ -24,7 +24,9 @@ import { RocketTokenRETH__factory } from "@/typechain";
 import Image from "next/image";
 
 const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
-const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
+export const provider = new ethers.JsonRpcProvider(
+  "https://rpc.ankr.com/eth_goerli"
+);
 
 export default async function Home() {
   const {
@@ -231,10 +233,10 @@ export default async function Home() {
 
         <LeaderBoard
           boardData={{
-            ethStakers: groupedStakers,
-            stethStakers: stakersStethConverted,
-            rethStakers: stakersRethConverted,
-            beaconchainethStakers: stakersBeaconChainConverted,
+            ethStakers: groupedStakers.slice(0, 50),
+            stethStakers: stakersStethConverted.slice(0, 50),
+            rethStakers: stakersRethConverted.slice(0, 50),
+            beaconchainethStakers: stakersBeaconChainConverted.slice(0, 50),
           }}
           title="Restaking Leaderboard"
         />

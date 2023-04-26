@@ -1,25 +1,54 @@
 "use client";
 
 import { UserData, getGoerliUrl, roundToDecimalPlaces } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { provider } from "../page";
 
 export default function LeaderBoard(data: any) {
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [ensNames, setEnsNames] = useState<{ [key: string]: string }>({});
+
+  const PAGE_SIZE = 10;
+  const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
+
+  useEffect(() => {
+    async function fetchEnsNames() {
+      // const cachedEnsNames = localStorage.getItem("ensNames");
+      //   if (cachedEnsNames) {
+      //     setEnsNames(JSON.parse(cachedEnsNames));
+      //   }
+
+      const newEnsNames: { [key: string]: string } = {};
+      let namesPromises = [];
+      let data: UserData;
+      for (data of activeData) {
+        if (!ensNames[data.depositor])
+          namesPromises.push(provider.lookupAddress(data.depositor));
+        else namesPromises.push(ensNames[data.depositor]);
+      }
+      const names = await Promise.all(namesPromises);
+
+      activeData.forEach((data: UserData, index: number) => {
+        newEnsNames[data.depositor] = names[index] || data.depositor;
+      });
+
+      setEnsNames((prevEnsNames) => ({ ...prevEnsNames, ...newEnsNames }));
+      // localStorage.setItem("ensNames", JSON.stringify(ensNames));
+    }
+    fetchEnsNames();
+  }, [activeData]);
 
   const handleToggleContent = (data: UserData[], index: number) => {
     setActiveData(data);
     setActiveButton(index);
   };
-
-  const PAGE_SIZE = 10;
-  const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
   return (
     <div className="mt-16 w-full">
@@ -101,7 +130,7 @@ export default function LeaderBoard(data: any) {
                         window.open(getGoerliUrl(userData.depositor));
                       }}
                     >
-                      {userData.depositor}
+                      {ensNames[userData.depositor]}
                     </td>
                     <td className="py-4 px-4 text-left text-sm">
                       {roundToDecimalPlaces(userData.total_deposits)}
