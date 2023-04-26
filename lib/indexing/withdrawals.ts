@@ -38,7 +38,7 @@ async function indexWithdrawalsRange(startBlock: number, endBlock: number, chunk
 }
 
 export async function indexWithdrawals() {
-  const startBlock = await getIndexingStartBlock("Withdrawals");
+  const startBlock = await getIndexingStartBlock("Withdrawals", true);
   const endBlock = await getIndexingEndBlock();
 
   const results = await indexWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);

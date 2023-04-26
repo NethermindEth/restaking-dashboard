@@ -45,7 +45,7 @@ async function indexPodsRange(
 }
 
 export async function indexPods() {
-  const startBlock = await getIndexingStartBlock("Pods");
+  const startBlock = await getIndexingStartBlock("Pods", true);
   const endBlock = await getIndexingEndBlock();
 
   const results = await indexPodsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);

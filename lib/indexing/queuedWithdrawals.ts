@@ -93,7 +93,7 @@ async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number,
 }
 
 export async function indexQueuedWithdrawals() {
-  const startBlock = await getIndexingStartBlock("QueuedWithdrawals");
+  const startBlock = await getIndexingStartBlock("QueuedWithdrawals", true);
   const endBlock = await getIndexingEndBlock();
 
   const results = await indexQueuedWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);

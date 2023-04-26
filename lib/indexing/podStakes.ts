@@ -65,7 +65,7 @@ async function indexPodStakesRange(
 }
 
 export async function indexPodStakes() {
-  const startBlock = await getIndexingStartBlock("PodStakes");
+  const startBlock = await getIndexingStartBlock("PodStakes", true);
   const endBlock = await getIndexingEndBlock();
 
   const results = await indexPodStakesRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);

@@ -201,7 +201,7 @@ async function indexDepositsRange(
 }
 
 export async function indexDeposits() {
-  const startBlock = await getIndexingStartBlock("Deposits");
+  const startBlock = await getIndexingStartBlock("Deposits", true);
   const endBlock = await getIndexingEndBlock();
 
   const results = await indexDepositsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
