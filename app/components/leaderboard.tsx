@@ -7,9 +7,12 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { provider } from "../page";
+import { ethers } from "ethers";
 
 export default function LeaderBoard(data: any) {
+  const provider = new ethers.JsonRpcProvider(
+    "https://rpc.ankr.com/eth_goerli"
+  );
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);

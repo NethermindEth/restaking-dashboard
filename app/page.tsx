@@ -24,9 +24,7 @@ import { RocketTokenRETH__factory } from "@/typechain";
 import Image from "next/image";
 
 const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
-export const provider = new ethers.JsonRpcProvider(
-  "https://rpc.ankr.com/eth_goerli"
-);
+const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
 
 export default async function Home() {
   const {
