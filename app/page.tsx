@@ -234,7 +234,7 @@ export default async function Home() {
             ethStakers: groupedStakers,
             stethStakers: stakersStethConverted,
             rethStakers: stakersRethConverted,
-            beaconchainethStakers: stakersBeaconChainConverted.slice(0, 50),
+            beaconchainethStakers: stakersBeaconChainConverted,
           }}
           title="Restaking Leaderboard"
         />

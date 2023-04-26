@@ -24,7 +24,7 @@ export default function LeaderBoard(data: any) {
   return (
     <div className="mt-16 w-full">
       <h3 className="text-center text-xl">{data.title}</h3>
-      <div className="flex flex-row mt-3 w-full">
+      <div className="flex flex-col lg:flex-row mt-3 w-full">
         <button
           className={`${
             activeButton === 0 ? "button-active" : "button-inactive-steth"
@@ -76,7 +76,7 @@ export default function LeaderBoard(data: any) {
         <p className="py-6 px-6 text-left text-sm">No staker yet</p>
       )}
       {activeData?.length && (
-        <div className="table-container w-full mt-6 overflow-y-scroll overflow-x-hidden">
+        <div className="w-full mt-6 overflow-x-scroll">
           <table className="table w-full border-collapse shadow-md rounded-md">
             <thead className="text-base">
               <tr>
