@@ -51,19 +51,35 @@ h3 {
 .button-active {
   color: var(--whitish);
   background-color: var(--accent-color);
-  
 }
 
-.button-inactive{
+.button-inactive-eth{
   color: var(--accent-color);
-  background-color:rgba(255, 184, 0, 0.6)
+  background-color:rgba(254, 156, 147, 0.6);
 }
 
-button:hover{
-  background-color: var(--accent-color);
+.button-inactive-steth{
+  color: var(--accent-color);
+  background-color: rgb(202, 223, 255);
+}
+
+.button-inactive-reth{
+  color: var(--accent-color);
+  background-color:rgba(255, 184, 0, 0.6);
+}
+
+.button-inactive-eth:hover{
+  color: var(--accent-color);
+  background-color: var(--tertiary-bg-rgb);
+}
+.button-inactive-steth:hover{
   color: var(--whitish);
+  background-color: var(--accent-color);
 }
-
+.button-inactive-reth:hover{
+  color: var(--accent-color);
+  background-color: var(--secondary-accent-color);
+}
 .table-container{
   height: 620px;
 }

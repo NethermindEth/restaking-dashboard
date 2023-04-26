@@ -18,7 +18,7 @@ export default function LeaderBoard(data: any) {
       <div className="flex flex-row mt-3 w-full">
         <button
           className={`${
-            activeButton === 0 ? "button-active" : "button-inactive"
+            activeButton === 0 ? "button-active" : "button-inactive-steth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
           onClick={() => handleToggleContent(data.boardData.ethStakers, 0)}
         >
@@ -26,17 +26,15 @@ export default function LeaderBoard(data: any) {
         </button>
         <button
           className={`${
-            activeButton === 1 ? "button-active" : "button-inactive"
+            activeButton === 3 ? "data-card-steth" : "button-inactive-steth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
-          onClick={() =>
-            handleToggleContent(data.boardData.beaconchainethStakers, 1)
-          }
+          onClick={() => handleToggleContent(data.boardData.stethStakers, 3)}
         >
-          Beacon Chain ETH
+          stETH
         </button>
         <button
           className={`${
-            activeButton === 2 ? "button-active" : "button-inactive"
+            activeButton === 2 ? "data-card-reth" : "button-inactive-reth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
           onClick={() => handleToggleContent(data.boardData.rethStakers, 2)}
         >
@@ -44,11 +42,13 @@ export default function LeaderBoard(data: any) {
         </button>
         <button
           className={`${
-            activeButton === 3 ? "button-active" : "button-inactive"
+            activeButton === 1 ? "data-card-eth" : "button-inactive-eth"
           } py-1 px-4 mr-2 grow border rounded focus:outline-none text-sm`}
-          onClick={() => handleToggleContent(data.boardData.stethStakers, 3)}
+          onClick={() =>
+            handleToggleContent(data.boardData.beaconchainethStakers, 1)
+          }
         >
-          stETH
+          Beacon Chain ETH
         </button>
       </div>
       {activeData?.length ? (
