@@ -62,7 +62,7 @@ function encodeIndexes(indexes: number[]): string {
  * Gets validator info for the specified validators through the Beacon API and
  * state and re-formats it.
  * @param indexes Validator indexes.
- * @param state State identifier.
+ * @param state State identifier. Refer to the Beacon API documentation.
  * @returns Processed validator info for the specified validators at the
  * specified state.
  */
@@ -99,6 +99,7 @@ export async function getValidators(indexes: number[], state: string): Promise<V
  * Depends on URI length limits, but considering indexes >100_000, a good
  * amount is 1200.
  * @param concurrentChunks Maximum amount of concurrent requests.
+ * @param state State identifier. Refer to the Beacon API documentation.
  * @returns Validator info for all validators.
  */
 export async function getAllValidators(
