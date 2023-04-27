@@ -93,42 +93,59 @@ export async function getValidators(
 }
 
 /**
- * Gets validator info for all the validators at the specified state.
+ * Gets validator info for validators at the specified state starting from
+ * the specified index. The calls are done in batches of
+ * `chunkSize * concurrentChunks` validators, `chunkSize` validators per
+ * Beacon API request. When the end of the validator list is reached,
+ * the search is automatically stopped and the `reachedLast` flag is set in
+ * the return object.
  * @param beaconProviderUrl URL of the Beacon API provider.
+ * @param startIndex Starting index of the search.
+ * @param maxBatches Maximum amount of batches of concurrent chunk fetches
+ * to be done.
  * @param chunkSize Amount of validators to be fetched on each request.
  * Depends on URI length limits, but considering indexes >100_000, a good
  * amount is 1200.
  * @param concurrentChunks Maximum amount of concurrent requests.
  * @param state State identifier. Refer to the Beacon API documentation.
- * @returns Validator info for all validators.
+ * @returns Validator info for all validators and a flag indicating whether
+ * the current last validator was reached.
  */
-export async function getAllValidators(
+export async function batchGetValidators(
   beaconProviderUrl: string,
+  startIndex: number,
+  maxBatches: number,
   chunkSize: number,
   concurrentChunks: number = 1,
   state: string = "finalized"
-): Promise<Validator[]> {
+): Promise<{ reachedLast: boolean; validators: Validator[] }> {
   const chunks: Array<Validator[]> = [];
+  let reachedLast = false;
 
-  for (let i = 0; ; i += chunkSize * concurrentChunks) {
-    const validators = await Promise.all(
+  for (let i = 0; i < maxBatches; i++) {
+    const batchStart = startIndex + i * chunkSize * concurrentChunks;
+
+    const validatorChunkBatch = await Promise.all(
       Array.from({ length: concurrentChunks }).map((_, chunkId) => {
-        const start = i + chunkSize * chunkId;
+        const requestStart = batchStart + chunkSize * chunkId;
 
         return getValidators(
           beaconProviderUrl,
-          Array.from({ length: chunkSize }).map((_, idx) => start + idx),
+          Array.from({ length: chunkSize }).map((_, idx) => requestStart + idx),
           state,
         );
       })
     );
 
-    const responseCount = validators.reduce((acc, el) => acc + el.length, 0);
-    
-    if (responseCount < chunkSize * concurrentChunks) break;
+    chunks.push(...validatorChunkBatch);
 
-    chunks.push(...validators);
+    const responseCount = validatorChunkBatch.reduce((acc, el) => acc + el.length, 0);
+
+    if (responseCount < chunkSize * concurrentChunks) {
+      reachedLast = true;
+      break;
+    }
   }
 
-  return chunks.flat();
+  return { reachedLast, validators: chunks.flat() };
 }

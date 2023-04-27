@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { getAllValidators } from "./utils/beaconProvider.ts";
+import { batchGetValidators } from "./utils/beaconProvider.ts";
 
 // serialization polyfill
 import "./utils/bigint.ts";
@@ -25,16 +25,66 @@ interface Validator {
  * @param beaconProviderUrl URL of the Beacon API provider.
  */
 export async function indexValidators(supabase: SupabaseClient, beaconProviderUrl: string) {
-  const validators: Validator[] = (
-    await getAllValidators(beaconProviderUrl, 1200, 20)
-  ).filter(el => {
-    return el.validator.withdrawalCredentials.startsWith("0x01");
-  }).map(el => ({
-    index: el.index,
-    balance: el.balance,
-    effectiveBalance: el.validator.effectiveBalance,
-    withdrawalAddress: ethers.getAddress("0x" + el.validator.withdrawalCredentials.slice(-40)),
-  }));
+  const entry = await supabase.from("ValidatorIndexingState").select("*");
+
+  if (entry.error) {
+    throw entry.error;
+  }
+  if (!entry.data.length) {
+    throw new Error("Missing state in ValidatorIndexingState table");
+  }
+  if (entry.data[0].lock) {
+    throw new Error("Trying to index validators while other validator indexer is running");
+  }
+
+  const lockUpdate = await supabase
+    .from("ValidatorIndexingState")
+    .update({
+      lastIndex: entry.data[0].lastIndex,
+      lock: true,
+    })
+    .eq("id", entry.data[0].id)
+    .eq("lock", false)
+    .select();
+
+  if (lockUpdate.error) throw lockUpdate.error;
+  if (!lockUpdate.data.length) {
+    throw new Error("Lock is already set on this indexing process");
+  }
+
+  const startIndex = entry.data[0].lastIndex + 1;
+  const batches = 4;
+  const chunkSize = 1200;
+  const concurrentChunks = 10;
+  const validatorAmount = batches * chunkSize * concurrentChunks;
+
+  const result = await batchGetValidators(
+    beaconProviderUrl,
+    startIndex,
+    batches,
+    chunkSize,
+    concurrentChunks,
+  );
+
+  const validators: Validator[] = result.validators
+    .filter(el => {
+      return el.validator.withdrawalCredentials.startsWith("0x01");
+    }).map(el => ({
+      index: el.index,
+      balance: el.balance,
+      effectiveBalance: el.validator.effectiveBalance,
+      withdrawalAddress: ethers.getAddress("0x" + el.validator.withdrawalCredentials.slice(-40)),
+    }));
 
   await supabase.from("_Validators").upsert(validators);
+  
+  const resultUpdate = await supabase
+    .from("ValidatorIndexingState")
+    .update({
+      lastIndex: (!result.reachedLast)? entry.data[0].lastIndex + validatorAmount : -1,
+      lock: false,
+    })
+    .eq("id", entry.data[0].id);
+
+  if (resultUpdate.error) throw resultUpdate.error;
 }
