@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { rangeChunkMap } from "./utils/chunk";
+import { rangeChunkMap } from "./utils/chunk.ts";
 import {
   INDEXING_BLOCK_CHUNK_SIZE,
   STRATEGY_MANAGER_ADDRESS,
@@ -8,12 +8,12 @@ import {
   STETH_ADDRESS,
   RETH_STRATEGY_ADDRESS,
   RETH_ADDRESS,
-} from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
-import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
+} from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { IStrategy__factory, StrategyManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
-import "./utils/bigint";
+import "./utils/bigint.ts";
 
 interface QueuedWithdrawal {
   block: number;

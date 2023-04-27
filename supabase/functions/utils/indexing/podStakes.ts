@@ -1,14 +1,14 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { rangeChunkMap } from "./utils/chunk";
-import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
-import { EigenPod__factory } from "../../typechain";
-import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
-import { EigenPodStakedEvent } from "../../typechain/EigenPod";
+import { rangeChunkMap } from "./utils/chunk.ts";
+import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { EigenPod__factory } from "../../typechain/index.ts";
+import { TypedContractEvent, TypedEventLog } from "../../typechain/common.ts";
+import { EigenPodStakedEvent } from "../../typechain/EigenPod.ts";
 
 // serialization polyfill
-import "./utils/bigint";
+import "./utils/bigint.ts";
 
 interface PodStake {
   block: number;

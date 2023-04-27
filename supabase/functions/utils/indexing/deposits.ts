@@ -1,17 +1,18 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { addressEq } from "./utils/address";
-import { rangeChunkMap } from "./utils/chunk";
-import { TransactionTrace, traceCallWalk } from "./utils/trace";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
-import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
-import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain";
-import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
-import { DepositEvent, StrategyManager } from "../../typechain/StrategyManager";
-import { TransferEvent } from "../../typechain/IERC20";
+import { addressEq } from "./utils/address.ts";
+import { rangeChunkMap } from "./utils/chunk.ts";
+import { TransactionTrace, traceCallWalk } from "./utils/trace.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants.ts";
+import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain/index.ts";
+import { TypedContractEvent, TypedEventLog } from "../../typechain/common.ts";
+import { DepositEvent, StrategyManager } from "../../typechain/StrategyManager.ts";
+import { TransferEvent } from "../../typechain/IERC20.ts";
+
 
 // serialization polyfill
-import "./utils/bigint";
+import "./utils/bigint.ts";
 
 interface Deposit {
   block: number;
