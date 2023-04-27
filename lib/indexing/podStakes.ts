@@ -25,6 +25,16 @@ type EigenPodStakedLog = TypedEventLog<
   >
 >;
 
+/**
+ * Gets indexable pod staking data from a block range. Basically, filters
+ * EigenPodStaked events from any contract for each block range chunk.
+ * This is not the restaking data, as it's still necessary to verify the
+ * deposit to actually restake, and this part is tracked as ETH deposits.
+ * @param startBlock Starting block.
+ * @param endBlock End block.
+ * @param chunkSize Maximum block range for log filtering calls.
+ * @returns Indexable pod stake data for a block range.
+ */
 async function indexPodStakesRange(
   startBlock: number,
   endBlock: number,
@@ -64,6 +74,16 @@ async function indexPodStakesRange(
   return index;
 }
 
+/**
+ * Does the default indexing procedure, getting the start block through the DB
+ * and setting the end block to the default indexing end block (at the moment
+ * the current finalized block), then fetches the indexable pod staking data
+ * and feeds it to the PodStakes table in the Supabase DB, while also updating
+ * the last indexed block record.
+ * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
+ * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
+ * simultaneous runs, which would end up inserting duplicate data.
+ */
 export async function indexPodStakes() {
   const startBlock = await getIndexingStartBlock("PodStakes", true);
   const endBlock = await getIndexingEndBlock();
