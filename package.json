@@ -14,6 +14,7 @@
     "@types/node": "18.15.11",
     "@types/react": "18.0.37",
     "@types/react-dom": "18.0.11",
+    "@vercel/og": "^0.5.3",
     "autoprefixer": "10.4.14",
     "chart.js": "^4.2.1",
     "eslint": "8.38.0",
@@ -31,8 +32,8 @@
   },
   "devDependencies": {
     "@typechain/ethers-v6": "^0.3.0",
-    "typechain": "^8.1.1",
     "@types/lodash": "^4.14.194",
-    "encoding": "^0.1.13"
+    "encoding": "^0.1.13",
+    "typechain": "^8.1.1"
   }
 }
