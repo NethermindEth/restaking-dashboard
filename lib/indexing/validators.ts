@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { supabase } from "../supabaseClient";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { getAllValidators } from "./utils/beaconProvider";
 
 // serialization polyfill
@@ -22,10 +22,11 @@ interface Validator {
  * credentials are added to the database, as the goal of this database is
  * getting EigenPod-related stakes, and in this case the pod L1 address should
  * be used as the validator withdrawal credentials.
+ * @param beaconProviderUrl URL of the Beacon API provider.
  */
-export async function indexValidators() {
+export async function indexValidators(supabase: SupabaseClient, beaconProviderUrl: string) {
   const validators: Validator[] = (
-    await getAllValidators(1200, 20)
+    await getAllValidators(beaconProviderUrl, 1200, 20)
   ).filter(el => {
     return el.validator.withdrawalCredentials.startsWith("0x01");
   }).map(el => ({

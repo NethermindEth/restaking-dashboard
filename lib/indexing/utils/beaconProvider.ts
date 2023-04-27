@@ -1,6 +1,4 @@
 
-const BEACON_PROVIDER_URL = process.env.BEACON_PROVIDER_URL || "";
-
 export interface BeaconApiResponse<T> {
   execution_optimistic: boolean;
   data: T[];
@@ -61,18 +59,19 @@ function encodeIndexes(indexes: number[]): string {
 /**
  * Gets validator info for the specified validators through the Beacon API and
  * state and re-formats it.
+ * @param beaconProviderUrl URL of the Beacon API provider.
  * @param indexes Validator indexes.
  * @param state State identifier. Refer to the Beacon API documentation.
  * @returns Processed validator info for the specified validators at the
  * specified state.
  */
-export async function getValidators(indexes: number[], state: string): Promise<Validator[]> {
-  if (!BEACON_PROVIDER_URL) {
-    throw new Error("BEACON_PROVIDER_URL environment variable is not set");
-  }
-
+export async function getValidators(
+  beaconProviderUrl: string,
+  indexes: number[],
+  state: string,
+): Promise<Validator[]> {
   const req = await fetch(
-    `${BEACON_PROVIDER_URL}/eth/v1/beacon/states/${state}/validators?${encodeIndexes(indexes)}`
+    `${beaconProviderUrl}/eth/v1/beacon/states/${state}/validators?${encodeIndexes(indexes)}`
   );
   const json = (await req.json()) as BeaconApiResponse<ValidatorResponse>;
 
@@ -95,6 +94,7 @@ export async function getValidators(indexes: number[], state: string): Promise<V
 
 /**
  * Gets validator info for all the validators at the specified state.
+ * @param beaconProviderUrl URL of the Beacon API provider.
  * @param chunkSize Amount of validators to be fetched on each request.
  * Depends on URI length limits, but considering indexes >100_000, a good
  * amount is 1200.
@@ -103,6 +103,7 @@ export async function getValidators(indexes: number[], state: string): Promise<V
  * @returns Validator info for all validators.
  */
 export async function getAllValidators(
+  beaconProviderUrl: string,
   chunkSize: number,
   concurrentChunks: number = 1,
   state: string = "finalized"
@@ -115,6 +116,7 @@ export async function getAllValidators(
         const start = i + chunkSize * chunkId;
 
         return getValidators(
+          beaconProviderUrl,
           Array.from({ length: chunkSize }).map((_, idx) => start + idx),
           state,
         );
@@ -130,4 +132,3 @@ export async function getAllValidators(
 
   return chunks.flat();
 }
-
