@@ -1,7 +1,9 @@
 import { clientProvider } from "@/lib/clientProvider";
-import { IStrategy__factory, RocketTokenRETH__factory } from "../../../typechain";
-import { RETH_ADDRESS, STETH_STRATEGY_ADDRESS } from "./constants";
+import { IStrategy__factory, RocketTokenRETH__factory } from "../typechain";
 import { ethers } from "ethers";
+
+export const STETH_STRATEGY_ADDRESS = "0xB613E78E2068d7489bb66419fB1cfa11275d14da";
+export const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
 
 /**
  * Gets the exchange rate for stETH strategy shares to ETH.
