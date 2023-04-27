@@ -15,6 +15,17 @@ interface Withdrawal {
   nonce: bigint;
 }
 
+/**
+ * Gets indexable withdrawal data from a block range. Basically, filters
+ * WithdrawalCompleted events from any contract for each block range chunk.
+ * This data is related to queued withdrawals that were made effective, so to
+ * get the actual amounts withdrawn and additional info this should be linked
+ * to recorded queued withdrawals and queued share withdrawals.
+ * @param startBlock Starting block.
+ * @param endBlock End block.
+ * @param chunkSize Maximum block range for log filtering calls.
+ * @returns Indexable withdrawal data for a block range.
+ */
 async function indexWithdrawalsRange(startBlock: number, endBlock: number, chunkSize: number) {
   const index: Withdrawal[] = [];
 
@@ -37,6 +48,16 @@ async function indexWithdrawalsRange(startBlock: number, endBlock: number, chunk
   return index;
 }
 
+/**
+ * Does the default indexing procedure, getting the start block through the DB
+ * and setting the end block to the default indexing end block (at the moment
+ * the current finalized block), then fetches the indexable withdrawals data
+ * and feeds it to the Withdrawals table in the Supabase DB, while also
+ * updating the last indexed block record.
+ * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
+ * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
+ * simultaneous runs, which would end up inserting duplicate data.
+ */
 export async function indexWithdrawals() {
   const startBlock = await getIndexingStartBlock("Withdrawals", true);
   const endBlock = await getIndexingEndBlock();
