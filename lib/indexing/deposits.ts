@@ -152,25 +152,27 @@ async function indexDepositsRange(
         "depositIntoStrategyWithSignature"
       ].map(el => strategyManager.getFunction(el).fragment);
 
-      await Promise.all(traceRequests.map((traceRequest, idx) => traceRequest.request.then((txTrace) => {
-        traceCallWalk(txTrace.result, true, trace => {
-          const fragment = depositFragments.find(el => el.selector === trace.input.slice(0, 10));
+      await Promise.all(
+        traceRequests.map(traceRequest => traceRequest.request.then(txTrace => {
+          traceCallWalk(txTrace.result, true, trace => {
+            const fragment = depositFragments.find(el => el.selector === trace.input.slice(0, 10));
 
-          if (addressEq(trace.to, STRATEGY_MANAGER_ADDRESS) && fragment) {
-            const decodedInput = strategyManager.interface.decodeFunctionData(fragment, trace.input);
+            if (addressEq(trace.to, STRATEGY_MANAGER_ADDRESS) && fragment) {
+              const decodedInput = strategyManager.interface.decodeFunctionData(fragment, trace.input);
 
-            index.push({
-              block: traceRequest.block,
-              depositor: decodedInput.staker || trace.from,
-              token: decodedInput.token,
-              amount: decodedInput.amount,
-              strategy: decodedInput.strategy,
-              shares: strategyManager.interface.parseCallResult(trace.output)[0],
-              caller: trace.from,
-            });
-          }
-        })
-      })));
+              index.push({
+                block: traceRequest.block,
+                depositor: decodedInput.staker || trace.from,
+                token: decodedInput.token,
+                amount: decodedInput.amount,
+                strategy: decodedInput.strategy,
+                shares: strategyManager.interface.parseCallResult(trace.output)[0],
+                caller: trace.from,
+              });
+            }
+          });
+        }))
+      );
 
       const beaconChainDepositLogs = await eigenPodManager.queryFilter(
         eigenPodManager.getEvent("BeaconChainETHDeposited"),
