@@ -20,23 +20,32 @@ interface QueuedWithdrawal {
   depositor: string;
   nonce: bigint;
   withdrawer: string;
-  // currently the same as the depositor
-  // caller: string;
   delegatedAddress: string;
   withdrawalRoot: string;
 }
 
 interface QueuedShareWithdrawal {
-  // (depositor, nonce) should be replaced by queued withdrawal ID
   depositor: string;
   nonce: bigint;
   token: string;
   strategy: string;
   shares: bigint;
-  // currently the same as the depositor
-  // caller: string;
 }
 
+/**
+ * Gets indexable withdrawal data from a block range. Basically, filters
+ * WithdrawalQueued and ShareWithdrawalQueued from the StrategyManager for
+ * each block range chunk.
+ * The idea is a withdrawal is actually composed of multiple share
+ * withdrawals, which are then the actual strategy withdrawal. These can be
+ * linked through the (depositor, nonce) pair, which acts as a withdrawal (not
+ * share withdrawal) ID.
+ * @param startBlock Starting block.
+ * @param endBlock End block.
+ * @param chunkSize Maximum block range for log filtering calls.
+ * @returns Indexable queued withdrawal and queued share withdrawal data for a
+ * block range.
+ */
 async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number, chunkSize: number) {
   const index: { withdrawals: QueuedWithdrawal[], shareWithdrawals: QueuedShareWithdrawal[] } = {
     withdrawals: [],
@@ -92,6 +101,17 @@ async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number,
   return index;
 }
 
+/**
+ * Does the default indexing procedure, getting the start block through the DB
+ * and setting the end block to the default indexing end block (at the moment
+ * the current finalized block), then fetches the indexable queued withdrawal
+ * data and feeds it to the QueuedWithdrawals and QueuedShareWithdrawals
+ * tables in the Supabase DB, while also updating the last indexed block
+ * record.
+ * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
+ * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
+ * simultaneous runs, which would end up inserting duplicate data.
+ */
 export async function indexQueuedWithdrawals() {
   const startBlock = await getIndexingStartBlock("QueuedWithdrawals", true);
   const endBlock = await getIndexingEndBlock();
