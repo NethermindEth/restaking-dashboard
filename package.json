@@ -38,6 +38,7 @@
     "@typechain/ethers-v6": "^0.3.0",
     "@types/lodash": "^4.14.194",
     "encoding": "^0.1.13",
+    "supabase": "^1.51.0",
     "typechain": "^8.1.1"
   }
 }
