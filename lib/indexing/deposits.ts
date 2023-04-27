@@ -40,10 +40,25 @@ type TransferLog = TypedEventLog<
   >
 >;
 
+/**
+ * Gets the Deposit logs in a block range from a StrategyManager contract.
+ * @param strategyManager StrategyManager contract.
+ * @param fromBlock Starting block.
+ * @param toBlock End block.
+ * @returns Deposit logs.
+ */
 async function getDepositLogs(strategyManager: StrategyManager, fromBlock: number, toBlock: number): Promise<DepositLog[]> {
   return await strategyManager.queryFilter(strategyManager.getEvent("Deposit"), fromBlock, toBlock);
 }
 
+/**
+ * Gets ERC20 Transfer logs related to Deposit StrategyManager logs in a block
+ * range. This is used later on to try and get the actual amount staked.
+ * @param depositLogs Deposit logs.
+ * @param fromBlock Starting block.
+ * @param toBlock End block.
+ * @returns Transfer logs.
+ */
 async function getTransferLogsFromDeposits(depositLogs: DepositLog[], fromBlock: number, toBlock: number): Promise<TransferLog[]> {
   if (!depositLogs.length) return [];
 
@@ -72,6 +87,13 @@ async function getTransferLogsFromDeposits(depositLogs: DepositLog[], fromBlock:
   });
 }
 
+/**
+ * Gets Deposit and Transfer events of transactions in a block range.
+ * @param strategyManager StrategyManager contract.
+ * @param fromBlock Starting block.
+ * @param toBlock End block.
+ * @returns Map from transaction hash to an object containing the logs.
+ */
 async function getTransactionDepositsAndTransfers(
   strategyManager: StrategyManager,
   fromBlock: number,
@@ -97,6 +119,15 @@ async function getTransactionDepositsAndTransfers(
   return txLogs;
 }
 
+/**
+ * Checks, from the Deposit and Transfer events of a transaction, if it's just
+ * a "straightforward" deposit, i.e. a direct deposit call. This is done
+ * safely, basically this is only true if there's only one Deposit, one
+ * Transfer and they're both related.
+ * @param deposits Deposit logs.
+ * @param transfers Transfer logs.
+ * @returns Whether this is a "straigtforward" deposit or not.
+ */
 function isStraightforwardDeposit(
   deposits: DepositLog[],
   transfers: TransferLog[]
@@ -107,6 +138,20 @@ function isStraightforwardDeposit(
     && addressEq(deposits[0].args.token, transfers[0].address);
 }
 
+/**
+ * Gets indexable deposit data from a block range. In steps, for each block
+ * range chunk:
+ * * Get Deposit and Transfer logs from transactions.
+ *  - If the transaction contains just a normal deposit, process it right away
+ *  - Otherwise, get transaction traces and decode individual
+ *    "depositIntoStrategy*" calls to then process the data.
+ * * Get BeaconChainETHDeposited logs and process deposits, fetching the
+ *   EigenPod owners and considering them as the deposit callers.
+ * @param startBlock Starting block.
+ * @param endBlock End block.
+ * @param chunkSize Maximum block range for log filtering calls.
+ * @returns Indexable deposit data for a block range.
+ */
 async function indexDepositsRange(
   startBlock: number,
   endBlock: number,
@@ -202,6 +247,16 @@ async function indexDepositsRange(
   return index;
 }
 
+/**
+ * Does the default indexing procedure, getting the start block through the DB
+ * and setting the end block to the default indexing end block (at the moment
+ * the current finalized block), then fetches the indexable deposit data and
+ * feeds it to the Deposit table in the Supabase DB, while also updating the
+ * last indexed block record.
+ * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
+ * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
+ * simultaneous runs, which would end up inserting duplicate data.
+ */
 export async function indexDeposits() {
   const startBlock = await getIndexingStartBlock("Deposits", true);
   const endBlock = await getIndexingEndBlock();
