@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { getAllValidators } from "./utils/beaconProvider";
+import { getAllValidators } from "./utils/beaconProvider.ts";
 
 // serialization polyfill
-import "./utils/bigint";
+import "./utils/bigint.ts";
 
 interface Validator {
   index: number;

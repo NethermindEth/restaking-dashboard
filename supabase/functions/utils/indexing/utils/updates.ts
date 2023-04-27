@@ -1,6 +1,6 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { INDEXING_START_BLOCK } from "./constants";
 import { ethers } from "ethers";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { INDEXING_START_BLOCK } from "./constants.ts";
 
 export type UpdateKey = "Deposits" | "PodStakes" | "Pods" | "QueuedWithdrawals" | "Withdrawals";
 
