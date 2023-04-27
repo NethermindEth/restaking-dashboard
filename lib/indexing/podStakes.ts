@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
-import { provider } from "../provider";
-import { supabase } from "../supabaseClient";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { rangeChunkMap } from "./utils/chunk";
 import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
 import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
@@ -30,12 +29,14 @@ type EigenPodStakedLog = TypedEventLog<
  * EigenPodStaked events from any contract for each block range chunk.
  * This is not the restaking data, as it's still necessary to verify the
  * deposit to actually restake, and this part is tracked as ETH deposits.
+ * @param provider Network provider.
  * @param startBlock Starting block.
  * @param endBlock End block.
  * @param chunkSize Maximum block range for log filtering calls.
  * @returns Indexable pod stake data for a block range.
  */
 async function indexPodStakesRange(
+  provider: ethers.Provider,
   startBlock: number,
   endBlock: number,
   chunkSize: number
@@ -83,21 +84,28 @@ async function indexPodStakesRange(
  * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
  * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
  * simultaneous runs, which would end up inserting duplicate data.
+ * @param supabase Supabase client.
+ * @param provider Network provider.
  */
-export async function indexPodStakes() {
-  const startBlock = await getIndexingStartBlock("PodStakes", true);
-  const endBlock = await getIndexingEndBlock();
+export async function indexPodStakes(
+  supabase: SupabaseClient,
+  provider: ethers.Provider,
+) {
+  const startBlock = await getIndexingStartBlock(supabase, "PodStakes", true);
+  const endBlock = await getIndexingEndBlock(provider);
 
   let results;
   try {
-    results = await indexPodStakesRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+    results = await indexPodStakesRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
   }
   catch (err) {
     await releaseBlockLock("PodStakes");
     throw err;
   }
 
-  await setLastIndexedBlock("PodStakes", endBlock);
+  await setLastIndexedBlock(supabase, "PodStakes", endBlock);
   await supabase.from("_PodStakes").insert(results);
   await releaseBlockLock("PodStakes");
+
+  return { startBlock, endBlock };
 }

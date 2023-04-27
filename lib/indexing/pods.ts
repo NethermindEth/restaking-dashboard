@@ -1,5 +1,5 @@
-import { provider } from "../provider";
-import { supabase } from "../supabaseClient";
+import { ethers } from "ethers";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { rangeChunkMap } from "./utils/chunk";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
 import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
@@ -18,12 +18,14 @@ interface Pod {
  * Gets indexable pod creation data from a block range. Basically, filters
  * PodDeployed events from the EigenPodManager contract for each block range
  * chunk.
+ * @param provider Network provider.
  * @param startBlock Starting block.
  * @param endBlock End block.
  * @param chunkSize Maximum block range for log filtering calls.
  * @returns Indexable pod creation data for a block range.
  */
 async function indexPodsRange(
+  provider: ethers.Provider,
   startBlock: number,
   endBlock: number,
   chunkSize: number
@@ -62,21 +64,28 @@ async function indexPodsRange(
  * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
  * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
  * simultaneous runs, which would end up inserting duplicate data.
+ * @param supabase Supabase client.
+ * @param provider Network provider.
  */
-export async function indexPods() {
-  const startBlock = await getIndexingStartBlock("Pods", true);
-  const endBlock = await getIndexingEndBlock();
+export async function indexPods(
+  supabase: SupabaseClient,
+  provider: ethers.Provider,
+) {
+  const startBlock = await getIndexingStartBlock(supabase, "Pods", true);
+  const endBlock = await getIndexingEndBlock(provider);
 
   let results;
   try {
-    results = await indexPodsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+    results = await indexPodsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
   }
   catch (err) {
     await releaseBlockLock("Pods");
     throw err;
   }
 
-  await setLastIndexedBlock("Pods", endBlock);
+  await setLastIndexedBlock(supabase, "Pods", endBlock);
   await supabase.from("_Pods").insert(results);
   await releaseBlockLock("Pods");
+
+  return { startBlock, endBlock };
 }

@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
-import { provider } from "../provider";
-import { supabase } from "../supabaseClient";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { addressEq } from "./utils/address";
 import { rangeChunkMap } from "./utils/chunk";
 import { TransactionTrace, traceCallWalk } from "./utils/trace";
@@ -54,12 +53,18 @@ async function getDepositLogs(strategyManager: StrategyManager, fromBlock: numbe
 /**
  * Gets ERC20 Transfer logs related to Deposit StrategyManager logs in a block
  * range. This is used later on to try and get the actual amount staked.
+ * @param provider Network provider.
  * @param depositLogs Deposit logs.
  * @param fromBlock Starting block.
  * @param toBlock End block.
  * @returns Transfer logs.
  */
-async function getTransferLogsFromDeposits(depositLogs: DepositLog[], fromBlock: number, toBlock: number): Promise<TransferLog[]> {
+async function getTransferLogsFromDeposits(
+  provider: ethers.Provider,
+  depositLogs: DepositLog[],
+  fromBlock: number,
+  toBlock: number
+): Promise<TransferLog[]> {
   if (!depositLogs.length) return [];
 
   const ierc20 = IERC20__factory.createInterface();
@@ -89,12 +94,14 @@ async function getTransferLogsFromDeposits(depositLogs: DepositLog[], fromBlock:
 
 /**
  * Gets Deposit and Transfer events of transactions in a block range.
+ * @param provider Network provider.
  * @param strategyManager StrategyManager contract.
  * @param fromBlock Starting block.
  * @param toBlock End block.
  * @returns Map from transaction hash to an object containing the logs.
  */
 async function getTransactionDepositsAndTransfers(
+  provider: ethers.Provider,
   strategyManager: StrategyManager,
   fromBlock: number,
   toBlock: number
@@ -102,7 +109,7 @@ async function getTransactionDepositsAndTransfers(
   const txLogs = new Map<string, { deposits: DepositLog[], transfers: TransferLog[] }>();
 
   const depositLogs = await getDepositLogs(strategyManager, fromBlock, toBlock);
-  const transferLogs = await getTransferLogsFromDeposits(depositLogs, fromBlock, toBlock);
+  const transferLogs = await getTransferLogsFromDeposits(provider, depositLogs, fromBlock, toBlock);
 
   depositLogs.forEach(log => {
     if (!txLogs.get(log.transactionHash)) {
@@ -147,12 +154,14 @@ function isStraightforwardDeposit(
  *    "depositIntoStrategy*" calls to then process the data.
  * * Get BeaconChainETHDeposited logs and process deposits, fetching the
  *   EigenPod owners and considering them as the deposit callers.
+ * @param provider Network provider.
  * @param startBlock Starting block.
  * @param endBlock End block.
  * @param chunkSize Maximum block range for log filtering calls.
  * @returns Indexable deposit data for a block range.
  */
 async function indexDepositsRange(
+  provider: ethers.JsonRpcApiProvider,
   startBlock: number,
   endBlock: number,
   chunkSize: number
@@ -166,7 +175,12 @@ async function indexDepositsRange(
 
   await Promise.all(
     rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
-      const txLogs = await getTransactionDepositsAndTransfers(strategyManager, fromBlock, toBlock);
+      const txLogs = await getTransactionDepositsAndTransfers(
+        provider,
+        strategyManager,
+        fromBlock,
+        toBlock
+      );
       const traceRequests: { block: number, request: Promise<TransactionTrace> }[] = [];
 
       txLogs.forEach(({ deposits, transfers }, txHash) => {
@@ -256,21 +270,28 @@ async function indexDepositsRange(
  * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
  * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
  * simultaneous runs, which would end up inserting duplicate data.
+ * @param supabase Supabase client.
+ * @param provider Network provider.
  */
-export async function indexDeposits() {
-  const startBlock = await getIndexingStartBlock("Deposits", true);
-  const endBlock = await getIndexingEndBlock();
+export async function indexDeposits(
+  supabase: SupabaseClient,
+  provider: ethers.JsonRpcApiProvider
+) {
+  const startBlock = await getIndexingStartBlock(supabase, "Deposits", true);
+  const endBlock = await getIndexingEndBlock(provider);
 
   let results;
   try {
-    results = await indexDepositsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+    results = await indexDepositsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
   }
   catch (err) {
     await releaseBlockLock("Deposits");
     throw err;
   }
 
-  await setLastIndexedBlock("Deposits", endBlock);
+  await setLastIndexedBlock(supabase, "Deposits", endBlock);
   await supabase.from("_Deposits").insert(results);
   await releaseBlockLock("Deposits");
+  
+  return { startBlock, endBlock };
 }

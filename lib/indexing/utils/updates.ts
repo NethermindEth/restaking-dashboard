@@ -1,18 +1,20 @@
-import { provider } from "../../provider";
-import { supabase } from "../../supabaseClient";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { INDEXING_START_BLOCK } from "./constants";
+import { ethers } from "ethers";
 
 export type UpdateKey = "Deposits" | "PodStakes" | "Pods" | "QueuedWithdrawals" | "Withdrawals";
 
 /**
  * Gets the block the indexing should start from through the DB stored last
  * indexed block.
+ * @param supabase Supabase client.
  * @param key Key used in the LastIndexedBlocks DB table.
  * @param lock Whether the indexing lock should be set to avoid simultaneous
  * indexing.
  * @returns The block height the indexing should start from.
  */
 export async function getIndexingStartBlock(
+  supabase: SupabaseClient,
   key: UpdateKey,
   lock: boolean = false
 ): Promise<number> {
@@ -55,9 +57,10 @@ export async function getIndexingStartBlock(
 /**
  * Gets the block the indexing should end at. Currently only fetches the
  * "finalized" block.
+ * @param provider Network provider.
  * @returns The block height the indexing should end at.
  */
-export async function getIndexingEndBlock() {
+export async function getIndexingEndBlock(provider: ethers.Provider) {
   const finalizedBlockNumber = (await provider.getBlock("finalized"))?.number;
 
   if (finalizedBlockNumber === undefined) {
@@ -71,10 +74,15 @@ export async function getIndexingEndBlock() {
  * Stores the last indexed block in the DB so the next indexing for this key
  * starts at the next block. The entry in the DB must either not exist or be
  * locked (`lock` column set).
+ * @param supabase Supabase client.
  * @param key Key used in the LastIndexedBlocks DB table.
  * @param block Last indexed block height.
  */
-export async function setLastIndexedBlock(key: UpdateKey, block: number) {
+export async function setLastIndexedBlock(
+  supabase: SupabaseClient,
+  key: UpdateKey,
+  block: number
+) {
   const entry = await supabase
     .from("LastIndexedBlocks")
     .select("key, block, lock")
