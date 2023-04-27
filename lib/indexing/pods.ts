@@ -14,6 +14,15 @@ interface Pod {
   owner: string;
 }
 
+/**
+ * Gets indexable pod creation data from a block range. Basically, filters
+ * PodDeployed events from the EigenPodManager contract for each block range
+ * chunk.
+ * @param startBlock Starting block.
+ * @param endBlock End block.
+ * @param chunkSize Maximum block range for log filtering calls.
+ * @returns Indexable pod creation data for a block range.
+ */
 async function indexPodsRange(
   startBlock: number,
   endBlock: number,
@@ -44,6 +53,16 @@ async function indexPodsRange(
   return index;
 }
 
+/**
+ * Does the default indexing procedure, getting the start block through the DB
+ * and setting the end block to the default indexing end block (at the moment
+ * the current finalized block), then fetches the indexable pod creation data
+ * and feeds it to the Pods table in the Supabase DB, while also updating the
+ * last indexed block record.
+ * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
+ * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
+ * simultaneous runs, which would end up inserting duplicate data.
+ */
 export async function indexPods() {
   const startBlock = await getIndexingStartBlock("Pods", true);
   const endBlock = await getIndexingEndBlock();
