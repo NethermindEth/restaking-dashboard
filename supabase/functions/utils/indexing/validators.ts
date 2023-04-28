@@ -24,7 +24,10 @@ interface Validator {
  * be used as the validator withdrawal credentials.
  * @param beaconProviderUrl URL of the Beacon API provider.
  */
-export async function indexValidators(supabase: SupabaseClient, beaconProviderUrl: string) {
+export async function indexValidators(
+  supabase: SupabaseClient,
+  beaconProviderUrl: string,
+): Promise<{ startIndex: number; endIndex: number }> {
   const entry = await supabase.from("ValidatorIndexingState").select("*");
 
   if (entry.error) {
@@ -87,4 +90,6 @@ export async function indexValidators(supabase: SupabaseClient, beaconProviderUr
     .eq("id", entry.data[0].id);
 
   if (resultUpdate.error) throw resultUpdate.error;
+
+  return { startIndex, endIndex: startIndex + validators.length - 1 };
 }

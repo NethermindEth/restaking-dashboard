@@ -3,7 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { addressEq } from "./utils/address.ts";
 import { rangeChunkMap } from "./utils/chunk.ts";
 import { TransactionTrace, traceCallWalk } from "./utils/trace.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants.ts";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain/index.ts";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common.ts";
@@ -277,7 +277,7 @@ async function indexDepositsRange(
 export async function indexDeposits(
   supabase: SupabaseClient,
   provider: ethers.JsonRpcApiProvider
-) {
+): Promise<{ startBlock: number; endBlock: number }> {
   const startBlock = await getIndexingStartBlock(supabase, "Deposits", true);
   const endBlock = await getIndexingEndBlock(provider);
 
@@ -293,6 +293,6 @@ export async function indexDeposits(
   await setLastIndexedBlock(supabase, "Deposits", endBlock);
   await supabase.from("_Deposits").insert(results);
   await releaseBlockLock("Deposits");
-  
+
   return { startBlock, endBlock };
 }

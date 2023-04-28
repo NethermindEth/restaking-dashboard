@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { rangeChunkMap } from "./utils/chunk.ts";
 import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
 import { EigenPod__factory } from "../../typechain/index.ts";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common.ts";
 import { EigenPodStakedEvent } from "../../typechain/EigenPod.ts";
@@ -90,7 +90,7 @@ async function indexPodStakesRange(
 export async function indexPodStakes(
   supabase: SupabaseClient,
   provider: ethers.Provider,
-) {
+): Promise<{ startBlock: number; endBlock: number }> {
   const startBlock = await getIndexingStartBlock(supabase, "PodStakes", true);
   const endBlock = await getIndexingEndBlock(provider);
 

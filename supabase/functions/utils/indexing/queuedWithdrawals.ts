@@ -9,7 +9,7 @@ import {
   RETH_STRATEGY_ADDRESS,
   RETH_ADDRESS,
 } from "./utils/constants.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
 import { IStrategy__factory, StrategyManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
@@ -123,7 +123,7 @@ async function indexQueuedWithdrawalsRange(
 export async function indexQueuedWithdrawals(
   supabase: SupabaseClient,
   provider: ethers.Provider,
-) {
+): Promise<{ startBlock: number; endBlock: number }> {
   const startBlock = await getIndexingStartBlock(supabase, "QueuedWithdrawals", true);
   const endBlock = await getIndexingEndBlock(provider);
 
