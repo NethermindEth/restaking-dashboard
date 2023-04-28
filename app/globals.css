@@ -48,6 +48,21 @@ h3 {
   color: var(--accent-color);
 }
 
+table {
+  width: 100%;
+  min-width: 560px;
+  table-layout: fixed;
+}
+
+.rank-row {
+  width: 15%;
+}
+.address-row {
+  width: 66%;
+}
+.amount-row {
+  width: 20%;
+}
 .button-active {
   color: var(--whitish);
   background-color: var(--accent-color);
@@ -56,6 +71,11 @@ h3 {
 .button-inactive-eth{
   color: var(--accent-color);
   background-color:rgba(254, 156, 147, 0.6);
+}
+.button-active-total{
+  color: var(--accent-color);
+  background-color: rgba(198,194,219,255);
+
 }
 
 .button-inactive-steth{
@@ -68,23 +88,34 @@ h3 {
   background-color:rgba(255, 184, 0, 0.6);
 }
 
-.button-inactive-eth:hover{
+.button-inactive-total{
   color: var(--accent-color);
-  background-color: var(--tertiary-bg-rgb);
+  background-color: #D7D3ED;
+}
+.button-inactive-total:hover{
+  color: var(--whitish);
+  background-color: var(--accent-color);
+}
+
+.button-inactive-eth:hover{
+  color: var(--whitish);
+  background-color: var(--accent-color);
 }
 .button-inactive-steth:hover{
   color: var(--whitish);
   background-color: var(--accent-color);
 }
 .button-inactive-reth:hover{
-  color: var(--accent-color);
-  background-color: var(--secondary-accent-color);
+  color: var(--whitish);
+  background-color: var(--accent-color); 
 }
 
 td{
   color:var(--accent-color);
+  border: 1px solid #c4d0e4;
+
 }
-tr:hover{
+tr:hover{   
   background-color:var(--alternative-bg);
 }
 
@@ -96,6 +127,7 @@ th{
 .pagination {
   color:var(--accent-color);
 }
+
 /* .staking-dashboard {
   width: 100%;
 } */
