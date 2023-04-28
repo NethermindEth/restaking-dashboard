@@ -106,7 +106,7 @@ export default function LeaderBoard(data: any) {
                     >
                       {userData.depositor}
                     </td>
-                    <td className="py-4 px-4 text-left text-sm amount-row overflow-x-scroll">
+                    <td className="py-4 px-4 text-left text-sm amount-row overflow-x-hidden">
                       {roundToDecimalPlaces(userData.total_deposits)}
                     </td>
                   </tr>
