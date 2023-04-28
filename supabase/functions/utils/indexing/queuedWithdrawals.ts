@@ -123,7 +123,7 @@ async function indexQueuedWithdrawalsRange(
 export async function indexQueuedWithdrawals(
   supabase: SupabaseClient,
   provider: ethers.Provider,
-) {
+): Promise<{ startBlock: number; endBlock: number }> {
   const startBlock = await getIndexingStartBlock(supabase, "QueuedWithdrawals", true);
   const endBlock = await getIndexingEndBlock(provider);
 
@@ -142,4 +142,6 @@ export async function indexQueuedWithdrawals(
     supabase.from("_QueuedShareWithdrawals").insert(results.shareWithdrawals),
   ]);
   await releaseBlockLock(supabase, "QueuedWithdrawals");
+
+  return { startBlock, endBlock };
 }

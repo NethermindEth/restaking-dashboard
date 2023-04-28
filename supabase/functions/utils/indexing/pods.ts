@@ -70,7 +70,7 @@ async function indexPodsRange(
 export async function indexPods(
   supabase: SupabaseClient,
   provider: ethers.Provider,
-) {
+): Promise<{ startBlock: number; endBlock: number }> {
   const startBlock = await getIndexingStartBlock(supabase, "Pods", true);
   const endBlock = await getIndexingEndBlock(provider);
 
@@ -86,4 +86,6 @@ export async function indexPods(
   await setLastIndexedBlock(supabase, "Pods", endBlock);
   await supabase.from("_Pods").insert(results);
   await releaseBlockLock(supabase, "Pods");
+
+  return { startBlock, endBlock };
 }

@@ -6,7 +6,7 @@ import { indexValidators } from "../utils/indexing/validators.ts";
 
 serve(async () => {
   try {
-    await indexValidators(
+    const { startIndex, endIndex } = await indexValidators(
       createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -14,7 +14,7 @@ serve(async () => {
       Deno.env.get("BEACON_PROVIDER_URL") ?? ""
     );
   
-    return new Response("Indexing successful!\n", { status: 200 });
+    return new Response(`Indexing successful! Validator index range: ${startIndex}-${endIndex}\n`, { status: 200 });
   }
   catch (err) {
     console.error(err);

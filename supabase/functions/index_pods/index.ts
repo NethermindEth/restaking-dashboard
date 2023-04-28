@@ -7,7 +7,7 @@ import { indexPods } from "../utils/indexing/pods.ts";
 
 serve(async () => {
   try {
-    await indexPods(
+    const { startBlock, endBlock } = await indexPods(
       createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -15,7 +15,7 @@ serve(async () => {
       new ethers.JsonRpcProvider(Deno.env.get("RPC_URL") ?? "", "goerli"),
     );
   
-    return new Response("Indexing successful!\n", { status: 200 });
+    return new Response(`Indexing successful! Block range: ${startBlock}-${endBlock}\n`, { status: 200 });
   }
   catch (err) {
     console.error(err);

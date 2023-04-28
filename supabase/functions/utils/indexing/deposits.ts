@@ -277,7 +277,7 @@ async function indexDepositsRange(
 export async function indexDeposits(
   supabase: SupabaseClient,
   provider: ethers.JsonRpcApiProvider
-) {
+): Promise<{ startBlock: number; endBlock: number }> {
   const startBlock = await getIndexingStartBlock(supabase, "Deposits", true);
   const endBlock = await getIndexingEndBlock(provider);
 
@@ -293,4 +293,6 @@ export async function indexDeposits(
   await setLastIndexedBlock(supabase, "Deposits", endBlock);
   await supabase.from("_Deposits").insert(results);
   await releaseBlockLock(supabase, "Deposits");
+
+  return { startBlock, endBlock };
 }
