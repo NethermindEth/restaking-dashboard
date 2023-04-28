@@ -193,7 +193,7 @@ export default async function Home() {
 
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Cumulative Beacon Chain ETH in EigenPod by day
+            Cumulative Beacon Chain ETH in EigenPods by day
           </h3>
           <div className="chart-2">
             <LineChart
@@ -209,7 +209,7 @@ export default async function Home() {
 
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Beacon Chain ETH Restaking by day
+            Added Beacon Chain ETH to EigenPods by day
           </h3>
           <div className="chart-staked-lst-date">
             <StackedBar
