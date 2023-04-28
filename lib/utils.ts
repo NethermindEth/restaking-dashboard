@@ -284,6 +284,14 @@ async function getENSNameIfExist(
   return address;
 }
 
+const getShortenedAddress = (
+  address: string,
+  first: number,
+  second: number
+) => {
+  return `${address.slice(0, first)}...${address.slice(-1 * second)}`;
+};
+
 export type { BlockData, UserData };
 
 export {
@@ -299,4 +307,5 @@ export {
   subtractArrays,
   getGoerliUrl,
   getENSNameIfExist,
+  getShortenedAddress,
 };
