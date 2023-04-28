@@ -13,7 +13,8 @@ serve(async () => {
       ),
       Deno.env.get("BEACON_PROVIDER_URL") ?? ""
     );
-  
+
+    console.log(`Indexing successful! Validator index range: ${startIndex}-${endIndex}`);
     return new Response(`Indexing successful! Validator index range: ${startIndex}-${endIndex}\n`, { status: 200 });
   }
   catch (err) {
