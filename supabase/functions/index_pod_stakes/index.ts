@@ -14,7 +14,8 @@ serve(async () => {
       ),
       new ethers.JsonRpcProvider(Deno.env.get("RPC_URL") ?? "", "goerli"),
     );
-  
+
+    console.log(`Indexing successful! Block range: ${startBlock}-${endBlock}`);
     return new Response(`Indexing successful! Block range: ${startBlock}-${endBlock}\n`, { status: 200 });
   }
   catch (err) {
