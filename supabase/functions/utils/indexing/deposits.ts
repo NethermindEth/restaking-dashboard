@@ -3,7 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { addressEq } from "./utils/address.ts";
 import { rangeChunkMap } from "./utils/chunk.ts";
 import { TransactionTrace, traceCallWalk } from "./utils/trace.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants.ts";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain/index.ts";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common.ts";
@@ -281,8 +281,16 @@ export async function indexDeposits(
   const startBlock = await getIndexingStartBlock(supabase, "Deposits", true);
   const endBlock = await getIndexingEndBlock(provider);
 
-  const results = await indexDepositsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  let results;
+  try {
+    results = await indexDepositsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  }
+  catch (err) {
+    await releaseBlockLock(supabase, "Deposits");
+    throw err;
+  }
 
-  await supabase.from("_Deposits").insert(results);
   await setLastIndexedBlock(supabase, "Deposits", endBlock);
+  await supabase.from("_Deposits").insert(results);
+  await releaseBlockLock(supabase, "Deposits");
 }
