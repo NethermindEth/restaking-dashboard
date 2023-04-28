@@ -9,7 +9,7 @@ import {
   RETH_STRATEGY_ADDRESS,
   RETH_ADDRESS,
 } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
 import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
 
 // serialization polyfill
@@ -116,11 +116,19 @@ export async function indexQueuedWithdrawals() {
   const startBlock = await getIndexingStartBlock("QueuedWithdrawals", true);
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexQueuedWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  let results;
+  try {
+    results = await indexQueuedWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  }
+  catch (err) {
+    await releaseBlockLock("QueuedWithdrawals");
+    throw err;
+  }
 
+  await setLastIndexedBlock("QueuedWithdrawals", endBlock);
   await Promise.all([
     supabase.from("_QueuedWithdrawals").insert(results.withdrawals),
     supabase.from("_QueuedShareWithdrawals").insert(results.shareWithdrawals),
   ]);
-  await setLastIndexedBlock("QueuedWithdrawals", endBlock);
+  await releaseBlockLock("QueuedWithdrawals");
 }

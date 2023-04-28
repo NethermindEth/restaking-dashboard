@@ -2,7 +2,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
 import { EigenPodManager__factory } from "../../typechain";
 
 // serialization polyfill
@@ -67,8 +67,16 @@ export async function indexPods() {
   const startBlock = await getIndexingStartBlock("Pods", true);
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexPodsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  let results;
+  try {
+    results = await indexPodsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  }
+  catch (err) {
+    await releaseBlockLock("Pods");
+    throw err;
+  }
 
-  await supabase.from("_Pods").insert(results);
   await setLastIndexedBlock("Pods", endBlock);
+  await supabase.from("_Pods").insert(results);
+  await releaseBlockLock("Pods");
 }

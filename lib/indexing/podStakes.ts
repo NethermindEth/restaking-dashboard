@@ -3,7 +3,7 @@ import { provider } from "../provider";
 import { supabase } from "../supabaseClient";
 import { rangeChunkMap } from "./utils/chunk";
 import { INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, setLastIndexedBlock } from "./utils/updates";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
 import { EigenPod__factory } from "../../typechain";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common";
 import { EigenPodStakedEvent } from "../../typechain/EigenPod";
@@ -88,8 +88,16 @@ export async function indexPodStakes() {
   const startBlock = await getIndexingStartBlock("PodStakes", true);
   const endBlock = await getIndexingEndBlock();
 
-  const results = await indexPodStakesRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  let results;
+  try {
+    results = await indexPodStakesRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+  }
+  catch (err) {
+    await releaseBlockLock("PodStakes");
+    throw err;
+  }
 
-  await supabase.from("_PodStakes").insert(results);
   await setLastIndexedBlock("PodStakes", endBlock);
+  await supabase.from("_PodStakes").insert(results);
+  await releaseBlockLock("PodStakes");
 }

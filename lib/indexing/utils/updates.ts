@@ -16,7 +16,10 @@ export async function getIndexingStartBlock(
   key: UpdateKey,
   lock: boolean = false
 ): Promise<number> {
-  const entry = await supabase.from("LastIndexedBlocks").select("key, block").eq("key", key);
+  const entry = await supabase
+    .from("LastIndexedBlocks")
+    .select("key, block")
+    .eq("key", key);
 
   if (entry.error) throw entry.error;
 
@@ -90,7 +93,38 @@ export async function setLastIndexedBlock(key: UpdateKey, block: number) {
 
   const upsert = await supabase
     .from("LastIndexedBlocks")
-    .upsert({ key, block, lock: false }, { onConflict: "key" });
+    .upsert({ key, block, lock: true }, { onConflict: "key" });
 
   if (upsert.error) throw upsert.error;
+}
+
+/**
+ * Releases the lock set when starting the indexing process if the `lock` flag
+ * on `getIndexingStartBlock` is active.
+ * Don't consider `getIndexingStartBlock` or `setLastIndexedBlock` when
+ * catching errors to trigger this function, as this would effectively make
+ * the lock useless.
+ * @param key Key used in the LastIndexedBlocks DB table.
+ * @param requireSet Requires that the lock was initially set.
+ */
+export async function releaseBlockLock(key: UpdateKey, requireSet: boolean = true) {
+  const entry = await supabase
+    .from("LastIndexedBlocks")
+    .select("key, block, lock")
+    .eq("key", key);
+
+  if (entry.error) throw entry.error;
+  if (!entry.data.length) {
+    throw new Error("Trying to release lock from unknown indexing process");
+  }
+  if (requireSet && !entry.data[0].lock) {
+    throw new Error("Trying to release unset lock and requireSet is active");
+  }
+
+  const update = await supabase
+    .from("LastIndexedBlocks")
+    .update({ ...entry.data[0], lock: false })
+    .eq("key", key);
+
+  if (update.error) throw update.error;
 }
