@@ -6,21 +6,13 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: rgb(255, 255, 255);
-  --whitish: rgba(235, 235, 235, 1);
-  --accent-color: rgb(26, 12, 109);
-  --secondary-accent-color: rgb(255, 184, 0);
+  --whitish: 235, 235, 235;
+  --accent-color: 26, 12, 109;
+  --secondary-accent-color: 255, 184, 0;
   --tertiary-accent-color: rgb(0, 153, 153);
   --alternative-bg: rgb(202, 223, 255);
-  --tertiary-bg-rgb: rgb(254, 156, 147);
+  --tertiary-bg-rgb: 254, 156, 147;
 }
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-} */
 
 body {
   font-family: Abcreprovariable, sans-serif;
@@ -30,56 +22,109 @@ body {
 }
 
 .data-card-steth {
-  color: var(--whitish);
-  background-color: var(--accent-color);
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--accent-color));
 }
 
 .data-card-reth {
-  color: var(--accent-color);
-  background-color: var(--secondary-accent-color);
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--secondary-accent-color));
 }
 
 .data-card-eth {
-  color: var(--accent-color);
-  background-color: var(--tertiary-bg-rgb);
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--tertiary-bg-rgb));
 }
 
 h3 {
-  color: var(--accent-color);
+  color: rgb(var(--accent-color));
 }
 
-/* .staking-dashboard {
-  width: 100%;
-} */
-
-/* .charts-homepage {
-  max-width: 50%;
-  margin: 0 25%;
-} */
-
-/* .chart {
-  width: 500px;
-  margin: 20px;
-  border-style: solid;
-  border-color: white;
+.table-button-totals-active,
+.table-head-totals {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 1);
 }
 
-.chart-2 {
-  width: 700px;
-  margin: 20px;
-  border-style: solid;
-  border-color: white;
-} */
+.table-button-totals-inactive {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 0.8);
+}
 
-/* .staking-dashboard {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  margin-top: 80px;
-} */
-/* 
-.deposits-cards {
-  width: max-content;
-  flex-direction: row;
-  margin-top: 40px;
-} */
+.table-button-totals-inactive:hover {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 0.9);
+}
+
+.table-button-steth-active,
+.table-head-steth {
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--accent-color));
+}
+
+.table-button-steth-inactive {
+  color: rgb(var(--whitish));
+  background-color: rgba(var(--accent-color), 0.6);
+}
+
+.table-button-steth-inactive:hover {
+  color: rgb(var(--whitish));
+  background-color: rgba(var(--accent-color), 0.8);
+}
+
+.table-button-reth-active,
+.table-head-reth {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--secondary-accent-color));
+}
+
+.table-button-reth-inactive {
+  color: rgb(var(--accent-color));
+  background-color: rgba(var(--secondary-accent-color), 0.6);
+}
+
+.table-button-reth-inactive:hover {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--secondary-accent-color), 0.8);
+}
+
+.table-button-beacon-active,
+.table-head-beacon {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--tertiary-bg-rgb));
+}
+
+.table-button-beacon-inactive {
+  color: rgb(var(--accent-color));
+  background-color: rgba(var(--tertiary-bg-rgb), 0.6);
+}
+
+.table-button-beacon-inactive:hover {
+  color: rgb(var(--accent-color));
+  background-color: rgba(var(--tertiary-bg-rgb), 0.8);
+}
+
+.table-head,
+.table-button {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+td {
+  color: rgb(var(--accent-color));
+}
+
+tbody tr:hover {
+  background-color: var(--alternative-bg);
+}
+
+.leaderboard-table {
+  scrollbar-width: none;
+}
+
+.leaderboard-table::-webkit-scrollbar {
+  display: none;
+}
+
+.pagination {
+  color: rgb(var(--accent-color));
+}

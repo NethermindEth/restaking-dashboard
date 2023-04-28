@@ -1,9 +1,14 @@
+import { ethers } from "ethers";
+
 type BlockData = {
   total_amount: number;
   block_chunk: number;
   block_chunk_date: string;
 };
-
+type UserData = {
+  depositor: string;
+  total_deposits: number;
+};
 function mergeBlockChunks(data: BlockData[]): BlockData[] {
   const mergedData: BlockData[] = [];
 
@@ -51,9 +56,10 @@ function sumTotalAmounts(data: BlockData[]): number {
 function roundToDecimalPlaces(
   value: number,
   decimalPlaces: number = 2
-): number {
-  const factor = Math.pow(10, decimalPlaces);
-  return Math.round(value * factor) / factor;
+): number | string {
+  // const factor = Math.pow(10, decimalPlaces);
+  // return Math.round(value * factor) / factor;
+  return value.toFixed(decimalPlaces);
 }
 
 function formatDate(inputDate: string): string {
@@ -265,7 +271,28 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
     });
 }
 
-export type { BlockData };
+function getGoerliUrl(address: string): string {
+  return `https://goerli.etherscan.io/address/${address}`;
+}
+
+async function getENSNameIfExist(
+  address: string,
+  provider: ethers.JsonRpcProvider
+) {
+  //const name = await provider.lookupAddress(address);
+  // return name ? name : address;
+  return address;
+}
+
+const getShortenedAddress = (
+  address: string,
+  first: number,
+  second: number
+) => {
+  return `${address.slice(0, first)}...${address.slice(-1 * second)}`;
+};
+
+export type { BlockData, UserData };
 
 export {
   mergeBlockChunks,
@@ -278,4 +305,7 @@ export {
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
   subtractArrays,
+  getGoerliUrl,
+  getENSNameIfExist,
+  getShortenedAddress,
 };

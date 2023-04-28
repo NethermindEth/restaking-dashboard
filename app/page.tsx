@@ -1,17 +1,20 @@
 import { ethers } from "ethers";
 import { Inter } from "next/font/google";
-import LineChart from "../charts/LineChart";
-import PieChart from "../charts/PieChart";
-import StackedBar from "../charts/StackedBar";
+import LineChart from "./components/charts/LineChart";
+import PieChart from "./components/charts/PieChart";
+import StackedBar from "./components/charts/StackedBar";
+import LeaderBoard from "./components/leaderboard";
 
 const inter = Inter({ subsets: ["latin"] });
 
 import { supabase } from "../lib/supabaseClient";
 import {
   BlockData,
+  UserData,
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
+  getENSNameIfExist,
   mergeBlockChunks,
   roundToDecimalPlaces,
   subtractArrays,
@@ -22,6 +25,7 @@ import Image from "next/image";
 
 const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
 const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
+const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
   const {
@@ -44,10 +48,12 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
+    stakersBeaconChainEth,
+    stakersReth,
+    stakersStethConverted,
+    groupedStakers,
+    rEthRate,
   } = await getDeposits();
-
-  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
-  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
@@ -59,9 +65,12 @@ export default async function Home() {
             width={64}
             height={72}
           />
-          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats on Testnet</p>
+          <p className="text-lg md:text-2xl ml-4">
+            EigenLayer Stats on Testnet
+          </p>
         </div>
       </div>
+
       <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
         <div className="data-card data-card-steth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block">
@@ -220,6 +229,16 @@ export default async function Home() {
             }}
           />
         </div>
+
+        <LeaderBoard
+          boardData={{
+            ethStakers: groupedStakers,
+            stethStakers: stakersStethConverted,
+            rethStakers: stakersReth,
+            beaconchainethStakers: stakersBeaconChainEth,
+          }}
+          title="Restaking Leaderboard"
+        />
       </div>
       <div className="mt-32">
         <p className="flex items-center">
@@ -238,6 +257,9 @@ export default async function Home() {
 }
 
 async function getDeposits() {
+  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
+  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
+
   // Move to promise.all
 
   // Deposits
@@ -339,6 +361,66 @@ async function getDeposits() {
   //   cummulativestEthDeposits
   // );
 
+  // LeaderBoard
+  let { data: stakersBeaconChainEth } = (await supabase
+    .from("stakers_beaconchaineth_deposits_view")
+    .select("*")) as { data: UserData[] };
+  let { data: stakersReth } = (await supabase
+    .from("stakers_reth_deposits_view")
+    .select("*")) as { data: UserData[] };
+  let { data: stakersSteth } = (await supabase
+    .from("stakers_steth_deposits_view")
+    .select("*")) as { data: UserData[] };
+
+  let stakersStethConverted = await Promise.all(
+    (stakersSteth as UserData[]).map(async (d) => ({
+      depositor: d.depositor,
+      total_deposits: d.total_deposits * rEthRate,
+    }))
+  );
+
+  let groupedStakers = [
+    ...(stakersBeaconChainEth as UserData[]),
+    ...(stakersReth as UserData[]),
+    ...(stakersStethConverted as UserData[]),
+  ]
+    .reduce((acc, cur) => {
+      const existingDepositor = acc.find(
+        (d: UserData) => d.depositor === cur.depositor
+      );
+      existingDepositor
+        ? (existingDepositor.total_deposits += cur.total_deposits)
+        : acc.push(cur);
+      return acc;
+    }, [] as UserData[])
+    .sort((a, b) => b.total_deposits - a.total_deposits);
+
+  stakersReth = stakersReth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersStethConverted = stakersStethConverted.slice(0, MAX_LEADERBOARD_SIZE);
+  groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
+
+  const allData = [
+    ...stakersReth,
+    ...stakersBeaconChainEth,
+    ...stakersStethConverted,
+    ...groupedStakers,
+  ];
+
+  const allDepositors = Array.from(
+    new Set(allData.map(({ depositor }) => depositor))
+  );
+
+  const lookupPromises = allDepositors.map((depositor) =>
+    provider.lookupAddress(depositor)
+  );
+  const resolvedAddresses = await Promise.all(lookupPromises);
+
+  allData.map(
+    (data, index) =>
+      (data.depositor = resolvedAddresses[index] ?? data.depositor)
+  );
+
   return {
     rEthDeposits,
     totalrEthDeposits,
@@ -359,5 +441,10 @@ async function getDeposits() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
+    stakersBeaconChainEth,
+    stakersReth,
+    stakersStethConverted,
+    groupedStakers,
+    rEthRate,
   };
 }
