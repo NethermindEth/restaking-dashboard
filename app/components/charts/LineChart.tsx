@@ -73,19 +73,20 @@ const dataConfig = {
 const LineChart = (data: any) => {
   const chartData = useMemo(() => {
     const internalChartData = cloneDeep(dataConfig);
+    // Todo: change dataset generation
+    if (data.data.namedLabels.length === 1) {
+      internalChartData.datasets.shift();
+      internalChartData.datasets.shift();
+    }
+    if (data.data.namedLabels.length === 2) {
+      internalChartData.datasets.pop();
+    }
+
     internalChartData.labels = data.data.timestamps;
     internalChartData.datasets.forEach((dataset, index) => {
       dataset.data = data.data.amounts[index];
       dataset.label = data.data.namedLabels[index];
     });
-    // Todo: change dataset generation
-    if (data.data.namedLabels.length === 1) {
-      internalChartData.datasets.pop();
-      internalChartData.datasets.pop();
-    }
-    if (data.data.namedLabels.length === 2) {
-      internalChartData.datasets.pop();
-    }
     return internalChartData;
   }, [data]);
 
