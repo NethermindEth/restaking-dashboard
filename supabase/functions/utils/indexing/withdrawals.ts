@@ -1,12 +1,12 @@
-import { provider } from "../provider";
-import { supabase } from "../supabaseClient";
-import { rangeChunkMap } from "./utils/chunk";
-import { INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
-import { StrategyManager__factory } from "../../typechain";
+import { ethers } from "ethers";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { rangeChunkMap } from "./utils/chunk.ts";
+import { INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
+import { StrategyManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
-import "./utils/bigint";
+import "./utils/bigint.ts";
 
 interface Withdrawal {
   block: number;
@@ -26,7 +26,12 @@ interface Withdrawal {
  * @param chunkSize Maximum block range for log filtering calls.
  * @returns Indexable withdrawal data for a block range.
  */
-async function indexWithdrawalsRange(startBlock: number, endBlock: number, chunkSize: number) {
+async function indexWithdrawalsRange(
+  provider: ethers.Provider,
+  startBlock: number,
+  endBlock: number,
+  chunkSize: number
+) {
   const index: Withdrawal[] = [];
 
   const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
@@ -57,21 +62,28 @@ async function indexWithdrawalsRange(startBlock: number, endBlock: number, chunk
  * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
  * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
  * simultaneous runs, which would end up inserting duplicate data.
+ * @param supabase Supabase client.
+ * @param provider Network provider.
  */
-export async function indexWithdrawals() {
-  const startBlock = await getIndexingStartBlock("Withdrawals", true);
-  const endBlock = await getIndexingEndBlock();
+export async function indexWithdrawals(
+  supabase: SupabaseClient,
+  provider: ethers.Provider,
+): Promise<{ startBlock: number; endBlock: number }> {
+  const startBlock = await getIndexingStartBlock(supabase, "Withdrawals", true);
+  const endBlock = await getIndexingEndBlock(provider);
 
   let results;
   try {
-    results = await indexWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+    results = await indexWithdrawalsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
   }
   catch (err) {
     await releaseBlockLock("Withdrawals");
     throw err;
   }
 
-  await setLastIndexedBlock("Withdrawals", endBlock);
+  await setLastIndexedBlock(supabase, "Withdrawals", endBlock);
   await supabase.from("_Withdrawals").insert(results);
   await releaseBlockLock("Withdrawals");
+
+  return { startBlock, endBlock };
 }

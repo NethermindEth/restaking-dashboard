@@ -1,6 +1,6 @@
-import { provider } from "../provider";
-import { supabase } from "../supabaseClient";
-import { rangeChunkMap } from "./utils/chunk";
+import { ethers } from "ethers";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { rangeChunkMap } from "./utils/chunk.ts";
 import {
   INDEXING_BLOCK_CHUNK_SIZE,
   STRATEGY_MANAGER_ADDRESS,
@@ -8,12 +8,12 @@ import {
   STETH_ADDRESS,
   RETH_STRATEGY_ADDRESS,
   RETH_ADDRESS,
-} from "./utils/constants";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates";
-import { IStrategy__factory, StrategyManager__factory } from "../../typechain";
+} from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
+import { IStrategy__factory, StrategyManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
-import "./utils/bigint";
+import "./utils/bigint.ts";
 
 interface QueuedWithdrawal {
   block: number;
@@ -40,13 +40,19 @@ interface QueuedShareWithdrawal {
  * withdrawals, which are then the actual strategy withdrawal. These can be
  * linked through the (depositor, nonce) pair, which acts as a withdrawal (not
  * share withdrawal) ID.
+ * @param provider Network provider.
  * @param startBlock Starting block.
  * @param endBlock End block.
  * @param chunkSize Maximum block range for log filtering calls.
  * @returns Indexable queued withdrawal and queued share withdrawal data for a
  * block range.
  */
-async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number, chunkSize: number) {
+async function indexQueuedWithdrawalsRange(
+  provider: ethers.Provider,
+  startBlock: number,
+  endBlock: number,
+  chunkSize: number
+) {
   const index: { withdrawals: QueuedWithdrawal[], shareWithdrawals: QueuedShareWithdrawal[] } = {
     withdrawals: [],
     shareWithdrawals: []
@@ -111,24 +117,31 @@ async function indexQueuedWithdrawalsRange(startBlock: number, endBlock: number,
  * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
  * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
  * simultaneous runs, which would end up inserting duplicate data.
+ * @param supabase Supabase client.
+ * @param provider Network provider.
  */
-export async function indexQueuedWithdrawals() {
-  const startBlock = await getIndexingStartBlock("QueuedWithdrawals", true);
-  const endBlock = await getIndexingEndBlock();
+export async function indexQueuedWithdrawals(
+  supabase: SupabaseClient,
+  provider: ethers.Provider,
+): Promise<{ startBlock: number; endBlock: number }> {
+  const startBlock = await getIndexingStartBlock(supabase, "QueuedWithdrawals", true);
+  const endBlock = await getIndexingEndBlock(provider);
 
   let results;
   try {
-    results = await indexQueuedWithdrawalsRange(startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
+    results = await indexQueuedWithdrawalsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
   }
   catch (err) {
     await releaseBlockLock("QueuedWithdrawals");
     throw err;
   }
 
-  await setLastIndexedBlock("QueuedWithdrawals", endBlock);
+  await setLastIndexedBlock(supabase, "QueuedWithdrawals", endBlock);
   await Promise.all([
     supabase.from("_QueuedWithdrawals").insert(results.withdrawals),
     supabase.from("_QueuedShareWithdrawals").insert(results.shareWithdrawals),
   ]);
   await releaseBlockLock("QueuedWithdrawals");
+
+  return { startBlock, endBlock };
 }
