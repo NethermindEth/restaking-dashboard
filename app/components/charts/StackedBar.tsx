@@ -23,6 +23,13 @@ const dataConfig = {
       borderWidth: 1,
     },
     {
+      label: "cbEth",
+      data: [],
+      backgroundColor: ["rgba(0, 153, 153, 0.6)"],
+      borderColor: ["rgba(0, 153, 153, 1)"],
+      borderWidth: 1,
+    },
+    {
       label: "Beacon Chain Eth",
       data: [],
       backgroundColor: "rgba(254, 156, 147, 0.6)",
