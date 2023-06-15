@@ -234,10 +234,10 @@ function extractAmountsAndTimestampsWithPrevious(...arrays: BlockData[][]): {
   return { amounts, timestamps };
 }
 
-function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
+function subtractArrays(arr1: BlockData[], arrays: BlockData[][]): BlockData[] {
   const combinedDates = new Set([
     ...arr1.map((item) => formatDate(item.block_chunk_date)),
-    ...arr2.map((item) => formatDate(item.block_chunk_date)),
+    ...arrays.flatMap((arr) => arr.map((item) => formatDate(item.block_chunk_date))),
   ]);
 
   const dateMap = (arr: BlockData[]): Map<string, BlockData> =>
@@ -247,7 +247,7 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
     );
 
   const dateMap1 = dateMap(arr1);
-  const dateMap2 = dateMap(arr2);
+  const dateMaps = arrays.map((arr) => dateMap(arr));
 
   return Array.from(combinedDates)
     .sort()
@@ -257,15 +257,15 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
         block_chunk: 0,
         block_chunk_date: formatDate(date),
       };
-      const item2 = dateMap2.get(date) || {
+      const items = dateMaps.map((dateMap) => (dateMap.get(date) || {
         total_amount: 0,
         block_chunk: 0,
         block_chunk_date: formatDate(date),
-      };
+      }));
 
       return {
-        total_amount: item1.total_amount - item2.total_amount,
-        block_chunk: item1.block_chunk - item2.block_chunk,
+        total_amount: item1.total_amount - items.reduce((acc, item) => acc + item.total_amount, 0),
+        block_chunk: item1.block_chunk - items.reduce((acc, item) => acc + item.block_chunk, 0),
         block_chunk_date: date,
       };
     });

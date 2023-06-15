@@ -40,6 +40,8 @@ export default function LeaderBoard(data: any) {
         return "reth";
       case 3:
         return "steth";
+      case 4:
+        return "cbeth";
       default:
         return "";
     }
@@ -87,6 +89,19 @@ export default function LeaderBoard(data: any) {
           }}
         >
           rETH
+        </button>
+        <button
+          className={`table-button ${
+            activeButton === 2
+              ? "table-button-cbeth-active"
+              : "table-button-cbeth-inactive"
+          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+          onClick={() => {
+            handleToggleContent(data.boardData.cbethStakers, 4);
+            setCurrentPage(1);
+          }}
+        >
+          cbETH
         </button>
         <button
           className={`table-button ${

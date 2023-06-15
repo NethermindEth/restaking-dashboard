@@ -31,6 +31,11 @@ body {
   background-color: rgb(var(--secondary-accent-color));
 }
 
+.data-card-cbeth {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--tertiary-accent-color));
+}
+
 .data-card-eth {
   color: rgb(var(--accent-color));
   background-color: rgb(var(--tertiary-bg-rgb));
@@ -86,6 +91,22 @@ h3 {
 .table-button-reth-inactive:hover {
   color: rgb(var(--accent-color));
   background-color: rgb(var(--secondary-accent-color), 0.8);
+}
+
+.table-button-cbeth-active,
+.table-head-cbeth {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--tertiary-accent-color));
+}
+
+.table-button-cbeth-inactive {
+  color: rgb(var(--accent-color));
+  background-color: rgba(var(--tertiary-accent-color), 0.6);
+}
+
+.table-button-cbeth-inactive:hover {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--tertiary-accent-color), 0.8);
 }
 
 .table-button-beacon-active,
