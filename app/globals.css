@@ -95,17 +95,17 @@ h3 {
 
 .table-button-cbeth-active,
 .table-head-cbeth {
-  color: rgb(var(--accent-color));
+  color: rgb(var(--whitish));
   background-color: rgb(var(--tertiary-accent-color));
 }
 
 .table-button-cbeth-inactive {
-  color: rgb(var(--accent-color));
+  color: rgb(var(--whitish));
   background-color: rgba(var(--tertiary-accent-color), 0.6);
 }
 
 .table-button-cbeth-inactive:hover {
-  color: rgb(var(--accent-color));
+  color: rgb(var(--whitish));
   background-color: rgb(var(--tertiary-accent-color), 0.8);
 }
 
