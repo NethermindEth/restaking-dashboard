@@ -80,7 +80,7 @@ export default async function () {
         </div>
         <div
           style={{ display: "flex" }}
-          tw="my-8 w-11/12 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center"
+          tw="my-8 w-11/12 lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center"
         >
           <div
             style={{
@@ -90,7 +90,7 @@ export default async function () {
               backgroundColor: "rgb(26, 12, 109)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
