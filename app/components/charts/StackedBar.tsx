@@ -46,8 +46,9 @@ export default (data: any) => {
     if (data.data.namedLabels.length === 1) {
       internalChartData.datasets.shift();
       internalChartData.datasets.shift();
+      internalChartData.datasets.shift();
     }
-    if (data.data.namedLabels.length === 2) {
+    if (data.data.namedLabels.length === 3) {
       internalChartData.datasets.pop();
     }
 
