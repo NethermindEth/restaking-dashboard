@@ -2,7 +2,7 @@
 
 import {
   UserData,
-  getGoerliUrl,
+  getEtherscanAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
 } from "@/lib/utils";
@@ -16,7 +16,7 @@ import { ethers } from "ethers";
 
 export default function LeaderBoard(data: any) {
   const provider = new ethers.JsonRpcProvider(
-    "https://rpc.ankr.com/eth_goerli"
+    "https://rpc.ankr.com/eth"
   );
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
@@ -40,6 +40,8 @@ export default function LeaderBoard(data: any) {
         return "reth";
       case 3:
         return "steth";
+      case 4:
+        return "cbeth";
       default:
         return "";
     }
@@ -90,6 +92,19 @@ export default function LeaderBoard(data: any) {
         </button>
         <button
           className={`table-button ${
+            activeButton === 2
+              ? "table-button-cbeth-active"
+              : "table-button-cbeth-inactive"
+          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+          onClick={() => {
+            handleToggleContent(data.boardData.cbethStakers, 4);
+            setCurrentPage(1);
+          }}
+        >
+          cbETH
+        </button>
+        <button
+          className={`table-button ${
             activeButton === 1
               ? "table-button-beacon-active"
               : "table-button-beacon-inactive"
@@ -134,7 +149,7 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getGoerliUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
                       {userData.depositor.endsWith(".eth")
@@ -145,7 +160,7 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getGoerliUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
                       {userData.depositor}

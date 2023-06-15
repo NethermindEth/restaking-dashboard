@@ -23,10 +23,16 @@ const dataConfig = {
       borderWidth: 1,
     },
     {
+      label: "cbEth",
+      data: [],
+      backgroundColor: ["rgba(0, 153, 153, 0.6)"],
+      borderColor: ["rgba(0, 153, 153, 1)"],
+      borderWidth: 1,
+    },
+    {
       label: "Beacon Chain Eth",
       data: [],
       backgroundColor: "rgba(254, 156, 147, 0.6)",
-
       borderColor: ["rgba(254, 156, 147, 1)"],
       borderWidth: 1,
     },
@@ -40,8 +46,9 @@ export default (data: any) => {
     if (data.data.namedLabels.length === 1) {
       internalChartData.datasets.shift();
       internalChartData.datasets.shift();
+      internalChartData.datasets.shift();
     }
-    if (data.data.namedLabels.length === 2) {
+    if (data.data.namedLabels.length === 3) {
       internalChartData.datasets.pop();
     }
 

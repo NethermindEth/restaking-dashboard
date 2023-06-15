@@ -23,6 +23,10 @@ const rEthLogo = fetch(new URL("../../public/reth.png", import.meta.url)).then(
   (res) => res.arrayBuffer()
 );
 
+const cbEthLogo = fetch(new URL("../../public/cbeth.png", import.meta.url)).then(
+  (res) => res.arrayBuffer()
+);
+
 const beaconEthLogo = fetch(
   new URL("../../public/beaconChainETH.png", import.meta.url)
 ).then((res) => res.arrayBuffer());
@@ -31,12 +35,14 @@ export default async function () {
   const {
     totalrEthDeposits,
     totalstEthDeposits,
+    totalcbEthDeposits,
     totalstEthWithdrawals,
     totalrEthWithdrawals,
+    totalcbEthWithdrawals,
     totalBeaconChainStakes,
   } = await getDeposits();
-  const [logoData, stEthLogoData, rEthLogoData, beaconEthLogoData] =
-    await Promise.all([logo, stEthLogo, rEthLogo, beaconEthLogo]);
+  const [logoData, stEthLogoData, rEthLogoData, cbEthLogoData, beaconEthLogoData] =
+    await Promise.all([logo, stEthLogo, rEthLogo, cbEthLogo, beaconEthLogo]);
 
   return new ImageResponse(
     (
@@ -69,12 +75,12 @@ export default async function () {
               height="72"
               src={logoData as unknown as string}
             />
-            <p tw="text-2xl ml-4">EigenLayer Stats on Testnet</p>
+            <p tw="text-2xl ml-4">EigenLayer Stats</p>
           </div>
         </div>
         <div
           style={{ display: "flex" }}
-          tw="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center"
+          tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
           <div
             style={{
@@ -84,7 +90,7 @@ export default async function () {
               backgroundColor: "rgb(26, 12, 109)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -93,8 +99,8 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked stETH</p>
-            <p tw="md:text-xl">
+            <p tw="text-base mx-auto">Staked stETH</p>
+            <p tw="text-xl mx-auto">
               {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
             </p>
           </div>
@@ -106,7 +112,7 @@ export default async function () {
               backgroundColor: "rgb(255, 184, 0)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -115,9 +121,31 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked rETH</p>
-            <p tw="md:text-xl">
+            <p tw="text-base mx-auto">Staked rETH</p>
+            <p tw="text-xl mx-auto">
               {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              color: "rgba(235, 235, 235, 1)",
+              backgroundColor: "rgb(0, 153, 153)",
+              textAlign: "center",
+            }}
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
+          >
+            <img
+              tw="mx-auto"
+              src={cbEthLogoData as unknown as string}
+              alt="cbETH"
+              width="48"
+              height="48"
+            />
+            <p tw="text-base mx-auto">Staked cbETH</p>
+            <p tw="text-xl mx-auto">
+              {roundToDecimalPlaces(totalcbEthDeposits - totalcbEthWithdrawals)}
             </p>
           </div>
           <div
@@ -128,7 +156,7 @@ export default async function () {
               backgroundColor: "rgb(254, 156, 147)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -158,19 +186,25 @@ export default async function () {
 async function getDeposits() {
   // Deposits
   let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from("consumabledailydepositsreth")
+    .from("mainnet_consumabledailydepositsreth")
     .select("*");
   rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
   let totalrEthDeposits = sumTotalAmounts(rEthDeposits as BlockData[]);
 
   let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from("consumabledailydepositssteth")
+    .from("mainnet_consumabledailydepositssteth")
     .select("*");
   stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
   let totalstEthDeposits = sumTotalAmounts(stEthDeposits as BlockData[]);
 
+  let { data: cbEthDeposits, error: cbEthDepositError } = await supabase
+    .from("mainnet_consumabledailydepositscbeth")
+    .select("*");
+  cbEthDeposits = mergeBlockChunks(cbEthDeposits as BlockData[]);
+  let totalcbEthDeposits = sumTotalAmounts(cbEthDeposits as BlockData[]);
+
   let { data: beaconChainStakes } = await supabase
-    .from("consumablebeaconchainstakeseth")
+    .from("mainnet_consumablebeaconchainstakeseth")
     .select("*");
   beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
   let totalBeaconChainStakes = sumTotalAmounts(
@@ -179,25 +213,34 @@ async function getDeposits() {
 
   // Withdrawals
   let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalsreth")
+    .from("mainnet_consumabledailywithdrawalsreth")
     .select("*");
   rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
   let totalrEthWithdrawals = sumTotalAmounts(rEthWithdrawals as BlockData[]);
 
   let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalssteth")
+    .from("mainnet_consumabledailywithdrawalssteth")
     .select("*");
   stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
   let totalstEthWithdrawals = sumTotalAmounts(stEthWithdrawals as BlockData[]);
+
+  let { data: cbEthWithdrawals, error: cbEthWithDrawalsError } = await supabase
+    .from("mainnet_consumabledailywithdrawalscbeth")
+    .select("*");
+  cbEthWithdrawals = mergeBlockChunks(cbEthWithdrawals as BlockData[]);
+  let totalcbEthWithdrawals = sumTotalAmounts(cbEthWithdrawals as BlockData[]);
 
   return {
     rEthDeposits,
     totalrEthDeposits,
     stEthDeposits,
     totalstEthDeposits,
+    cbEthDeposits,
+    totalcbEthDeposits,
     stEthWithdrawals,
     totalstEthWithdrawals,
     totalrEthWithdrawals,
+    totalcbEthWithdrawals,
     beaconChainStakes,
     totalBeaconChainStakes,
   };

@@ -14,17 +14,17 @@ import {
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
-  getENSNameIfExist,
   mergeBlockChunks,
   roundToDecimalPlaces,
   subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
-import { RocketTokenRETH__factory } from "@/typechain";
+import { RocketTokenRETH__factory, StakedTokenV1__factory } from "@/typechain";
 import Image from "next/image";
 
-const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
-const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
+const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
+const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
 const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
@@ -35,11 +35,13 @@ export default async function Home() {
     stEthDeposits,
     totalstEthDeposits,
     cummulativestEthDeposits,
+    totalcbEthDeposits,
     chartDataDepositsDaily,
     chartDataDepositsCumulative,
     stEthWithdrawals,
     totalstEthWithdrawals,
     totalrEthWithdrawals,
+    totalcbEthWithdrawals,
     cummulativestEthWithdrawals,
     chartDataWithdrawalsDaily,
     chartDataWithdrawalsCumulative,
@@ -49,10 +51,12 @@ export default async function Home() {
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
     stakersBeaconChainEth,
-    stakersReth,
-    stakersStethConverted,
+    stakersRethConverted,
+    stakersCbethConverted,
+    stakersSteth,
     groupedStakers,
     rEthRate,
+    cbEthRate,
     chartDataBeaconStakesDaily,
     chartDataBeaconStakesCumulative,
   } = await getDeposits();
@@ -68,7 +72,7 @@ export default async function Home() {
             height={72}
           />
           <p className="text-lg md:text-2xl ml-4">
-            EigenLayer Stats on Testnet
+            EigenLayer Stats
           </p>
         </div>
       </div>
@@ -95,6 +99,15 @@ export default async function Home() {
           <p className="text-sm md:text-base">Staked rETH</p>
           <p className="md:text-xl">
             {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
+          </p>
+        </div>
+        <div className="data-card data-card-cbeth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+          <span className="inline-block ">
+            <Image src={"/cbeth.png"} alt="cbETH" width={48} height={48} />
+          </span>
+          <p className="text-sm md:text-base">Staked cbETH</p>
+          <p className="md:text-xl">
+            {roundToDecimalPlaces(totalcbEthDeposits - totalcbEthWithdrawals)}
           </p>
         </div>
         <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
@@ -142,7 +155,7 @@ export default async function Home() {
                 title: "Cumulative deposited tokens by day",
                 amounts: chartDataDepositsCumulative.amounts,
                 timestamps: chartDataDepositsCumulative.timestamps,
-                namedLabels: ["stETH", "rETH"],
+                namedLabels: ["stETH", "rETH", "cbETH"],
               }}
             />
           </div>
@@ -154,7 +167,7 @@ export default async function Home() {
               data={{
                 amounts: chartDataDepositsDaily.amounts,
                 labels: chartDataDepositsDaily.timestamps,
-                namedLabels: ["stETH", "rETH"],
+                namedLabels: ["stETH", "rETH", "cbETH"],
               }}
               title="Deposited tokens by day"
             />
@@ -171,7 +184,7 @@ export default async function Home() {
                 title: "Cumulative Token Withdrawals by day",
                 amounts: chartDataWithdrawalsCumulative.amounts,
                 timestamps: chartDataWithdrawalsCumulative.timestamps,
-                namedLabels: ["stETH", "rETH"],
+                namedLabels: ["stETH", "rETH", "cbETH"],
               }}
             />
           </div>
@@ -184,7 +197,7 @@ export default async function Home() {
               data={{
                 amounts: chartDataWithdrawalsDaily.amounts,
                 labels: chartDataWithdrawalsDaily.timestamps,
-                namedLabels: ["stETH", "rETH"],
+                namedLabels: ["stETH", "rETH", "cbETH"],
               }}
               title="Token Withdrawals by day"
             />
@@ -257,9 +270,10 @@ export default async function Home() {
               amounts: [
                 totalstEthDeposits - totalstEthWithdrawals,
                 (totalrEthDeposits - totalrEthWithdrawals) * rEthRate,
+                (totalcbEthDeposits - totalcbEthWithdrawals) * cbEthRate,
                 totalBeaconChainStakes,
               ],
-              labels: ["stETH", "rETH (as ETH)", "Beacon Chain ETH"],
+              labels: ["stETH", "rETH (as ETH)", "cbETH (as ETH)", "Beacon Chain ETH"],
             }}
           />
         </div>
@@ -267,8 +281,9 @@ export default async function Home() {
         <LeaderBoard
           boardData={{
             ethStakers: groupedStakers,
-            stethStakers: stakersStethConverted,
-            rethStakers: stakersReth,
+            stethStakers: stakersSteth,
+            rethStakers: stakersRethConverted,
+            cbethStakers: stakersCbethConverted,
             beaconchainethStakers: stakersBeaconChainEth,
           }}
           title="Restaking Leaderboard"
@@ -294,18 +309,21 @@ async function getDeposits() {
   const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
   const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
+  const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
+  const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
+
   // Move to promise.all
 
   // Deposits
   let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from("consumabledailydepositsreth")
+    .from("mainnet_consumabledailydepositsreth")
     .select("*");
   rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
   let totalrEthDeposits = sumTotalAmounts(rEthDeposits as BlockData[]);
   let cummulativerEthDeposits = accumulateAmounts(rEthDeposits as BlockData[]);
 
   let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from("consumabledailydepositssteth")
+    .from("mainnet_consumabledailydepositssteth")
     .select("*");
   stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
   let totalstEthDeposits = sumTotalAmounts(stEthDeposits as BlockData[]);
@@ -313,8 +331,17 @@ async function getDeposits() {
     stEthDeposits as BlockData[]
   );
 
+  let { data: cbEthDeposits, error: cbEthDepositError } = await supabase
+    .from("mainnet_consumabledailydepositscbeth")
+    .select("*");
+  cbEthDeposits = mergeBlockChunks(cbEthDeposits as BlockData[]);
+  let totalcbEthDeposits = sumTotalAmounts(cbEthDeposits as BlockData[]);
+  let cummulativecbEthDeposits = accumulateAmounts(
+    cbEthDeposits as BlockData[]
+  );
+
   let { data: beaconChainStakes } = await supabase
-    .from("consumablebeaconchainstakeseth")
+    .from("mainnet_consumablebeaconchainstakeseth")
     .select("*");
   beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
   let totalBeaconChainStakes = sumTotalAmounts(
@@ -328,12 +355,14 @@ async function getDeposits() {
   let chartDataDepositsDaily = extractAmountsAndTimestamps(
     stEthDeposits as BlockData[],
     rEthDeposits as BlockData[],
+    cbEthDeposits as BlockData[],
     beaconChainStakes as BlockData[]
   );
 
   let chartDataDepositsCumulative = extractAmountsAndTimestampsWithPrevious(
     cummulativestEthDeposits,
     cummulativerEthDeposits,
+    cummulativecbEthDeposits,
     cummulativeBeaconChainStakes
   );
 
@@ -347,7 +376,7 @@ async function getDeposits() {
 
   // Withdrawals
   let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalsreth")
+    .from("mainnet_consumabledailywithdrawalsreth")
     .select("*");
   rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
   let totalrEthWithdrawals = sumTotalAmounts(rEthWithdrawals as BlockData[]);
@@ -356,7 +385,7 @@ async function getDeposits() {
   );
 
   let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalssteth")
+    .from("mainnet_consumabledailywithdrawalssteth")
     .select("*");
   stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
   let totalstEthWithdrawals = sumTotalAmounts(stEthWithdrawals as BlockData[]);
@@ -364,29 +393,45 @@ async function getDeposits() {
     stEthWithdrawals as BlockData[]
   );
 
+  let { data: cbEthWithdrawals, error: cbEthWithDrawalsError } = await supabase
+    .from("mainnet_consumabledailywithdrawalscbeth")
+    .select("*");
+  cbEthWithdrawals = mergeBlockChunks(cbEthWithdrawals as BlockData[]);
+  let totalcbEthWithdrawals = sumTotalAmounts(cbEthWithdrawals as BlockData[]);
+  let cummulativecbEthWithdrawals = accumulateAmounts(
+    cbEthWithdrawals as BlockData[]
+  );
+
   // Withdrawals prepared for charts.
   let chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
     stEthWithdrawals as BlockData[],
-    rEthWithdrawals as BlockData[]
+    rEthWithdrawals as BlockData[],
+    cbEthWithdrawals as BlockData[]
   );
 
   let chartDataWithdrawalsCumulative = extractAmountsAndTimestampsWithPrevious(
     cummulativestEthWithdrawals,
-    cummulativerEthWithdrawals
+    cummulativerEthWithdrawals,
+    cummulativecbEthWithdrawals
   );
 
   let sumStEth = subtractArrays(
     stEthDeposits as BlockData[],
-    stEthWithdrawals as BlockData[]
+    [stEthWithdrawals as BlockData[]]
   );
 
   let sumREth = subtractArrays(
     rEthDeposits as BlockData[],
-    rEthWithdrawals as BlockData[]
+    [rEthWithdrawals as BlockData[]]
+  );
+
+  let sumCbEth = subtractArrays(
+    cbEthDeposits as BlockData[],
+    [cbEthWithdrawals as BlockData[]]
   );
 
   let chartDataSumStEth = extractAmountsAndTimestamps(
-    subtractArrays(sumStEth, sumREth)
+    subtractArrays(sumStEth, [sumREth, sumCbEth])
   );
 
   // let chartDataStEthCumulative = extractAmountsAndTimestampsWithPrevious(
@@ -395,7 +440,7 @@ async function getDeposits() {
   // );
 
   let chartDataSumREth = extractAmountsAndTimestamps(
-    subtractArrays(sumREth, sumStEth)
+    subtractArrays(sumREth, [sumStEth, sumCbEth])
   );
 
   // let chartDataREthCumulative = extractAmountsAndTimestampsWithPrevious(
@@ -405,26 +450,33 @@ async function getDeposits() {
 
   // LeaderBoard
   let { data: stakersBeaconChainEth } = (await supabase
-    .from("stakers_beaconchaineth_deposits_view")
+    .from("mainnet_stakers_beaconchaineth_deposits_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersReth } = (await supabase
-    .from("stakers_reth_deposits_view")
+    .from("mainnet_stakers_reth_deposits_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersSteth } = (await supabase
-    .from("stakers_steth_deposits_view")
+    .from("mainnet_stakers_steth_deposits_view")
+    .select("*")) as { data: UserData[] };
+  let { data: stakersCbeth } = (await supabase
+    .from("mainnet_stakers_cbeth_deposits_view")
     .select("*")) as { data: UserData[] };
 
-  let stakersStethConverted = await Promise.all(
-    (stakersSteth as UserData[]).map(async (d) => ({
-      depositor: d.depositor,
-      total_deposits: d.total_deposits * rEthRate,
-    }))
-  );
+  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+    depositor: d.depositor,
+    total_deposits: d.total_deposits * rEthRate,
+  }));
+
+  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+    depositor: d.depositor,
+    total_deposits: d.total_deposits * cbEthRate,
+  }));
 
   let groupedStakers = [
     ...(stakersBeaconChainEth as UserData[]),
-    ...(stakersReth as UserData[]),
-    ...(stakersStethConverted as UserData[]),
+    ...(stakersRethConverted as UserData[]),
+    ...(stakersSteth as UserData[]),
+    ...(stakersCbethConverted as UserData[]),
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
@@ -437,15 +489,17 @@ async function getDeposits() {
     }, [] as UserData[])
     .sort((a, b) => b.total_deposits - a.total_deposits);
 
-  stakersReth = stakersReth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersRethConverted = stakersRethConverted.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersCbethConverted = stakersCbethConverted.slice(0, MAX_LEADERBOARD_SIZE);
   stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersStethConverted = stakersStethConverted.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersSteth = stakersSteth.slice(0, MAX_LEADERBOARD_SIZE);
   groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
-    ...stakersReth,
+    ...stakersRethConverted,
     ...stakersBeaconChainEth,
-    ...stakersStethConverted,
+    ...stakersSteth,
+    ...stakersCbethConverted,
     ...groupedStakers,
   ];
 
@@ -470,11 +524,13 @@ async function getDeposits() {
     stEthDeposits,
     totalstEthDeposits,
     cummulativestEthDeposits,
+    totalcbEthDeposits,
     chartDataDepositsDaily,
     chartDataDepositsCumulative,
     stEthWithdrawals,
     totalstEthWithdrawals,
     totalrEthWithdrawals,
+    totalcbEthWithdrawals,
     cummulativestEthWithdrawals,
     chartDataWithdrawalsDaily,
     chartDataWithdrawalsCumulative,
@@ -484,10 +540,12 @@ async function getDeposits() {
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
     stakersBeaconChainEth,
-    stakersReth,
-    stakersStethConverted,
+    stakersRethConverted,
+    stakersSteth,
+    stakersCbethConverted,
     groupedStakers,
     rEthRate,
+    cbEthRate,
     chartDataBeaconStakesDaily,
     chartDataBeaconStakesCumulative,
   };
