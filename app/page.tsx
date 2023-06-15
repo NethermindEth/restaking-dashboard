@@ -52,9 +52,9 @@ export default async function Home() {
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
     stakersBeaconChainEth,
-    stakersReth,
-    stakersCbeth,
-    stakersStethConverted,
+    stakersRethConverted,
+    stakersCbethConverted,
+    stakersSteth,
     groupedStakers,
     rEthRate,
     cbEthRate,
@@ -282,9 +282,9 @@ export default async function Home() {
         <LeaderBoard
           boardData={{
             ethStakers: groupedStakers,
-            stethStakers: stakersStethConverted,
-            rethStakers: stakersReth,
-            cbethStakers: stakersCbeth,
+            stethStakers: stakersSteth,
+            rethStakers: stakersRethConverted,
+            cbethStakers: stakersCbethConverted,
             beaconchainethStakers: stakersBeaconChainEth,
           }}
           title="Restaking Leaderboard"
@@ -463,18 +463,21 @@ async function getDeposits() {
     .from("mainnet_stakers_cbeth_deposits_view")
     .select("*")) as { data: UserData[] };
 
-  let stakersStethConverted = await Promise.all(
-    (stakersSteth as UserData[]).map(async (d) => ({
-      depositor: d.depositor,
-      total_deposits: d.total_deposits * rEthRate,
-    }))
-  );
+  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+    depositor: d.depositor,
+    total_deposits: d.total_deposits * rEthRate,
+  }));
+
+  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+    depositor: d.depositor,
+    total_deposits: d.total_deposits * cbEthRate,
+  }));
 
   let groupedStakers = [
     ...(stakersBeaconChainEth as UserData[]),
-    ...(stakersReth as UserData[]),
-    ...(stakersStethConverted as UserData[]),
-    ...(stakersCbeth as UserData[]),
+    ...(stakersRethConverted as UserData[]),
+    ...(stakersSteth as UserData[]),
+    ...(stakersCbethConverted as UserData[]),
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
@@ -487,17 +490,17 @@ async function getDeposits() {
     }, [] as UserData[])
     .sort((a, b) => b.total_deposits - a.total_deposits);
 
-  stakersReth = stakersReth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersCbeth = stakersCbeth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersRethConverted = stakersRethConverted.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersCbethConverted = stakersCbethConverted.slice(0, MAX_LEADERBOARD_SIZE);
   stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersStethConverted = stakersStethConverted.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersSteth = stakersSteth.slice(0, MAX_LEADERBOARD_SIZE);
   groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
-    ...stakersReth,
+    ...stakersRethConverted,
     ...stakersBeaconChainEth,
-    ...stakersStethConverted,
-    ...stakersCbeth,
+    ...stakersSteth,
+    ...stakersCbethConverted,
     ...groupedStakers,
   ];
 
@@ -538,9 +541,9 @@ async function getDeposits() {
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
     stakersBeaconChainEth,
-    stakersReth,
-    stakersStethConverted,
-    stakersCbeth,
+    stakersRethConverted,
+    stakersSteth,
+    stakersCbethConverted,
     groupedStakers,
     rEthRate,
     cbEthRate,
