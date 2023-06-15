@@ -10,11 +10,13 @@ const dataConfig = {
       backgroundColor: [
         "rgba(26, 12, 109, 1)",
         "rgba(255, 184, 0, 1)",
+        "rgba(0, 153, 153, 1)",
         "rgba(254, 156, 147, 1)",
       ],
       hoverBackgroundColor: [
         "rgba(26, 12, 109, 0.6)",
         "rgba(255, 184, 0, 0.6)",
+        "rgba(0, 153, 153, 1)",
         "rgba(254, 156, 147, 0.6)",
       ],
     },
