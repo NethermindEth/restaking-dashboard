@@ -298,14 +298,14 @@ async function getDeposits() {
 
   // Deposits
   let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from("consumabledailydepositsreth")
+    .from("mainnet_consumabledailydepositsreth")
     .select("*");
   rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
   let totalrEthDeposits = sumTotalAmounts(rEthDeposits as BlockData[]);
   let cummulativerEthDeposits = accumulateAmounts(rEthDeposits as BlockData[]);
 
   let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from("consumabledailydepositssteth")
+    .from("mainnet_consumabledailydepositssteth")
     .select("*");
   stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
   let totalstEthDeposits = sumTotalAmounts(stEthDeposits as BlockData[]);
@@ -314,7 +314,7 @@ async function getDeposits() {
   );
 
   let { data: beaconChainStakes } = await supabase
-    .from("consumablebeaconchainstakeseth")
+    .from("mainnet_consumablebeaconchainstakeseth")
     .select("*");
   beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
   let totalBeaconChainStakes = sumTotalAmounts(
@@ -347,7 +347,7 @@ async function getDeposits() {
 
   // Withdrawals
   let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalsreth")
+    .from("mainnet_consumabledailywithdrawalsreth")
     .select("*");
   rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
   let totalrEthWithdrawals = sumTotalAmounts(rEthWithdrawals as BlockData[]);
@@ -356,7 +356,7 @@ async function getDeposits() {
   );
 
   let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalssteth")
+    .from("mainnet_consumabledailywithdrawalssteth")
     .select("*");
   stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
   let totalstEthWithdrawals = sumTotalAmounts(stEthWithdrawals as BlockData[]);
@@ -405,13 +405,13 @@ async function getDeposits() {
 
   // LeaderBoard
   let { data: stakersBeaconChainEth } = (await supabase
-    .from("stakers_beaconchaineth_deposits_view")
+    .from("mainnet_stakers_beaconchaineth_deposits_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersReth } = (await supabase
-    .from("stakers_reth_deposits_view")
+    .from("mainnet_stakers_reth_deposits_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersSteth } = (await supabase
-    .from("stakers_steth_deposits_view")
+    .from("mainnet_stakers_steth_deposits_view")
     .select("*")) as { data: UserData[] };
 
   let stakersStethConverted = await Promise.all(

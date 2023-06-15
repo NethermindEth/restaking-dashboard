@@ -158,19 +158,19 @@ export default async function () {
 async function getDeposits() {
   // Deposits
   let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from("consumabledailydepositsreth")
+    .from("mainnet_consumabledailydepositsreth")
     .select("*");
   rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
   let totalrEthDeposits = sumTotalAmounts(rEthDeposits as BlockData[]);
 
   let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from("consumabledailydepositssteth")
+    .from("mainnet_consumabledailydepositssteth")
     .select("*");
   stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
   let totalstEthDeposits = sumTotalAmounts(stEthDeposits as BlockData[]);
 
   let { data: beaconChainStakes } = await supabase
-    .from("consumablebeaconchainstakeseth")
+    .from("mainnet_consumablebeaconchainstakeseth")
     .select("*");
   beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
   let totalBeaconChainStakes = sumTotalAmounts(
@@ -179,13 +179,13 @@ async function getDeposits() {
 
   // Withdrawals
   let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalsreth")
+    .from("mainnet_consumabledailywithdrawalsreth")
     .select("*");
   rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
   let totalrEthWithdrawals = sumTotalAmounts(rEthWithdrawals as BlockData[]);
 
   let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalssteth")
+    .from("mainnet_consumabledailywithdrawalssteth")
     .select("*");
   stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
   let totalstEthWithdrawals = sumTotalAmounts(stEthWithdrawals as BlockData[]);
