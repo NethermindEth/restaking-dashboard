@@ -20,10 +20,11 @@ import {
   subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
-import { RocketTokenRETH__factory } from "@/typechain";
+import { RocketTokenRETH__factory, StakedTokenV1__factory } from "@/typechain";
 import Image from "next/image";
 
 const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
 const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
 const MAX_LEADERBOARD_SIZE = 50;
 
@@ -293,6 +294,9 @@ export default async function Home() {
 async function getDeposits() {
   const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
   const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
+
+  const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
+  const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
 
   // Move to promise.all
 
