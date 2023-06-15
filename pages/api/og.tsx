@@ -69,7 +69,7 @@ export default async function () {
               height="72"
               src={logoData as unknown as string}
             />
-            <p tw="text-2xl ml-4">EigenLayer Stats on Testnet</p>
+            <p tw="text-2xl ml-4">EigenLayer Stats</p>
           </div>
         </div>
         <div

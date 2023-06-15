@@ -68,7 +68,7 @@ export default async function Home() {
             height={72}
           />
           <p className="text-lg md:text-2xl ml-4">
-            EigenLayer Stats on Testnet
+            EigenLayer Stats
           </p>
         </div>
       </div>
