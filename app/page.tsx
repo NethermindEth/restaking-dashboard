@@ -14,7 +14,6 @@ import {
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
-  getENSNameIfExist,
   mergeBlockChunks,
   roundToDecimalPlaces,
   subtractArrays,
