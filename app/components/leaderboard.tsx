@@ -2,7 +2,7 @@
 
 import {
   UserData,
-  getGoerliUrl,
+  getEtherscanAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
 } from "@/lib/utils";
