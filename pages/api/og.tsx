@@ -90,7 +90,7 @@ export default async function () {
               backgroundColor: "rgb(26, 12, 109)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -112,7 +112,7 @@ export default async function () {
               backgroundColor: "rgb(255, 184, 0)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -134,7 +134,7 @@ export default async function () {
               backgroundColor: "rgb(0, 153, 153)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -156,7 +156,7 @@ export default async function () {
               backgroundColor: "rgb(254, 156, 147)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
