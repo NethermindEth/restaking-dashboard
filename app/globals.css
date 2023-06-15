@@ -9,7 +9,7 @@
   --whitish: 235, 235, 235;
   --accent-color: 26, 12, 109;
   --secondary-accent-color: 255, 184, 0;
-  --tertiary-accent-color: rgb(0, 153, 153);
+  --tertiary-accent-color: 0, 153, 153;
   --alternative-bg: rgb(202, 223, 255);
   --tertiary-bg-rgb: 254, 156, 147;
 }
@@ -32,7 +32,7 @@ body {
 }
 
 .data-card-cbeth {
-  color: rgb(var(--accent-color));
+  color: rgb(var(--whitish));
   background-color: rgb(var(--tertiary-accent-color));
 }
 
