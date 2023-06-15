@@ -16,7 +16,7 @@ import { ethers } from "ethers";
 
 export default function LeaderBoard(data: any) {
   const provider = new ethers.JsonRpcProvider(
-    "https://rpc.ankr.com/eth_goerli"
+    "https://rpc.ankr.com/eth"
   );
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
