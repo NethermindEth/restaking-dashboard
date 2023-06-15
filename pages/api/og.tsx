@@ -80,7 +80,7 @@ export default async function () {
         </div>
         <div
           style={{ display: "flex" }}
-          tw="my-8 mx-8 w-11/12 lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center"
+          tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
           <div
             style={{
@@ -90,7 +90,7 @@ export default async function () {
               backgroundColor: "rgb(26, 12, 109)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -112,7 +112,7 @@ export default async function () {
               backgroundColor: "rgb(255, 184, 0)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -134,7 +134,7 @@ export default async function () {
               backgroundColor: "rgb(0, 153, 153)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -156,7 +156,7 @@ export default async function () {
               backgroundColor: "rgb(254, 156, 147)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-24 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
