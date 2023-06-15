@@ -23,7 +23,7 @@ import {
 import { RocketTokenRETH__factory } from "@/typechain";
 import Image from "next/image";
 
-const RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
+const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
 const MAX_LEADERBOARD_SIZE = 50;
 
