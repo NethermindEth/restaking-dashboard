@@ -80,7 +80,7 @@ export default async function () {
         </div>
         <div
           style={{ display: "flex" }}
-          tw="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
+          tw="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center"
         >
           <div
             style={{
