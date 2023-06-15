@@ -99,8 +99,8 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked stETH</p>
-            <p tw="md:text-xl">
+            <p tw="text-base mx-auto">Staked stETH</p>
+            <p tw="text-xl mx-auto">
               {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
             </p>
           </div>
@@ -121,8 +121,8 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked rETH</p>
-            <p tw="md:text-xl">
+            <p tw="text-base mx-auto">Staked rETH</p>
+            <p tw="text-xl mx-auto">
               {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
             </p>
           </div>
@@ -143,8 +143,8 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked cbETH</p>
-            <p tw="md:text-xl">
+            <p tw="text-base mx-auto">Staked cbETH</p>
+            <p tw="text-xl mx-auto">
               {roundToDecimalPlaces(totalcbEthDeposits - totalcbEthWithdrawals)}
             </p>
           </div>
