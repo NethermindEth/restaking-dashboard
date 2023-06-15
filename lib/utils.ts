@@ -271,8 +271,8 @@ function subtractArrays(arr1: BlockData[], arr2: BlockData[]): BlockData[] {
     });
 }
 
-function getGoerliUrl(address: string): string {
-  return `https://goerli.etherscan.io/address/${address}`;
+function getEtherscanAddressUrl(address: string): string {
+  return `https://etherscan.io/address/${address}`;
 }
 
 async function getENSNameIfExist(
@@ -305,7 +305,7 @@ export {
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
   subtractArrays,
-  getGoerliUrl,
+  getEtherscanAddressUrl,
   getENSNameIfExist,
   getShortenedAddress,
 };

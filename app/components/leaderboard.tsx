@@ -134,7 +134,7 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getGoerliUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
                       {userData.depositor.endsWith(".eth")
@@ -145,7 +145,7 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getGoerliUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
                       {userData.depositor}
