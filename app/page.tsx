@@ -21,6 +21,7 @@ import {
 } from "@/lib/utils";
 import { RocketTokenRETH__factory, StakedTokenV1__factory } from "@/typechain";
 import Image from "next/image";
+import Disclamer from "./components/Disclamer";
 
 const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
@@ -71,9 +72,7 @@ export default async function Home() {
             width={64}
             height={72}
           />
-          <p className="text-lg md:text-2xl ml-4">
-            EigenLayer Stats
-          </p>
+          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats</p>
         </div>
       </div>
 
@@ -273,7 +272,12 @@ export default async function Home() {
                 (totalcbEthDeposits - totalcbEthWithdrawals) * cbEthRate,
                 totalBeaconChainStakes,
               ],
-              labels: ["stETH", "rETH (as ETH)", "cbETH (as ETH)", "Beacon Chain ETH"],
+              labels: [
+                "stETH",
+                "rETH (as ETH)",
+                "cbETH (as ETH)",
+                "Beacon Chain ETH",
+              ],
             }}
           />
         </div>
@@ -300,6 +304,7 @@ export default async function Home() {
             style={{ display: "inline-block" }}
           />
         </p>
+        <Disclamer />
       </div>
     </main>
   );
@@ -415,20 +420,17 @@ async function getDeposits() {
     cummulativecbEthWithdrawals
   );
 
-  let sumStEth = subtractArrays(
-    stEthDeposits as BlockData[],
-    [stEthWithdrawals as BlockData[]]
-  );
+  let sumStEth = subtractArrays(stEthDeposits as BlockData[], [
+    stEthWithdrawals as BlockData[],
+  ]);
 
-  let sumREth = subtractArrays(
-    rEthDeposits as BlockData[],
-    [rEthWithdrawals as BlockData[]]
-  );
+  let sumREth = subtractArrays(rEthDeposits as BlockData[], [
+    rEthWithdrawals as BlockData[],
+  ]);
 
-  let sumCbEth = subtractArrays(
-    cbEthDeposits as BlockData[],
-    [cbEthWithdrawals as BlockData[]]
-  );
+  let sumCbEth = subtractArrays(cbEthDeposits as BlockData[], [
+    cbEthWithdrawals as BlockData[],
+  ]);
 
   let chartDataSumStEth = extractAmountsAndTimestamps(
     subtractArrays(sumStEth, [sumREth, sumCbEth])

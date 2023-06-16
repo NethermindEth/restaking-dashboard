@@ -32,12 +32,14 @@
     "react-bootstrap": "^2.7.4",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
+    "react-modal": "^3.16.1",
     "tailwindcss": "3.3.1",
     "typescript": "5.0.4"
   },
   "devDependencies": {
     "@typechain/ethers-v6": "^0.3.0",
     "@types/lodash": "^4.14.194",
+    "@types/react-modal": "^3.16.0",
     "encoding": "^0.1.13",
     "supabase": "^1.51.0",
     "typechain": "^8.1.1"
