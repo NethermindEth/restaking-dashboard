@@ -21,7 +21,7 @@ import {
 } from "@/lib/utils";
 import { RocketTokenRETH__factory, StakedTokenV1__factory } from "@/typechain";
 import Image from "next/image";
-import Disclamer from "./components/Disclamer";
+import Disclaimer from "./components/Disclaimer";
 
 const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
@@ -304,7 +304,7 @@ export default async function Home() {
             style={{ display: "inline-block" }}
           />
         </p>
-        <Disclamer />
+        <Disclaimer />
       </div>
     </main>
   );

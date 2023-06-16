@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 
-export default function Disclamer() {
+export default function Disclaimer() {
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     if (isOpen) {
@@ -21,7 +21,7 @@ export default function Disclamer() {
           setIsOpen(true);
         }}
       >
-        Important Disclamer! Click here to read.
+        Important Disclaimer! Click here to read.
       </button>
       <Modal
         isOpen={isOpen}
@@ -30,7 +30,7 @@ export default function Disclamer() {
         overlayClassName="overlay"
       >
         <div className="flex flex-col">
-          <h2 className="text-center text-xl py-5">Disclamer</h2>
+          <h2 className="text-center text-xl py-5">Disclaimer</h2>
           <p className="px-2 text-justify text-md">
             This dashboard has been created by Demerzel Solutions Limited (t/a
             Nethermind), a company registered in England and Wales under company
