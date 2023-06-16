@@ -21,7 +21,7 @@ export default function Disclaimer() {
           setIsOpen(true);
         }}
       >
-        Important Disclaimer! Click here to read.
+        Disclaimer - Click here to read.
       </button>
       <Modal
         isOpen={isOpen}
@@ -35,31 +35,41 @@ export default function Disclaimer() {
             This dashboard has been created by Demerzel Solutions Limited (t/a
             Nethermind), a company registered in England and Wales under company
             number 10908862, with its registered address at 30 Churchill Place,
-            London E14 5EU (Nethermind, us or we). The dashboard and any
-            information by or in connection with it ("content") are provided on
-            an 'as is' and 'as available' basis and you are solely responsible
-            for all decisions and actions you take regarding your use of the
-            dashboard and content. Nethermind makes no warranty, condition or
-            representation, express or implied, in relation to the dashboard or
-            content, whether in regards to its quality, accuracy, reliability,
-            adequacy, outcomes, fitness for purpose, suitability, or otherwise.
-            We expressly disclaim any liability for errors or omission in the
-            dashboard or content. The dashboard and content are intended for
-            informational purposes only. They are not meant to serve as any form
-            of advice, whether financial, investment or otherwise. Both past
-            performance and yield may not be a reliable guide to future
-            performance. Nethermind is not a securities broker/dealer,
-            cryptoasset broker/dealer, investment adviser, commodity trading
-            advisor, or financial adviser, analyst or planner of any kind. We
-            are neither licensed nor qualified to provide investment or trading
-            advice, and Nethermind does not explicitly or implicitly recommend
-            or suggest an investment strategy of any kind. You should conduct
-            their own research and consult an independent financial, tax or
-            legal advisor before making any investment decision. To the fullest
-            extent permitted by law, Nethermind disclaims any liability
-            whatsoever in connection with this dashboard, its content and your
-            use thereof, including without limitation for any loss or damage
-            (whether direct or indirect) that you may suffer or incur in
+            London E14 5EU (Nethermind, us or we).
+            <br />
+            <br />
+            The dashboard and any information by or in connection with it
+            ("content") are provided on an 'as is' and 'as available' basis and
+            you are solely responsible for all decisions and actions you take
+            regarding your use of the dashboard and content.
+            <br />
+            <br />
+            Nethermind makes no warranty, condition or representation, express
+            or implied, in relation to the dashboard or content, whether in
+            regards to its quality, accuracy, reliability, adequacy, outcomes,
+            fitness for purpose, suitability, or otherwise. We expressly
+            disclaim any liability for errors or omission in the dashboard or
+            content.
+            <br />
+            <br />
+            The dashboard and content are intended for informational purposes
+            only. They are not meant to serve as any form of advice, whether
+            financial, investment or otherwise. Both past performance and yield
+            may not be a reliable guide to future performance. Nethermind is not
+            a securities broker/dealer, cryptoasset broker/dealer, investment
+            adviser, commodity trading advisor, or financial adviser, analyst or
+            planner of any kind. We are neither licensed nor qualified to
+            provide investment or trading advice, and Nethermind does not
+            explicitly or implicitly recommend or suggest an investment strategy
+            of any kind. You should conduct their own research and consult an
+            independent financial, tax or legal advisor before making any
+            investment decision.
+            <br />
+            <br />
+            To the fullest extent permitted by law, Nethermind disclaims any
+            liability whatsoever in connection with this dashboard, its content
+            and your use thereof, including without limitation for any loss or
+            damage (whether direct or indirect) that you may suffer or incur in
             connection with your use of the dashboard or content.
           </p>
           <button
