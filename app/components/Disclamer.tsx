@@ -16,7 +16,7 @@ export default function Disclamer() {
   return (
     <div>
       <button
-        className="btn text-sm text-center py-5"
+        className="btn text-sm font-normal text-center py-5"
         onClick={() => {
           setIsOpen(true);
         }}
