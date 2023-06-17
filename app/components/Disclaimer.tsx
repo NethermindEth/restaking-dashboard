@@ -16,12 +16,12 @@ export default function Disclaimer() {
   return (
     <div>
       <button
-        className="btn text-sm font-normal text-center py-5"
+        className="btn text-sm font-normal text-center py-5 underline"
         onClick={() => {
           setIsOpen(true);
         }}
       >
-        Disclaimer - Click here to read.
+        Disclaimer
       </button>
       <Modal
         isOpen={isOpen}
