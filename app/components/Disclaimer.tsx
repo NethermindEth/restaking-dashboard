@@ -14,7 +14,7 @@ export default function Disclaimer() {
   }, [isOpen]);
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <button
         className="btn text-sm font-normal text-center py-5 underline"
         onClick={() => {
