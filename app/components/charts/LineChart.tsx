@@ -93,14 +93,16 @@ const dataConfig = {
 const LineChart = (data: any) => {
   const chartData = useMemo(() => {
     const internalChartData = cloneDeep(dataConfig);
+
     // Todo: change dataset generation
     if (data.data.namedLabels.length === 1) {
       internalChartData.datasets.shift();
       internalChartData.datasets.shift();
       internalChartData.datasets.shift();
-    }
-    if (data.data.namedLabels.length === 3) {
-      internalChartData.datasets.pop();
+    } else {
+      for (let i = data.data.namedLabels.length; i < 4; i++) {
+        internalChartData.datasets.pop();
+      }
     }
 
     internalChartData.labels = data.data.timestamps;
