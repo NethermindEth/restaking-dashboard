@@ -309,7 +309,7 @@ async function getDeposits(isMainnet: boolean) {
     (data, index) =>
       (data.depositor = resolvedAddresses[index] ?? data.depositor)
   );
-
+  console.log(chartDataBeaconStakesDaily, chartDataBeaconStakesCumulative);
   return {
     rEthDeposits,
     totalrEthDeposits,
