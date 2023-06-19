@@ -12,12 +12,8 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { ethers } from "ethers";
 
 export default function LeaderBoard(data: any) {
-  const provider = new ethers.JsonRpcProvider(
-    "https://rpc.ankr.com/eth"
-  );
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,19 +86,21 @@ export default function LeaderBoard(data: any) {
         >
           rETH
         </button>
-        <button
-          className={`table-button ${
-            activeButton === 2
-              ? "table-button-cbeth-active"
-              : "table-button-cbeth-inactive"
-          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
-          onClick={() => {
-            handleToggleContent(data.boardData.cbethStakers, 4);
-            setCurrentPage(1);
-          }}
-        >
-          cbETH
-        </button>
+        {data.isMainnet && (
+          <button
+            className={`table-button ${
+              activeButton === 4
+                ? "table-button-cbeth-active"
+                : "table-button-cbeth-inactive"
+            } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+            onClick={() => {
+              handleToggleContent(data.boardData.cbethStakers, 4);
+              setCurrentPage(1);
+            }}
+          >
+            cbETH
+          </button>
+        )}
         <button
           className={`table-button ${
             activeButton === 1
