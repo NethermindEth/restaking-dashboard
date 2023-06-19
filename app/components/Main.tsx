@@ -16,7 +16,10 @@ export default function MainPage(params: any) {
   const [networkData, setNetworkData] = useState(
     params.data[isMainnet ? "mainnet" : "goerli"]
   );
-
+  console.log(
+    networkData.chartDataBeaconStakesDaily,
+    networkData.chartDataBeaconStakesCumulative
+  );
   const handleSwitchBtn = () => {
     const network = !isMainnet;
     setIsMainnet(network);
