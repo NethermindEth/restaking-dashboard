@@ -18,6 +18,12 @@ export default function LeaderBoard(data: any) {
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
+  useEffect(() => {
+    setActiveData(data.boardData.ethStakers);
+    setActiveButton(0);
+    setCurrentPage(1);
+  }, [data]);
+
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
