@@ -56,7 +56,9 @@ export default function MainPage(params: any) {
             width={64}
             height={72}
           />
-          <p className="text-lg md:text-2xl ml-4">EigenLayer Stats</p>
+          <p className="text-lg md:text-2xl ml-4">
+            EigenLayer Stats on {isMainnet ? "Mainnet" : "Testnet"}
+          </p>
         </div>
       </div>
 
