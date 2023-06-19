@@ -2,7 +2,7 @@
 
 import {
   UserData,
-  getEtherscanAddressUrl,
+  getAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
 } from "@/lib/utils";
@@ -153,7 +153,9 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(userData.depositor));
+                        window.open(
+                          getAddressUrl(data.isMainnet, userData.depositor)
+                        );
                       }}
                     >
                       {userData.depositor.endsWith(".eth")
@@ -164,7 +166,9 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(userData.depositor));
+                        window.open(
+                          getAddressUrl(data.isMainnet, userData.depositor)
+                        );
                       }}
                     >
                       {userData.depositor}
