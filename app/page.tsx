@@ -301,7 +301,7 @@ async function getDeposits(isMainnet: boolean) {
   );
 
   const lookupPromises = allDepositors.map((depositor) =>
-    mainnetProvider.lookupAddress(depositor)
+    provider.lookupAddress(depositor)
   );
   const resolvedAddresses = await Promise.all(lookupPromises);
 
