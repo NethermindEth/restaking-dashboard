@@ -1,6 +1,5 @@
 "use client";
 
-import { ethers } from "ethers";
 import { Inter } from "next/font/google";
 import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
@@ -16,10 +15,7 @@ export default function MainPage(params: any) {
   const [networkData, setNetworkData] = useState(
     params.data[isMainnet ? "mainnet" : "goerli"]
   );
-  console.log(
-    networkData.chartDataBeaconStakesDaily,
-    networkData.chartDataBeaconStakesCumulative
-  );
+
   const handleSwitchBtn = () => {
     const network = !isMainnet;
     setIsMainnet(network);
