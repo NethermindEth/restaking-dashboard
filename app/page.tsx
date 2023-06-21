@@ -201,19 +201,9 @@ async function fetchData(isMainnet: boolean) {
     subtractArrays(sumStEth, [sumREth, sumCbEth])
   );
 
-  // let chartDataStEthCumulative = extractAmountsAndTimestampsWithPrevious(
-  //   cummulativestEthDeposits,
-  //   cummulativerEthDeposits
-  // );
-
   const chartDataSumREth = extractAmountsAndTimestamps(
     subtractArrays(sumREth, [sumStEth, sumCbEth])
   );
-
-  // let chartDataREthCumulative = extractAmountsAndTimestampsWithPrevious(
-  //   cummulativerEthDeposits,
-  //   cummulativestEthDeposits
-  // );
 
   // LeaderBoard
   let [stakersBeaconChainEth, stakersReth, stakersSteth, stakersCbeth] = (
