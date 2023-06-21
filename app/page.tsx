@@ -132,49 +132,48 @@ async function fetchData(isMainnet: boolean) {
     extractAmountsAndTimestampsWithPrevious(cummulativeBeaconChainStakes);
 
   // Withdrawals
-  let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from(
-      isMainnet
-        ? "mainnet_consumabledailywithdrawalsreth"
-        : "consumabledailywithdrawalsreth"
-    )
-    .select("*");
-  rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
-  let totalrEthWithdrawals = sumTotalAmounts(rEthWithdrawals as BlockData[]);
-  let cummulativerEthWithdrawals = accumulateAmounts(
-    rEthWithdrawals as BlockData[]
-  );
+  const [rEthWithdrawals, stEthWithdrawals, cbEthWithdrawals] = (
+    await Promise.all([
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailywithdrawalsreth"
+            : "consumabledailywithdrawalsreth"
+        )
+        .select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailywithdrawalssteth"
+            : "consumabledailywithdrawalssteth"
+        )
+        .select("*"),
+      supabase.from("mainnet_consumabledailywithdrawalscbeth").select("*"),
+    ])
+  ).map((response) => mergeBlockChunks(response.data as BlockData[]));
 
-  let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from(
-      isMainnet
-        ? "mainnet_consumabledailywithdrawalssteth"
-        : "consumabledailywithdrawalssteth"
-    )
-    .select("*");
-  stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
-  let totalstEthWithdrawals = sumTotalAmounts(stEthWithdrawals as BlockData[]);
-  let cummulativestEthWithdrawals = accumulateAmounts(
-    stEthWithdrawals as BlockData[]
-  );
+  const [totalrEthWithdrawals, cummulativerEthWithdrawals] = [
+    sumTotalAmounts(rEthWithdrawals),
+    accumulateAmounts(rEthWithdrawals),
+  ];
 
-  let { data: cbEthWithdrawals, error: cbEthWithDrawalsError } = await supabase
-    .from("mainnet_consumabledailywithdrawalscbeth")
-    .select("*");
-  cbEthWithdrawals = mergeBlockChunks(cbEthWithdrawals as BlockData[]);
-  let totalcbEthWithdrawals = sumTotalAmounts(cbEthWithdrawals as BlockData[]);
-  let cummulativecbEthWithdrawals = accumulateAmounts(
-    cbEthWithdrawals as BlockData[]
-  );
+  const [totalstEthWithdrawals, cummulativestEthWithdrawals] = [
+    sumTotalAmounts(stEthWithdrawals),
+    accumulateAmounts(stEthWithdrawals),
+  ];
+  const [totalcbEthWithdrawals, cummulativecbEthWithdrawals] = [
+    sumTotalAmounts(cbEthWithdrawals),
+    accumulateAmounts(cbEthWithdrawals),
+  ];
 
   // Withdrawals prepared for charts.
-  let chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
-    stEthWithdrawals as BlockData[],
-    rEthWithdrawals as BlockData[],
-    cbEthWithdrawals as BlockData[]
+  const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
+    stEthWithdrawals,
+    rEthWithdrawals,
+    cbEthWithdrawals
   );
 
-  let chartDataWithdrawalsCumulative = isMainnet
+  const chartDataWithdrawalsCumulative = isMainnet
     ? extractAmountsAndTimestampsWithPrevious(
         cummulativestEthWithdrawals,
         cummulativerEthWithdrawals,
@@ -185,19 +184,13 @@ async function fetchData(isMainnet: boolean) {
         cummulativerEthWithdrawals
       );
 
-  let sumStEth = subtractArrays(stEthDeposits as BlockData[], [
-    stEthWithdrawals as BlockData[],
-  ]);
+  const sumStEth = subtractArrays(stEthDeposits, [stEthWithdrawals]);
 
-  let sumREth = subtractArrays(rEthDeposits as BlockData[], [
-    rEthWithdrawals as BlockData[],
-  ]);
+  const sumREth = subtractArrays(rEthDeposits, [rEthWithdrawals]);
 
-  let sumCbEth = subtractArrays(cbEthDeposits as BlockData[], [
-    cbEthWithdrawals as BlockData[],
-  ]);
+  const sumCbEth = subtractArrays(cbEthDeposits, [cbEthWithdrawals]);
 
-  let chartDataSumStEth = extractAmountsAndTimestamps(
+  const chartDataSumStEth = extractAmountsAndTimestamps(
     subtractArrays(sumStEth, [sumREth, sumCbEth])
   );
 
@@ -206,7 +199,7 @@ async function fetchData(isMainnet: boolean) {
   //   cummulativerEthDeposits
   // );
 
-  let chartDataSumREth = extractAmountsAndTimestamps(
+  const chartDataSumREth = extractAmountsAndTimestamps(
     subtractArrays(sumREth, [sumStEth, sumCbEth])
   );
 
