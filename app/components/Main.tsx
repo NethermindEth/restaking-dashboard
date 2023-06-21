@@ -45,7 +45,7 @@ export default function MainPage(params: any) {
             ></div>
           </div>
         </label>
-        <span className="ml-2">Goerli</span>
+        <span className="ml-2">Testnet</span>
       </div>
       <div className="z-10 max-w-5xl items-center justify-between font-mono text-sm">
         <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none lgmb-12">
