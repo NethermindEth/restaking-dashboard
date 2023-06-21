@@ -55,27 +55,16 @@ function roundToDecimalPlaces(
   value: number,
   decimalPlaces: number = 2
 ): number | string {
-  // const factor = Math.pow(10, decimalPlaces);
-  // return Math.round(value * factor) / factor;
   return value.toFixed(decimalPlaces);
 }
 
-function formatDate(inputDate: string): string {
+function formatDate(inputDate: string, toStandard: boolean = false): string {
   const date = new Date(inputDate);
   const day = date.getDate().toString().padStart(2, "0");
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear().toString().slice(-2);
 
-  return `${month}/${day}/${year}`;
-}
-
-function formatDateToStandard(inputDate: string): string {
-  const date = new Date(inputDate);
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear().toString().slice(-2);
-
-  return `${day}/${month}/${year}`;
+  return toStandard ? `${day}/${month}/${year}` : `${month}/${day}/${year}`;
 }
 
 function fillMissingDates(...arrays: BlockData[][]): BlockData[][] {
@@ -178,7 +167,7 @@ function extractAmountsAndTimestamps(...arrays: BlockData[][]): {
   const filledArrays = arrays.map((arr) => filledArray(arr, combinedDates));
 
   let timestamps = Array.from(combinedDates).sort();
-  timestamps = timestamps.map((timestamp) => formatDateToStandard(timestamp));
+  timestamps = timestamps.map((timestamp) => formatDate(timestamp, true));
   const amounts = filledArrays.map((arr) =>
     arr.map((item) => item.total_amount)
   );
@@ -224,7 +213,7 @@ function extractAmountsAndTimestampsWithPrevious(...arrays: BlockData[][]): {
   const filledArrays = arrays.map((arr) => filledArray(arr, combinedDates));
 
   let timestamps = Array.from(combinedDates).sort();
-  timestamps = timestamps.map((date) => formatDateToStandard(date));
+  timestamps = timestamps.map((date) => formatDate(date, true));
   const amounts = filledArrays.map((arr) =>
     arr.map((item) => item.total_amount)
   );
