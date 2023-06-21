@@ -30,8 +30,8 @@ const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
   const [mainnetData, goerliData] = await Promise.all([
-    getDeposits(true),
-    getDeposits(false),
+    fetchData(true),
+    fetchData(false),
   ]);
 
   return (
@@ -39,7 +39,7 @@ export default async function Home() {
   );
 }
 
-async function getDeposits(isMainnet: boolean) {
+async function fetchData(isMainnet: boolean) {
   const provider = isMainnet ? mainnetProvider : testnetProvider;
   const rEthAddress = isMainnet ? MAINNET_RETH_ADDRESS : TESTNET_RETH_ADDRESS;
 
@@ -49,58 +49,54 @@ async function getDeposits(isMainnet: boolean) {
   const cbEth = StakedTokenV1__factory.connect(MAINNET_CBETH_ADDRESS, provider);
   const cbEthRate = isMainnet ? Number(await cbEth.exchangeRate()) / 1e18 : 0;
 
-  // Move to promise.all
-
   // Deposits
-  let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from(
-      isMainnet
-        ? "mainnet_consumabledailydepositsreth"
-        : "consumabledailydepositsreth"
-    )
-    .select("*");
-  rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
-  let totalrEthDeposits = sumTotalAmounts(rEthDeposits as BlockData[]);
-  let cummulativerEthDeposits = accumulateAmounts(rEthDeposits as BlockData[]);
+  const [rEthDeposits, stEthDeposits, cbEthDeposits, beaconChainStakes] = (
+    await Promise.all([
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailydepositsreth"
+            : "consumabledailydepositsreth"
+        )
+        .select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailydepositssteth"
+            : "consumabledailydepositssteth"
+        )
+        .select("*"),
+      supabase.from("mainnet_consumabledailydepositscbeth").select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumablebeaconchainstakeseth"
+            : "consumablebeaconchainstakeseth"
+        )
+        .select("*")
+        .limit(100),
+    ])
+  ).map((response) => mergeBlockChunks(response.data as BlockData[]));
 
-  let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from(
-      isMainnet
-        ? "mainnet_consumabledailydepositssteth"
-        : "consumabledailydepositssteth"
-    )
-    .select("*");
-  stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
-  let totalstEthDeposits = sumTotalAmounts(stEthDeposits as BlockData[]);
-  let cummulativestEthDeposits = accumulateAmounts(
-    stEthDeposits as BlockData[]
-  );
+  const [totalrEthDeposits, cummulativerEthDeposits] = [
+    sumTotalAmounts(rEthDeposits as BlockData[]),
+    accumulateAmounts(rEthDeposits as BlockData[]),
+  ];
 
-  let { data: cbEthDeposits, error: cbEthDepositError } = await supabase
-    .from("mainnet_consumabledailydepositscbeth")
-    .select("*");
-  cbEthDeposits = mergeBlockChunks(cbEthDeposits as BlockData[]);
-  let totalcbEthDeposits = sumTotalAmounts(cbEthDeposits as BlockData[]);
-  let cummulativecbEthDeposits = accumulateAmounts(
-    cbEthDeposits as BlockData[]
-  );
+  const [totalstEthDeposits, cummulativestEthDeposits] = [
+    sumTotalAmounts(stEthDeposits as BlockData[]),
+    accumulateAmounts(stEthDeposits as BlockData[]),
+  ];
 
-  let { data: beaconChainStakes } = await supabase
-    .from(
-      isMainnet
-        ? "mainnet_consumablebeaconchainstakeseth"
-        : "consumablebeaconchainstakeseth"
-    )
-    .select("*")
-    .limit(100);
+  const [totalcbEthDeposits, cummulativecbEthDeposits] = [
+    sumTotalAmounts(cbEthDeposits as BlockData[]),
+    accumulateAmounts(cbEthDeposits as BlockData[]),
+  ];
 
-  beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
-  let totalBeaconChainStakes = sumTotalAmounts(
-    beaconChainStakes as BlockData[]
-  );
-  let cummulativeBeaconChainStakes = accumulateAmounts(
-    beaconChainStakes as BlockData[]
-  );
+  const [totalBeaconChainStakes, cummulativeBeaconChainStakes] = [
+    sumTotalAmounts(beaconChainStakes as BlockData[]),
+    accumulateAmounts(beaconChainStakes as BlockData[]),
+  ];
 
   // Deposits prepared for charts.
   let chartDataDepositsDaily = isMainnet
