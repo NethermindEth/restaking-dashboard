@@ -75,7 +75,11 @@ async function fetchData(isMainnet: boolean) {
         .select("*")
         .limit(100),
     ])
-  ).map((response) => mergeBlockChunks(response.data as BlockData[]));
+  ).map((response) =>
+    isMainnet
+      ? (response.data as BlockData[])
+      : mergeBlockChunks(response.data as BlockData[])
+  );
 
   const [totalrEthDeposits, cummulativerEthDeposits] = [
     sumTotalAmounts(rEthDeposits),
@@ -149,7 +153,11 @@ async function fetchData(isMainnet: boolean) {
         .select("*"),
       supabase.from("mainnet_consumabledailywithdrawalscbeth").select("*"),
     ])
-  ).map((response) => mergeBlockChunks(response.data as BlockData[]));
+  ).map((response) =>
+    isMainnet
+      ? (response.data as BlockData[])
+      : mergeBlockChunks(response.data as BlockData[])
+  );
 
   const [totalrEthWithdrawals, cummulativerEthWithdrawals] = [
     sumTotalAmounts(rEthWithdrawals),
