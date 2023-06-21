@@ -1,5 +1,3 @@
-import { ethers } from "ethers";
-
 type BlockData = {
   total_amount: number;
   block_chunk: number;
@@ -286,15 +284,6 @@ function getAddressUrl(isMainnet: boolean, address: string): string {
     : `https://goerli.etherscan.io/address/${address}`;
 }
 
-async function getENSNameIfExist(
-  address: string,
-  provider: ethers.JsonRpcProvider
-) {
-  //const name = await provider.lookupAddress(address);
-  // return name ? name : address;
-  return address;
-}
-
 const getShortenedAddress = (
   address: string,
   first: number,
@@ -317,6 +306,5 @@ export {
   extractAmountsAndTimestampsWithPrevious,
   subtractArrays,
   getAddressUrl,
-  getENSNameIfExist,
   getShortenedAddress,
 };
