@@ -79,40 +79,40 @@ async function fetchData(isMainnet: boolean) {
   ).map((response) => mergeBlockChunks(response.data as BlockData[]));
 
   const [totalrEthDeposits, cummulativerEthDeposits] = [
-    sumTotalAmounts(rEthDeposits as BlockData[]),
-    accumulateAmounts(rEthDeposits as BlockData[]),
+    sumTotalAmounts(rEthDeposits),
+    accumulateAmounts(rEthDeposits),
   ];
 
   const [totalstEthDeposits, cummulativestEthDeposits] = [
-    sumTotalAmounts(stEthDeposits as BlockData[]),
-    accumulateAmounts(stEthDeposits as BlockData[]),
+    sumTotalAmounts(stEthDeposits),
+    accumulateAmounts(stEthDeposits),
   ];
 
   const [totalcbEthDeposits, cummulativecbEthDeposits] = [
-    sumTotalAmounts(cbEthDeposits as BlockData[]),
-    accumulateAmounts(cbEthDeposits as BlockData[]),
+    sumTotalAmounts(cbEthDeposits),
+    accumulateAmounts(cbEthDeposits),
   ];
 
   const [totalBeaconChainStakes, cummulativeBeaconChainStakes] = [
-    sumTotalAmounts(beaconChainStakes as BlockData[]),
-    accumulateAmounts(beaconChainStakes as BlockData[]),
+    sumTotalAmounts(beaconChainStakes),
+    accumulateAmounts(beaconChainStakes),
   ];
 
   // Deposits prepared for charts.
-  let chartDataDepositsDaily = isMainnet
+  const chartDataDepositsDaily = isMainnet
     ? extractAmountsAndTimestamps(
-        stEthDeposits as BlockData[],
-        rEthDeposits as BlockData[],
-        cbEthDeposits as BlockData[],
-        beaconChainStakes as BlockData[]
+        stEthDeposits,
+        rEthDeposits,
+        cbEthDeposits,
+        beaconChainStakes
       )
     : extractAmountsAndTimestamps(
-        stEthDeposits as BlockData[],
-        rEthDeposits as BlockData[],
-        beaconChainStakes as BlockData[]
+        stEthDeposits,
+        rEthDeposits,
+        beaconChainStakes
       );
 
-  let chartDataDepositsCumulative = isMainnet
+  const chartDataDepositsCumulative = isMainnet
     ? extractAmountsAndTimestampsWithPrevious(
         cummulativestEthDeposits,
         cummulativerEthDeposits,
@@ -125,13 +125,11 @@ async function fetchData(isMainnet: boolean) {
         cummulativeBeaconChainStakes
       );
 
-  let chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
-    beaconChainStakes as BlockData[]
-  );
+  const chartDataBeaconStakesDaily =
+    extractAmountsAndTimestamps(beaconChainStakes);
 
-  let chartDataBeaconStakesCumulative = extractAmountsAndTimestampsWithPrevious(
-    cummulativeBeaconChainStakes
-  );
+  const chartDataBeaconStakesCumulative =
+    extractAmountsAndTimestampsWithPrevious(cummulativeBeaconChainStakes);
 
   // Withdrawals
   let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
