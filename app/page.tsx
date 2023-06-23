@@ -192,9 +192,7 @@ async function fetchData(isMainnet: boolean) {
       );
 
   const sumStEth = subtractArrays(stEthDeposits, [stEthWithdrawals]);
-
   const sumREth = subtractArrays(rEthDeposits, [rEthWithdrawals]);
-
   const sumCbEth = subtractArrays(cbEthDeposits, [cbEthWithdrawals]);
 
   const chartDataSumStEth = extractAmountsAndTimestamps(
