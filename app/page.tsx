@@ -396,22 +396,22 @@ async function fetchData(isMainnet: boolean) {
     cummulativestEthDeposits,
     cummulativecbEthDeposits,
   ] = [
-    accumulateAmounts(rEthDeposits as BlockData[]),
-    accumulateAmounts(stEthDeposits as BlockData[]),
-    accumulateAmounts(cbEthDeposits as BlockData[]),
+    accumulateAmounts(rEthDeposits),
+    accumulateAmounts(stEthDeposits),
+    accumulateAmounts(cbEthDeposits),
   ];
 
   const [totalBeaconChainStakes, cummulativeBeaconChainStakes] = [
-    sumTotalAmounts(beaconChainStakes as BlockData[]),
-    accumulateAmounts(beaconChainStakes as BlockData[]),
+    sumTotalAmounts(beaconChainStakes),
+    accumulateAmounts(beaconChainStakes),
   ];
 
   // Deposits prepared for charts.
   let chartDataDepositsDaily = extractAmountsAndTimestamps(
-    stEthDeposits as BlockData[],
-    rEthDeposits as BlockData[],
-    cbEthDeposits as BlockData[],
-    beaconChainStakes as BlockData[]
+    stEthDeposits,
+    rEthDeposits,
+    cbEthDeposits,
+    beaconChainStakes
   );
 
   let chartDataDepositsCumulative = extractAmountsAndTimestampsWithPrevious(
@@ -421,9 +421,8 @@ async function fetchData(isMainnet: boolean) {
     cummulativeBeaconChainStakes
   );
 
-  let chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
-    beaconChainStakes as BlockData[]
-  );
+  let chartDataBeaconStakesDaily =
+    extractAmountsAndTimestamps(beaconChainStakes);
 
   let chartDataBeaconStakesCumulative = extractAmountsAndTimestampsWithPrevious(
     cummulativeBeaconChainStakes
@@ -455,16 +454,16 @@ async function fetchData(isMainnet: boolean) {
     cummulativestEthWithdrawals,
     cummulativecbEthWithdrawals,
   ] = [
-    accumulateAmounts(rEthWithdrawals as BlockData[]),
-    accumulateAmounts(stEthWithdrawals as BlockData[]),
-    accumulateAmounts(cbEthWithdrawals as BlockData[]),
+    accumulateAmounts(rEthWithdrawals),
+    accumulateAmounts(stEthWithdrawals),
+    accumulateAmounts(cbEthWithdrawals),
   ];
 
   // Withdrawals prepared for charts.
   let chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
-    stEthWithdrawals as BlockData[],
-    rEthWithdrawals as BlockData[],
-    cbEthWithdrawals as BlockData[]
+    stEthWithdrawals,
+    rEthWithdrawals,
+    cbEthWithdrawals
   );
 
   let chartDataWithdrawalsCumulative = extractAmountsAndTimestampsWithPrevious(
@@ -473,17 +472,11 @@ async function fetchData(isMainnet: boolean) {
     cummulativecbEthWithdrawals
   );
 
-  let sumStEth = subtractArrays(stEthDeposits as BlockData[], [
-    stEthWithdrawals as BlockData[],
-  ]);
+  let sumStEth = subtractArrays(stEthDeposits, [stEthWithdrawals]);
 
-  let sumREth = subtractArrays(rEthDeposits as BlockData[], [
-    rEthWithdrawals as BlockData[],
-  ]);
+  let sumREth = subtractArrays(rEthDeposits, [rEthWithdrawals]);
 
-  let sumCbEth = subtractArrays(cbEthDeposits as BlockData[], [
-    cbEthWithdrawals as BlockData[],
-  ]);
+  let sumCbEth = subtractArrays(cbEthDeposits, [cbEthWithdrawals]);
 
   let chartDataSumStEth = extractAmountsAndTimestamps(
     subtractArrays(sumStEth, [sumREth, sumCbEth])
@@ -531,21 +524,21 @@ async function fetchData(isMainnet: boolean) {
     ])
   ).map((response) => response.data as UserData[]);
 
-  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+  let stakersRethConverted = stakersReth.map((d) => ({
     depositor: d.depositor,
     total_deposits: d.total_deposits * rEthRate,
-  }));
+  })) as UserData[];
 
-  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+  let stakersCbethConverted = stakersCbeth.map((d) => ({
     depositor: d.depositor,
     total_deposits: d.total_deposits * cbEthRate,
-  }));
+  })) as UserData[];
 
   let groupedStakers = [
-    ...(stakersBeaconChainEth as UserData[]),
-    ...(stakersRethConverted as UserData[]),
-    ...(stakersSteth as UserData[]),
-    ...(stakersCbethConverted as UserData[]),
+    ...stakersBeaconChainEth,
+    ...stakersRethConverted,
+    ...stakersSteth,
+    ...stakersCbethConverted,
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
