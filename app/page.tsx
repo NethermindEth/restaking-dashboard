@@ -74,7 +74,7 @@ export default async function Home() {
     cbEthRate,
     chartDataBeaconStakesDaily,
     chartDataBeaconStakesCumulative,
-  } = await getDeposits(true);
+  } = await fetchData(true);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
@@ -318,7 +318,7 @@ export default async function Home() {
   );
 }
 
-async function getDeposits(isMainnet: boolean) {
+async function fetchData(isMainnet: boolean) {
   const provider = isMainnet ? mainnetProvider : testnetProvider;
   const rEthAddress = isMainnet ? MAINNET_RETH_ADDRESS : TESTNET_RETH_ADDRESS;
 
