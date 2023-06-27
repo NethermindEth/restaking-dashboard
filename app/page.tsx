@@ -19,16 +19,30 @@ import {
   subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
-import { RocketTokenRETH__factory, StakedTokenV1__factory, StrategyBaseTVLLimits__factory } from "@/typechain";
+import {
+  RocketTokenRETH__factory,
+  StakedTokenV1__factory,
+  StrategyBaseTVLLimits__factory,
+} from "@/typechain";
 import Image from "next/image";
 import Disclaimer from "./components/Disclaimer";
 
-const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
-const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
-const STETH_STRATEGY_ADDRESS = "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
-const CBETH_STRATEGY_ADDRESS = "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
-const RETH_STRATEGY_ADDRESS = "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
-const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
+const MAINNET_RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+const MAINNET_CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
+const TESTNET_RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
+
+const MAINNET_STETH_STRATEGY_ADDRESS =
+  "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
+const MAINNET_CBETH_STRATEGY_ADDRESS =
+  "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
+const MAINNET_RETH_STRATEGY_ADDRESS =
+  "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
+
+const mainnetProvider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
+const testnetProvider = new ethers.JsonRpcProvider(
+  "https://rpc.ankr.com/eth_goerli"
+);
+
 const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
@@ -60,7 +74,7 @@ export default async function Home() {
     cbEthRate,
     chartDataBeaconStakesDaily,
     chartDataBeaconStakesCumulative,
-  } = await getDeposits();
+  } = await getDeposits(true);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
@@ -87,27 +101,21 @@ export default async function Home() {
             />
           </span>
           <p className="text-sm md:text-base">Staked stETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(stEthTvl)}
-          </p>
+          <p className="md:text-xl">{roundToDecimalPlaces(stEthTvl)}</p>
         </div>
         <div className="data-card data-card-reth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block ">
             <Image src={"/reth.webp"} alt="rETH" width={48} height={48} />
           </span>
           <p className="text-sm md:text-base">Staked rETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(rEthTvl)}
-          </p>
+          <p className="md:text-xl">{roundToDecimalPlaces(rEthTvl)}</p>
         </div>
         <div className="data-card data-card-cbeth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block ">
             <Image src={"/cbeth.png"} alt="cbETH" width={48} height={48} />
           </span>
           <p className="text-sm md:text-base">Staked cbETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(cbEthTvl)}
-          </p>
+          <p className="md:text-xl">{roundToDecimalPlaces(cbEthTvl)}</p>
         </div>
         <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block">
@@ -268,8 +276,8 @@ export default async function Home() {
             data={{
               amounts: [
                 stEthTvl,
-                (rEthTvl) * rEthRate,
-                (cbEthTvl) * cbEthRate,
+                rEthTvl * rEthRate,
+                cbEthTvl * cbEthRate,
                 totalBeaconChainStakes,
               ],
               labels: [
@@ -310,20 +318,47 @@ export default async function Home() {
   );
 }
 
-async function getDeposits() {
-  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
+async function getDeposits(isMainnet: boolean) {
+  const provider = isMainnet ? mainnetProvider : testnetProvider;
+  const rEthAddress = isMainnet ? MAINNET_RETH_ADDRESS : TESTNET_RETH_ADDRESS;
+
+  const rEth = RocketTokenRETH__factory.connect(rEthAddress, provider);
   const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
-  const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
-  const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
+  const cbEth = StakedTokenV1__factory.connect(MAINNET_CBETH_ADDRESS, provider);
+  const cbEthRate = isMainnet ? Number(await cbEth.exchangeRate()) / 1e18 : 0;
 
-  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(STETH_STRATEGY_ADDRESS, provider);
-  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
-  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
-  
-  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
-  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
-  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
+  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(
+    MAINNET_STETH_STRATEGY_ADDRESS,
+    provider
+  );
+  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(
+    MAINNET_RETH_STRATEGY_ADDRESS,
+    provider
+  );
+  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
+    MAINNET_CBETH_STRATEGY_ADDRESS,
+    provider
+  );
+
+  const stEthTvl =
+    Number(
+      await stEthStrategy.sharesToUnderlyingView(
+        await stEthStrategy.totalShares()
+      )
+    ) / 1e18;
+  const rEthTvl =
+    Number(
+      await rEthStrategy.sharesToUnderlyingView(
+        await rEthStrategy.totalShares()
+      )
+    ) / 1e18;
+  const cbEthTvl =
+    Number(
+      await cbEthStrategy.sharesToUnderlyingView(
+        await cbEthStrategy.totalShares()
+      )
+    ) / 1e18;
 
   // Move to promise.all
 
