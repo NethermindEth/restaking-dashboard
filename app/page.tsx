@@ -363,38 +363,48 @@ async function getDeposits(isMainnet: boolean) {
   // Move to promise.all
 
   // Deposits
-  let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from("mainnet_consumabledailydepositsreth")
-    .select("*");
-  rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
-  let cummulativerEthDeposits = accumulateAmounts(rEthDeposits as BlockData[]);
+  const [rEthDeposits, stEthDeposits, cbEthDeposits, beaconChainStakes] = (
+    await Promise.all([
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailydepositsreth"
+            : "consumabledailydepositsreth"
+        )
+        .select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailydepositssteth"
+            : "consumabledailydepositssteth"
+        )
+        .select("*"),
+      supabase.from("mainnet_consumabledailydepositscbeth").select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumablebeaconchainstakeseth"
+            : "consumablebeaconchainstakeseth"
+        )
+        .select("*")
+        .limit(100),
+    ])
+  ).map((response) => mergeBlockChunks(response.data as BlockData[]));
 
-  let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from("mainnet_consumabledailydepositssteth")
-    .select("*");
-  stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
-  let cummulativestEthDeposits = accumulateAmounts(
-    stEthDeposits as BlockData[]
-  );
+  const [
+    cummulativerEthDeposits,
+    cummulativestEthDeposits,
+    cummulativecbEthDeposits,
+  ] = [
+    accumulateAmounts(rEthDeposits as BlockData[]),
+    accumulateAmounts(stEthDeposits as BlockData[]),
+    accumulateAmounts(cbEthDeposits as BlockData[]),
+  ];
 
-  let { data: cbEthDeposits, error: cbEthDepositError } = await supabase
-    .from("mainnet_consumabledailydepositscbeth")
-    .select("*");
-  cbEthDeposits = mergeBlockChunks(cbEthDeposits as BlockData[]);
-  let cummulativecbEthDeposits = accumulateAmounts(
-    cbEthDeposits as BlockData[]
-  );
-
-  let { data: beaconChainStakes } = await supabase
-    .from("mainnet_consumablebeaconchainstakeseth")
-    .select("*");
-  beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
-  let totalBeaconChainStakes = sumTotalAmounts(
-    beaconChainStakes as BlockData[]
-  );
-  let cummulativeBeaconChainStakes = accumulateAmounts(
-    beaconChainStakes as BlockData[]
-  );
+  const [totalBeaconChainStakes, cummulativeBeaconChainStakes] = [
+    sumTotalAmounts(beaconChainStakes as BlockData[]),
+    accumulateAmounts(beaconChainStakes as BlockData[]),
+  ];
 
   // Deposits prepared for charts.
   let chartDataDepositsDaily = extractAmountsAndTimestamps(
