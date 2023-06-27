@@ -485,36 +485,31 @@ async function getDeposits() {
     .from("temp_mainnet_cbethstakers_view")
     .select("*")) as { data: UserData[] };
 
-  const rEthAmounts = await Promise.all(
-    stakersReth.map((d) =>
-      rEthStrategy.sharesToUnderlyingView(BigInt(d.total_deposits * 1e18))
-    )
+  const rEthSharesRate = await rEthStrategy.sharesToUnderlyingView(
+    BigInt(1e18)
+  );
+  const stEthSharesRate = await stEthStrategy.sharesToUnderlyingView(
+    BigInt(1e18)
+  );
+  const cbEthSharesRate = await cbEthStrategy.sharesToUnderlyingView(
+    BigInt(1e18)
   );
 
-  const stEthAmounts = await Promise.all(
-    stakersSteth.map((d) =>
-      stEthStrategy.sharesToUnderlyingView(BigInt(d.total_deposits * 1e18))
-    )
-  );
-  const cbEthAmounts = await Promise.all(
-    stakersCbeth.map((d) =>
-      cbEthStrategy.sharesToUnderlyingView(BigInt(d.total_deposits * 1e18))
-    )
-  );
-
-  let stakersRethConverted = (stakersReth as UserData[]).map((d, index) => ({
+  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits: (Number(rEthAmounts[index]) / 1e18) * rEthRate,
+    total_deposits:
+      (Number(rEthSharesRate) * d.total_deposits * rEthRate) / 1e18,
   }));
 
-  let stakersStethConverted = stakersSteth.map((d, index) => ({
+  let stakersStethConverted = stakersSteth.map((d) => ({
     depositor: d.depositor,
-    total_deposits: Number(stEthAmounts[index]) / 1e18,
+    total_deposits: (Number(stEthSharesRate) * d.total_deposits) / 1e18,
   }));
 
-  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d, index) => ({
+  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits: (Number(cbEthAmounts[index]) / 1e18) * cbEthRate,
+    total_deposits:
+      (Number(cbEthSharesRate) * d.total_deposits * cbEthRate) / 1e18,
   }));
 
   let groupedStakers = [
