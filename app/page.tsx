@@ -19,12 +19,20 @@ import {
   subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
-import { RocketTokenRETH__factory, StakedTokenV1__factory } from "@/typechain";
+import {
+  RocketTokenRETH__factory,
+  StakedTokenV1__factory,
+  StrategyBaseTVLLimits_factory__factory,
+} from "@/typechain";
 import Image from "next/image";
 import Disclaimer from "./components/Disclaimer";
 
 const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
+const STETH_STRATEGY_ADDRESS = "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
+const CBETH_STRATEGY_ADDRESS = "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
+const RETH_STRATEGY_ADDRESS = "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
+
 const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
 const MAX_LEADERBOARD_SIZE = 50;
 
@@ -54,7 +62,7 @@ export default async function Home() {
     stakersBeaconChainEth,
     stakersRethConverted,
     stakersCbethConverted,
-    stakersSteth,
+    stakersStethConverted,
     groupedStakers,
     rEthRate,
     cbEthRate,
@@ -285,7 +293,7 @@ export default async function Home() {
         <LeaderBoard
           boardData={{
             ethStakers: groupedStakers,
-            stethStakers: stakersSteth,
+            stethStakers: stakersStethConverted,
             rethStakers: stakersRethConverted,
             cbethStakers: stakersCbethConverted,
             beaconchainethStakers: stakersBeaconChainEth,
@@ -316,6 +324,19 @@ async function getDeposits() {
 
   const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
   const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
+
+  const stEthStrategy = StrategyBaseTVLLimits_factory__factory.connect(
+    STETH_STRATEGY_ADDRESS,
+    provider
+  );
+  const rEthStrategy = StrategyBaseTVLLimits_factory__factory.connect(
+    RETH_STRATEGY_ADDRESS,
+    provider
+  );
+  const cbEthStrategy = StrategyBaseTVLLimits_factory__factory.connect(
+    CBETH_STRATEGY_ADDRESS,
+    provider
+  );
 
   // Move to promise.all
 
@@ -452,32 +473,54 @@ async function getDeposits() {
 
   // LeaderBoard
   let { data: stakersBeaconChainEth } = (await supabase
-    .from("mainnet_stakers_beaconchaineth_deposits_view")
+    .from("temp_mainnet_beaconchainethstakers_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersReth } = (await supabase
-    .from("mainnet_stakers_reth_deposits_view")
+    .from("temp_mainnet_rethstakers_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersSteth } = (await supabase
-    .from("mainnet_stakers_steth_deposits_view")
+    .from("temp_mainnet_stethstakers_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersCbeth } = (await supabase
-    .from("mainnet_stakers_cbeth_deposits_view")
+    .from("temp_mainnet_cbethstakers_view")
     .select("*")) as { data: UserData[] };
 
-  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+  const rEthAmounts = await Promise.all(
+    stakersReth.map((d) =>
+      rEthStrategy.sharesToUnderlyingView(BigInt(d.total_deposits * 1e18))
+    )
+  );
+
+  const stEthAmounts = await Promise.all(
+    stakersSteth.map((d) =>
+      stEthStrategy.sharesToUnderlyingView(BigInt(d.total_deposits * 1e18))
+    )
+  );
+  const cbEthAmounts = await Promise.all(
+    stakersCbeth.map((d) =>
+      cbEthStrategy.sharesToUnderlyingView(BigInt(d.total_deposits * 1e18))
+    )
+  );
+
+  let stakersRethConverted = (stakersReth as UserData[]).map((d, index) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * rEthRate,
+    total_deposits: (Number(rEthAmounts[index]) / 1e18) * rEthRate,
   }));
 
-  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+  let stakersStethConverted = stakersSteth.map((d, index) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * cbEthRate,
+    total_deposits: Number(stEthAmounts[index]) / 1e18,
+  }));
+
+  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d, index) => ({
+    depositor: d.depositor,
+    total_deposits: (Number(cbEthAmounts[index]) / 1e18) * cbEthRate,
   }));
 
   let groupedStakers = [
     ...(stakersBeaconChainEth as UserData[]),
     ...(stakersRethConverted as UserData[]),
-    ...(stakersSteth as UserData[]),
+    ...(stakersStethConverted as UserData[]),
     ...(stakersCbethConverted as UserData[]),
   ]
     .reduce((acc, cur) => {
@@ -494,13 +537,13 @@ async function getDeposits() {
   stakersRethConverted = stakersRethConverted.slice(0, MAX_LEADERBOARD_SIZE);
   stakersCbethConverted = stakersCbethConverted.slice(0, MAX_LEADERBOARD_SIZE);
   stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersSteth = stakersSteth.slice(0, MAX_LEADERBOARD_SIZE);
+  stakersStethConverted = stakersStethConverted.slice(0, MAX_LEADERBOARD_SIZE);
   groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
     ...stakersRethConverted,
     ...stakersBeaconChainEth,
-    ...stakersSteth,
+    ...stakersStethConverted,
     ...stakersCbethConverted,
     ...groupedStakers,
   ];
@@ -543,7 +586,7 @@ async function getDeposits() {
     cummulativeBeaconChainStakes,
     stakersBeaconChainEth,
     stakersRethConverted,
-    stakersSteth,
+    stakersStethConverted,
     stakersCbethConverted,
     groupedStakers,
     rEthRate,
