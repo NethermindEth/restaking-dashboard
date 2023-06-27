@@ -389,7 +389,7 @@ async function getDeposits(isMainnet: boolean) {
         .select("*")
         .limit(100),
     ])
-  ).map((response) => mergeBlockChunks(response.data as BlockData[]));
+  ).map((response) => response.data as BlockData[]);
 
   const [
     cummulativerEthDeposits,
