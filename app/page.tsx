@@ -504,18 +504,14 @@ async function getDeposits(isMainnet: boolean) {
   // );
 
   // LeaderBoard
-  let { data: stakersBeaconChainEth } = (await supabase
-    .from("mainnet_stakers_beaconchaineth_deposits_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersReth } = (await supabase
-    .from("mainnet_stakers_reth_deposits_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersSteth } = (await supabase
-    .from("mainnet_stakers_steth_deposits_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersCbeth } = (await supabase
-    .from("mainnet_stakers_cbeth_deposits_view")
-    .select("*")) as { data: UserData[] };
+  let [stakersBeaconChainEth, stakersReth, stakersSteth, stakersCbeth] = (
+    await Promise.all([
+      supabase.from("mainnet_stakers_beaconchaineth_deposits_view").select("*"),
+      supabase.from("mainnet_stakers_reth_deposits_view").select("*"),
+      supabase.from("mainnet_stakers_steth_deposits_view").select("*"),
+      supabase.from("mainnet_stakers_cbeth_deposits_view").select("*"),
+    ])
+  ).map((response) => response.data as UserData[]);
 
   let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
     depositor: d.depositor,
