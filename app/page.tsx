@@ -450,17 +450,15 @@ async function getDeposits(isMainnet: boolean) {
     ])
   ).map((response) => response.data as BlockData[]);
 
-  let cummulativerEthWithdrawals = accumulateAmounts(
-    rEthWithdrawals as BlockData[]
-  );
-
-  let cummulativestEthWithdrawals = accumulateAmounts(
-    stEthWithdrawals as BlockData[]
-  );
-
-  let cummulativecbEthWithdrawals = accumulateAmounts(
-    cbEthWithdrawals as BlockData[]
-  );
+  const [
+    cummulativerEthWithdrawals,
+    cummulativestEthWithdrawals,
+    cummulativecbEthWithdrawals,
+  ] = [
+    accumulateAmounts(rEthWithdrawals as BlockData[]),
+    accumulateAmounts(stEthWithdrawals as BlockData[]),
+    accumulateAmounts(cbEthWithdrawals as BlockData[]),
+  ];
 
   // Withdrawals prepared for charts.
   let chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
