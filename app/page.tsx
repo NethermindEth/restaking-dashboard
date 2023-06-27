@@ -323,7 +323,7 @@ async function getDeposits() {
   
   const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
   const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
-  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
+  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
 
   // Move to promise.all
 
