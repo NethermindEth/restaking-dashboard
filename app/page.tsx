@@ -506,9 +506,27 @@ async function fetchData(isMainnet: boolean) {
   // LeaderBoard
   let [stakersBeaconChainEth, stakersReth, stakersSteth, stakersCbeth] = (
     await Promise.all([
-      supabase.from("mainnet_stakers_beaconchaineth_deposits_view").select("*"),
-      supabase.from("mainnet_stakers_reth_deposits_view").select("*"),
-      supabase.from("mainnet_stakers_steth_deposits_view").select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_stakers_beaconchaineth_deposits_view"
+            : "stakers_beaconchaineth_deposits_view"
+        )
+        .select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_stakers_reth_deposits_view"
+            : "stakers_reth_deposits_view"
+        )
+        .select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_stakers_steth_deposits_view"
+            : "stakers_steth_deposits_view"
+        )
+        .select("*"),
       supabase.from("mainnet_stakers_cbeth_deposits_view").select("*"),
     ])
   ).map((response) => response.data as UserData[]);
