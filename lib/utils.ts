@@ -237,7 +237,9 @@ function extractAmountsAndTimestampsWithPrevious(...arrays: BlockData[][]): {
 function subtractArrays(arr1: BlockData[], arrays: BlockData[][]): BlockData[] {
   const combinedDates = new Set([
     ...arr1.map((item) => formatDate(item.block_chunk_date)),
-    ...arrays.flatMap((arr) => arr.map((item) => formatDate(item.block_chunk_date))),
+    ...arrays.flatMap((arr) =>
+      arr.map((item) => formatDate(item.block_chunk_date))
+    ),
   ]);
 
   const dateMap = (arr: BlockData[]): Map<string, BlockData> =>
@@ -257,15 +259,22 @@ function subtractArrays(arr1: BlockData[], arrays: BlockData[][]): BlockData[] {
         block_chunk: 0,
         block_chunk_date: formatDate(date),
       };
-      const items = dateMaps.map((dateMap) => (dateMap.get(date) || {
-        total_amount: 0,
-        block_chunk: 0,
-        block_chunk_date: formatDate(date),
-      }));
+      const items = dateMaps.map(
+        (dateMap) =>
+          dateMap.get(date) || {
+            total_amount: 0,
+            block_chunk: 0,
+            block_chunk_date: formatDate(date),
+          }
+      );
 
       return {
-        total_amount: item1.total_amount - items.reduce((acc, item) => acc + item.total_amount, 0),
-        block_chunk: item1.block_chunk - items.reduce((acc, item) => acc + item.block_chunk, 0),
+        total_amount:
+          item1.total_amount -
+          items.reduce((acc, item) => acc + item.total_amount, 0),
+        block_chunk:
+          item1.block_chunk -
+          items.reduce((acc, item) => acc + item.block_chunk, 0),
         block_chunk_date: date,
       };
     });
@@ -273,15 +282,6 @@ function subtractArrays(arr1: BlockData[], arrays: BlockData[][]): BlockData[] {
 
 function getEtherscanAddressUrl(address: string): string {
   return `https://etherscan.io/address/${address}`;
-}
-
-async function getENSNameIfExist(
-  address: string,
-  provider: ethers.JsonRpcProvider
-) {
-  //const name = await provider.lookupAddress(address);
-  // return name ? name : address;
-  return address;
 }
 
 const getShortenedAddress = (
@@ -306,6 +306,5 @@ export {
   extractAmountsAndTimestampsWithPrevious,
   subtractArrays,
   getEtherscanAddressUrl,
-  getENSNameIfExist,
   getShortenedAddress,
 };
