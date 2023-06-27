@@ -430,26 +430,34 @@ async function getDeposits(isMainnet: boolean) {
   );
 
   // Withdrawals
-  let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from("mainnet_consumabledailywithdrawalsreth")
-    .select("*");
-  rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
+  const [rEthWithdrawals, stEthWithdrawals, cbEthWithdrawals] = (
+    await Promise.all([
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailywithdrawalsreth"
+            : "consumabledailywithdrawalsreth"
+        )
+        .select("*"),
+      supabase
+        .from(
+          isMainnet
+            ? "mainnet_consumabledailywithdrawalssteth"
+            : "consumabledailywithdrawalssteth"
+        )
+        .select("*"),
+      supabase.from("mainnet_consumabledailywithdrawalscbeth").select("*"),
+    ])
+  ).map((response) => response.data as BlockData[]);
+
   let cummulativerEthWithdrawals = accumulateAmounts(
     rEthWithdrawals as BlockData[]
   );
 
-  let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from("mainnet_consumabledailywithdrawalssteth")
-    .select("*");
-  stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
   let cummulativestEthWithdrawals = accumulateAmounts(
     stEthWithdrawals as BlockData[]
   );
 
-  let { data: cbEthWithdrawals, error: cbEthWithDrawalsError } = await supabase
-    .from("mainnet_consumabledailywithdrawalscbeth")
-    .select("*");
-  cbEthWithdrawals = mergeBlockChunks(cbEthWithdrawals as BlockData[]);
   let cummulativecbEthWithdrawals = accumulateAmounts(
     cbEthWithdrawals as BlockData[]
   );
