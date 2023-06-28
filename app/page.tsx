@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { supabase } from "../lib/supabaseClient";
 import {
   BlockData,
-  UserData,
+  LeaderboardUserData,
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
@@ -19,7 +19,11 @@ import {
   subtractArrays,
   sumTotalAmounts,
 } from "@/lib/utils";
-import { RocketTokenRETH__factory, StakedTokenV1__factory, StrategyBaseTVLLimits__factory } from "@/typechain";
+import {
+  RocketTokenRETH__factory,
+  StakedTokenV1__factory,
+  StrategyBaseTVLLimits__factory,
+} from "@/typechain";
 import Image from "next/image";
 import Disclaimer from "./components/Disclaimer";
 
@@ -51,10 +55,10 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
+    stakersBeaconChainEthConverted,
     stakersRethConverted,
     stakersCbethConverted,
-    stakersSteth,
+    stakersStethConverted,
     groupedStakers,
     rEthRate,
     cbEthRate,
@@ -87,27 +91,21 @@ export default async function Home() {
             />
           </span>
           <p className="text-sm md:text-base">Staked stETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(stEthTvl)}
-          </p>
+          <p className="md:text-xl">{roundToDecimalPlaces(stEthTvl)}</p>
         </div>
         <div className="data-card data-card-reth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block ">
             <Image src={"/reth.webp"} alt="rETH" width={48} height={48} />
           </span>
           <p className="text-sm md:text-base">Staked rETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(rEthTvl)}
-          </p>
+          <p className="md:text-xl">{roundToDecimalPlaces(rEthTvl)}</p>
         </div>
         <div className="data-card data-card-cbeth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block ">
             <Image src={"/cbeth.png"} alt="cbETH" width={48} height={48} />
           </span>
           <p className="text-sm md:text-base">Staked cbETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(cbEthTvl)}
-          </p>
+          <p className="md:text-xl">{roundToDecimalPlaces(cbEthTvl)}</p>
         </div>
         <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block">
@@ -268,8 +266,8 @@ export default async function Home() {
             data={{
               amounts: [
                 stEthTvl,
-                (rEthTvl) * rEthRate,
-                (cbEthTvl) * cbEthRate,
+                rEthTvl * rEthRate,
+                cbEthTvl * cbEthRate,
                 totalBeaconChainStakes,
               ],
               labels: [
@@ -285,10 +283,10 @@ export default async function Home() {
         <LeaderBoard
           boardData={{
             ethStakers: groupedStakers,
-            stethStakers: stakersSteth,
+            stethStakers: stakersStethConverted,
             rethStakers: stakersRethConverted,
             cbethStakers: stakersCbethConverted,
-            beaconchainethStakers: stakersBeaconChainEth,
+            beaconchainethStakers: stakersBeaconChainEthConverted,
           }}
           title="Restaking Leaderboard"
         />
@@ -320,7 +318,7 @@ async function getDeposits() {
   const stEthStrategy = StrategyBaseTVLLimits__factory.connect(STETH_STRATEGY_ADDRESS, provider);
   const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
   const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
-  
+
   const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
   const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
   const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
@@ -453,56 +451,73 @@ async function getDeposits() {
   // );
 
   // LeaderBoard
-  let { data: stakersBeaconChainEth } = (await supabase
-    .from("mainnet_stakers_beaconchaineth_deposits_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersReth } = (await supabase
-    .from("mainnet_stakers_reth_deposits_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersSteth } = (await supabase
-    .from("mainnet_stakers_steth_deposits_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersCbeth } = (await supabase
-    .from("mainnet_stakers_cbeth_deposits_view")
-    .select("*")) as { data: UserData[] };
+  const { data: stakersBeaconChainEth } = (await supabase
+    .from("mainnet_stakers_beaconchaineth_view")
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: Array<{ depositor: string; total_staked: number}> };
+  const { data: stakersReth } = (await supabase
+    .from("mainnet_stakers_reth_view")
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
+  const { data: stakersSteth } = (await supabase
+    .from("mainnet_stakers_steth_view")
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
+  const { data: stakersCbeth } = (await supabase
+    .from("mainnet_stakers_cbeth_view")
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
 
-  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+  const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const cbEthSharesRate = Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+
+  const stakersBeaconChainEthConverted: LeaderboardUserData[] = stakersBeaconChainEth.map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * rEthRate,
+    totalStaked: d.total_staked,
   }));
 
-  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+  const stakersRethConverted: LeaderboardUserData[] = stakersReth.map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * cbEthRate,
+    totalStaked: d.total_staked_shares * rEthSharesRate * rEthRate,
   }));
 
-  let groupedStakers = [
-    ...(stakersBeaconChainEth as UserData[]),
-    ...(stakersRethConverted as UserData[]),
-    ...(stakersSteth as UserData[]),
-    ...(stakersCbethConverted as UserData[]),
+  const stakersStethConverted: LeaderboardUserData[] = stakersSteth.map((d) => ({
+    depositor: d.depositor,
+    totalStaked: d.total_staked_shares * stEthSharesRate,
+  }));
+
+  const stakersCbethConverted: LeaderboardUserData[] = stakersCbeth.map((d) => ({
+    depositor: d.depositor,
+    totalStaked: d.total_staked_shares * cbEthSharesRate * cbEthRate,
+  }));
+
+  const groupedStakers = [
+    ...stakersBeaconChainEthConverted,
+    ...stakersRethConverted,
+    ...stakersStethConverted,
+    ...stakersCbethConverted,
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
-        (d: UserData) => d.depositor === cur.depositor
+        (d: LeaderboardUserData) => d.depositor === cur.depositor
       );
       existingDepositor
-        ? (existingDepositor.total_deposits += cur.total_deposits)
-        : acc.push(cur);
+        ? (existingDepositor.totalStaked += cur.totalStaked)
+        : acc.push({ ...cur });
       return acc;
-    }, [] as UserData[])
-    .sort((a, b) => b.total_deposits - a.total_deposits);
-
-  stakersRethConverted = stakersRethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersCbethConverted = stakersCbethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersSteth = stakersSteth.slice(0, MAX_LEADERBOARD_SIZE);
-  groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
+    }, [] as LeaderboardUserData[])
+    .sort((a, b) => b.totalStaked - a.totalStaked)
+    .slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
     ...stakersRethConverted,
-    ...stakersBeaconChainEth,
-    ...stakersSteth,
+    ...stakersBeaconChainEthConverted,
+    ...stakersStethConverted,
     ...stakersCbethConverted,
     ...groupedStakers,
   ];
@@ -540,9 +555,9 @@ async function getDeposits() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
+    stakersBeaconChainEthConverted,
     stakersRethConverted,
-    stakersSteth,
+    stakersStethConverted,
     stakersCbethConverted,
     groupedStakers,
     rEthRate,
