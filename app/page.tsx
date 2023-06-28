@@ -464,25 +464,23 @@ async function getDeposits() {
     .from("temp_mainnet_cbethstakers_view")
     .select("*")) as { data: UserData[] };
 
-  const rEthSharesRate = await rEthStrategy.sharesToUnderlyingView(BigInt(1e18));
-  const stEthSharesRate = await stEthStrategy.sharesToUnderlyingView(BigInt(1e18));
-  const cbEthSharesRate = await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18));
+  const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const cbEthSharesRate = Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
 
   let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits:
-      (Number(rEthSharesRate) * d.total_deposits * rEthRate) / 1e18,
+    total_deposits: d.total_deposits * rEthSharesRate * rEthRate,
   }));
 
   let stakersStethConverted = stakersSteth.map((d) => ({
     depositor: d.depositor,
-    total_deposits: (Number(stEthSharesRate) * d.total_deposits) / 1e18,
+    total_deposits: d.total_deposits * stEthSharesRate,
   }));
 
   let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits:
-      (Number(cbEthSharesRate) * d.total_deposits * cbEthRate) / 1e18,
+    total_deposits: d.total_deposits * cbEthSharesRate * cbEthRate,
   }));
 
   let groupedStakers = [
