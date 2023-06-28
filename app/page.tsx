@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { supabase } from "../lib/supabaseClient";
 import {
   BlockData,
-  UserData,
+  LeaderboardUserData,
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
@@ -55,7 +55,7 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
+    stakersBeaconChainEthConverted,
     stakersRethConverted,
     stakersCbethConverted,
     stakersStethConverted,
@@ -286,7 +286,7 @@ export default async function Home() {
             stethStakers: stakersStethConverted,
             rethStakers: stakersRethConverted,
             cbethStakers: stakersCbethConverted,
-            beaconchainethStakers: stakersBeaconChainEth,
+            beaconchainethStakers: stakersBeaconChainEthConverted,
           }}
           title="Restaking Leaderboard"
         />
@@ -455,63 +455,68 @@ async function getDeposits() {
     .from("mainnet_stakers_beaconchaineth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-  ) as unknown as { data: UserData[] };
+  ) as unknown as { data: Array<{ depositor: string; total_staked: number}> };
   const { data: stakersReth } = (await supabase
     .from("mainnet_stakers_reth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-  ) as unknown as { data: UserData[] };
+    ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
   const { data: stakersSteth } = (await supabase
     .from("mainnet_stakers_steth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-  ) as unknown as { data: UserData[] };
+    ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
   const { data: stakersCbeth } = (await supabase
     .from("mainnet_stakers_cbeth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-  ) as unknown as { data: UserData[] };
+    ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
 
   const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const cbEthSharesRate = Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
 
-  const stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+  const stakersBeaconChainEthConverted: LeaderboardUserData[] = stakersBeaconChainEth.map((d) => ({
     depositor: d.depositor,
-    total_staked: d.total_staked_shares! * rEthSharesRate * rEthRate,
+    totalStaked: d.total_staked,
   }));
 
-  const stakersStethConverted = stakersSteth.map((d) => ({
+  const stakersRethConverted: LeaderboardUserData[] = stakersReth.map((d) => ({
     depositor: d.depositor,
-    total_staked: d.total_staked_shares! * stEthSharesRate,
+    totalStaked: d.total_staked_shares * rEthSharesRate * rEthRate,
   }));
 
-  const stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+  const stakersStethConverted: LeaderboardUserData[] = stakersSteth.map((d) => ({
     depositor: d.depositor,
-    total_staked: d.total_staked_shares! * cbEthSharesRate * cbEthRate,
+    totalStaked: d.total_staked_shares * stEthSharesRate,
+  }));
+
+  const stakersCbethConverted: LeaderboardUserData[] = stakersCbeth.map((d) => ({
+    depositor: d.depositor,
+    totalStaked: d.total_staked_shares * cbEthSharesRate * cbEthRate,
   }));
 
   const groupedStakers = [
-    ...stakersBeaconChainEth,
+    ...stakersBeaconChainEthConverted,
     ...stakersRethConverted,
     ...stakersStethConverted,
     ...stakersCbethConverted,
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
-        (d: UserData) => d.depositor === cur.depositor
+        (d: LeaderboardUserData) => d.depositor === cur.depositor
       );
       existingDepositor
-        ? (existingDepositor.total_staked! += cur.total_staked!)
+        ? (existingDepositor.totalStaked += cur.totalStaked)
         : acc.push({ ...cur });
       return acc;
-    }, [] as UserData[])
-    .sort((a, b) => b.total_staked! - a.total_staked!)
+    }, [] as LeaderboardUserData[])
+    .sort((a, b) => b.totalStaked - a.totalStaked)
     .slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
     ...stakersRethConverted,
-    ...stakersBeaconChainEth,
+    ...stakersBeaconChainEthConverted,
     ...stakersStethConverted,
     ...stakersCbethConverted,
     ...groupedStakers,
@@ -550,7 +555,7 @@ async function getDeposits() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
+    stakersBeaconChainEthConverted,
     stakersRethConverted,
     stakersStethConverted,
     stakersCbethConverted,

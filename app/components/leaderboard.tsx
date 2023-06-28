@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  UserData,
+  LeaderboardUserData,
   getEtherscanAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
@@ -25,7 +25,7 @@ export default function LeaderBoard(data: any) {
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
-  const handleToggleContent = (data: UserData[], index: number) => {
+  const handleToggleContent = (data: LeaderboardUserData[], index: number) => {
     setActiveData(data);
     setActiveButton(index);
   };
@@ -138,9 +138,9 @@ export default function LeaderBoard(data: any) {
               </tr>
             </thead>
             <tbody>
-              {(activeData as UserData[])
+              {(activeData as LeaderboardUserData[])
                 .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-                .map((userData, index) => (
+                .map((LeaderboardUserData, index) => (
                   <tr className="border-b-2" key={index}>
                     <td className="py-4 px-4 text-left text-md">
                       {(currentPage - 1) * PAGE_SIZE + index + 1}
@@ -149,24 +149,24 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(LeaderboardUserData.depositor));
                       }}
                     >
-                      {userData.depositor.endsWith(".eth")
-                        ? userData.depositor
-                        : getShortenedAddress(userData.depositor, 4, 6)}
+                      {LeaderboardUserData.depositor.endsWith(".eth")
+                        ? LeaderboardUserData.depositor
+                        : getShortenedAddress(LeaderboardUserData.depositor, 4, 6)}
                     </td>
                     <td
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(LeaderboardUserData.depositor));
                       }}
                     >
-                      {userData.depositor}
+                      {LeaderboardUserData.depositor}
                     </td>
                     <td className="py-4 px-4 text-right text-sm">
-                      {roundToDecimalPlaces(userData.total_staked!)}
+                      {roundToDecimalPlaces(LeaderboardUserData.totalStaked)}
                     </td>
                   </tr>
                 ))}
