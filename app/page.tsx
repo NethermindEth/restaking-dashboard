@@ -451,18 +451,26 @@ async function getDeposits() {
   // );
 
   // LeaderBoard
-  let { data: stakersBeaconChainEth } = (await supabase
+  const { data: stakersBeaconChainEth } = (await supabase
     .from("mainnet_stakers_beaconchaineth_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersReth } = (await supabase
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: UserData[] };
+  const { data: stakersReth } = (await supabase
     .from("mainnet_stakers_reth_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersSteth } = (await supabase
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: UserData[] };
+  const { data: stakersSteth } = (await supabase
     .from("mainnet_stakers_steth_view")
-    .select("*")) as { data: UserData[] };
-  let { data: stakersCbeth } = (await supabase
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: UserData[] };
+  const { data: stakersCbeth } = (await supabase
     .from("mainnet_stakers_cbeth_view")
-    .select("*")) as { data: UserData[] };
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)
+  ) as unknown as { data: UserData[] };
 
   const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
