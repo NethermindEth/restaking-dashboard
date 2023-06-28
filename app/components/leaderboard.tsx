@@ -140,7 +140,7 @@ export default function LeaderBoard(data: any) {
             <tbody>
               {(activeData as LeaderboardUserData[])
                 .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-                .map((LeaderboardUserData, index) => (
+                .map((userData, index) => (
                   <tr className="border-b-2" key={index}>
                     <td className="py-4 px-4 text-left text-md">
                       {(currentPage - 1) * PAGE_SIZE + index + 1}
@@ -149,24 +149,24 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(LeaderboardUserData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
-                      {LeaderboardUserData.depositor.endsWith(".eth")
-                        ? LeaderboardUserData.depositor
-                        : getShortenedAddress(LeaderboardUserData.depositor, 4, 6)}
+                      {userData.depositor.endsWith(".eth")
+                        ? userData.depositor
+                        : getShortenedAddress(userData.depositor, 4, 6)}
                     </td>
                     <td
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(LeaderboardUserData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
-                      {LeaderboardUserData.depositor}
+                      {userData.depositor}
                     </td>
                     <td className="py-4 px-4 text-right text-sm">
-                      {roundToDecimalPlaces(LeaderboardUserData.totalStaked)}
+                      {roundToDecimalPlaces(userData.totalStaked)}
                     </td>
                   </tr>
                 ))}
