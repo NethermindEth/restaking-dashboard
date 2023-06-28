@@ -452,59 +452,54 @@ async function getDeposits() {
 
   // LeaderBoard
   let { data: stakersBeaconChainEth } = (await supabase
-    .from("temp_mainnet_beaconchainethstakers_view")
+    .from("mainnet_stakers_beaconchaineth_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersReth } = (await supabase
-    .from("temp_mainnet_rethstakers_view")
+    .from("mainnet_stakers_reth_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersSteth } = (await supabase
-    .from("temp_mainnet_stethstakers_view")
+    .from("mainnet_stakers_steth_view")
     .select("*")) as { data: UserData[] };
   let { data: stakersCbeth } = (await supabase
-    .from("temp_mainnet_cbethstakers_view")
+    .from("mainnet_stakers_cbeth_view")
     .select("*")) as { data: UserData[] };
 
   const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const cbEthSharesRate = Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
 
-  let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
+  const stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * rEthSharesRate * rEthRate,
+    total_staked: d.total_staked_shares! * rEthSharesRate * rEthRate,
   }));
 
-  let stakersStethConverted = stakersSteth.map((d) => ({
+  const stakersStethConverted = stakersSteth.map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * stEthSharesRate,
+    total_staked: d.total_staked_shares! * stEthSharesRate,
   }));
 
-  let stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
+  const stakersCbethConverted = (stakersCbeth as UserData[]).map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * cbEthSharesRate * cbEthRate,
+    total_staked: d.total_staked_shares! * cbEthSharesRate * cbEthRate,
   }));
 
-  let groupedStakers = [
-    ...(stakersBeaconChainEth as UserData[]),
-    ...(stakersRethConverted as UserData[]),
-    ...(stakersStethConverted as UserData[]),
-    ...(stakersCbethConverted as UserData[]),
+  const groupedStakers = [
+    ...stakersBeaconChainEth,
+    ...stakersRethConverted,
+    ...stakersStethConverted,
+    ...stakersCbethConverted,
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
         (d: UserData) => d.depositor === cur.depositor
       );
       existingDepositor
-        ? (existingDepositor.total_deposits += cur.total_deposits)
+        ? (existingDepositor.total_staked! += cur.total_staked!)
         : acc.push({ ...cur });
       return acc;
     }, [] as UserData[])
-    .sort((a, b) => b.total_deposits - a.total_deposits);
-
-  stakersRethConverted = stakersRethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersCbethConverted = stakersCbethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersStethConverted = stakersStethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
+    .sort((a, b) => b.total_staked! - a.total_staked!)
+    .slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
     ...stakersRethConverted,

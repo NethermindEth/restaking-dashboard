@@ -166,7 +166,7 @@ export default function LeaderBoard(data: any) {
                       {userData.depositor}
                     </td>
                     <td className="py-4 px-4 text-right text-sm">
-                      {roundToDecimalPlaces(userData.total_deposits)}
+                      {roundToDecimalPlaces(userData.total_staked!)}
                     </td>
                   </tr>
                 ))}

@@ -7,7 +7,8 @@ type BlockData = {
 };
 type UserData = {
   depositor: string;
-  total_deposits: number;
+  total_staked_shares?: number;
+  total_staked?: number;
 };
 function mergeBlockChunks(data: BlockData[]): BlockData[] {
   const mergedData: BlockData[] = [];
