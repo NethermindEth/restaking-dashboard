@@ -460,17 +460,17 @@ async function getDeposits() {
     .from("mainnet_stakers_reth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-    ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
+  ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
   const { data: stakersSteth } = (await supabase
     .from("mainnet_stakers_steth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-    ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
+  ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
   const { data: stakersCbeth } = (await supabase
     .from("mainnet_stakers_cbeth_view")
     .select("*")
     .limit(MAX_LEADERBOARD_SIZE)
-    ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
+  ) as unknown as { data: Array<{ depositor: string; total_staked_shares: number}> };
 
   const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
