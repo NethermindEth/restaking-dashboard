@@ -315,37 +315,13 @@ async function getDeposits() {
   const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
   const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
 
-  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    STETH_STRATEGY_ADDRESS,
-    provider
-  );
-  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    RETH_STRATEGY_ADDRESS,
-    provider
-  );
-  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    CBETH_STRATEGY_ADDRESS,
-    provider
-  );
+  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(STETH_STRATEGY_ADDRESS, provider);
+  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
+  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
 
-  const stEthTvl =
-    Number(
-      await stEthStrategy.sharesToUnderlyingView(
-        await stEthStrategy.totalShares()
-      )
-    ) / 1e18;
-  const rEthTvl =
-    Number(
-      await rEthStrategy.sharesToUnderlyingView(
-        await rEthStrategy.totalShares()
-      )
-    ) / 1e18;
-  const cbEthTvl =
-    Number(
-      await cbEthStrategy.sharesToUnderlyingView(
-        await cbEthStrategy.totalShares()
-      )
-    ) / 1e18;
+  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
+  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
+  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
 
   // Move to promise.all
 
@@ -488,15 +464,9 @@ async function getDeposits() {
     .from("temp_mainnet_cbethstakers_view")
     .select("*")) as { data: UserData[] };
 
-  const rEthSharesRate = await rEthStrategy.sharesToUnderlyingView(
-    BigInt(1e18)
-  );
-  const stEthSharesRate = await stEthStrategy.sharesToUnderlyingView(
-    BigInt(1e18)
-  );
-  const cbEthSharesRate = await cbEthStrategy.sharesToUnderlyingView(
-    BigInt(1e18)
-  );
+  const rEthSharesRate = await rEthStrategy.sharesToUnderlyingView(BigInt(1e18));
+  const stEthSharesRate = await stEthStrategy.sharesToUnderlyingView(BigInt(1e18));
+  const cbEthSharesRate = await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18));
 
   let stakersRethConverted = (stakersReth as UserData[]).map((d) => ({
     depositor: d.depositor,
