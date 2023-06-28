@@ -495,7 +495,7 @@ async function getDeposits() {
       );
       existingDepositor
         ? (existingDepositor.total_deposits += cur.total_deposits)
-        : acc.push(cur);
+        : acc.push({ ...cur });
       return acc;
     }, [] as UserData[])
     .sort((a, b) => b.total_deposits - a.total_deposits);
