@@ -5,10 +5,12 @@ type BlockData = {
   block_chunk: number;
   block_chunk_date: string;
 };
-type UserData = {
+
+interface LeaderboardUserData {
   depositor: string;
-  total_deposits: number;
-};
+  totalStaked: number;
+}
+
 function mergeBlockChunks(data: BlockData[]): BlockData[] {
   const mergedData: BlockData[] = [];
 
@@ -292,7 +294,7 @@ const getShortenedAddress = (
   return `${address.slice(0, first)}...${address.slice(-1 * second)}`;
 };
 
-export type { BlockData, UserData };
+export type { BlockData, LeaderboardUserData };
 
 export {
   mergeBlockChunks,

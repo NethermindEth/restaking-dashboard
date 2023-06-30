@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { supabase } from "../lib/supabaseClient";
 import {
   BlockData,
-  UserData,
+  LeaderboardUserData,
   accumulateAmounts,
   extractAmountsAndTimestamps,
   extractAmountsAndTimestampsWithPrevious,
@@ -65,10 +65,10 @@ export default async function Home() {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
+    stakersBeaconChainEthConverted,
     stakersRethConverted,
     stakersCbethConverted,
-    stakersSteth,
+    stakersStethConverted,
     groupedStakers,
     rEthRate,
     cbEthRate,
@@ -293,10 +293,10 @@ export default async function Home() {
         <LeaderBoard
           boardData={{
             ethStakers: groupedStakers,
-            stethStakers: stakersSteth,
+            stethStakers: stakersStethConverted,
             rethStakers: stakersRethConverted,
             cbethStakers: stakersCbethConverted,
-            beaconchainethStakers: stakersBeaconChainEth,
+            beaconchainethStakers: stakersBeaconChainEthConverted,
           }}
           title="Restaking Leaderboard"
         />
@@ -497,70 +497,90 @@ async function fetchData(isMainnet: boolean) {
   // );
 
   // LeaderBoard
-  let [stakersBeaconChainEth, stakersReth, stakersSteth, stakersCbeth] = (
+  const { data: stakersBeaconChainEth } = (await supabase
+    .from("mainnet_stakers_beaconchaineth_view")
+    .select("*")
+    .limit(MAX_LEADERBOARD_SIZE)) as unknown as {
+    data: Array<{ depositor: string; total_staked: number }>;
+  };
+
+  const [stakersReth, stakersSteth, stakersCbeth] = (
     await Promise.all([
       supabase
-        .from(
-          isMainnet
-            ? "mainnet_stakers_beaconchaineth_deposits_view"
-            : "stakers_beaconchaineth_deposits_view"
-        )
-        .select("*"),
+        .from("mainnet_stakers_reth_view")
+        .select("*")
+        .limit(MAX_LEADERBOARD_SIZE),
       supabase
-        .from(
-          isMainnet
-            ? "mainnet_stakers_reth_deposits_view"
-            : "stakers_reth_deposits_view"
-        )
-        .select("*"),
+        .from("mainnet_stakers_steth_view")
+        .select("*")
+        .limit(MAX_LEADERBOARD_SIZE),
       supabase
-        .from(
-          isMainnet
-            ? "mainnet_stakers_steth_deposits_view"
-            : "stakers_steth_deposits_view"
-        )
-        .select("*"),
-      supabase.from("mainnet_stakers_cbeth_deposits_view").select("*"),
+        .from("mainnet_stakers_cbeth_view")
+        .select("*")
+        .limit(MAX_LEADERBOARD_SIZE),
     ])
-  ).map((response) => response.data as UserData[]);
+  ).map(
+    (d) =>
+      d.data as Array<{
+        depositor: string;
+        total_staked_shares: number;
+      }>
+  );
 
-  let stakersRethConverted = stakersReth.map((d) => ({
+  const rEthSharesRate =
+    Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const stEthSharesRate =
+    Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const cbEthSharesRate =
+    Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+
+  const stakersBeaconChainEthConverted: LeaderboardUserData[] =
+    stakersBeaconChainEth.map((d) => ({
+      depositor: d.depositor,
+      totalStaked: d.total_staked,
+    }));
+
+  const stakersRethConverted: LeaderboardUserData[] = stakersReth.map((d) => ({
     depositor: d.depositor,
-    total_deposits: d.total_deposits * rEthRate,
-  })) as UserData[];
+    totalStaked: d.total_staked_shares * rEthSharesRate * rEthRate,
+  }));
 
-  let stakersCbethConverted = stakersCbeth.map((d) => ({
-    depositor: d.depositor,
-    total_deposits: d.total_deposits * cbEthRate,
-  })) as UserData[];
+  const stakersStethConverted: LeaderboardUserData[] = stakersSteth.map(
+    (d) => ({
+      depositor: d.depositor,
+      totalStaked: d.total_staked_shares * stEthSharesRate,
+    })
+  );
 
-  let groupedStakers = [
-    ...stakersBeaconChainEth,
+  const stakersCbethConverted: LeaderboardUserData[] = stakersCbeth.map(
+    (d) => ({
+      depositor: d.depositor,
+      totalStaked: d.total_staked_shares * cbEthSharesRate * cbEthRate,
+    })
+  );
+
+  const groupedStakers = [
+    ...stakersBeaconChainEthConverted,
     ...stakersRethConverted,
-    ...stakersSteth,
+    ...stakersStethConverted,
     ...stakersCbethConverted,
   ]
     .reduce((acc, cur) => {
       const existingDepositor = acc.find(
-        (d: UserData) => d.depositor === cur.depositor
+        (d: LeaderboardUserData) => d.depositor === cur.depositor
       );
       existingDepositor
-        ? (existingDepositor.total_deposits += cur.total_deposits)
-        : acc.push(cur);
+        ? (existingDepositor.totalStaked += cur.totalStaked)
+        : acc.push({ ...cur });
       return acc;
-    }, [] as UserData[])
-    .sort((a, b) => b.total_deposits - a.total_deposits);
-
-  stakersRethConverted = stakersRethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersCbethConverted = stakersCbethConverted.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersBeaconChainEth = stakersBeaconChainEth.slice(0, MAX_LEADERBOARD_SIZE);
-  stakersSteth = stakersSteth.slice(0, MAX_LEADERBOARD_SIZE);
-  groupedStakers = groupedStakers.slice(0, MAX_LEADERBOARD_SIZE);
+    }, [] as LeaderboardUserData[])
+    .sort((a, b) => b.totalStaked - a.totalStaked)
+    .slice(0, MAX_LEADERBOARD_SIZE);
 
   const allData = [
     ...stakersRethConverted,
-    ...stakersBeaconChainEth,
-    ...stakersSteth,
+    ...stakersBeaconChainEthConverted,
+    ...stakersStethConverted,
     ...stakersCbethConverted,
     ...groupedStakers,
   ];
@@ -598,9 +618,9 @@ async function fetchData(isMainnet: boolean) {
     beaconChainStakes,
     totalBeaconChainStakes,
     cummulativeBeaconChainStakes,
-    stakersBeaconChainEth,
+    stakersBeaconChainEthConverted,
     stakersRethConverted,
-    stakersSteth,
+    stakersStethConverted,
     stakersCbethConverted,
     groupedStakers,
     rEthRate,

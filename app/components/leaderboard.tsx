@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  UserData,
+  LeaderboardUserData,
   getEtherscanAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
@@ -25,7 +25,7 @@ export default function LeaderBoard(data: any) {
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
-  const handleToggleContent = (data: UserData[], index: number) => {
+  const handleToggleContent = (data: LeaderboardUserData[], index: number) => {
     setActiveData(data);
     setActiveButton(index);
   };
@@ -138,7 +138,7 @@ export default function LeaderBoard(data: any) {
               </tr>
             </thead>
             <tbody>
-              {(activeData as UserData[])
+              {(activeData as LeaderboardUserData[])
                 .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
                 .map((userData, index) => (
                   <tr className="border-b-2" key={index}>
@@ -166,7 +166,7 @@ export default function LeaderBoard(data: any) {
                       {userData.depositor}
                     </td>
                     <td className="py-4 px-4 text-right text-sm">
-                      {roundToDecimalPlaces(userData.total_deposits)}
+                      {roundToDecimalPlaces(userData.totalStaked)}
                     </td>
                   </tr>
                 ))}
