@@ -122,24 +122,6 @@ export default async function Home() {
           </p>
         </div>
       </div>
-      {/* <div className="p-6 mx-4 shadow-md rounded-md">
-          <div>
-            <div className="">Total Staked ETH</div>
-            <div className="">{latestDeposits.amountNative}</div>
-          </div>
-        </div>
-        <div className="p-6 mx-4 shadow-md rounded-md">
-          <div>
-            <div className="">Total Staked StEth</div>
-            <div className="">{latestDeposits.amountStEth}</div>
-          </div>
-        </div>
-        <div className="p-6 mx-4 shadow-md rounded-md">
-          <div>
-            <div className="">Total Staked rEth</div>
-            <div className="">{latestDeposits.amountREth}</div>
-          </div>
-        </div> */}
 
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage mt-16">
@@ -232,33 +214,6 @@ export default async function Home() {
             />
           </div>
         </div>
-
-        {/* <div className="charts-homepage mt-6">
-          <h3>Staking and withdrawing of StEth</h3>
-          <div className="chart-staked-lst-date">
-            <StackedBar
-              data={{
-                amounts: chartDataSumStEth.amounts,
-                labels: chartDataSumStEth.timestamps,
-                namedLabels: ["Staked - Withdrawn"],
-              }}
-              title="Staking and withdrawing of StEth"
-            />
-          </div>
-        </div>
-        <div className="charts-homepage mt-6">
-          <h3>Staking and withdrawing of rEth</h3>
-          <div className="chart-2">
-            <LineChart
-              data={{
-                title: "Staking and withdrawing of rEth",
-                amounts: chartDataSumREth.amounts,
-                timestamps: chartDataSumREth.timestamps,
-                namedLabels: ["Staked - Withdrawn"],
-              }}
-            />
-          </div>
-        </div> */}
 
         <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
           <h3 className="text-center text-xl">Deposited tokens</h3>
@@ -436,19 +391,9 @@ async function getDeposits() {
     subtractArrays(sumStEth, [sumREth, sumCbEth])
   );
 
-  // let chartDataStEthCumulative = extractAmountsAndTimestampsWithPrevious(
-  //   cummulativestEthDeposits,
-  //   cummulativerEthDeposits
-  // );
-
   let chartDataSumREth = extractAmountsAndTimestamps(
     subtractArrays(sumREth, [sumStEth, sumCbEth])
   );
-
-  // let chartDataREthCumulative = extractAmountsAndTimestampsWithPrevious(
-  //   cummulativerEthDeposits,
-  //   cummulativestEthDeposits
-  // );
 
   // LeaderBoard
   const { data: stakersBeaconChainEth } = (await supabase
