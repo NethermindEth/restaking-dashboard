@@ -11,8 +11,12 @@ serve(async () => {
       createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        {
+          db: { schema: "mainnet" },
+        },
       ),
-      new ethers.JsonRpcProvider(Deno.env.get("RPC_URL") ?? "", "goerli"),
+      new ethers.JsonRpcProvider(Deno.env.get("MAINNET_RPC_URL") ?? "", "mainnet"),
+      "mainnet",
     );
 
     console.log(`Indexing successful! Block range: ${startBlock}-${endBlock}`);
