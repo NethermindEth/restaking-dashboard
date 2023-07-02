@@ -1,15 +1,22 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { addressToPsqlHexString } from "./utils/address.ts";
 import { batchGetValidators } from "./utils/beaconProvider.ts";
+import { getIndexingStartValidatorIndex } from "./utils/updates.ts";
 
 // serialization polyfill
 import "./utils/bigint.ts";
+import { Database } from "../database.types.ts";
 
 interface Validator {
   index: number;
+  pubkey: string;
   balance: bigint;
-  effectiveBalance: bigint;
-  withdrawalAddress: string;
+  effective_balance: bigint;
+  withdrawal_address: string;
+  activation_eligibility_epoch: number;
+  exit_epoch: number;
+  slashed: boolean;
 }
 
 /**
@@ -25,41 +32,13 @@ interface Validator {
  * @param beaconProviderUrl URL of the Beacon API provider.
  */
 export async function indexValidators(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   beaconProviderUrl: string,
 ): Promise<{ startIndex: number; endIndex: number }> {
-  const entry = await supabase.from("ValidatorIndexingState").select("*");
-
-  if (entry.error) {
-    throw entry.error;
-  }
-  if (!entry.data.length) {
-    throw new Error("Missing state in ValidatorIndexingState table");
-  }
-  if (entry.data[0].lock) {
-    throw new Error("Trying to index validators while other validator indexer is running");
-  }
-
-  const lockUpdate = await supabase
-    .from("ValidatorIndexingState")
-    .update({
-      lastIndex: entry.data[0].lastIndex,
-      lock: true,
-    })
-    .eq("id", entry.data[0].id)
-    .eq("lock", false)
-    .select();
-
-  if (lockUpdate.error) throw lockUpdate.error;
-  if (!lockUpdate.data.length) {
-    throw new Error("Lock is already set on this indexing process");
-  }
-
-  const startIndex = entry.data[0].lastIndex + 1;
-  const batches = 4;
+  const startIndex = await getIndexingStartValidatorIndex(supabase);
+  const batches = 1;
   const chunkSize = 1200;
   const concurrentChunks = 10;
-  const validatorAmount = batches * chunkSize * concurrentChunks;
 
   const result = await batchGetValidators(
     beaconProviderUrl,
@@ -68,28 +47,28 @@ export async function indexValidators(
     chunkSize,
     concurrentChunks,
   );
+  const endIndex = result.validators.reduce((acc, validator) => (acc < validator.index)? validator.index : acc, 0);
 
   const validators: Validator[] = result.validators
     .filter(el => {
       return el.validator.withdrawalCredentials.startsWith("0x01");
     }).map(el => ({
       index: el.index,
+      pubkey: addressToPsqlHexString(el.validator.pubkey),
       balance: el.balance,
-      effectiveBalance: el.validator.effectiveBalance,
-      withdrawalAddress: ethers.getAddress("0x" + el.validator.withdrawalCredentials.slice(-40)),
+      effective_balance: el.validator.effectiveBalance,
+      withdrawal_address: addressToPsqlHexString(ethers.getAddress("0x" + el.validator.withdrawalCredentials.slice(-40))),
+      activation_eligibility_epoch: el.validator.activationEligibilityEpoch,
+      exit_epoch: el.validator.exitEpoch,
+      slashed: el.validator.slashed,
     }));
 
-  await supabase.from("_Validators").upsert(validators);
-  
-  const resultUpdate = await supabase
-    .from("ValidatorIndexingState")
-    .update({
-      lastIndex: (!result.reachedLast)? entry.data[0].lastIndex + validatorAmount : -1,
-      lock: false,
-    })
-    .eq("id", entry.data[0].id);
+  const { error } = await supabase.rpc("index_validators", {
+    p_rows: validators,
+    p_index: (!result.reachedLast)? endIndex : -1,
+  });
 
-  if (resultUpdate.error) throw resultUpdate.error;
+  if (error) throw error;
 
-  return { startIndex, endIndex: startIndex + validators.length - 1 };
+  return { startIndex, endIndex };
 }
