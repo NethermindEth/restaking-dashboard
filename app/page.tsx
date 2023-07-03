@@ -17,59 +17,50 @@ import {
 
 import Dashboard from "./components/Dashboard";
 
-const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
-const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
-const STETH_STRATEGY_ADDRESS = "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
-const CBETH_STRATEGY_ADDRESS = "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
-const RETH_STRATEGY_ADDRESS = "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
-const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
+const TESTNET_RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
+const MAINNET_RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+const MAINNET_CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
+const MAINNET_STETH_STRATEGY_ADDRESS =
+  "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
+const MAINNET_CBETH_STRATEGY_ADDRESS =
+  "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
+const MAINNET_RETH_STRATEGY_ADDRESS =
+  "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
+const mainnetProvider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
+const testnetProvider = new ethers.JsonRpcProvider(
+  '"https://rpc.ankr.com/eth_goerli"'
+);
 const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
-  // const {
-  //   rEthTvl,
-  //   stEthTvl,
-  //   cbEthTvl,
-  //   chartDataDepositsDaily,
-  //   chartDataDepositsCumulative,
-  //   chartDataWithdrawalsDaily,
-  //   chartDataWithdrawalsCumulative,
-  //   totalStakedBeaconChainEth,
-  //   stakersBeaconChainEthConverted,
-  //   stakersREthConverted,
-  //   stakersCbEthConverted,
-  //   stakersStEthConverted,
-  //   groupedStakers,
-  //   rEthRate,
-  //   cbEthRate,
-  //   chartDataBeaconStakesDaily,
-  //   chartDataBeaconStakesCumulative,
-  // } = await getDashboardData();
-
   const [mainnetData, goerliData] = await Promise.all([
-    getDashboardData(),
-    getDashboardData(),
+    getDashboardData(true),
+    getDashboardData(false),
   ]);
   return <Dashboard data={{ mainnet: mainnetData, goerli: goerliData }} />;
 }
 
-async function getDashboardData() {
-  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
+async function getDashboardData(isMainnet: boolean) {
+  const provider = isMainnet ? mainnetProvider : testnetProvider;
+  const rEth = RocketTokenRETH__factory.connect(
+    isMainnet ? MAINNET_RETH_ADDRESS : TESTNET_RETH_ADDRESS,
+    provider
+  );
   const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
-  const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
+  const cbEth = StakedTokenV1__factory.connect(MAINNET_CBETH_ADDRESS, provider);
   const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
 
   const stEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    STETH_STRATEGY_ADDRESS,
+    MAINNET_STETH_STRATEGY_ADDRESS,
     provider
   );
   const rEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    RETH_STRATEGY_ADDRESS,
+    MAINNET_RETH_STRATEGY_ADDRESS,
     provider
   );
   const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    CBETH_STRATEGY_ADDRESS,
+    MAINNET_CBETH_STRATEGY_ADDRESS,
     provider
   );
 
