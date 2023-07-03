@@ -464,7 +464,7 @@ async function getDashboardData() {
     .sort((a, b) => b.totalStaked - a.totalStaked)
     .slice(0, MAX_LEADERBOARD_SIZE);
 
-  const allData = [
+  const allStakerData = [
     ...stakersREthConverted,
     ...stakersBeaconChainEthConverted,
     ...stakersStEthConverted,
@@ -472,16 +472,16 @@ async function getDashboardData() {
     ...groupedStakers,
   ];
 
-  const ensAddresses = Object.fromEntries(
+  const stakerEnsNames = Object.fromEntries(
     await Promise.all(
-      Array.from(new Set(allData.map(el => el.depositor))).map(async (depositor) => {
+      Array.from(new Set(allStakerData.map(el => el.depositor))).map(async (depositor) => {
         return [depositor, await provider.lookupAddress(depositor)]
       })
     )
   );
 
-  allData.forEach(entry => {
-    entry.depositor = ensAddresses[entry.depositor] ?? entry.depositor;
+  allStakerData.forEach(entry => {
+    entry.depositor = stakerEnsNames[entry.depositor] ?? entry.depositor;
   });
 
   return {
