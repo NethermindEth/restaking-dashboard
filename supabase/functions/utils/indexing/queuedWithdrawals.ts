@@ -1,35 +1,24 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { rangeChunkMap } from "./utils/chunk.ts";
-import {
-  INDEXING_BLOCK_CHUNK_SIZE,
-  STRATEGY_MANAGER_ADDRESS,
-  STETH_STRATEGY_ADDRESS,
-  STETH_ADDRESS,
-  RETH_STRATEGY_ADDRESS,
-  RETH_ADDRESS,
-} from "./utils/constants.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
-import { IStrategy__factory, StrategyManager__factory } from "../../typechain/index.ts";
+import { addressToPsqlHexString } from "./utils/address.ts";
+import { CHAIN_DATA, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock } from "./utils/updates.ts";
+import { StrategyManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
 import "./utils/bigint.ts";
+import { Database } from "../database.types.ts";
 
-interface QueuedWithdrawal {
-  block: number;
+interface ShareWithdrawal {
+  queued_block: number;
+  log_index: number;
   depositor: string;
   nonce: bigint;
-  withdrawer: string;
-  delegatedAddress: string;
-  withdrawalRoot: string;
-}
-
-interface QueuedShareWithdrawal {
-  depositor: string;
-  nonce: bigint;
-  token: string;
   strategy: string;
   shares: bigint;
+  withdrawer: string;
+  delegated_address: string;
 }
 
 /**
@@ -51,18 +40,11 @@ async function indexQueuedWithdrawalsRange(
   provider: ethers.Provider,
   startBlock: number,
   endBlock: number,
-  chunkSize: number
+  chunkSize: number,
+  chain: "mainnet" | "goerli",
 ) {
-  const index: { withdrawals: QueuedWithdrawal[], shareWithdrawals: QueuedShareWithdrawal[] } = {
-    withdrawals: [],
-    shareWithdrawals: []
-  };
-
-  const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
-  const strategyUnderlyingToken: Record<string, string | Promise<string>> = {
-    [STETH_STRATEGY_ADDRESS]: STETH_ADDRESS,
-    [RETH_STRATEGY_ADDRESS]: RETH_ADDRESS,
-  };
+  const index: ShareWithdrawal[] = [];
+  const strategyManager = StrategyManager__factory.connect(CHAIN_DATA[chain].strategyManagerAddress, provider);
   
   await Promise.all(
     rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
@@ -71,36 +53,26 @@ async function indexQueuedWithdrawalsRange(
         strategyManager.queryFilter(strategyManager.getEvent("ShareWithdrawalQueued"), fromBlock, toBlock),
       ]);
 
+      const withdrawalInfo: Record<string, { withdrawer: string; delegatedAddress: string; withdrawalRoot: string }> = {};
+
       withdrawalLogs.forEach(log => {
-        index.withdrawals.push({
-          block: log.blockNumber,
-          depositor: log.args.depositor,
-          nonce: log.args.nonce,
-          withdrawer: log.args.withdrawer,
-          delegatedAddress: log.args.delegatedAddress,
-          withdrawalRoot: log.args.withdrawalRoot,
-        });
+        withdrawalInfo[`${log.args.depositor}_${log.args.nonce}`] = log.args;
       });
 
       shareWithdrawalLogs.forEach(log => {
-        const strategy = log.args.strategy;
+        const { withdrawer, delegatedAddress } = withdrawalInfo[`${log.args.depositor}_${log.args.nonce}`];
 
-        if (!strategyUnderlyingToken[strategy]) {
-          strategyUnderlyingToken[strategy] = IStrategy__factory.connect(strategy, provider).underlyingToken();
-        }
+        index.push({
+          queued_block: log.blockNumber,
+          log_index: log.index,
+          depositor: addressToPsqlHexString(log.args.depositor),
+          nonce: log.args.nonce,
+          strategy: addressToPsqlHexString(log.args.strategy),
+          shares: log.args.shares,
+          withdrawer: addressToPsqlHexString(withdrawer),
+          delegated_address: addressToPsqlHexString(delegatedAddress),
+        });
       });
-
-      await Promise.all(
-        shareWithdrawalLogs.map(async log => {
-          index.shareWithdrawals.push({
-            depositor: log.args.depositor,
-            nonce: log.args.nonce,
-            token: await strategyUnderlyingToken[log.args.strategy],
-            strategy: log.args.strategy,
-            shares: log.args.shares,
-          });
-        })
-      );
     })
   );
 
@@ -114,34 +86,21 @@ async function indexQueuedWithdrawalsRange(
  * data and feeds it to the QueuedWithdrawals and QueuedShareWithdrawals
  * tables in the Supabase DB, while also updating the last indexed block
  * record.
- * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
- * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
- * simultaneous runs, which would end up inserting duplicate data.
  * @param supabase Supabase client.
  * @param provider Network provider.
  */
 export async function indexQueuedWithdrawals(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   provider: ethers.Provider,
+  chain: "mainnet" | "goerli",
 ): Promise<{ startBlock: number; endBlock: number }> {
-  const startBlock = await getIndexingStartBlock(supabase, "QueuedWithdrawals", true);
-  const endBlock = await getIndexingEndBlock(provider);
+  const startBlock = await getIndexingStartBlock(supabase, "QueuedWithdrawals", chain);
+  const endBlock = await getIndexingEndBlock(startBlock, provider);
 
-  let results;
-  try {
-    results = await indexQueuedWithdrawalsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
-  }
-  catch (err) {
-    await releaseBlockLock("QueuedWithdrawals");
-    throw err;
-  }
+  const results = await indexQueuedWithdrawalsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE, chain);
+  const { error } = await supabase.rpc("index_share_withdrawals", { p_rows: results, p_block: endBlock });
 
-  await setLastIndexedBlock(supabase, "QueuedWithdrawals", endBlock);
-  await Promise.all([
-    supabase.from("_QueuedWithdrawals").insert(results.withdrawals),
-    supabase.from("_QueuedShareWithdrawals").insert(results.shareWithdrawals),
-  ]);
-  await releaseBlockLock("QueuedWithdrawals");
+  if (error) throw error;
 
   return { startBlock, endBlock };
 }

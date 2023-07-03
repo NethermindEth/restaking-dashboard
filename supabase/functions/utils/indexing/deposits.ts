@@ -1,10 +1,10 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { addressEq } from "./utils/address.ts";
+import { addressEq, addressToPsqlHexString } from "./utils/address.ts";
 import { rangeChunkMap } from "./utils/chunk.ts";
 import { TransactionTrace, traceCallWalk } from "./utils/trace.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
-import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock } from "./utils/updates.ts";
+import { CHAIN_DATA, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
 import { EigenPodManager__factory, IERC20__factory, StrategyManager__factory } from "../../typechain/index.ts";
 import { TypedContractEvent, TypedEventLog } from "../../typechain/common.ts";
 import { DepositEvent, StrategyManager } from "../../typechain/StrategyManager.ts";
@@ -13,12 +13,13 @@ import { TransferEvent } from "../../typechain/IERC20.ts";
 
 // serialization polyfill
 import "./utils/bigint.ts";
+import { Database } from "../database.types.ts";
 
 interface Deposit {
-  block: number;
   depositor: string;
-  token: string;
   amount: bigint;
+  block: number;
+  log_index: number;
   strategy: string;
   shares: bigint;
   caller: string;
@@ -165,12 +166,13 @@ async function indexDepositsRange(
   provider: ethers.JsonRpcApiProvider,
   startBlock: number,
   endBlock: number,
-  chunkSize: number
+  chunkSize: number,
+  chain: "mainnet" | "goerli",
 ): Promise<Deposit[]> {
   const index: Deposit[] = [];
 
-  const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
-  const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_MANAGER_ADDRESS, provider);
+  const strategyManager = StrategyManager__factory.connect(CHAIN_DATA[chain].strategyManagerAddress, provider);
+  const eigenPodManager = EigenPodManager__factory.connect(CHAIN_DATA[chain].eigenPodManagerAddress, provider);
 
   const beaconChainStrategy = await strategyManager.beaconChainETHStrategy();
 
@@ -182,26 +184,28 @@ async function indexDepositsRange(
         fromBlock,
         toBlock
       );
-      const traceRequests: { block: number, request: Promise<TransactionTrace> }[] = [];
+      const traceRequests: { block: number, deposits: DepositLog[], request: Promise<TransactionTrace> }[] = [];
 
       txLogs.forEach(({ deposits, transfers }, txHash) => {
         if (isStraightforwardDeposit(deposits, transfers)) {
+          // being straightforward also means only 1 deposit
           const deposit = deposits[0];
           const transfer = transfers[0];
 
           index.push({
             block: deposit.blockNumber,
-            depositor: deposit.args.depositor,
-            token: deposit.args.token,
+            log_index: deposit.index,
+            depositor: addressToPsqlHexString(deposit.args.depositor),
             amount: transfer.args.value,
-            strategy: deposit.args.strategy,
+            strategy: addressToPsqlHexString(deposit.args.strategy),
             shares: deposit.args.shares,
-            caller: transfer.args.from,
+            caller: addressToPsqlHexString(transfer.args.from),
           });
         }
         else {
           traceRequests.push({
             block: deposits[0].blockNumber,
+            deposits,
             request: provider.send("debug_traceTransaction", [txHash, { type: "callTracer" }])
           });
         }
@@ -216,18 +220,38 @@ async function indexDepositsRange(
         traceRequests.map(traceRequest => traceRequest.request.then(txTrace => {
           traceCallWalk(txTrace.result, true, trace => {
             const fragment = depositFragments.find(el => el.selector === trace.input.slice(0, 10));
+            const depositMatches = traceRequest.deposits.map(deposit => ({ matched: false, deposit }));
 
-            if (addressEq(trace.to, STRATEGY_MANAGER_ADDRESS) && fragment) {
+            if (addressEq(trace.to, CHAIN_DATA[chain].strategyManagerAddress) && fragment) {
               const decodedInput = strategyManager.interface.decodeFunctionData(fragment, trace.input);
+              const depositor = decodedInput.staker || trace.from;
+              const shares = strategyManager.interface.parseCallResult(trace.output)[0];
+
+              const matchingDeposit = depositMatches.find(depositMatch => {
+                if (depositMatch.matched) return false;
+
+                if (
+                  addressEq(depositMatch.deposit.args.strategy, decodedInput.strategy)
+                  && addressEq(depositMatch.deposit.args.depositor, depositor)
+                  && depositMatch.deposit.args.shares === shares
+                ) {
+                  depositMatch.matched = true;
+                  return true;
+                }
+
+                return false;
+              });
+
+              if (!matchingDeposit) throw new Error(`Couldn't find deposit trace in block ${traceRequest.block}`);
 
               index.push({
                 block: traceRequest.block,
-                depositor: decodedInput.staker || trace.from,
-                token: decodedInput.token,
+                log_index: matchingDeposit.deposit.index,
+                depositor: addressToPsqlHexString(depositor),
                 amount: decodedInput.amount,
-                strategy: decodedInput.strategy,
-                shares: strategyManager.interface.parseCallResult(trace.output)[0],
-                caller: trace.from,
+                strategy: addressToPsqlHexString(decodedInput.strategy),
+                shares,
+                caller: addressToPsqlHexString(trace.from),
               });
             }
           });
@@ -248,12 +272,12 @@ async function indexDepositsRange(
       await Promise.all(beaconChainDepositLogs.map(async log => {
         index.push({
           block: log.blockNumber,
-          depositor: log.args.podOwner,
-          token: ethers.ZeroAddress,
+          log_index: log.index,
+          depositor: addressToPsqlHexString(log.args.podOwner),
           amount: log.args.amount,
-          strategy: beaconChainStrategy,
+          strategy: addressToPsqlHexString(beaconChainStrategy),
           shares: log.args.amount,
-          caller: await ownerToPod[log.args.podOwner],
+          caller: addressToPsqlHexString(await ownerToPod[log.args.podOwner]),
         });
       }));
     })
@@ -268,31 +292,21 @@ async function indexDepositsRange(
  * the current finalized block), then fetches the indexable deposit data and
  * feeds it to the Deposit table in the Supabase DB, while also updating the
  * last indexed block record.
- * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
- * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
- * simultaneous runs, which would end up inserting duplicate data.
  * @param supabase Supabase client.
  * @param provider Network provider.
  */
 export async function indexDeposits(
-  supabase: SupabaseClient,
-  provider: ethers.JsonRpcApiProvider
+  supabase: SupabaseClient<Database>,
+  provider: ethers.JsonRpcApiProvider,
+  chain: "mainnet" | "goerli",
 ): Promise<{ startBlock: number; endBlock: number }> {
-  const startBlock = await getIndexingStartBlock(supabase, "Deposits", true);
-  const endBlock = await getIndexingEndBlock(provider);
+  const startBlock = await getIndexingStartBlock(supabase, "Deposits", chain);
+  const endBlock = await getIndexingEndBlock(startBlock, provider);
 
-  let results;
-  try {
-    results = await indexDepositsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
-  }
-  catch (err) {
-    await releaseBlockLock("Deposits");
-    throw err;
-  }
+  const results = await indexDepositsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE, chain);
+  const { error } = await supabase.rpc("index_deposits", { p_rows: results, p_block: endBlock });
 
-  await setLastIndexedBlock(supabase, "Deposits", endBlock);
-  await supabase.from("_Deposits").insert(results);
-  await releaseBlockLock("Deposits");
+  if (error) throw error;
 
   return { startBlock, endBlock };
 }
