@@ -472,20 +472,17 @@ async function getDashboardData() {
     ...groupedStakers,
   ];
 
-  const allDepositors = Array.from(
-    new Set(allData.map(({ depositor }) => depositor))
+  const ensAddresses = Object.fromEntries(
+    await Promise.all(
+      Array.from(new Set(allData.map(el => el.depositor))).map(async (depositor) => {
+        return [depositor, await provider.lookupAddress(depositor)]
+      })
+    )
   );
 
-  const lookupPromises = allDepositors.map((depositor) =>
-    provider.lookupAddress(depositor)
-  );
-
-  const resolvedAddresses = await Promise.all(lookupPromises);
-
-  allData.map(
-    (data, index) =>
-      (data.depositor = resolvedAddresses[index] ?? data.depositor)
-  );
+  allData.forEach(entry => {
+    entry.depositor = ensAddresses[entry.depositor] ?? entry.depositor;
+  });
 
   return {
     rEthDeposits,
