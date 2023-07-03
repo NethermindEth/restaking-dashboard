@@ -1,6 +1,5 @@
 "use client";
 
-import { ethers } from "ethers";
 import { Inter } from "next/font/google";
 import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
@@ -9,11 +8,7 @@ import LeaderBoard from "./leaderboard";
 
 const inter = Inter({ subsets: ["latin"] });
 
-import {
-  LeaderboardUserData,
-  extractAmountsAndTimestamps,
-  roundToDecimalPlaces,
-} from "@/lib/utils";
+import { roundToDecimalPlaces } from "@/lib/utils";
 import Image from "next/image";
 import Disclaimer from "./Disclaimer";
 import { useState } from "react";

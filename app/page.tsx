@@ -9,11 +9,7 @@ import {
   StakedTokenV1__factory,
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
-import {
-  LeaderboardUserData,
-  extractAmountsAndTimestamps,
-  roundToDecimalPlaces,
-} from "@/lib/utils";
+import { LeaderboardUserData, extractAmountsAndTimestamps } from "@/lib/utils";
 
 import Dashboard from "./components/Dashboard";
 
