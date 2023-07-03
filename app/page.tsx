@@ -394,6 +394,7 @@ async function getDashboardData() {
     await supabase
       .from("StakersBeaconChainETHShares")
       .select("*")
+      .order("total_staked_shares", { ascending: false })
       .limit(MAX_LEADERBOARD_SIZE)
   ) || [];
 
@@ -401,6 +402,7 @@ async function getDashboardData() {
     await supabase
       .from("StakersRETHShares")
       .select("*")
+      .order("total_staked_shares", { ascending: false })
       .limit(MAX_LEADERBOARD_SIZE)
   ) || [];
 
@@ -408,6 +410,7 @@ async function getDashboardData() {
     await supabase
       .from("StakersCbETHShares")
       .select("*")
+      .order("total_staked_shares", { ascending: false })
       .limit(MAX_LEADERBOARD_SIZE)
   ) || [];
 
@@ -415,6 +418,7 @@ async function getDashboardData() {
     await supabase
       .from("StakersStETHShares")
       .select("*")
+      .order("total_staked_shares", { ascending: false })
       .limit(MAX_LEADERBOARD_SIZE)
   ) || [];
 
