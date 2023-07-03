@@ -114,11 +114,6 @@ export default function LeaderBoard(data: any) {
         </button>
       </div>
       {activeData?.length ? (
-        <p />
-      ) : (
-        <p className="py-6 px-6 text-left text-sm">No staker yet</p>
-      )}
-      {activeData?.length && (
         <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
           <table className="table w-full border-collapse">
             <thead
@@ -191,6 +186,8 @@ export default function LeaderBoard(data: any) {
             </button>
           </div>
         </div>
+      ) : (
+        <p className="py-6 px-6 text-left text-sm">No staker yet</p>
       )}
     </div>
   );
