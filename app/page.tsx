@@ -31,7 +31,7 @@ const MAX_LEADERBOARD_SIZE = 50;
 export default async function Home() {
   const [mainnetData, goerliData] = await Promise.all([
     getDashboardData(true),
-    getDashboardData(false),
+    getDashboardData(true), // set to false when goerli data is indexed
   ]);
   return <Dashboard data={{ mainnet: mainnetData, goerli: goerliData }} />;
 }
