@@ -1,4 +1,4 @@
-import { supabase, supabaseUnwrap } from "@/lib/supabaseClient";
+import { mainnetSupabaseClient, supabaseUnwrap } from "@/lib/supabaseClient";
 import { roundToDecimalPlaces } from "@/lib/utils";
 import { RocketTokenRETH__factory, StakedTokenV1__factory, StrategyBaseTVLLimits__factory } from "@/typechain";
 import { ImageResponse } from "@vercel/og";
@@ -201,7 +201,7 @@ async function getDashboardData() {
   const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
 
   const totalStakedBeaconChainEth = supabaseUnwrap(
-    await supabase
+    await mainnetSupabaseClient
       .from("StakedBeaconChainETH")
       .select("*")
   )![0].amount || 0;
