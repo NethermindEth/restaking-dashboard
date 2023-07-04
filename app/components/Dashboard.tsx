@@ -24,7 +24,7 @@ export default function Dashboard(data: any) {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
-      <div className="flex self-end items-center">
+      {/* <div className="flex self-end items-center">
         <span className="mr-2">Mainnet</span>
         <label className="flex items-center cursor-pointer">
           <div className="relative">
@@ -47,7 +47,7 @@ export default function Dashboard(data: any) {
           </div>
         </label>
         <span className="ml-2">Testnet</span>
-      </div>
+      </div> */}
       <div className="z-10 max-w-5xl items-center justify-between font-mono text-sm">
         <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none lgmb-12">
           <Image

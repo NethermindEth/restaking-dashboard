@@ -45,11 +45,13 @@ const NETWORK_DATA: Record<
 const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
-  const [mainnetData, goerliData] = await Promise.all([
+  const [mainnetData /*goerliData*/] = await Promise.all([
     getDashboardData(true),
-    getDashboardData(false), // set to false when goerli data is indexed
+    // getDashboardData(false),
   ]);
-  return <Dashboard data={{ mainnet: mainnetData, goerli: goerliData }} />;
+  return (
+    <Dashboard data={{ mainnet: mainnetData, goerli: {} /*goerliData*/ }} />
+  );
 }
 
 async function getDashboardData(isMainnet: boolean) {
