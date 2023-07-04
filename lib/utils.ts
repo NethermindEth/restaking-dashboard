@@ -1,8 +1,7 @@
-
 export interface DailyTokenData {
   date: string | null;
   total_amount: number | null;
-};
+}
 
 export interface LeaderboardUserData {
   depositor: string;
@@ -31,14 +30,20 @@ export function extractAmountsAndTimestamps(...data: DailyTokenData[][]): {
   amounts: number[][];
   timestamps: string[];
 } {
-  const amounts = data.map(tokenData => tokenData.map(el => el.total_amount!));
-  const dates = data.map(tokenData => tokenData.map(el => el.date)).sort((a, b) => a.length - b.length)[0];
+  const amounts = data.map((tokenData) =>
+    tokenData.map((el) => el.total_amount!)
+  );
+  const dates = data
+    .map((tokenData) => tokenData.map((el) => el.date))
+    .sort((a, b) => a.length - b.length)[0];
 
-  return { amounts, timestamps: dates.map(el => formatDateToStandard(el!)) };
+  return { amounts, timestamps: dates.map((el) => formatDateToStandard(el!)) };
 }
 
-export function getEtherscanAddressUrl(address: string): string {
-  return `https://etherscan.io/address/${address}`;
+export function getAddressUrl(isMainnet: boolean, address: string): string {
+  return isMainnet
+    ? `https://etherscan.io/address/${address}`
+    : `https://goerli.etherscan.io/address/${address}`;
 }
 
 export function getShortenedAddress(
@@ -47,4 +52,4 @@ export function getShortenedAddress(
   second: number
 ) {
   return `${address.slice(0, first)}...${address.slice(-1 * second)}`;
-};
+}
