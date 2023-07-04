@@ -3,7 +3,11 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
-import { supabase, supabaseUnwrap } from "../lib/supabaseClient";
+import {
+  mainnetSupabaseClient,
+  goerliSupabaseClient,
+  supabaseUnwrap,
+} from "../lib/supabaseClient";
 import {
   RocketTokenRETH__factory,
   StakedTokenV1,
@@ -11,7 +15,11 @@ import {
   StrategyBaseTVLLimits,
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
-import { LeaderboardUserData, extractAmountsAndTimestamps } from "@/lib/utils";
+import {
+  DailyTokenData,
+  LeaderboardUserData,
+  extractAmountsAndTimestamps,
+} from "@/lib/utils";
 
 import Dashboard from "./components/Dashboard";
 
@@ -57,6 +65,7 @@ export default async function Home() {
 async function getDashboardData(isMainnet: boolean) {
   const networkData = isMainnet ? NETWORK_DATA.mainnet : NETWORK_DATA.goerli;
   const provider = networkData.provider;
+  const supabase = isMainnet ? mainnetSupabaseClient : goerliSupabaseClient;
 
   const rEth = RocketTokenRETH__factory.connect(
     networkData.rethAddress,
@@ -113,7 +122,7 @@ async function getDashboardData(isMainnet: boolean) {
   const stEthDeposits =
     supabaseUnwrap(await supabase.from("DailyStETHDeposits").select("*")) || [];
 
-  const cbEthDeposits =
+  const cbEthDeposits: DailyTokenData[] =
     supabaseUnwrap(await supabase.from("DailyCbETHDeposits").select("*")) || [];
 
   const cumulativeREthDeposits =
@@ -126,7 +135,7 @@ async function getDashboardData(isMainnet: boolean) {
       await supabase.from("CumulativeDailyStETHDeposits").select("*")
     ) || [];
 
-  const cumulativeCbEthDeposits =
+  const cumulativeCbEthDeposits: DailyTokenData[] =
     supabaseUnwrap(
       await supabase.from("CumulativeDailyCbETHDeposits").select("*")
     ) || [];
@@ -149,7 +158,7 @@ async function getDashboardData(isMainnet: boolean) {
     supabaseUnwrap(await supabase.from("DailyStETHWithdrawals").select("*")) ||
     [];
 
-  const cbEthWithdrawals =
+  const cbEthWithdrawals: DailyTokenData[] =
     supabaseUnwrap(await supabase.from("DailyCbETHWithdrawals").select("*")) ||
     [];
 
@@ -163,7 +172,7 @@ async function getDashboardData(isMainnet: boolean) {
       await supabase.from("CumulativeDailyStETHWithdrawals").select("*")
     ) || [];
 
-  const cumulativeCbEthWithdrawals =
+  const cumulativeCbEthWithdrawals: DailyTokenData[] =
     supabaseUnwrap(
       await supabase.from("CumulativeDailyCbETHWithdrawals").select("*")
     ) || [];
