@@ -35,7 +35,30 @@ export default function Dashboard(data: any) {
           <p className="text-lg md:text-2xl ml-4">EigenLayer Stats</p>
         </div>
       </div>
-
+      <div className="flex self-end items-center">
+        <span className="mr-2">Mainnet</span>
+        <label className="flex items-center cursor-pointer">
+          <div className="relative">
+            <input
+              type="checkbox"
+              className="hidden"
+              checked={isMainnet}
+              onChange={() => switchNetwork(!isMainnet)}
+            />
+            <div
+              className={`toggle-path ${
+                isMainnet ? "toggle-btn-mainnet" : "toggle-btn-goerli"
+              } w-12 h-6 rounded-full shadow-inner`}
+            ></div>
+            <div
+              className={`toggle-circle absolute bg-white w-6 h-6 rounded-full shadow inset-y-0 left-0 transform transition-transform duration-200 ${
+                isMainnet ? "translate-x-0" : "translate-x-full"
+              }`}
+            ></div>
+          </div>
+        </label>
+        <span className="ml-2">Testnet</span>
+      </div>
       <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
         <div className="data-card data-card-steth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block">
@@ -60,15 +83,18 @@ export default function Dashboard(data: any) {
             {roundToDecimalPlaces(networkData.rEthTvl)}
           </p>
         </div>
-        <div className="data-card data-card-cbeth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-          <span className="inline-block ">
-            <Image src={"/cbeth.png"} alt="cbETH" width={48} height={48} />
-          </span>
-          <p className="text-sm md:text-base">Staked cbETH</p>
-          <p className="md:text-xl">
-            {roundToDecimalPlaces(networkData.cbEthTvl)}
-          </p>
-        </div>
+        {isMainnet && (
+          <div className="data-card data-card-cbeth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
+            <span className="inline-block ">
+              <Image src={"/cbeth.png"} alt="cbETH" width={48} height={48} />
+            </span>
+            <p className="text-sm md:text-base">Staked cbETH</p>
+            <p className="md:text-xl">
+              {roundToDecimalPlaces(networkData.cbEthTvl)}
+            </p>
+          </div>
+        )}
+
         <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
           <span className="inline-block">
             <Image
@@ -96,7 +122,9 @@ export default function Dashboard(data: any) {
                 title: "Cumulative deposited tokens by day",
                 amounts: networkData.chartDataDepositsCumulative.amounts,
                 timestamps: networkData.chartDataDepositsCumulative.timestamps,
-                namedLabels: ["stETH", "rETH", "cbETH"],
+                namedLabels: isMainnet
+                  ? ["stETH", "rETH", "cbETH"]
+                  : ["stETH", "rETH"],
               }}
             />
           </div>
@@ -108,7 +136,9 @@ export default function Dashboard(data: any) {
               data={{
                 amounts: networkData.chartDataDepositsDaily.amounts,
                 labels: networkData.chartDataDepositsDaily.timestamps,
-                namedLabels: ["stETH", "rETH", "cbETH"],
+                namedLabels: isMainnet
+                  ? ["stETH", "rETH", "cbETH"]
+                  : ["stETH", "rETH"],
               }}
               title="Deposited tokens by day"
             />
@@ -126,7 +156,9 @@ export default function Dashboard(data: any) {
                 amounts: networkData.chartDataWithdrawalsCumulative.amounts,
                 timestamps:
                   networkData.chartDataWithdrawalsCumulative.timestamps,
-                namedLabels: ["stETH", "rETH", "cbETH"],
+                namedLabels: isMainnet
+                  ? ["stETH", "rETH", "cbETH"]
+                  : ["stETH", "rETH"],
               }}
             />
           </div>
@@ -139,7 +171,9 @@ export default function Dashboard(data: any) {
               data={{
                 amounts: networkData.chartDataWithdrawalsDaily.amounts,
                 labels: networkData.chartDataWithdrawalsDaily.timestamps,
-                namedLabels: ["stETH", "rETH", "cbETH"],
+                namedLabels: isMainnet
+                  ? ["stETH", "rETH", "cbETH"]
+                  : ["stETH", "rETH"],
               }}
               title="Token Withdrawals by day"
             />
@@ -183,24 +217,33 @@ export default function Dashboard(data: any) {
           <h3 className="text-center text-xl">Deposited tokens</h3>
           <PieChart
             data={{
-              amounts: [
-                networkData.stEthTvl,
-                networkData.rEthTvl * networkData.rEthRate,
-                networkData.cbEthTvl * networkData.cbEthRate,
-                networkData.totalStakedBeaconChainEth,
-              ],
-              labels: [
-                "stETH",
-                "rETH (as ETH)",
-                "cbETH (as ETH)",
-                "Beacon Chain ETH",
-              ],
+              amounts: isMainnet
+                ? [
+                    networkData.stEthTvl,
+                    networkData.rEthTvl * networkData.rEthRate,
+                    networkData.cbEthTvl * networkData.cbEthRate,
+                    networkData.totalStakedBeaconChainEth,
+                  ]
+                : [
+                    networkData.stEthTvl,
+                    networkData.rEthTvl * networkData.rEthRate,
+                    networkData.totalStakedBeaconChainEth,
+                  ],
+              labels: isMainnet
+                ? [
+                    "stETH",
+                    "rETH (as ETH)",
+                    "cbETH (as ETH)",
+                    "Beacon Chain ETH",
+                  ]
+                : ["stETH", "rETH (as ETH)", "Beacon Chain ETH"],
             }}
           />
         </div>
 
         <LeaderBoard
           boardData={{
+            isMainnet,
             ethStakers: networkData.groupedStakers,
             stethStakers: networkData.stakersStEthConverted,
             rethStakers: networkData.stakersREthConverted,
