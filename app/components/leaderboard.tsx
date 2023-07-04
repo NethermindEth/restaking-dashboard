@@ -6,7 +6,7 @@ import {
   getShortenedAddress,
   roundToDecimalPlaces,
 } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -17,6 +17,12 @@ export default function LeaderBoard(data: any) {
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setActiveData(data.boardData.ethStakers);
+    setActiveButton(0);
+    setCurrentPage(1);
+  }, [data]);
 
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
