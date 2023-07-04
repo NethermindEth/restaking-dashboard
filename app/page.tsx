@@ -6,7 +6,9 @@ const inter = Inter({ subsets: ["latin"] });
 import { supabase, supabaseUnwrap } from "../lib/supabaseClient";
 import {
   RocketTokenRETH__factory,
+  StakedTokenV1,
   StakedTokenV1__factory,
+  StrategyBaseTVLLimits,
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
 import { LeaderboardUserData, extractAmountsAndTimestamps } from "@/lib/utils";
@@ -69,8 +71,8 @@ async function getDashboardData(isMainnet: boolean) {
     provider
   );
 
-  let cbEth;
-  let cbEthStrategy;
+  let cbEth: StakedTokenV1;
+  let cbEthStrategy: StrategyBaseTVLLimits;
   let cbEthRate = 0;
   let cbEthTvl = 0;
   if (isMainnet) {
