@@ -13,53 +13,83 @@ import { LeaderboardUserData, extractAmountsAndTimestamps } from "@/lib/utils";
 
 import Dashboard from "./components/Dashboard";
 
-const TESTNET_RETH_ADDRESS = "0x178E141a0E3b34152f73Ff610437A7bf9B83267A";
-const MAINNET_RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
-const MAINNET_CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
-const MAINNET_STETH_STRATEGY_ADDRESS =
-  "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
-const MAINNET_CBETH_STRATEGY_ADDRESS =
-  "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
-const MAINNET_RETH_STRATEGY_ADDRESS =
-  "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
-const mainnetProvider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
-const testnetProvider = new ethers.JsonRpcProvider(
-  '"https://rpc.ankr.com/eth_goerli"'
-);
+const NETWORK_DATA: Record<
+  string,
+  {
+    provider: any;
+    rethAddress: string;
+    cbethAddress?: string;
+    stethStrategy: string;
+    cbethStrategy?: string;
+    rethStrategy: string;
+  }
+> = {
+  mainnet: {
+    provider: new ethers.JsonRpcProvider("https://rpc.ankr.com/eth"),
+    rethAddress: "0xae78736Cd615f374D3085123A210448E74Fc6393",
+    cbethAddress: "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
+    stethStrategy: "0x93c4b944D05dfe6df7645A86cd2206016c51564D",
+    cbethStrategy: "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc",
+    rethStrategy: "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2",
+  },
+  goerli: {
+    provider: new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli"),
+    rethAddress: "0x178E141a0E3b34152f73Ff610437A7bf9B83267A",
+    stethStrategy: "0xB613E78E2068d7489bb66419fB1cfa11275d14da",
+    rethStrategy: "0x879944A8cB437a5f8061361f82A6d4EED59070b5",
+  },
+};
+
 const MAX_LEADERBOARD_SIZE = 50;
 
 export default async function Home() {
   const [mainnetData, goerliData] = await Promise.all([
     getDashboardData(true),
-    getDashboardData(true), // set to false when goerli data is indexed
+    getDashboardData(false), // set to false when goerli data is indexed
   ]);
   return <Dashboard data={{ mainnet: mainnetData, goerli: goerliData }} />;
 }
 
 async function getDashboardData(isMainnet: boolean) {
-  const provider = isMainnet ? mainnetProvider : testnetProvider;
+  const networkData = isMainnet ? NETWORK_DATA.mainnet : NETWORK_DATA.goerli;
+  const provider = networkData.provider;
+
   const rEth = RocketTokenRETH__factory.connect(
-    isMainnet ? MAINNET_RETH_ADDRESS : TESTNET_RETH_ADDRESS,
+    networkData.rethAddress,
     provider
   );
   const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
-  const cbEth = StakedTokenV1__factory.connect(MAINNET_CBETH_ADDRESS, provider);
-  const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
-
   const stEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    MAINNET_STETH_STRATEGY_ADDRESS,
+    networkData.stethStrategy,
     provider
   );
   const rEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    MAINNET_RETH_STRATEGY_ADDRESS,
-    provider
-  );
-  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    MAINNET_CBETH_STRATEGY_ADDRESS,
+    networkData.rethStrategy,
     provider
   );
 
+  let cbEth;
+  let cbEthStrategy;
+  let cbEthRate = 0;
+  let cbEthTvl = 0;
+  if (isMainnet) {
+    cbEth = StakedTokenV1__factory.connect(
+      networkData.cbethAddress as string,
+      provider
+    );
+    cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
+    cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
+      networkData.cbethStrategy as string,
+      provider
+    );
+    cbEthTvl =
+      Number(
+        await cbEthStrategy.sharesToUnderlyingView(
+          await cbEthStrategy.totalShares()
+        )
+      ) / 1e18;
+  }
   const stEthTvl =
     Number(
       await stEthStrategy.sharesToUnderlyingView(
@@ -70,12 +100,6 @@ async function getDashboardData(isMainnet: boolean) {
     Number(
       await rEthStrategy.sharesToUnderlyingView(
         await rEthStrategy.totalShares()
-      )
-    ) / 1e18;
-  const cbEthTvl =
-    Number(
-      await cbEthStrategy.sharesToUnderlyingView(
-        await cbEthStrategy.totalShares()
       )
     ) / 1e18;
 
@@ -230,8 +254,9 @@ async function getDashboardData(isMainnet: boolean) {
     Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const stEthSharesRate =
     Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
-  const cbEthSharesRate =
-    Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const cbEthSharesRate = isMainnet
+    ? Number(await cbEthStrategy!.sharesToUnderlyingView(BigInt(1e18))) / 1e18
+    : 0;
 
   const stakersBeaconChainEthConverted: LeaderboardUserData[] =
     stakersBeaconChainEth.map((d) => ({
