@@ -2,11 +2,11 @@
 
 import {
   LeaderboardUserData,
-  getEtherscanAddressUrl,
+  getAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
 } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -17,6 +17,12 @@ export default function LeaderBoard(data: any) {
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setActiveData(data.boardData.ethStakers);
+    setActiveButton(0);
+    setCurrentPage(1);
+  }, [data]);
 
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
@@ -86,19 +92,21 @@ export default function LeaderBoard(data: any) {
         >
           rETH
         </button>
-        <button
-          className={`table-button ${
-            activeButton === 2
-              ? "table-button-cbeth-active"
-              : "table-button-cbeth-inactive"
-          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
-          onClick={() => {
-            handleToggleContent(data.boardData.cbethStakers, 4);
-            setCurrentPage(1);
-          }}
-        >
-          cbETH
-        </button>
+        {data.boardData.isMainnet && (
+          <button
+            className={`table-button ${
+              activeButton === 2
+                ? "table-button-cbeth-active"
+                : "table-button-cbeth-inactive"
+            } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+            onClick={() => {
+              handleToggleContent(data.boardData.cbethStakers, 4);
+              setCurrentPage(1);
+            }}
+          >
+            cbETH
+          </button>
+        )}
         <button
           className={`table-button ${
             activeButton === 1
@@ -140,7 +148,12 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(userData.depositor));
+                        window.open(
+                          getAddressUrl(
+                            data.boardData.isMainnet,
+                            userData.depositor
+                          )
+                        );
                       }}
                     >
                       {userData.depositor.endsWith(".eth")
@@ -151,7 +164,12 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getEtherscanAddressUrl(userData.depositor));
+                        window.open(
+                          getAddressUrl(
+                            data.boardData.isMainnet,
+                            userData.depositor
+                          )
+                        );
                       }}
                     >
                       {userData.depositor}

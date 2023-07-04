@@ -180,3 +180,12 @@ tbody tr:hover {
   color: rgb(var(--whitish));
   background-color: rgb(var(--accent-color));
 }
+
+.toggle-btn-mainnet{
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--accent-color));
+}
+
+.toggle-btn-goerli{
+  color: rgb(var(--whitish));
+  background-color: rgba(var(--accent-color), 0.6);}

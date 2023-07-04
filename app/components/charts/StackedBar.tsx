@@ -47,10 +47,10 @@ export default (data: any) => {
       internalChartData.datasets.shift();
       internalChartData.datasets.shift();
       internalChartData.datasets.shift();
-    }
-    if (data.data.namedLabels.length === 3) {
-      internalChartData.datasets.pop();
-    }
+    } else
+      for (let i = data.data.namedLabels.length; i < 4; i++) {
+        internalChartData.datasets.pop();
+      }
 
     internalChartData.labels = data.data.labels;
     internalChartData.datasets.forEach((dataset, index) => {
