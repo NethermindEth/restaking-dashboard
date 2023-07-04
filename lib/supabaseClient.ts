@@ -1,22 +1,22 @@
 import { PostgrestError, createClient } from "@supabase/supabase-js";
 import { Database } from "./database.types";
 
-const supabaseConfig = {
-  mainnet: {
-    supabaseUrl: process.env.NEXT_PUBLIC_NEW_SUPABASE_URL || "",
-    supabaseKey: process.env.NEXT_PUBLIC_NEW_SUPABASE_KEY || "",
-  },
-  goerli: {
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_KEY || "",
-  },
-};
+const supabaseUrl = process.env.NEXT_PUBLIC_NEW_SUPABASE_URL || "";
+const supabaseKey = process.env.NEXT_PUBLIC_NEW_SUPABASE_KEY || "";
 
-export const supabase = createClient<Database>(
-  supabaseConfig.mainnet.supabaseUrl,
-  supabaseConfig.mainnet.supabaseKey,
+export const mainnetSupabaseClient = createClient<Database>(
+  supabaseUrl,
+  supabaseKey,
   {
     db: { schema: "mainnet" },
+  }
+);
+
+export const goerliSupabaseClient = createClient<Database>(
+  supabaseUrl,
+  supabaseKey,
+  {
+    db: { schema: "goerli" },
   }
 );
 
