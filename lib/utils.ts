@@ -30,12 +30,8 @@ export function extractAmountsAndTimestamps(...data: DailyTokenData[][]): {
   amounts: number[][];
   timestamps: string[];
 } {
-  const amounts = data.map((tokenData) =>
-    tokenData.map((el) => el.total_amount!)
-  );
-  const dates = data
-    .map((tokenData) => tokenData.map((el) => el.date))
-    .sort((a, b) => a.length - b.length)[0];
+  const amounts = data.map(tokenData => tokenData.map(el => el.total_amount!));
+  const dates = data.map(tokenData => tokenData.map(el => el.date)).sort((a, b) => a.length - b.length)[0];
 
   return { amounts, timestamps: dates.map((el) => formatDateToStandard(el!)) };
 }
