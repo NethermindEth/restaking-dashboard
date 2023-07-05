@@ -1,61 +1,52 @@
 "use client";
+import { cloneDeep } from "lodash";
 import { useMemo } from "react";
 import { Pie } from "react-chartjs-2";
 
-const dataConfig = {
-  labels: [],
-  datasets: [
-    {
-      data: [],
-      backgroundColor: [
-        "rgba(26, 12, 109, 1)",
-        "rgba(255, 184, 0, 1)",
-        "rgba(0, 153, 153, 1)",
-        "rgba(254, 156, 147, 1)",
-      ],
-      hoverBackgroundColor: [
-        "rgba(26, 12, 109, 0.6)",
-        "rgba(255, 184, 0, 0.6)",
-        "rgba(0, 153, 153, 1)",
-        "rgba(254, 156, 147, 0.6)",
-      ],
+const tokenConfig: {[key: string]: { backgroundColor: string; hoverBackgroundColor: string }} = {
+    stETH: {
+      backgroundColor: "rgba(26, 12, 109, 1)",
+      hoverBackgroundColor: "rgba(26, 12, 109, 0.6)",
     },
-  ],
-};
+    "rETH (as ETH)": {
+      backgroundColor: "rgba(255, 184, 0, 1)",
+      hoverBackgroundColor: "rgba(255, 184, 0, 0.6)",
+    },
+    "cbETH (as ETH)": {
+      backgroundColor: "rgba(0, 153, 153, 1)",
+      hoverBackgroundColor: "rgba(0, 153, 153, 0.6)",
+    },
+    "Beacon Chain ETH": {
+      backgroundColor: "rgba(254, 156, 147, 1)",
+      hoverBackgroundColor: "rgba(254, 156, 147, 0.6)",
+    },
+  };
 
-const PieChart = (data: any) => {
+const PieChart = (params: { data: { labels: string[]; amounts: Number[] }}) => {
   const chartData = useMemo(() => {
-    const internalChartData = dataConfig;
-    internalChartData.datasets[0].data = data.data.amounts;
-    internalChartData.labels = data.data.labels;
-    if (data.data.labels.length === 3) {
-      internalChartData.datasets[0].backgroundColor = [
-        "rgba(26, 12, 109, 1)",
-        "rgba(255, 184, 0, 1)",
-        "rgba(254, 156, 147, 1)",
-      ];
-      internalChartData.datasets[0].hoverBackgroundColor = [
-        "rgba(26, 12, 109, 0.6)",
-        "rgba(255, 184, 0, 0.6)",
-        "rgba(254, 156, 147, 0.6)",
-      ];
-    } else {
-      internalChartData.datasets[0].backgroundColor = [
-        "rgba(26, 12, 109, 1)",
-        "rgba(255, 184, 0, 1)",
-        "rgba(0, 153, 153, 1)",
-        "rgba(254, 156, 147, 1)",
-      ];
-      internalChartData.datasets[0].hoverBackgroundColor = [
-        "rgba(26, 12, 109, 0.6)",
-        "rgba(255, 184, 0, 0.6)",
-        "rgba(0, 153, 153, 1)",
-        "rgba(254, 156, 147, 0.6)",
-      ];
-    }
+    const internalConfig = cloneDeep(tokenConfig);
+    const dataset: {
+      data: Number[];
+      backgroundColor: string[];
+      hoverBackgroundColor: string[];
+    } = {
+      data: params.data.amounts,
+      backgroundColor: [],
+      hoverBackgroundColor: [],
+    };
 
-    return internalChartData;
-  }, [data]);
+    params.data.labels.forEach((token: string) => {
+      const config = internalConfig[token];
+      dataset.backgroundColor.push(config.backgroundColor);
+      dataset.hoverBackgroundColor.push(config.hoverBackgroundColor);
+      return internalConfig[token];
+    });
+
+    return {
+      labels: params.data.labels,
+      datasets: [dataset],
+    };
+  }, [params]);
 
   return <Pie data={chartData} redraw width={"100%"} />;
 };
