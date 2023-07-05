@@ -4,61 +4,57 @@ import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import { cloneDeep } from "lodash";
 
-const dataConfig = {
-  labels: [],
-
-  datasets: [
-    {
-      label: "stEth",
-      data: [],
-      backgroundColor: ["rgba(26, 12, 109, 0.6)"],
-      borderColor: ["rgba(26, 12, 109, 1)"],
-      borderWidth: 1,
-    },
-    {
-      label: "rEth",
-      data: [],
-      backgroundColor: ["rgba(255, 184, 0, 0.6)"],
-      borderColor: ["rgba(255, 184, 0, 1)"],
-      borderWidth: 1,
-    },
-    {
-      label: "cbEth",
-      data: [],
-      backgroundColor: ["rgba(0, 153, 153, 0.6)"],
-      borderColor: ["rgba(0, 153, 153, 1)"],
-      borderWidth: 1,
-    },
-    {
-      label: "Beacon Chain Eth",
-      data: [],
-      backgroundColor: "rgba(254, 156, 147, 0.6)",
-      borderColor: ["rgba(254, 156, 147, 1)"],
-      borderWidth: 1,
-    },
-  ],
+const tokenConfig: { [key: string]: any } = {
+  stETH: {
+    label: "stETH",
+    data: [],
+    backgroundColor: ["rgba(26, 12, 109, 0.6)"],
+    borderColor: ["rgba(26, 12, 109, 1)"],
+    borderWidth: 1,
+  },
+  rETH: {
+    label: "rETH",
+    data: [],
+    backgroundColor: ["rgba(255, 184, 0, 0.6)"],
+    borderColor: ["rgba(255, 184, 0, 1)"],
+    borderWidth: 1,
+  },
+  cbETH: {
+    label: "cbETH",
+    data: [],
+    backgroundColor: ["rgba(0, 153, 153, 0.6)"],
+    borderColor: ["rgba(0, 153, 153, 1)"],
+    borderWidth: 1,
+  },
+  ETH: {
+    label: "Beacon Chain Eth",
+    data: [],
+    backgroundColor: "rgba(254, 156, 147, 0.6)",
+    borderColor: ["rgba(254, 156, 147, 1)"],
+    borderWidth: 1,
+  },
 };
 
-export default (data: any) => {
+export default (params: {
+  data: { namedLabels: string[]; labels: string[]; amounts: Number[][] };
+}) => {
   const chartData = useMemo(() => {
-    const internalChartData = cloneDeep(dataConfig);
-    // Todo: change dataset generation
-    if (data.data.namedLabels.length === 1) {
-      internalChartData.datasets.shift();
-      internalChartData.datasets.shift();
-      internalChartData.datasets.shift();
-    } else
-      for (let i = data.data.namedLabels.length; i < 4; i++) {
-        internalChartData.datasets.pop();
-      }
+    const internalConfig = cloneDeep(tokenConfig);
 
-    internalChartData.labels = data.data.labels;
-    internalChartData.datasets.forEach((dataset, index) => {
-      dataset.data = data.data.amounts[index];
-      dataset.label = data.data.namedLabels[index];
-    });
-    return internalChartData;
-  }, [data]);
+    const datasets = params.data.namedLabels.map(
+      (token: string, index: number) => {
+        const config = internalConfig[token];
+        config.label = token;
+        config.data = params.data.amounts[index];
+        return config;
+      }
+    );
+
+    return {
+      labels: params.data.labels,
+      datasets,
+    };
+  }, [params]);
 
   return (
     <Bar
