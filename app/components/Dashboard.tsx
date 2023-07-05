@@ -141,7 +141,6 @@ export default function Dashboard(data: any) {
                   ? ["stETH", "rETH", "cbETH"]
                   : ["stETH", "rETH"],
               }}
-              title="Deposited tokens by day"
             />
           </div>
         </div>
@@ -176,7 +175,6 @@ export default function Dashboard(data: any) {
                   ? ["stETH", "rETH", "cbETH"]
                   : ["stETH", "rETH"],
               }}
-              title="Token Withdrawals by day"
             />
           </div>
         </div>
@@ -209,7 +207,6 @@ export default function Dashboard(data: any) {
                 labels: networkData.chartDataBeaconStakesDaily.timestamps,
                 namedLabels: ["ETH"],
               }}
-              title="Token Withdrawals by day"
             />
           </div>
         </div>
