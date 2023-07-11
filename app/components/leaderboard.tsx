@@ -1,23 +1,19 @@
 "use client";
 
 import {
-  UserData,
-  getGoerliUrl,
+  LeaderboardUserData,
+  getEtherscanAddressUrl,
   getShortenedAddress,
   roundToDecimalPlaces,
 } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { ethers } from "ethers";
 
 export default function LeaderBoard(data: any) {
-  const provider = new ethers.JsonRpcProvider(
-    "https://rpc.ankr.com/eth_goerli"
-  );
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +21,7 @@ export default function LeaderBoard(data: any) {
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
-  const handleToggleContent = (data: UserData[], index: number) => {
+  const handleToggleContent = (data: LeaderboardUserData[], index: number) => {
     setActiveData(data);
     setActiveButton(index);
   };
@@ -40,6 +36,8 @@ export default function LeaderBoard(data: any) {
         return "reth";
       case 3:
         return "steth";
+      case 4:
+        return "cbeth";
       default:
         return "";
     }
@@ -90,6 +88,19 @@ export default function LeaderBoard(data: any) {
         </button>
         <button
           className={`table-button ${
+            activeButton === 2
+              ? "table-button-cbeth-active"
+              : "table-button-cbeth-inactive"
+          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+          onClick={() => {
+            handleToggleContent(data.boardData.cbethStakers, 4);
+            setCurrentPage(1);
+          }}
+        >
+          cbETH
+        </button>
+        <button
+          className={`table-button ${
             activeButton === 1
               ? "table-button-beacon-active"
               : "table-button-beacon-inactive"
@@ -103,11 +114,6 @@ export default function LeaderBoard(data: any) {
         </button>
       </div>
       {activeData?.length ? (
-        <p />
-      ) : (
-        <p className="py-6 px-6 text-left text-sm">No staker yet</p>
-      )}
-      {activeData?.length && (
         <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
           <table className="table w-full border-collapse">
             <thead
@@ -123,7 +129,7 @@ export default function LeaderBoard(data: any) {
               </tr>
             </thead>
             <tbody>
-              {(activeData as UserData[])
+              {(activeData as LeaderboardUserData[])
                 .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
                 .map((userData, index) => (
                   <tr className="border-b-2" key={index}>
@@ -134,7 +140,7 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getGoerliUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
                       {userData.depositor.endsWith(".eth")
@@ -145,13 +151,13 @@ export default function LeaderBoard(data: any) {
                       className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        window.open(getGoerliUrl(userData.depositor));
+                        window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
                       {userData.depositor}
                     </td>
                     <td className="py-4 px-4 text-right text-sm">
-                      {roundToDecimalPlaces(userData.total_deposits)}
+                      {roundToDecimalPlaces(userData.totalStaked)}
                     </td>
                   </tr>
                 ))}
@@ -180,6 +186,8 @@ export default function LeaderBoard(data: any) {
             </button>
           </div>
         </div>
+      ) : (
+        <p className="py-6 px-6 text-left text-sm">No staker yet</p>
       )}
     </div>
   );

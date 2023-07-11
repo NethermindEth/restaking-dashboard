@@ -10,8 +10,11 @@ serve(async () => {
       createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        {
+          db: { schema: "mainnet" },
+        },
       ),
-      Deno.env.get("BEACON_PROVIDER_URL") ?? ""
+      Deno.env.get("MAINNET_BEACON_PROVIDER_URL") ?? ""
     );
 
     console.log(`Indexing successful! Validator index range: ${startIndex}-${endIndex}`);

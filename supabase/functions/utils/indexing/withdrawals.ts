@@ -1,18 +1,25 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { rangeChunkMap } from "./utils/chunk.ts";
-import { INDEXING_BLOCK_CHUNK_SIZE, STRATEGY_MANAGER_ADDRESS } from "./utils/constants.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
-import { StrategyManager__factory } from "../../typechain/index.ts";
+import { addressToPsqlHexString } from "./utils/address.ts";
+import { CHAIN_DATA, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock } from "./utils/updates.ts";
+import { IStrategy__factory, StrategyManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
 import "./utils/bigint.ts";
+import { Database } from "../database.types.ts";
 
-interface Withdrawal {
+interface WithdrawalData {
   block: number;
-  // (depositor, nonce) should be replaced by queued withdrawal ID
   depositor: string;
-  nonce: bigint;
+  nonce: number;
+}
+
+interface RatesUpdateData {
+  block: number;
+  strategy: string;
+  rate: bigint;
 }
 
 /**
@@ -30,11 +37,12 @@ async function indexWithdrawalsRange(
   provider: ethers.Provider,
   startBlock: number,
   endBlock: number,
-  chunkSize: number
+  chunkSize: number,
+  chain: "mainnet" | "goerli",
 ) {
-  const index: Withdrawal[] = [];
+  const index: WithdrawalData[] = [];
 
-  const strategyManager = StrategyManager__factory.connect(STRATEGY_MANAGER_ADDRESS, provider);
+  const strategyManager = StrategyManager__factory.connect(CHAIN_DATA[chain].strategyManagerAddress, provider);
   
   await Promise.all(
     rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
@@ -43,8 +51,8 @@ async function indexWithdrawalsRange(
       withdrawalLogs.forEach(log => {
         index.push({
           block: log.blockNumber,
-          depositor: log.args.depositor,
-          nonce: log.args.nonce,
+          depositor: addressToPsqlHexString(log.args.depositor),
+          nonce: Number(log.args.nonce),
         });
       });
     })
@@ -66,24 +74,35 @@ async function indexWithdrawalsRange(
  * @param provider Network provider.
  */
 export async function indexWithdrawals(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   provider: ethers.Provider,
+  chain: "mainnet" | "goerli",
 ): Promise<{ startBlock: number; endBlock: number }> {
-  const startBlock = await getIndexingStartBlock(supabase, "Withdrawals", true);
-  const endBlock = await getIndexingEndBlock(provider);
+  const startBlock = await getIndexingStartBlock(supabase, "Withdrawals", chain);
+  const endBlock = await getIndexingEndBlock(startBlock, provider);
 
-  let results;
-  try {
-    results = await indexWithdrawalsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
-  }
-  catch (err) {
-    await releaseBlockLock("Withdrawals");
-    throw err;
-  }
+  const results = await indexWithdrawalsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE, chain);
+  const { data: strategies, error: strategiesError } = await supabase.rpc("share_withdrawal_strategies", {
+    p_rows: results,
+  });
 
-  await setLastIndexedBlock(supabase, "Withdrawals", endBlock);
-  await supabase.from("_Withdrawals").insert(results);
-  await releaseBlockLock("Withdrawals");
+  if (strategiesError) throw strategiesError;
+
+  const ratesUpdateData: RatesUpdateData[] = await Promise.all(strategies.map(async ({ block, strategy }) => {
+    return {
+      block,
+      strategy: addressToPsqlHexString(strategy),
+      rate: await IStrategy__factory.connect(strategy, provider).sharesToUnderlyingView(BigInt(1e22), { blockTag: block }),
+    };
+  }));
+
+  const { error } = await supabase.rpc("update_share_withdrawals", {
+    p_withdrawal_data: results,
+    p_rates_data: ratesUpdateData,
+    p_block: endBlock,
+  });
+
+  if (error) throw error;
 
   return { startBlock, endBlock };
 }

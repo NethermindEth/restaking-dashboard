@@ -1,12 +1,14 @@
 import { ethers } from "ethers";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { rangeChunkMap } from "./utils/chunk.ts";
-import { EIGEN_POD_MANAGER_ADDRESS, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
-import { getIndexingEndBlock, getIndexingStartBlock, releaseBlockLock, setLastIndexedBlock } from "./utils/updates.ts";
+import { addressToPsqlHexString } from "./utils/address.ts";
+import { CHAIN_DATA, INDEXING_BLOCK_CHUNK_SIZE } from "./utils/constants.ts";
+import { getIndexingEndBlock, getIndexingStartBlock } from "./utils/updates.ts";
 import { EigenPodManager__factory } from "../../typechain/index.ts";
 
 // serialization polyfill
 import "./utils/bigint.ts";
+import { Database } from "../database.types.ts";
 
 interface Pod {
   block: number;
@@ -28,11 +30,12 @@ async function indexPodsRange(
   provider: ethers.Provider,
   startBlock: number,
   endBlock: number,
-  chunkSize: number
+  chunkSize: number,
+  chain: "mainnet" | "goerli",
 ): Promise<Pod[]> {
   const index: Pod[] = [];
 
-  const eigenPodManager = EigenPodManager__factory.connect(EIGEN_POD_MANAGER_ADDRESS, provider);
+  const eigenPodManager = EigenPodManager__factory.connect(CHAIN_DATA[chain].eigenPodManagerAddress, provider);
 
   await Promise.all(
     rangeChunkMap(startBlock, endBlock, chunkSize, async (fromBlock, toBlock) => {
@@ -45,8 +48,8 @@ async function indexPodsRange(
       deployedPodsLogs.forEach(log => {
         index.push({
           block: log.blockNumber,
-          address: log.args.eigenPod,
-          owner: log.args.podOwner,
+          address: addressToPsqlHexString(log.args.eigenPod),
+          owner: addressToPsqlHexString(log.args.podOwner),
         });
       });
     })
@@ -61,31 +64,21 @@ async function indexPodsRange(
  * the current finalized block), then fetches the indexable pod creation data
  * and feeds it to the Pods table in the Supabase DB, while also updating the
  * last indexed block record.
- * The `getIndexingStartBlock` -> `setLastIndexedBlock` procedure also acts as
- * a 'mutex' through the `lock` column in LastIndexedBlocks, preventing
- * simultaneous runs, which would end up inserting duplicate data.
  * @param supabase Supabase client.
  * @param provider Network provider.
  */
 export async function indexPods(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   provider: ethers.Provider,
+  chain: "mainnet" | "goerli",
 ): Promise<{ startBlock: number; endBlock: number }> {
-  const startBlock = await getIndexingStartBlock(supabase, "Pods", true);
-  const endBlock = await getIndexingEndBlock(provider);
+  const startBlock = await getIndexingStartBlock(supabase, "Pods", chain);
+  const endBlock = await getIndexingEndBlock(startBlock, provider);
 
-  let results;
-  try {
-    results = await indexPodsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE);
-  }
-  catch (err) {
-    await releaseBlockLock("Pods");
-    throw err;
-  }
+  const results = await indexPodsRange(provider, startBlock, endBlock, INDEXING_BLOCK_CHUNK_SIZE, chain);
+  const { error } = await supabase.rpc("index_pods", { p_rows: results, p_block: endBlock });
 
-  await setLastIndexedBlock(supabase, "Pods", endBlock);
-  await supabase.from("_Pods").insert(results);
-  await releaseBlockLock("Pods");
+  if (error) throw error;
 
   return { startBlock, endBlock };
 }

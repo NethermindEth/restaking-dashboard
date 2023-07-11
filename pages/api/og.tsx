@@ -1,11 +1,15 @@
-import { supabase } from "@/lib/supabaseClient";
-import {
-  BlockData,
-  mergeBlockChunks,
-  roundToDecimalPlaces,
-  sumTotalAmounts,
-} from "@/lib/utils";
+import { supabase, supabaseUnwrap } from "@/lib/supabaseClient";
+import { roundToDecimalPlaces } from "@/lib/utils";
+import { RocketTokenRETH__factory, StakedTokenV1__factory, StrategyBaseTVLLimits__factory } from "@/typechain";
 import { ImageResponse } from "@vercel/og";
+import { ethers } from "ethers";
+
+const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
+const STETH_STRATEGY_ADDRESS = "0x93c4b944D05dfe6df7645A86cd2206016c51564D";
+const CBETH_STRATEGY_ADDRESS = "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
+const RETH_STRATEGY_ADDRESS = "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
+const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
 
 export const config = {
   runtime: "edge",
@@ -23,20 +27,24 @@ const rEthLogo = fetch(new URL("../../public/reth.png", import.meta.url)).then(
   (res) => res.arrayBuffer()
 );
 
+const cbEthLogo = fetch(new URL("../../public/cbeth.png", import.meta.url)).then(
+  (res) => res.arrayBuffer()
+);
+
 const beaconEthLogo = fetch(
   new URL("../../public/beaconChainETH.png", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 export default async function () {
   const {
-    totalrEthDeposits,
-    totalstEthDeposits,
-    totalstEthWithdrawals,
-    totalrEthWithdrawals,
-    totalBeaconChainStakes,
-  } = await getDeposits();
-  const [logoData, stEthLogoData, rEthLogoData, beaconEthLogoData] =
-    await Promise.all([logo, stEthLogo, rEthLogo, beaconEthLogo]);
+    stEthTvl,
+    rEthTvl,
+    cbEthTvl,
+    totalStakedBeaconChainEth,
+  } = await getDashboardData();
+
+  const [logoData, stEthLogoData, rEthLogoData, cbEthLogoData, beaconEthLogoData] =
+    await Promise.all([logo, stEthLogo, rEthLogo, cbEthLogo, beaconEthLogo]);
 
   return new ImageResponse(
     (
@@ -69,12 +77,12 @@ export default async function () {
               height="72"
               src={logoData as unknown as string}
             />
-            <p tw="text-2xl ml-4">EigenLayer Stats on Testnet</p>
+            <p tw="text-2xl ml-4">EigenLayer Stats</p>
           </div>
         </div>
         <div
           style={{ display: "flex" }}
-          tw="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center"
+          tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
           <div
             style={{
@@ -84,7 +92,7 @@ export default async function () {
               backgroundColor: "rgb(26, 12, 109)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -93,9 +101,9 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked stETH</p>
-            <p tw="md:text-xl">
-              {roundToDecimalPlaces(totalstEthDeposits - totalstEthWithdrawals)}
+            <p tw="text-base mx-auto">Staked stETH</p>
+            <p tw="text-xl mx-auto">
+              {roundToDecimalPlaces(stEthTvl)}
             </p>
           </div>
           <div
@@ -106,7 +114,7 @@ export default async function () {
               backgroundColor: "rgb(255, 184, 0)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -115,9 +123,31 @@ export default async function () {
               width="48"
               height="48"
             />
-            <p tw="text-sm md:text-base">Staked rETH</p>
-            <p tw="md:text-xl">
-              {roundToDecimalPlaces(totalrEthDeposits - totalrEthWithdrawals)}
+            <p tw="text-base mx-auto">Staked rETH</p>
+            <p tw="text-xl mx-auto">
+              {roundToDecimalPlaces(rEthTvl)}
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              color: "rgba(235, 235, 235, 1)",
+              backgroundColor: "rgb(0, 153, 153)",
+              textAlign: "center",
+            }}
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
+          >
+            <img
+              tw="mx-auto"
+              src={cbEthLogoData as unknown as string}
+              alt="cbETH"
+              width="48"
+              height="48"
+            />
+            <p tw="text-base mx-auto">Staked cbETH</p>
+            <p tw="text-xl mx-auto">
+              {roundToDecimalPlaces(cbEthTvl)}
             </p>
           </div>
           <div
@@ -128,7 +158,7 @@ export default async function () {
               backgroundColor: "rgb(254, 156, 147)",
               textAlign: "center",
             }}
-            tw="grow mt-0 py-8 px-24 mx-4 shadow-lg rounded-md text-center"
+            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
           >
             <img
               tw="mx-auto"
@@ -139,7 +169,7 @@ export default async function () {
             />
             <p tw="text-base mx-auto">Beacon Chain ETH</p>
             <p tw="text-xl mx-auto">
-              {roundToDecimalPlaces(totalBeaconChainStakes)}
+              {roundToDecimalPlaces(totalStakedBeaconChainEth)}
             </p>
           </div>
         </div>
@@ -155,50 +185,31 @@ export default async function () {
   );
 }
 
-async function getDeposits() {
-  // Deposits
-  let { data: rEthDeposits, error: rEthDepositError } = await supabase
-    .from("consumabledailydepositsreth")
-    .select("*");
-  rEthDeposits = mergeBlockChunks(rEthDeposits as BlockData[]);
-  let totalrEthDeposits = sumTotalAmounts(rEthDeposits as BlockData[]);
+async function getDashboardData() {
+  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
+  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
-  let { data: stEthDeposits, error: stEthDepositError } = await supabase
-    .from("consumabledailydepositssteth")
-    .select("*");
-  stEthDeposits = mergeBlockChunks(stEthDeposits as BlockData[]);
-  let totalstEthDeposits = sumTotalAmounts(stEthDeposits as BlockData[]);
+  const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
+  const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
 
-  let { data: beaconChainStakes } = await supabase
-    .from("consumablebeaconchainstakeseth")
-    .select("*");
-  beaconChainStakes = mergeBlockChunks(beaconChainStakes as BlockData[]);
-  let totalBeaconChainStakes = sumTotalAmounts(
-    beaconChainStakes as BlockData[]
-  );
+  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(STETH_STRATEGY_ADDRESS, provider);
+  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
+  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
 
-  // Withdrawals
-  let { data: rEthWithdrawals, error: rEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalsreth")
-    .select("*");
-  rEthWithdrawals = mergeBlockChunks(rEthWithdrawals as BlockData[]);
-  let totalrEthWithdrawals = sumTotalAmounts(rEthWithdrawals as BlockData[]);
+  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
+  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
+  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
 
-  let { data: stEthWithdrawals, error: stEthWithDrawalsError } = await supabase
-    .from("consumabledailywithdrawalssteth")
-    .select("*");
-  stEthWithdrawals = mergeBlockChunks(stEthWithdrawals as BlockData[]);
-  let totalstEthWithdrawals = sumTotalAmounts(stEthWithdrawals as BlockData[]);
+  const totalStakedBeaconChainEth = supabaseUnwrap(
+    await supabase
+      .from("StakedBeaconChainETH")
+      .select("*")
+  )![0].amount || 0;
 
   return {
-    rEthDeposits,
-    totalrEthDeposits,
-    stEthDeposits,
-    totalstEthDeposits,
-    stEthWithdrawals,
-    totalstEthWithdrawals,
-    totalrEthWithdrawals,
-    beaconChainStakes,
-    totalBeaconChainStakes,
+    stEthTvl,
+    rEthTvl,
+    cbEthTvl,
+    totalStakedBeaconChainEth,
   };
 }
