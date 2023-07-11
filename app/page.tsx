@@ -24,6 +24,7 @@ const CBETH_STRATEGY_ADDRESS = "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
 const RETH_STRATEGY_ADDRESS = "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
 const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
 const MAX_LEADERBOARD_SIZE = 50;
+const MAX_CHART_SIZE = 30;
 
 export default async function Home() {
   const {
@@ -262,97 +263,114 @@ async function getDashboardData() {
     await supabase
       .from("DailyRETHDeposits")
       .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse() || [];
 
   const stEthDeposits = supabaseUnwrap(
     await supabase
       .from("DailyStETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cbEthDeposits = supabaseUnwrap(
     await supabase
       .from("DailyCbETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeREthDeposits = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyRETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeStEthDeposits = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyStETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeCbEthDeposits = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyCbETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const beaconChainEthDeposits = supabaseUnwrap(
     await supabase
       .from("DailyBeaconChainETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeBeaconChainEthDeposits = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyBeaconChainETHDeposits")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const rEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("DailyRETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const stEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("DailyStETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cbEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("DailyCbETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeREthWithdrawals = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyRETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeStEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyStETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeCbEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyCbETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const beaconChainEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("DailyBeaconChainETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const cumulativeBeaconChainEthWithdrawals = supabaseUnwrap(
     await supabase
       .from("CumulativeDailyBeaconChainETHWithdrawals")
-      .select("*")
-  ) || [];
+      .order("date", { ascending: false })
+      .limit(MAX_CHART_SIZE)
+  ).reverse()|| [];
 
   const totalStakedBeaconChainEth = supabaseUnwrap(
     await supabase
