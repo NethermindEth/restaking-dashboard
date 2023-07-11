@@ -273,6 +273,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyStETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -282,6 +283,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyCbETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -291,6 +293,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyRETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -300,6 +303,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyStETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -309,6 +313,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyCbETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -318,6 +323,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyBeaconChainETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -327,6 +333,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyBeaconChainETHDeposits")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -336,6 +343,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyRETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -345,6 +353,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyStETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -354,6 +363,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyCbETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -363,6 +373,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyRETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -372,6 +383,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyStETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -381,6 +393,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyCbETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -390,6 +403,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("DailyBeaconChainETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
@@ -399,6 +413,7 @@ async function getDashboardData() {
     supabaseUnwrap(
       await supabase
         .from("CumulativeDailyBeaconChainETHWithdrawals")
+        .select("*")
         .order("date", { ascending: false })
         .limit(MAX_CHART_SIZE)
     ) || []
