@@ -40,7 +40,6 @@ const dataConfig = {
 };
 
 export default (data: any) => {
-  const labelsLimit = 30;
   const chartData = useMemo(() => {
     const internalChartData = cloneDeep(dataConfig);
     // Todo: change dataset generation
@@ -53,9 +52,9 @@ export default (data: any) => {
       internalChartData.datasets.pop();
     }
 
-    internalChartData.labels = data.data.labels.slice(-labelsLimit);
+    internalChartData.labels = data.data.labels;
     internalChartData.datasets.forEach((dataset, index) => {
-      dataset.data = data.data.amounts[index].slice(-labelsLimit);
+      dataset.data = data.data.amounts[index];
       dataset.label = data.data.namedLabels[index];
     });
     return internalChartData;
@@ -69,7 +68,7 @@ export default (data: any) => {
         responsive: true,
         normalized: true,
         scales: {
-          x: { stacked: true, min: 0, max: labelsLimit },
+          x: { stacked: true, min: 0 },
           y: { stacked: true },
         },
         color: "rgb(26, 12, 109)",
