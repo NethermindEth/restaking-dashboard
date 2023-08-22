@@ -107,7 +107,7 @@ export default async function Home() {
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Cumulative deposited tokens by day
+            Cumulative Token Deposits by day
           </h3>
           <div className="chart-2">
             <LineChart
@@ -121,7 +121,7 @@ export default async function Home() {
           </div>
         </div>
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Deposited tokens by day</h3>
+          <h3 className="text-center text-xl">Token Deposits by day</h3>
           <div className="chart-staked-lst-date">
             <StackedBar
               data={{
