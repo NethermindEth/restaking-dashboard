@@ -245,6 +245,18 @@ export default async function Home() {
 }
 
 async function getDashboardData() {
+  const indexingBlockEntry = (
+    supabaseUnwrap(
+      await supabase
+        .from("LastIndexedBlock")
+        .select("block")
+    ) || []
+  );
+
+  if (!indexingBlockEntry.length) throw new Error("Error while getting deposits indexing block");
+
+  const indexingBlock = indexingBlockEntry[0].block;
+
   const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
   const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
 
@@ -255,9 +267,9 @@ async function getDashboardData() {
   const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
   const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
 
-  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares({ blockTag: "finalized" }), { blockTag: "finalized" })) / 1e18;
-  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares({ blockTag: "finalized" }), { blockTag: "finalized" })) / 1e18;
-  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares({ blockTag: "finalized" }), { blockTag: "finalized" })) / 1e18;
+  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares({ blockTag: indexingBlock }), { blockTag: indexingBlock })) / 1e18;
+  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares({ blockTag: indexingBlock }), { blockTag: indexingBlock })) / 1e18;
+  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares({ blockTag: indexingBlock }), { blockTag: indexingBlock })) / 1e18;
 
   const rEthDeposits = (
     supabaseUnwrap(
