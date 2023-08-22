@@ -255,9 +255,9 @@ async function getDashboardData() {
   const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
   const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
 
-  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
-  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
-  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
+  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares({ blockTag: "finalized" }), { blockTag: "finalized" })) / 1e18;
+  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares({ blockTag: "finalized" }), { blockTag: "finalized" })) / 1e18;
+  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares({ blockTag: "finalized" }), { blockTag: "finalized" })) / 1e18;
 
   const rEthDeposits = (
     supabaseUnwrap(
