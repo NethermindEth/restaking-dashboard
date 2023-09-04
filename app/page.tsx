@@ -4,6 +4,7 @@ import LineChart from "./components/charts/LineChart";
 import PieChart from "./components/charts/PieChart";
 import StackedBar from "./components/charts/StackedBar";
 import LeaderBoard from "./components/leaderboard";
+import spiceClient from "../lib/spiceAi";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,7 +14,12 @@ import {
   StakedTokenV1__factory,
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
-import { LeaderboardUserData, extractAmountsAndTimestamps, roundToDecimalPlaces } from "@/lib/utils";
+import {
+  DailyTokenData,
+  LeaderboardUserData,
+  extractAmountsAndTimestamps,
+  roundToDecimalPlaces,
+} from "@/lib/utils";
 import Image from "next/image";
 import Disclaimer from "./components/Disclaimer";
 
@@ -251,73 +257,86 @@ async function getDashboardData() {
   const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
   const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
 
-  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(STETH_STRATEGY_ADDRESS, provider);
-  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(RETH_STRATEGY_ADDRESS, provider);
-  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(CBETH_STRATEGY_ADDRESS, provider);
+  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(
+    STETH_STRATEGY_ADDRESS,
+    provider
+  );
+  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(
+    RETH_STRATEGY_ADDRESS,
+    provider
+  );
+  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
+    CBETH_STRATEGY_ADDRESS,
+    provider
+  );
 
-  const stEthTvl = Number(await stEthStrategy.sharesToUnderlyingView(await stEthStrategy.totalShares())) / 1e18;
-  const rEthTvl = Number(await rEthStrategy.sharesToUnderlyingView(await rEthStrategy.totalShares())) / 1e18;
-  const cbEthTvl = Number(await cbEthStrategy.sharesToUnderlyingView(await cbEthStrategy.totalShares())) / 1e18;
+  const stEthTvl =
+    Number(
+      await stEthStrategy.sharesToUnderlyingView(
+        await stEthStrategy.totalShares()
+      )
+    ) / 1e18;
+  const rEthTvl =
+    Number(
+      await rEthStrategy.sharesToUnderlyingView(
+        await rEthStrategy.totalShares()
+      )
+    ) / 1e18;
+  const cbEthTvl =
+    Number(
+      await cbEthStrategy.sharesToUnderlyingView(
+        await cbEthStrategy.totalShares()
+      )
+    ) / 1e18;
 
-  const rEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("DailyRETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  let rEthDeposits: DailyTokenData[] = [];
+  let stEthDeposits: DailyTokenData[] = [];
+  let cbEthDeposits: DailyTokenData[] = [];
 
-  const stEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("DailyStETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  const depositData = await spiceClient.query(`WITH cumulative_totals AS (
+    SELECT
+        TO_DATE(block_timestamp) AS "date",
+        strategy,
+        SUM(token_amount) / POWER(10, 18) as total_amount,
+        SUM(shares) / POWER(10, 18) as total_shares
+    FROM eth.eigenlayer.strategy_manager_deposits
+    WHERE strategy IN (
+        '0x93c4b944d05dfe6df7645a86cd2206016c51564d',
+        '0x54945180db7943c0ed0fee7edab2bd24620256bc',
+        '0x1bee69b7dfffa4e2d53c2a2df135c388ad25dcd2'
+    )
+    GROUP BY TO_DATE(block_timestamp), strategy
+)
+  SELECT
+      ct1."date",
+      ct1.strategy,
+      ct1.total_amount,
+      ct1.total_shares,
+      (
+          SELECT SUM(ct2.total_amount)
+          FROM cumulative_totals ct2
+          WHERE ct2.strategy = ct1.strategy
+              AND ct2."date" <= ct1."date"
+      ) as cumulative_total_amount,
+      (
+          SELECT SUM(ct2.total_shares)
+          FROM cumulative_totals ct2
+          WHERE ct2.strategy = ct1.strategy
+              AND ct2."date" <= ct1."date"
+      ) as cumulative_total_shares
+  FROM cumulative_totals ct1
+  ORDER BY ct1."date" DESC;
+`);
 
-  const cbEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("DailyCbETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
-
-  const cumulativeREthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("CumulativeDailyRETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
-
-  const cumulativeStEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("CumulativeDailyStETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
-
-  const cumulativeCbEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("CumulativeDailyCbETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  depositData.toArray().forEach((ele) => {
+    if (ele.strategy === RETH_STRATEGY_ADDRESS.toLowerCase()) {
+      rEthDeposits.push(ele);
+    } else if (ele.strategy === CBETH_STRATEGY_ADDRESS.toLowerCase()) {
+      cbEthDeposits.push(ele);
+    } else if (ele.strategy === STETH_STRATEGY_ADDRESS.toLowerCase()) {
+      stEthDeposits.push(ele);
+    }
+  });
 
   const beaconChainEthDeposits = (
     supabaseUnwrap(
@@ -419,97 +438,119 @@ async function getDashboardData() {
     ) || []
   ).reverse();
 
-  const totalStakedBeaconChainEth = supabaseUnwrap(
-    await supabase
-      .from("StakedBeaconChainETH")
-      .select("*")
-  )![0].amount || 0;
+  const totalStakedBeaconChainEth =
+    supabaseUnwrap(await supabase.from("StakedBeaconChainETH").select("*"))![0]
+      .amount || 0;
 
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
+    false,
     stEthDeposits,
     rEthDeposits,
     cbEthDeposits,
-    beaconChainEthDeposits,
+    beaconChainEthDeposits
   );
 
   const chartDataDepositsCumulative = extractAmountsAndTimestamps(
-    cumulativeStEthDeposits,
-    cumulativeREthDeposits,
-    cumulativeCbEthDeposits,
+    true,
+    stEthDeposits,
+    rEthDeposits,
+    cbEthDeposits,
     cumulativeBeaconChainEthDeposits
   );
 
-  const chartDataBeaconStakesDaily = extractAmountsAndTimestamps(beaconChainEthDeposits);
+  // all bool values herafter are for test purpose only for now
 
-  const chartDataBeaconStakesCumulative = extractAmountsAndTimestamps(cumulativeBeaconChainEthDeposits);
+  const chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
+    false,
+    beaconChainEthDeposits
+  );
+
+  const chartDataBeaconStakesCumulative = extractAmountsAndTimestamps(
+    false,
+    cumulativeBeaconChainEthDeposits
+  );
 
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
+    false,
     stEthWithdrawals,
     rEthWithdrawals,
-    cbEthWithdrawals,
+    cbEthWithdrawals
   );
 
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
+    false,
     cumulativeStEthWithdrawals,
     cumulativeREthWithdrawals,
     cumulativeCbEthWithdrawals
   );
 
-  const stakersBeaconChainEth = supabaseUnwrap(
-    await supabase
-      .from("StakersBeaconChainETHShares")
-      .select("*")
-      .order("total_staked_shares", { ascending: false })
-      .limit(MAX_LEADERBOARD_SIZE)
-  ) || [];
+  const stakersBeaconChainEth =
+    supabaseUnwrap(
+      await supabase
+        .from("StakersBeaconChainETHShares")
+        .select("*")
+        .order("total_staked_shares", { ascending: false })
+        .limit(MAX_LEADERBOARD_SIZE)
+    ) || [];
 
-  const stakersREth = supabaseUnwrap(
-    await supabase
-      .from("StakersRETHShares")
-      .select("*")
-      .order("total_staked_shares", { ascending: false })
-      .limit(MAX_LEADERBOARD_SIZE)
-  ) || [];
+  const stakersREth =
+    supabaseUnwrap(
+      await supabase
+        .from("StakersRETHShares")
+        .select("*")
+        .order("total_staked_shares", { ascending: false })
+        .limit(MAX_LEADERBOARD_SIZE)
+    ) || [];
 
-  const stakersCbEth = supabaseUnwrap(
-    await supabase
-      .from("StakersCbETHShares")
-      .select("*")
-      .order("total_staked_shares", { ascending: false })
-      .limit(MAX_LEADERBOARD_SIZE)
-  ) || [];
+  const stakersCbEth =
+    supabaseUnwrap(
+      await supabase
+        .from("StakersCbETHShares")
+        .select("*")
+        .order("total_staked_shares", { ascending: false })
+        .limit(MAX_LEADERBOARD_SIZE)
+    ) || [];
 
-  const stakersStEth = supabaseUnwrap(
-    await supabase
-      .from("StakersStETHShares")
-      .select("*")
-      .order("total_staked_shares", { ascending: false })
-      .limit(MAX_LEADERBOARD_SIZE)
-  ) || [];
+  const stakersStEth =
+    supabaseUnwrap(
+      await supabase
+        .from("StakersStETHShares")
+        .select("*")
+        .order("total_staked_shares", { ascending: false })
+        .limit(MAX_LEADERBOARD_SIZE)
+    ) || [];
 
-  const rEthSharesRate = Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
-  const stEthSharesRate = Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
-  const cbEthSharesRate = Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const rEthSharesRate =
+    Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const stEthSharesRate =
+    Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const cbEthSharesRate =
+    Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
 
-  const stakersBeaconChainEthConverted: LeaderboardUserData[] = stakersBeaconChainEth.map((d) => ({
-    depositor: d.depositor!,
-    totalStaked: d.total_staked_shares!,
-  }));
+  const stakersBeaconChainEthConverted: LeaderboardUserData[] =
+    stakersBeaconChainEth.map((d) => ({
+      depositor: d.depositor!,
+      totalStaked: d.total_staked_shares!,
+    }));
 
   const stakersREthConverted: LeaderboardUserData[] = stakersREth.map((d) => ({
     depositor: d.depositor!,
     totalStaked: d.total_staked_shares! * rEthSharesRate * rEthRate,
   }));
 
-  const stakersStEthConverted: LeaderboardUserData[] = stakersStEth.map((d) => ({
-    depositor: d.depositor!,
-    totalStaked: d.total_staked_shares! * stEthSharesRate,
-  }));
+  const stakersStEthConverted: LeaderboardUserData[] = stakersStEth.map(
+    (d) => ({
+      depositor: d.depositor!,
+      totalStaked: d.total_staked_shares! * stEthSharesRate,
+    })
+  );
 
-  const stakersCbEthConverted: LeaderboardUserData[] = stakersCbEth.map((d) => ({
-    depositor: d.depositor!,
-    totalStaked: d.total_staked_shares! * cbEthSharesRate * cbEthRate,
-  }));
+  const stakersCbEthConverted: LeaderboardUserData[] = stakersCbEth.map(
+    (d) => ({
+      depositor: d.depositor!,
+      totalStaked: d.total_staked_shares! * cbEthSharesRate * cbEthRate,
+    })
+  );
 
   const groupedStakers = [
     ...stakersBeaconChainEthConverted,
@@ -539,13 +580,15 @@ async function getDashboardData() {
 
   const stakerEnsNames = Object.fromEntries(
     await Promise.all(
-      Array.from(new Set(allStakerData.map(el => el.depositor))).map(async (depositor) => {
-        return [depositor, await provider.lookupAddress(depositor)]
-      })
+      Array.from(new Set(allStakerData.map((el) => el.depositor))).map(
+        async (depositor) => {
+          return [depositor, await provider.lookupAddress(depositor)];
+        }
+      )
     )
   );
 
-  allStakerData.forEach(entry => {
+  allStakerData.forEach((entry) => {
     entry.depositor = stakerEnsNames[entry.depositor] ?? entry.depositor;
   });
 

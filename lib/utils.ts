@@ -1,8 +1,8 @@
-
 export interface DailyTokenData {
   date: string | null;
   total_amount: number | null;
-};
+  cumulative_total_amount: number | null;
+}
 
 export interface LeaderboardUserData {
   depositor: string;
@@ -27,14 +27,23 @@ export function formatDateToStandard(inputDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
-export function extractAmountsAndTimestamps(...data: DailyTokenData[][]): {
+export function extractAmountsAndTimestamps(
+  cumulative: Boolean,
+  ...data: DailyTokenData[][]
+): {
   amounts: number[][];
   timestamps: string[];
 } {
-  const amounts = data.map(tokenData => tokenData.map(el => el.total_amount!));
-  const dates = data.map(tokenData => tokenData.map(el => el.date)).sort((a, b) => a.length - b.length)[0];
+  const amounts = data.map((tokenData) =>
+    tokenData.map((el) =>
+      cumulative ? el.cumulative_total_amount! : el.total_amount!
+    )
+  );
+  const dates = data
+    .map((tokenData) => tokenData.map((el) => el.date))
+    .sort((a, b) => a.length - b.length)[0];
 
-  return { amounts, timestamps: dates.map(el => formatDateToStandard(el!)) };
+  return { amounts, timestamps: dates.map((el) => formatDateToStandard(el!)) };
 }
 
 export function getEtherscanAddressUrl(address: string): string {
@@ -47,4 +56,4 @@ export function getShortenedAddress(
   second: number
 ) {
   return `${address.slice(0, first)}...${address.slice(-1 * second)}`;
-};
+}
