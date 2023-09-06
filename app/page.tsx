@@ -4,6 +4,7 @@ import LineChart from "./components/charts/LineChart";
 import PieChart from "./components/charts/PieChart";
 import StackedBar from "./components/charts/StackedBar";
 import LeaderBoard from "./components/leaderboard";
+import { SpiceClient } from "@spiceai/spice";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,6 +17,7 @@ import {
 import { LeaderboardUserData, extractAmountsAndTimestamps, roundToDecimalPlaces } from "@/lib/utils";
 import Image from "next/image";
 import Disclaimer from "./components/Disclaimer";
+import { SpiceEigenlayerQueries } from "../lib/spice-queries";
 
 const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
@@ -245,6 +247,9 @@ export default async function Home() {
 }
 
 async function getDashboardData() {
+  const spiceClient = new SpiceClient(process.env.NEXT_PUBLIC_SPICE_KEY || "");
+  const spiceQueries = new SpiceEigenlayerQueries(spiceClient)
+  
   const indexingBlockEntry = (
     supabaseUnwrap(
       await supabase
@@ -331,25 +336,30 @@ async function getDashboardData() {
     ) || []
   ).reverse();
 
-  const beaconChainEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("DailyBeaconChainETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  // const beaconChainEthDeposits = (
+  //   supabaseUnwrap(
+  //     await supabase
+  //       .from("DailyBeaconChainETHDeposits")
+  //       .select("*")
+  //       .order("date", { ascending: false })
+  //       .limit(MAX_CHART_SIZE)
+  //   ) || []
+  // ).reverse();
 
-  const cumulativeBeaconChainEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("CumulativeDailyBeaconChainETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  // const cumulativeBeaconChainEthDeposits = (
+  //   supabaseUnwrap(
+  //     await supabase
+  //       .from("CumulativeDailyBeaconChainETHDeposits")
+  //       .select("*")
+  //       .order("date", { ascending: false })
+  //       .limit(MAX_CHART_SIZE)
+  //   ) || []
+  // ).reverse();
+
+  const beaconChainEthDeposits = await spiceQueries.dailyBeaconChainETHDeposit()
+  console.log("Beacon chain ETH deposits", beaconChainEthDeposits)
+
+  const cumulativeBeaconChainEthDeposits = await spiceQueries.dailyCumulativeBeaconChainETHDeposit()
 
   const rEthWithdrawals = (
     supabaseUnwrap(
@@ -431,11 +441,8 @@ async function getDashboardData() {
     ) || []
   ).reverse();
 
-  const totalStakedBeaconChainEth = supabaseUnwrap(
-    await supabase
-      .from("StakedBeaconChainETH")
-      .select("*")
-  )![0].amount || 0;
+  const totalStakedBeaconChainEth = await spiceQueries.totalStakedBeaconChainEth()
+  console.log("Total Staked Beacon Chain ETH = ", totalStakedBeaconChainEth)
 
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
     stEthDeposits,
@@ -467,13 +474,16 @@ async function getDashboardData() {
     cumulativeCbEthWithdrawals
   );
 
-  const stakersBeaconChainEth = supabaseUnwrap(
-    await supabase
-      .from("StakersBeaconChainETHShares")
-      .select("*")
-      .order("total_staked_shares", { ascending: false })
-      .limit(MAX_LEADERBOARD_SIZE)
-  ) || [];
+  // const stakersBeaconChainEth = supabaseUnwrap(
+  //   await supabase
+  //     .from("StakersBeaconChainETHShares")
+  //     .select("*")
+  //     .order("total_staked_shares", { ascending: false })
+  //     .limit(MAX_LEADERBOARD_SIZE)
+  // ) || [];
+
+  const stakersBeaconChainEth = await spiceQueries.stakersBeaconChainEth()
+  console.log("Stakers beacon chain ETH", stakersBeaconChainEth)
 
   const stakersREth = supabaseUnwrap(
     await supabase
