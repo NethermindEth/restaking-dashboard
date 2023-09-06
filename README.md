@@ -3,6 +3,7 @@
 This project is composed of two parts:
 - A [Next.js](https://nextjs.org/) frontend bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) 
 - A supabase database and set of edge functions that are run via cron jobs.
+- Spice AI SDK requires Node version >= 18.x.x
 
 ## Getting Started with the Next.js App
 
