@@ -46,20 +46,28 @@ export class SpiceEigenlayerQueries {
     public async dailyBeaconChainETHDeposit() {
         try{
             const result = this.spiceClient.query(`
-                SELECT 
-                    TO_DATE(block_timestamp) as created_at,
-                    SUM(SUM(effective_balance)/POW(10,9)) OVER (ORDER BY TO_DATE(block_timestamp) ASC) as Cumulative_Daily_Added_Effective_Balance
-                FROM 
-                    eth.beacon.validators
-                JOIN 
-                    eth.eigenlayer.eigenpods
-                ON 
-                    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential
-                GROUP BY 
-                    created_at
-                ORDER BY 
-                    created_at ASC;`
-            )
+            SELECT 
+                GREATEST(
+                    TO_DATE(ep.block_timestamp),
+                    TO_DATE(1606845623 + 32 * 12 * activation_eligibility_epoch),
+                    TO_DATE(COALESCE(bte.block_timestamp, 0))
+                ) as "date",
+                SUM(effective_balance)/POW(10,9) as Daily_Added_Effective_Balance,
+            FROM 
+                eth.beacon.validators vl
+            JOIN 
+                eth.eigenlayer.eigenpods ep
+            ON 
+                vl.withdrawal_credentials = ep.withdrawal_credential
+            LEFT JOIN
+                eth.beacon.bls_to_execution_changes bte
+            ON
+                bte.validator_index = vl.validator_index
+            GROUP BY 
+                "date"
+            ORDER BY 
+                "date" ASC;
+            `)
             return result
         } catch(err: any) {
             console.log(err)
@@ -70,20 +78,29 @@ export class SpiceEigenlayerQueries {
     public async dailyCumulativeBeaconChainETHDeposit() {
         try{
             const result = this.spiceClient.query(`
-                SELECT 
-                    TO_DATE(block_timestamp) as created_at,
-                    SUM(effective_balance)/POW(10,9) as Daily_Added_Effective_Balance,
-                    SUM(SUM(effective_balance)/POW(10,9)) OVER (ORDER BY TO_DATE(block_timestamp) ASC) as Cumulative_Daily_Added_Effective_Balance
-                FROM 
-                    eth.beacon.validators
-                JOIN 
-                    eth.eigenlayer.eigenpods
-                ON 
-                    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential
-                GROUP BY 
-                    created_at
-                ORDER BY 
-                    created_at ASC;`
+            SELECT 
+                GREATEST(
+                    TO_DATE(ep.block_timestamp),
+                    TO_DATE(1606845623 + 32 * 12 * activation_eligibility_epoch),
+                    TO_DATE(COALESCE(bte.block_timestamp, 0))
+                ) as "date",
+                SUM(effective_balance)/POW(10,9) as Daily_Added_Effective_Balance,
+                SUM(SUM(effective_balance)/POW(10,9)) OVER (ORDER BY "date" ASC) as Cumulative_Daily_Added_Effective_Balance
+            FROM 
+                eth.beacon.validators vl
+            JOIN 
+                eth.eigenlayer.eigenpods ep
+            ON 
+                vl.withdrawal_credentials = ep.withdrawal_credential
+            LEFT JOIN
+                eth.beacon.bls_to_execution_changes bte
+            ON
+                bte.validator_index = vl.validator_index
+            GROUP BY 
+                "date"
+            ORDER BY 
+                "date" ASC;
+            `        
             )
             return result
         } catch(err: any) {
