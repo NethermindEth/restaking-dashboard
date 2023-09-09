@@ -293,7 +293,7 @@ async function getDashboardData() {
   let stEthDeposits: DailyTokenData[] = [];
   let cbEthDeposits: DailyTokenData[] = [];
 
-  const depositData = await spiceClient.query(`WITH cumulative_totals AS (
+  let depositData = await spiceClient.query(`WITH cumulative_totals AS (
     SELECT
         TO_DATE(block_timestamp) AS "date",
         strategy,
@@ -317,16 +317,20 @@ async function getDashboardData() {
           FROM cumulative_totals ct2
           WHERE ct2.strategy = ct1.strategy
               AND ct2."date" <= ct1."date"
-      ) as cumulative_total_amount,
+      ) as cumulative_total_amozunt,
       (
           SELECT SUM(ct2.total_shares)
           FROM cumulative_totals ct2
           WHERE ct2.strategy = ct1.strategy
               AND ct2."date" <= ct1."date"
       ) as cumulative_total_shares
-  FROM cumulative_totals ct1
-  ORDER BY ct1."date" DESC;
+      FROM cumulative_totals ct1
+      ORDER BY ct1."date" DESC;
 `);
+
+  let depositDataArray = depositData.toArray();
+
+  for (let i = 0; i < depositDataArray.length; i++) {}
 
   depositData.toArray().forEach((ele) => {
     if (ele.strategy === RETH_STRATEGY_ADDRESS.toLowerCase()) {

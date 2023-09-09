@@ -1,0 +1,19 @@
+service: aws-node-http-api-typescript
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  getDeposits:
+    handler: handler.getDeposits
+    events:
+      - httpApi:
+          path: /
+          method: get
+
+useDotenv: true
+
+plugins:
+  - serverless-plugin-typescript
