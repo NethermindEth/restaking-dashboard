@@ -1,7 +1,6 @@
 export interface DailyTokenData {
   date: string | null;
   total_amount: number | null;
-  cumulative_total_amount: number | null;
 }
 
 export interface LeaderboardUserData {
@@ -27,17 +26,12 @@ export function formatDateToStandard(inputDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
-export function extractAmountsAndTimestamps(
-  cumulative: Boolean,
-  ...data: DailyTokenData[][]
-): {
+export function extractAmountsAndTimestamps(...data: DailyTokenData[][]): {
   amounts: number[][];
   timestamps: string[];
 } {
   const amounts = data.map((tokenData) =>
-    tokenData.map((el) =>
-      cumulative ? el.cumulative_total_amount! : el.total_amount!
-    )
+    tokenData.map((el) => el.total_amount!)
   );
   const dates = data
     .map((tokenData) => tokenData.map((el) => el.date))

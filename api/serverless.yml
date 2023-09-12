@@ -3,17 +3,28 @@ frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs14.x
 
 functions:
   getDeposits:
     handler: handler.getDeposits
+    runtime: nodejs14.x
+    timeout: 12
     events:
       - httpApi:
-          path: /
+          path: /deposits
+          method: get
+  getWithdrawls:
+    handler: handler.getWithdrawals
+    runtime: nodejs14.x
+    timeout: 12
+    events:
+      - httpApi:
+          path: /withdrawls
           method: get
 
 useDotenv: true
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-offline

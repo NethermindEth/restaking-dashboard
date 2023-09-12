@@ -38,31 +38,66 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getWithdrawals = exports.getDeposits = void 0;
 var spice_1 = require("./spice");
+var STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
+var CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
+var RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 var getDeposits = function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
+    var response, rEthDeposits, cbEthDeposits, stEthDeposits, array;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, spice_1.default.query("\n    WITH DailyTokenDeposits AS (\n        SELECT\n            TO_DATE(block_timestamp) AS \"date\",\n            token,\n            SUM(token_amount) / POWER(10, 18) AS total_amount,\n            SUM(shares) / POWER(10, 18) AS total_shares\n        FROM eth.eigenlayer.strategy_manager_deposits\n        WHERE token IN (\n            '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',\n            '0xbe9895146f7af43049ca1c1ae358b0541ea49704',\n            '0xae78736cd615f374d3085123a210448e74fc6393'\n        )\n        GROUP BY \"date\", token\n    ),\n    DailyValidatorDeposits AS (\n        SELECT\n            GREATEST(\n                TO_DATE(ep.block_timestamp),\n                TO_DATE(1606845623 + 32 * 12 * activation_eligibility_epoch),\n                TO_DATE(COALESCE(bte.block_timestamp, 0))\n            ) as \"date\",\n            NULL as token,\n            count(*) * 32 AS total_amount,\n            count(*) * 32 AS total_shares\n        FROM\n            eth.beacon.validators vl\n        INNER JOIN\n            eth.eigenlayer.eigenpods ep\n        ON\n            LEFT(vl.withdrawal_credentials, 4) = '0x01' AND vl.withdrawal_credentials = ep.withdrawal_credential\n        LEFT JOIN\n            eth.beacon.bls_to_execution_changes bte\n        ON\n            bte.validator_index = vl.validator_index\n        GROUP BY \"date\"\n    ),\n    DailyDeposits AS (\n        SELECT * FROM DailyTokenDeposits UNION ALL SELECT * FROM DailyValidatorDeposits\n    ),\n    MinDate AS (\n        SELECT MIN(\"date\") AS min_date FROM DailyDeposits\n    ),\n    DateSeries AS (\n        SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS \"date\"\n        FROM eth.blocks\n        WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))\n    ),\n    TokenSeries AS (\n        SELECT '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' AS token\n        UNION ALL\n            SELECT '0xbe9895146f7af43049ca1c1ae358b0541ea49704'\n        UNION ALL\n            SELECT '0xae78736cd615f374d3085123a210448e74fc6393'\n        UNION ALL\n            SELECT NULL\n    ),\n    AllCombinations AS (\n        SELECT\n            ds.\"date\",\n            ts.token\n        FROM\n            DateSeries ds\n        CROSS JOIN\n            TokenSeries ts\n    )\n    SELECT\n        ac.\"date\",\n        ac.token,\n        COALESCE(td.total_amount, 0) AS total_amount,\n        COALESCE(td.total_shares, 0) AS total_shares\n    FROM\n        AllCombinations ac\n    LEFT JOIN\n        DailyDeposits td\n    ON\n        ac.\"date\" = td.\"date\"\n    AND\n        (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))\n    ORDER BY\n        ac.\"date\",\n        ac.token;\n\n    ")];
+            case 0: return [4 /*yield*/, spice_1.default.query("\n  WITH DailyTokenDeposits AS (\n    SELECT\n        TO_DATE(block_timestamp) AS \"date\",\n        token,\n        SUM(token_amount) / POWER(10, 18) AS total_amount,\n        SUM(shares) / POWER(10, 18) AS total_shares\n    FROM eth.eigenlayer.strategy_manager_deposits\n    WHERE token IN (\n        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',\n        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',\n        '0xae78736cd615f374d3085123a210448e74fc6393'\n    )\n    GROUP BY \"date\", token\n),\nDailyValidatorDeposits AS (\n    SELECT\n        GREATEST(\n            TO_DATE(ep.block_timestamp),\n            TO_DATE(1606845623 + 32 * 12 * activation_eligibility_epoch),\n            TO_DATE(COALESCE(bte.block_timestamp, 0))\n        ) as \"date\",\n        NULL as token,\n        count(*) * 32 AS total_amount,\n        count(*) * 32 AS total_shares\n    FROM\n        eth.beacon.validators vl\n    INNER JOIN\n        eth.eigenlayer.eigenpods ep\n    ON\n        LEFT(vl.withdrawal_credentials, 4) = '0x01' AND vl.withdrawal_credentials = ep.withdrawal_credential\n    LEFT JOIN\n        eth.beacon.bls_to_execution_changes bte\n    ON\n        bte.validator_index = vl.validator_index\n    GROUP BY \"date\"\n),\nDailyDeposits AS (\n    SELECT * FROM DailyTokenDeposits UNION ALL SELECT * FROM DailyValidatorDeposits\n),\nMinDate AS (\n    SELECT MIN(\"date\") AS min_date FROM DailyDeposits\n),\nDateSeries AS (\n    SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS \"date\"\n    FROM eth.blocks\n    WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))\n),\nTokenSeries AS (\n    SELECT '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' AS token\n    UNION ALL\n        SELECT '0xbe9895146f7af43049ca1c1ae358b0541ea49704'\n    UNION ALL\n        SELECT '0xae78736cd615f374d3085123a210448e74fc6393'\n    UNION ALL\n        SELECT NULL\n),\nAllCombinations AS (\n    SELECT\n        ds.\"date\",\n        ts.token\n    FROM\n        DateSeries ds\n    CROSS JOIN\n        TokenSeries ts\n)\nSELECT\n    ac.\"date\",\n    ac.token,\n    COALESCE(td.total_amount, 0) AS total_amount,\n    COALESCE(td.total_shares, 0) AS total_shares\nFROM\n    AllCombinations ac\nLEFT JOIN\n    DailyDeposits td\nON\n    ac.\"date\" = td.\"date\"\nAND\n    (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))\nORDER BY\n    ac.\"date\",\n    ac.token;\n    ")];
             case 1:
                 response = _a.sent();
+                rEthDeposits = [];
+                cbEthDeposits = [];
+                stEthDeposits = [];
+                array = response.toArray();
+                // @ts-ignore
+                array.forEach(function (ele) {
+                    if (ele.token === RETH_ADDRESS.toLowerCase()) {
+                        rEthDeposits.push(ele);
+                    }
+                    else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
+                        cbEthDeposits.push(ele);
+                    }
+                    else if (ele.token === STETH_ADDRESS.toLowerCase()) {
+                        stEthDeposits.push(ele);
+                    }
+                });
                 return [2 /*return*/, {
                         statusCode: 200,
-                        body: JSON.stringify(response),
+                        body: JSON.stringify([stEthDeposits, cbEthDeposits, rEthDeposits]),
                     }];
         }
     });
 }); };
 exports.getDeposits = getDeposits;
 var getWithdrawals = function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
+    var response, rEthWithdrawls, cbEthWithdrawls, stEthWithdrawls, array;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, spice_1.default.query("\n  WITH DailyTokenWithdrawals AS (\n    SELECT\n        TO_DATE(block_timestamp) AS \"date\",\n        token,\n        SUM(token_amount) / POWER(10, 18) AS total_amount,\n        SUM(shares) / POWER(10, 18) AS total_shares\n    FROM eth.eigenlayer.strategy_manager_withdrawal_completed\n    WHERE token IN (\n        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',\n        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',\n        '0xae78736cd615f374d3085123a210448e74fc6393'\n    )\n    AND receive_as_tokens\n    GROUP BY \"date\", token\n),\nDailyValidatorWithdrawals AS (\n    SELECT\n        TO_DATE(1606845623 + 32 * 12 * exit_epoch) as \"date\",\n        NULL as token,\n        count(*) * 32 AS total_amount,\n        count(*) * 32 AS total_shares\n        FROM\n            eth.beacon.validators vl\n        INNER JOIN\n            eth.eigenlayer.eigenpods ep\n        ON\n            LEFT(vl.withdrawal_credentials, 4) = '0x01' AND vl.withdrawal_credentials = ep.withdrawal_credential\n        GROUP BY \"date\"\n    ),\n    DailyWithdrawals AS (\n        SELECT * FROM DailyTokenWithdrawals UNION ALL SELECT * FROM DailyValidatorWithdrawals\n    ),\n    MinDate AS (\n        SELECT MIN(\"date\") AS min_date FROM DailyTokenWithdrawals\n    ),\n    DateSeries AS (\n        SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS \"date\"\n        FROM eth.blocks\n        WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))\n    ),\n    TokenSeries AS (\n        SELECT '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' AS token\n        UNION ALL\n            SELECT '0xbe9895146f7af43049ca1c1ae358b0541ea49704'\n        UNION ALL\n            SELECT '0xae78736cd615f374d3085123a210448e74fc6393'\n        UNION ALL\n            SELECT NULL\n    ),\n    AllCombinations AS (\n        SELECT \n            ds.\"date\", \n            ts.token\n        FROM \n            DateSeries ds\n        CROSS JOIN \n            TokenSeries ts\n    )\n    SELECT \n        ac.\"date\", \n        ac.token, \n        COALESCE(tw.total_amount, 0) AS total_amount,\n        COALESCE(tw.total_shares, 0) AS total_shares\n    FROM \n        AllCombinations ac\n    LEFT JOIN \n        DailyWithdrawals tw\n    ON \n        ac.\"date\" = tw.\"date\" \n    AND \n        (ac.token = tw.token OR (ac.token IS NULL and tw.token IS NULL))\n    ORDER BY \n    ac.\"date\", \n    ac.token;\n      ")];
             case 1:
                 response = _a.sent();
+                rEthWithdrawls = [];
+                cbEthWithdrawls = [];
+                stEthWithdrawls = [];
+                array = response.toArray();
+                // @ts-ignore
+                array.forEach(function (ele) {
+                    if (ele.token === RETH_ADDRESS.toLowerCase()) {
+                        rEthWithdrawls.push(ele);
+                    }
+                    else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
+                        cbEthWithdrawls.push(ele);
+                    }
+                    else if (ele.token === STETH_ADDRESS.toLowerCase()) {
+                        stEthWithdrawls.push(ele);
+                    }
+                });
                 return [2 /*return*/, {
                         statusCode: 200,
-                        body: JSON.stringify(response),
+                        body: JSON.stringify([stEthWithdrawls, cbEthWithdrawls, rEthWithdrawls]),
                     }];
         }
     });
