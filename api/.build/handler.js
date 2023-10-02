@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dailyBeaconChainETHWithdrawal = exports.dailyBeaconChainETHDeposit = exports.stakersBeaconChainEth = exports.totalStakedBeaconChainEth = exports.getWithdrawals = exports.getDeposits = void 0;
+exports.dailyBeaconChainETHDeposit = exports.stakersBeaconChainEth = exports.totalStakedBeaconChainEth = exports.getWithdrawals = exports.getStrategyDepositLeaderBoard = exports.getDeposits = void 0;
 var spice_1 = require("./spice");
 var STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
 var CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
@@ -72,6 +72,45 @@ var getDeposits = function (event) { return __awaiter(void 0, void 0, void 0, fu
     });
 }); };
 exports.getDeposits = getDeposits;
+var getStrategyDepositLeaderBoard = function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, rEth, cbEth, stEth, array;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log("here");
+                return [4 /*yield*/, spice_1.default.query("\n  WITH ranked_deposits AS (\n    SELECT\n        depositor,\n        token,\n        SUM(token_amount) / POWER(10, 18) AS total_amount,\n        SUM(shares) / POWER(10, 18) AS total_shares,\n        ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn\n    FROM eth.eigenlayer.strategy_manager_deposits\n    WHERE token IN (\n        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',\n        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',\n        '0xae78736cd615f374d3085123a210448e74fc6393'\n    )\n    GROUP BY depositor, token\n)\n    SELECT *\n    FROM ranked_deposits\n    WHERE rn <= 50;\n")];
+            case 1:
+                response = _a.sent();
+                rEth = [];
+                cbEth = [];
+                stEth = [];
+                array = response.toArray();
+                // @ts-ignore
+                array.forEach(function (ele) {
+                    ele = {
+                        total_amount: ele.total_amount,
+                        total_staked_shares: ele.total_shares,
+                        depositor: ele.depositor,
+                        token: ele.token,
+                    };
+                    if (ele.token === RETH_ADDRESS.toLowerCase()) {
+                        rEth.push(ele);
+                    }
+                    else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
+                        cbEth.push(ele);
+                    }
+                    else if (ele.token === STETH_ADDRESS.toLowerCase()) {
+                        stEth.push(ele);
+                    }
+                });
+                return [2 /*return*/, {
+                        statusCode: 200,
+                        body: JSON.stringify([stEth, cbEth, rEth]),
+                    }];
+        }
+    });
+}); };
+exports.getStrategyDepositLeaderBoard = getStrategyDepositLeaderBoard;
 var getWithdrawals = function (event) { return __awaiter(void 0, void 0, void 0, function () {
     var response, rEthWithdrawls, cbEthWithdrawls, stEthWithdrawls, array;
     return __generator(this, function (_a) {
@@ -131,7 +170,7 @@ function stakersBeaconChainEth() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, spice_1.default.query("\n                SELECT \n                    eth.eigenlayer.eigenpods.pod_owner,\n                    SUM(eth.beacon.validators.effective_balance) / POWER(10,18) AS total_effective_balance\n                FROM \n                    eth.beacon.validators\n                JOIN \n                    eth.eigenlayer.eigenpods\n                ON \n                    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential \n                    AND eth.beacon.validators.effective_balance != '0'\n                GROUP BY \n                    eth.eigenlayer.eigenpods.pod_owner;")];
+                    return [4 /*yield*/, spice_1.default.query("\n    SELECT \n    eth.eigenlayer.eigenpods.pod_owner,\n    SUM(eth.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance\nFROM \n    eth.beacon.validators\nJOIN \n    eth.eigenlayer.eigenpods\nON \n    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential \n    AND eth.beacon.validators.effective_balance != '0'\nGROUP BY \n    eth.eigenlayer.eigenpods.pod_owner\nORDER BY total_effective_balance DESC;")];
                 case 1:
                     result = _a.sent();
                     return [2 /*return*/, {
@@ -172,28 +211,4 @@ function dailyBeaconChainETHDeposit() {
     });
 }
 exports.dailyBeaconChainETHDeposit = dailyBeaconChainETHDeposit;
-function dailyBeaconChainETHWithdrawal() {
-    return __awaiter(this, void 0, void 0, function () {
-        var result, err_4;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, spice_1.default.query("\n            SELECT TO_DATE(block_timestamp) AS \"date\",token,SUM(token_amount) / POWER(10, 18) AS total_amount, SUM(shares) / POWER(10, 18) AS total_shares\n            FROM eth.eigenlayer.strategy_manager_withdrawal_completed\n            WHERE token IN (\n                    '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',\n                    '0xbe9895146f7af43049ca1c1ae358b0541ea49704',\n                    '0xae78736cd615f374d3085123a210448e74fc6393'\n                )\n            GROUP BY \"date\",token\n              ")];
-                case 1:
-                    result = _a.sent();
-                    return [2 /*return*/, {
-                            statusCode: 200,
-                            body: JSON.stringify(result.toArray()),
-                        }];
-                case 2:
-                    err_4 = _a.sent();
-                    console.log(err_4);
-                    throw err_4;
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-exports.dailyBeaconChainETHWithdrawal = dailyBeaconChainETHWithdrawal;
 //# sourceMappingURL=handler.js.map

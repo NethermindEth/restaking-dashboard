@@ -14,7 +14,6 @@ export function roundToDecimalPlaces(
 ): number | string {
   // const factor = Math.pow(10, decimalPlaces);
   // return Math.round(value * factor) / factor;
-  console.log(value);
   return value.toFixed(decimalPlaces);
 }
 

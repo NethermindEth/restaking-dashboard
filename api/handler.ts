@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import SpiceClient from "./spice";
-import { DailyTokenData } from "@/lib/utils";
+import { DailyTokenData, LeaderboardUserData } from "@/lib/utils";
 
 const STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
 const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
@@ -116,6 +116,61 @@ ORDER BY
   };
 };
 
+export const getStrategyDepositLeaderBoard = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  console.log("here");
+  const response = await SpiceClient.query(`
+  WITH ranked_deposits AS (
+    SELECT
+        depositor,
+        token,
+        SUM(token_amount) / POWER(10, 18) AS total_amount,
+        SUM(shares) / POWER(10, 18) AS total_shares,
+        ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
+    FROM eth.eigenlayer.strategy_manager_deposits
+    WHERE token IN (
+        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
+        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',
+        '0xae78736cd615f374d3085123a210448e74fc6393'
+    )
+    GROUP BY depositor, token
+)
+    SELECT *
+    FROM ranked_deposits
+    WHERE rn <= 50;
+`);
+
+  const rEth: DailyTokenData[] = [];
+  const cbEth: DailyTokenData[] = [];
+  const stEth: DailyTokenData[] = [];
+
+  const array = response.toArray();
+
+  // @ts-ignore
+  array.forEach((ele) => {
+    ele = {
+      total_amount: ele.total_amount,
+      total_staked_shares: ele.total_shares,
+      depositor: ele.depositor,
+      token: ele.token,
+    };
+
+    if (ele.token === RETH_ADDRESS.toLowerCase()) {
+      rEth.push(ele);
+    } else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
+      cbEth.push(ele);
+    } else if (ele.token === STETH_ADDRESS.toLowerCase()) {
+      stEth.push(ele);
+    }
+  });
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify([stEth, cbEth, rEth]),
+  };
+};
+
 export const getWithdrawals = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -196,9 +251,9 @@ DailyValidatorWithdrawals AS (
     ac.token;
       `);
 
-  const rEthWithdrawls: DailyTokenData[] = [];
-  const cbEthWithdrawls: DailyTokenData[] = [];
-  const stEthWithdrawls: DailyTokenData[] = [];
+  const rEthWithdrawls: any[] = [];
+  const cbEthWithdrawls: any[] = [];
+  const stEthWithdrawls: any[] = [];
 
   const array = response.toArray();
 
@@ -237,18 +292,19 @@ export async function totalStakedBeaconChainEth() {
 export async function stakersBeaconChainEth() {
   try {
     const result = await SpiceClient.query(`
-                SELECT 
-                    eth.eigenlayer.eigenpods.pod_owner,
-                    SUM(eth.beacon.validators.effective_balance) / POWER(10,18) AS total_effective_balance
-                FROM 
-                    eth.beacon.validators
-                JOIN 
-                    eth.eigenlayer.eigenpods
-                ON 
-                    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential 
-                    AND eth.beacon.validators.effective_balance != '0'
-                GROUP BY 
-                    eth.eigenlayer.eigenpods.pod_owner;`);
+    SELECT 
+    eth.eigenlayer.eigenpods.pod_owner,
+    SUM(eth.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
+FROM 
+    eth.beacon.validators
+JOIN 
+    eth.eigenlayer.eigenpods
+ON 
+    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential 
+    AND eth.beacon.validators.effective_balance != '0'
+GROUP BY 
+    eth.eigenlayer.eigenpods.pod_owner
+ORDER BY total_effective_balance DESC;`);
 
     return {
       statusCode: 200,
@@ -302,29 +358,6 @@ export async function dailyBeaconChainETHDeposit() {
     ORDER BY 
         Date_Series."date";
     `);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result.toArray()),
-    };
-  } catch (err: any) {
-    console.log(err);
-    throw err;
-  }
-}
-
-export async function dailyBeaconChainETHWithdrawal() {
-  try {
-    const result = await SpiceClient.query(`
-            SELECT TO_DATE(block_timestamp) AS "date",token,SUM(token_amount) / POWER(10, 18) AS total_amount, SUM(shares) / POWER(10, 18) AS total_shares
-            FROM eth.eigenlayer.strategy_manager_withdrawal_completed
-            WHERE token IN (
-                    '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
-                    '0xbe9895146f7af43049ca1c1ae358b0541ea49704',
-                    '0xae78736cd615f374d3085123a210448e74fc6393'
-                )
-            GROUP BY "date",token
-              `);
 
     return {
       statusCode: 200,
