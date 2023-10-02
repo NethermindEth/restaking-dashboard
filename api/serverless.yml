@@ -22,6 +22,38 @@ functions:
       - httpApi:
           path: /withdrawls
           method: get
+  totalStakedBeaconChainEth:
+    handler: handler.totalStakedBeaconChainEth
+    runtime: nodejs14.x
+    timeout: 12
+    events:
+      - httpApi:
+          path: /totalStakedBeconChainEth
+          method: get
+  stakersBeaconChainEth:
+    handler: handler.stakersBeaconChainEth
+    runtime: nodejs14.x
+    timeout: 12
+    events:
+      - httpApi:
+          path: /stakersBeaconChainEth
+          method: get
+  dailyBeaconChainETHDeposit:
+    handler: handler.dailyBeaconChainETHDeposit
+    runtime: nodejs14.x
+    timeout: 12
+    events:
+      - httpApi:
+          path: /dailyBeaconChainETHDeposit
+          method: get
+  dailyBeaconChainETHWithdrawal:
+    handler: handler.dailyBeaconChainETHWithdrawal
+    runtime: nodejs14.x
+    timeout: 12
+    events:
+      - httpApi:
+          path: /dailyBeaconChainETHWithdrawal
+          method: get
 
 useDotenv: true
 

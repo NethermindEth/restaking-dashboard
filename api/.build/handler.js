@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWithdrawals = exports.getDeposits = void 0;
+exports.dailyBeaconChainETHWithdrawal = exports.dailyBeaconChainETHDeposit = exports.stakersBeaconChainEth = exports.totalStakedBeaconChainEth = exports.getWithdrawals = exports.getDeposits = void 0;
 var spice_1 = require("./spice");
 var STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
 var CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
@@ -103,4 +103,97 @@ var getWithdrawals = function (event) { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 exports.getWithdrawals = getWithdrawals;
+function totalStakedBeaconChainEth() {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, spice_1.default.query("SELECT SUM(effective_balance)/POW(10,9) as final_balance\n                FROM eth.beacon.validators\n                JOIN eth.eigenlayer.eigenpods\n                ON eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential AND effective_balance!='0'\n            ")];
+                case 1:
+                    result = _a.sent();
+                    return [2 /*return*/, { statusCode: 200, body: JSON.stringify(result.toString()) }];
+                case 2:
+                    err_1 = _a.sent();
+                    console.log(err_1);
+                    throw err_1;
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.totalStakedBeaconChainEth = totalStakedBeaconChainEth;
+function stakersBeaconChainEth() {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, err_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, spice_1.default.query("\n                SELECT \n                    eth.eigenlayer.eigenpods.pod_owner,\n                    SUM(eth.beacon.validators.effective_balance) / POWER(10,18) AS total_effective_balance\n                FROM \n                    eth.beacon.validators\n                JOIN \n                    eth.eigenlayer.eigenpods\n                ON \n                    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential \n                    AND eth.beacon.validators.effective_balance != '0'\n                GROUP BY \n                    eth.eigenlayer.eigenpods.pod_owner;")];
+                case 1:
+                    result = _a.sent();
+                    return [2 /*return*/, {
+                            statusCode: 200,
+                            body: JSON.stringify(result.toArray()),
+                        }];
+                case 2:
+                    err_2 = _a.sent();
+                    console.log(err_2);
+                    throw err_2;
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.stakersBeaconChainEth = stakersBeaconChainEth;
+function dailyBeaconChainETHDeposit() {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, err_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, spice_1.default.query("\n    WITH Daily_Deposits AS (\n        SELECT \n            GREATEST(\n                TO_DATE(ep.block_timestamp),\n                TO_DATE(1606845623 + 32 * 12 * activation_eligibility_epoch),\n                TO_DATE(COALESCE(bte.block_timestamp, 0))\n            ) as \"date\",\n            CAST(count(*) * 32 AS FLOAT) AS daily_added_effective_balance\n        FROM \n            eth.beacon.validators vl\n        JOIN \n            eth.eigenlayer.eigenpods ep\n        ON \n            vl.withdrawal_credentials = ep.withdrawal_credential\n        LEFT JOIN\n            eth.beacon.bls_to_execution_changes bte\n        ON\n            bte.validator_index = vl.validator_index\n        GROUP BY \n            \"date\"\n    ),\n    Date_Series AS (\n        SELECT DISTINCT DATE_ADD((SELECT MIN(\"date\") FROM Daily_Deposits), number) AS \"date\"\n        FROM eth.blocks\n        WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT MIN(\"date\") FROM Daily_Deposits))\n    )\n    SELECT \n        Date_Series.\"date\",\n        COALESCE(Daily_Deposits.daily_added_effective_balance, 0) AS daily_added_effective_balance,\n        SUM(COALESCE(Daily_Deposits.daily_added_effective_balance, 0)) OVER (ORDER BY Date_Series.\"date\" ASC) AS cumulative_daily_effective_balance\n    FROM \n        Date_Series\n    LEFT JOIN\n        Daily_Deposits\n    ON \n        Date_Series.\"date\" = Daily_Deposits.\"date\"\n    ORDER BY \n        Date_Series.\"date\";\n    ")];
+                case 1:
+                    result = _a.sent();
+                    return [2 /*return*/, {
+                            statusCode: 200,
+                            body: JSON.stringify(result.toArray()),
+                        }];
+                case 2:
+                    err_3 = _a.sent();
+                    console.log(err_3);
+                    throw err_3;
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.dailyBeaconChainETHDeposit = dailyBeaconChainETHDeposit;
+function dailyBeaconChainETHWithdrawal() {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, err_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, spice_1.default.query("\n            SELECT TO_DATE(block_timestamp) AS \"date\",token,SUM(token_amount) / POWER(10, 18) AS total_amount, SUM(shares) / POWER(10, 18) AS total_shares\n            FROM eth.eigenlayer.strategy_manager_withdrawal_completed\n            WHERE token IN (\n                    '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',\n                    '0xbe9895146f7af43049ca1c1ae358b0541ea49704',\n                    '0xae78736cd615f374d3085123a210448e74fc6393'\n                )\n            GROUP BY \"date\",token\n              ")];
+                case 1:
+                    result = _a.sent();
+                    return [2 /*return*/, {
+                            statusCode: 200,
+                            body: JSON.stringify(result.toArray()),
+                        }];
+                case 2:
+                    err_4 = _a.sent();
+                    console.log(err_4);
+                    throw err_4;
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.dailyBeaconChainETHWithdrawal = dailyBeaconChainETHWithdrawal;
 //# sourceMappingURL=handler.js.map

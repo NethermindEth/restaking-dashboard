@@ -78,6 +78,7 @@ export async function getDashboardData() {
 
   const cumulatativeDepositData: DailyTokenData[][] =
     structuredClone(depositData);
+
   cumulatativeDepositData.map((ele) =>
     ele.map((value, index, arr) => {
       const cumulativeAmount =
@@ -104,39 +105,38 @@ export async function getDashboardData() {
     })
   );
 
-  const cumulativeBeaconChainEthDeposits = (
-    supabaseUnwrap(
-      await supabase
-        .from("CumulativeDailyBeaconChainETHDeposits")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  const beaconChainEthDepositsResponse = (
+    await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/dailyBeaconChainETHDeposit`
+    )
+  ).data;
 
-  const beaconChainEthWithdrawals = (
-    supabaseUnwrap(
-      await supabase
-        .from("DailyBeaconChainETHWithdrawals")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  const beaconChainEthDeposits = beaconChainEthDepositsResponse.map((e) => {
+    return { date: e.date, total_amount: e.daily_added_effective_balance };
+  });
 
-  const cumulativeBeaconChainEthWithdrawals = (
-    supabaseUnwrap(
-      await supabase
-        .from("CumulativeDailyBeaconChainETHWithdrawals")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(MAX_CHART_SIZE)
-    ) || []
-  ).reverse();
+  const cumulativeBeaconChainEthDeposits = beaconChainEthDepositsResponse.map(
+    (e) => {
+      return {
+        date: e.date,
+        total_amount: e.cumulative_daily_effective_balance,
+      };
+    }
+  );
 
-  const totalStakedBeaconChainEth =
-    supabaseUnwrap(await supabase.from("StakedBeaconChainETH").select("*"))![0]
-      .amount || 0;
+  const totalStakedBeaconChainEth = JSON.parse(
+    (
+      await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/totalStakedBeconChainEth`
+      )
+    ).data
+  )[0].final_balance;
+
+  const stakersBeaconChainEth = (
+    await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/stakersBeaconChainEth`
+    )
+  ).data;
 
   const chartDataDepositsDaily = extractAmountsAndTimestamps(...depositData);
 
@@ -145,15 +145,12 @@ export async function getDashboardData() {
   );
 
   // all bool values herafter are for test purpose only for now
-
   const chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
-    //beaconChainEthDeposits
-    ...depositData
+    beaconChainEthDeposits
   );
 
   const chartDataBeaconStakesCumulative = extractAmountsAndTimestamps(
-    // beaconChainEthDeposits
-    ...depositData
+    cumulativeBeaconChainEthDeposits
   );
 
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
@@ -163,15 +160,6 @@ export async function getDashboardData() {
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
     ...cumulatativeWithdrawData
   );
-
-  const stakersBeaconChainEth =
-    supabaseUnwrap(
-      await supabase
-        .from("StakersBeaconChainETHShares")
-        .select("*")
-        .order("total_staked_shares", { ascending: false })
-        .limit(MAX_LEADERBOARD_SIZE)
-    ) || [];
 
   const stakersREth =
     supabaseUnwrap(
@@ -208,10 +196,16 @@ export async function getDashboardData() {
     Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
 
   const stakersBeaconChainEthConverted: LeaderboardUserData[] =
-    stakersBeaconChainEth.map((d) => ({
-      depositor: d.depositor!,
-      totalStaked: d.total_staked_shares!,
-    }));
+    // @ts-ignore
+    stakersBeaconChainEth.map((d) => {
+      console.log(d);
+      return {
+        depositor: d.pod_owner,
+        totalStaked: parseInt(d.total_effective_balance),
+      };
+    });
+
+  console.log(JSON.stringify(stakersBeaconChainEthConverted));
 
   const stakersREthConverted: LeaderboardUserData[] = stakersREth.map((d) => ({
     depositor: d.depositor!,
@@ -250,27 +244,27 @@ export async function getDashboardData() {
     .sort((a, b) => b.totalStaked - a.totalStaked)
     .slice(0, MAX_LEADERBOARD_SIZE);
 
-  const allStakerData = [
-    ...stakersREthConverted,
-    ...stakersBeaconChainEthConverted,
-    ...stakersStEthConverted,
-    ...stakersCbEthConverted,
-    ...groupedStakers,
-  ];
+  // const allStakerData = [
+  //   ...stakersREthConverted,
+  //   ...stakersBeaconChainEthConverted,
+  //   ...stakersStEthConverted,
+  //   ...stakersCbEthConverted,
+  //   ...groupedStakers,
+  // ];
 
-  const stakerEnsNames = Object.fromEntries(
-    await Promise.all(
-      Array.from(new Set(allStakerData.map((el) => el.depositor))).map(
-        async (depositor) => {
-          return [depositor, await provider.lookupAddress(depositor)];
-        }
-      )
-    )
-  );
+  // const stakerEnsNames = Object.fromEntries(
+  //   await Promise.all(
+  //     Array.from(new Set(allStakerData.map((el) => el.depositor)))
+  //       .filter((e) => e !== undefined)
+  //       .map(async (depositor) => {
+  //         return [depositor, await provider.lookupAddress(depositor)];
+  //       })
+  //   )
+  // );
 
-  allStakerData.forEach((entry) => {
-    entry.depositor = stakerEnsNames[entry.depositor] ?? entry.depositor;
-  });
+  // allStakerData.forEach((entry) => {
+  //   entry.depositor = stakerEnsNames[entry.depositor] ?? entry.depositor;
+  // });
 
   return {
     rEthTvl,

@@ -14,6 +14,7 @@ export function roundToDecimalPlaces(
 ): number | string {
   // const factor = Math.pow(10, decimalPlaces);
   // return Math.round(value * factor) / factor;
+  console.log(value);
   return value.toFixed(decimalPlaces);
 }
 
@@ -49,5 +50,5 @@ export function getShortenedAddress(
   first: number,
   second: number
 ) {
-  return `${address.slice(0, first)}...${address.slice(-1 * second)}`;
+  return `${address?.slice(0, first)}...${address.slice(-1 * second)}`;
 }

@@ -143,7 +143,7 @@ export default function LeaderBoard(data: any) {
                         window.open(getEtherscanAddressUrl(userData.depositor));
                       }}
                     >
-                      {userData.depositor.endsWith(".eth")
+                      {userData.depositor?.endsWith(".eth")
                         ? userData.depositor
                         : getShortenedAddress(userData.depositor, 4, 6)}
                     </td>
