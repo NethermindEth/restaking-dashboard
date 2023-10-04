@@ -11,5 +11,3 @@ npm-debug.log*
 
 # Typechain generated files
 typechain
-package.json.lock
-yarn.lock
