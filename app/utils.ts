@@ -7,6 +7,8 @@ import {
 import {
   DailyTokenData,
   LeaderboardUserData,
+  Deposits,
+  Withdraws,
   extractAmountsAndTimestamps,
 } from "@/lib/utils";
 import axios from "axios";
@@ -58,20 +60,6 @@ export async function getDashboardData() {
         await cbEthStrategy.totalShares()
       )
     ) / 1e18;
-
-  interface Deposits {
-    stEthDeposits: DailyTokenData[];
-    cbEthDeposits: DailyTokenData[];
-    rEthDeposits: DailyTokenData[];
-    beaconChainDeposits: DailyTokenData[];
-  }
-
-  interface Withdraws {
-    stEthWithdrawls: DailyTokenData[];
-    cbEthWithdrawls: DailyTokenData[];
-    rEthWithdrawls: DailyTokenData[];
-    beaconChainWithdrawls: DailyTokenData[];
-  }
 
   const depositDataPromise = axios.get<Deposits>(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`

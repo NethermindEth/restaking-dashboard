@@ -17,6 +17,20 @@ export interface DailyTokenWithdrawals {
   total_shares: number | null;
 }
 
+export interface Deposits {
+  stEthDeposits: DailyTokenData[];
+  cbEthDeposits: DailyTokenData[];
+  rEthDeposits: DailyTokenData[];
+  beaconChainDeposits: DailyTokenData[];
+}
+
+export interface Withdraws {
+  stEthWithdrawls: DailyTokenData[];
+  cbEthWithdrawls: DailyTokenData[];
+  rEthWithdrawls: DailyTokenData[];
+  beaconChainWithdrawls: DailyTokenData[];
+}
+
 export function roundToDecimalPlaces(
   value: number,
   decimalPlaces: number = 2
