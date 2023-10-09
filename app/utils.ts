@@ -65,11 +65,19 @@ export async function getDashboardData() {
     rEthDeposits: DailyTokenData[];
     beaconChainDeposits: DailyTokenData[];
   }
+
+  interface Withdraws {
+    stEthWithdrawls: DailyTokenData[];
+    cbEthWithdrawls: DailyTokenData[];
+    rEthWithdrawls: DailyTokenData[];
+    beaconChainWithdrawls: DailyTokenData[];
+  }
+
   const depositDataPromise = axios.get<Deposits>(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`
   );
 
-  const withdrawDataPromise = axios.get<DailyTokenData[][]>(
+  const withdrawDataPromise = axios.get<Withdraws>(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawls`
   );
 
@@ -81,7 +89,6 @@ export async function getDashboardData() {
   const depositData = depositDataResponse.data;
 
   const withdrawData = withdrawDataResponse.data;
-  console.log(depositData.cbEthDeposits);
 
   const cumulatativeDepositData: DailyTokenData[][] = [
     [
@@ -91,20 +98,13 @@ export async function getDashboardData() {
     ],
   ];
 
-  const cumulatativeWithdrawData: DailyTokenData[][] =
-    structuredClone(withdrawData);
-  cumulatativeWithdrawData.map((ele) =>
-    ele.map((value, index, arr) => {
-      const cumulativeAmount =
-        index == 0
-          ? value.total_amount
-          : value.total_amount! + arr[index - 1].total_amount!;
-      // @ts-ignore
-      value.total_amount = cumulativeAmount;
-      return value;
-    })
-  );
-
+  const cumulatativeWithdrawData: DailyTokenData[][] = [
+    [
+      ...withdrawData.stEthWithdrawls,
+      ...withdrawData.cbEthWithdrawls,
+      ...withdrawData.rEthWithdrawls,
+    ],
+  ];
   const totalStakedBeaconChainEth = JSON.parse(
     (
       await axios.get(
@@ -144,7 +144,9 @@ export async function getDashboardData() {
 
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
     false,
-    ...withdrawData
+    withdrawData.stEthWithdrawls,
+    withdrawData.cbEthWithdrawls,
+    withdrawData.rEthWithdrawls
   );
 
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
@@ -152,17 +154,17 @@ export async function getDashboardData() {
     ...cumulatativeWithdrawData
   );
 
-  const depositDataStakers: DailyTokenData[][] = await (
-    await axios.get(
+  const depositDataStakers = (
+    await axios.get<Deposits>(
       `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`
     )
   ).data;
 
-  const stakersStEth = depositDataStakers[0] || [];
+  const stakersStEth = depositDataStakers.stEthDeposits || [];
 
-  const stakersCbEth = depositDataStakers[1] || [];
+  const stakersCbEth = depositDataStakers.cbEthDeposits || [];
 
-  const stakersREth = depositDataStakers[2] || [];
+  const stakersREth = depositDataStakers.rEthDeposits || [];
 
   const rEthSharesRate =
     Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;

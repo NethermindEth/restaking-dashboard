@@ -82,35 +82,35 @@ AllCombinations AS (
         TokenSeries ts
 ),
 CumulativeDeposits AS (
-SELECT
-    ac."date",
-    ac.token,
-    COALESCE(td.total_amount, 0) AS total_amount,
-    COALESCE(td.total_shares, 0) AS total_shares,
-    SUM(COALESCE(td.total_amount, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_amount,
-    SUM(COALESCE(td.total_shares, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_shares
-FROM
-    AllCombinations ac
-LEFT JOIN
-    DailyDeposits td
-ON
-    ac."date" = td."date"
-AND
-    (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
-)
-SELECT
-cd."date",
-cd.token,
-cd.total_amount,
-cd.total_shares,
-cd.cumulative_amount,
-cd.cumulative_shares
-FROM
-CumulativeDeposits cd
-ORDER BY
-cd."date",
-cd.token;
-    `);
+    SELECT
+        ac."date",
+        ac.token,
+        COALESCE(td.total_amount, 0) AS total_amount,
+        COALESCE(td.total_shares, 0) AS total_shares,
+        SUM(COALESCE(td.total_amount, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_amount,
+        SUM(COALESCE(td.total_shares, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_shares
+    FROM
+        AllCombinations ac
+    LEFT JOIN
+        DailyDeposits td
+    ON
+        ac."date" = td."date"
+    AND
+        (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
+  )
+  SELECT
+    cd."date",
+    cd.token,
+    cd.total_amount,
+    cd.total_shares,
+    cd.cumulative_amount,
+    cd.cumulative_shares
+  FROM
+    CumulativeDeposits cd
+  ORDER BY
+    cd."date",
+    cd.token;
+  `);
 
   const rEthDeposits: DailyTokenData[] = [];
   const cbEthDeposits: DailyTokenData[] = [];
@@ -121,14 +121,18 @@ cd.token;
 
   // @ts-ignore
   array.forEach((ele) => {
-    if (ele.token === RETH_ADDRESS) {
-      rEthDeposits.push(ele);
-    } else if (ele.token === CBETH_ADDRESS) {
-      cbEthDeposits.push(ele);
-    } else if (ele.token === STETH_ADDRESS) {
-      stEthDeposits.push(ele);
-    } else {
-      beaconChainDeposits.push(ele);
+    switch (ele.token) {
+      case RETH_ADDRESS:
+        rEthDeposits.push(ele);
+        break;
+      case CBETH_ADDRESS:
+        cbEthDeposits.push(ele);
+        break;
+      case STETH_ADDRESS:
+        stEthDeposits.push(ele);
+        break;
+      default:
+        beaconChainDeposits.push(ele);
     }
   });
 
@@ -182,18 +186,22 @@ export const getStrategyDepositLeaderBoard = async (
       token: ele.token,
     };
 
-    if (ele.token === RETH_ADDRESS.toLowerCase()) {
-      rEthDeposits.push(ele);
-    } else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
-      cbEthDeposits.push(ele);
-    } else if (ele.token === STETH_ADDRESS.toLowerCase()) {
-      stEthDeposits.push(ele);
+    switch (ele.token) {
+      case RETH_ADDRESS:
+        rEthDeposits.push(ele);
+        break;
+      case CBETH_ADDRESS:
+        cbEthDeposits.push(ele);
+        break;
+      case STETH_ADDRESS:
+        stEthDeposits.push(ele);
+        break;
     }
   });
 
   return {
     statusCode: 200,
-    body: JSON.stringify([stEthDeposits, cbEthDeposits, rEthDeposits]),
+    body: JSON.stringify({ stEthDeposits, cbEthDeposits, rEthDeposits }),
   };
 };
 
@@ -242,11 +250,11 @@ DailyValidatorWithdrawals AS (
         WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
     TokenSeries AS (
-        SELECT '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' AS token
+        SELECT '${STETH_ADDRESS}' AS token
         UNION ALL
-            SELECT '0xbe9895146f7af43049ca1c1ae358b0541ea49704'
+            SELECT '${RETH_ADDRESS}'
         UNION ALL
-            SELECT '0xae78736cd615f374d3085123a210448e74fc6393'
+            SELECT '${CBETH_ADDRESS}'
         UNION ALL
             SELECT NULL
     ),
@@ -258,45 +266,70 @@ DailyValidatorWithdrawals AS (
             DateSeries ds
         CROSS JOIN 
             TokenSeries ts
+    ),
+  CumulativeWithdrawls AS (
+      SELECT
+          ac."date",
+          ac.token,
+          COALESCE(td.total_amount, 0) AS total_amount,
+          COALESCE(td.total_shares, 0) AS total_shares,
+          SUM(COALESCE(td.total_amount, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_amount,
+          SUM(COALESCE(td.total_shares, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_shares
+      FROM
+          AllCombinations ac
+      LEFT JOIN
+        DailyWithdrawals td
+      ON
+          ac."date" = td."date"
+      AND
+          (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
     )
-    SELECT 
-        ac."date", 
-        ac.token, 
-        COALESCE(tw.total_amount, 0) AS total_amount,
-        COALESCE(tw.total_shares, 0) AS total_shares
-    FROM 
-        AllCombinations ac
-    LEFT JOIN 
-        DailyWithdrawals tw
-    ON 
-        ac."date" = tw."date" 
-    AND 
-        (ac.token = tw.token OR (ac.token IS NULL and tw.token IS NULL))
-    ORDER BY 
-    ac."date", 
-    ac.token;
-      `);
+  SELECT
+    cd."date",
+    cd.token,
+    cd.total_amount,
+    cd.total_shares,
+    cd.cumulative_amount,
+    cd.cumulative_shares
+  FROM
+    CumulativeWithdrawls cd
+  ORDER BY
+    cd."date",
+    cd.token;
+  `);
 
   const rEthWithdrawls: DailyTokenWithdrawals[] = [];
   const cbEthWithdrawls: DailyTokenWithdrawals[] = [];
   const stEthWithdrawls: DailyTokenWithdrawals[] = [];
+  const beaconChainWithdrawls: DailyTokenWithdrawals[] = [];
 
   const array = response.toArray();
 
   // @ts-ignore
   array.forEach((ele) => {
-    if (ele.token === RETH_ADDRESS.toLowerCase()) {
-      rEthWithdrawls.push(ele);
-    } else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
-      cbEthWithdrawls.push(ele);
-    } else if (ele.token === STETH_ADDRESS.toLowerCase()) {
-      stEthWithdrawls.push(ele);
+    switch (ele.token) {
+      case RETH_ADDRESS:
+        rEthWithdrawls.push(ele);
+        break;
+      case CBETH_ADDRESS:
+        cbEthWithdrawls.push(ele);
+        break;
+      case STETH_ADDRESS:
+        stEthWithdrawls.push(ele);
+        break;
+      default:
+        beaconChainWithdrawls.push(ele);
     }
   });
 
   return {
     statusCode: 200,
-    body: JSON.stringify([stEthWithdrawls, cbEthWithdrawls, rEthWithdrawls]),
+    body: JSON.stringify({
+      stEthWithdrawls,
+      cbEthWithdrawls,
+      rEthWithdrawls,
+      beaconChainWithdrawls,
+    }),
   };
 };
 

@@ -42,11 +42,11 @@ export function extractAmountsAndTimestamps(
   amounts: number[][];
   timestamps: string[];
 } {
-  const amounts = data.map((tokenData) =>
+  const amounts = data.map((tokenData) => {
     tokenData.map((el) => {
       return cumulative ? el.cumulative_amount! : el.total_amount!;
-    })
-  );
+    });
+  });
 
   const dates = data
     .map((tokenData) => tokenData.map((el) => el.date))
