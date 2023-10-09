@@ -1,11 +1,20 @@
 export interface DailyTokenData {
   date: string | null;
   total_amount: number | null;
+  total_shares: number | null;
+  cumulative_amount: number | null;
+  cumulative_shares: number | null;
 }
 
 export interface LeaderboardUserData {
   depositor: string;
   totalStaked: number;
+}
+
+export interface DailyTokenWithdrawals {
+  date: string | null;
+  total_amount: number | null;
+  total_shares: number | null;
 }
 
 export function roundToDecimalPlaces(
@@ -26,13 +35,19 @@ export function formatDateToStandard(inputDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
-export function extractAmountsAndTimestamps(...data: DailyTokenData[][]): {
+export function extractAmountsAndTimestamps(
+  cumulative: boolean,
+  ...data: DailyTokenData[][]
+): {
   amounts: number[][];
   timestamps: string[];
 } {
   const amounts = data.map((tokenData) =>
-    tokenData.map((el) => el.total_amount!)
+    tokenData.map((el) => {
+      return cumulative ? el.cumulative_amount! : el.total_amount!;
+    })
   );
+
   const dates = data
     .map((tokenData) => tokenData.map((el) => el.date))
     .sort((a, b) => a.length - b.length)[0];

@@ -1,6 +1,6 @@
 {
-  "name": "aws-node-http-api-typescript",
-  "description": "This template demonstrates how to make a simple HTTP API with Node.js and Typescript running on AWS Lambda and API Gateway using the Serverless Framework v3",
+  "name": "stripe-ai-sererless",
+  "description": "Serverless code to handle Strip Ai query requests",
   "version": "1.0.0",
   "dependencies": {
     "@spiceai/spice": "^0.5.1",

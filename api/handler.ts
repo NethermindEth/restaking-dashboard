@@ -1,10 +1,16 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import SpiceClient from "./spice";
-import { DailyTokenData, LeaderboardUserData } from "@/lib/utils";
+import {
+  DailyTokenData,
+  DailyTokenWithdrawals,
+  LeaderboardUserData,
+} from "@/lib/utils";
 
-const STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
-const CBETH_ADDRESS = "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704";
-const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+const STETH_ADDRESS =
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84".toLowerCase();
+const CBETH_ADDRESS =
+  "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704".toLowerCase();
+const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393".toLowerCase();
 
 export const getDeposits = async (
   event: APIGatewayProxyEvent
@@ -18,9 +24,9 @@ export const getDeposits = async (
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM eth.eigenlayer.strategy_manager_deposits
     WHERE token IN (
-        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
-        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',
-        '0xae78736cd615f374d3085123a210448e74fc6393'
+        '${STETH_ADDRESS}',
+        '${CBETH_ADDRESS}',
+        '${RETH_ADDRESS}'
     )
     GROUP BY "date", token
 ),
@@ -58,11 +64,11 @@ DateSeries AS (
     WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
 ),
 TokenSeries AS (
-    SELECT '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' AS token
+    SELECT '${STETH_ADDRESS}' AS token
     UNION ALL
-        SELECT '0xbe9895146f7af43049ca1c1ae358b0541ea49704'
+        SELECT '${CBETH_ADDRESS}'
     UNION ALL
-        SELECT '0xae78736cd615f374d3085123a210448e74fc6393'
+        SELECT '${RETH_ADDRESS}'
     UNION ALL
         SELECT NULL
 ),
@@ -74,12 +80,15 @@ AllCombinations AS (
         DateSeries ds
     CROSS JOIN
         TokenSeries ts
-)
+),
+CumulativeDeposits AS (
 SELECT
     ac."date",
     ac.token,
     COALESCE(td.total_amount, 0) AS total_amount,
-    COALESCE(td.total_shares, 0) AS total_shares
+    COALESCE(td.total_shares, 0) AS total_shares,
+    SUM(COALESCE(td.total_amount, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_amount,
+    SUM(COALESCE(td.total_shares, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_shares
 FROM
     AllCombinations ac
 LEFT JOIN
@@ -88,31 +97,49 @@ ON
     ac."date" = td."date"
 AND
     (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
+)
+SELECT
+cd."date",
+cd.token,
+cd.total_amount,
+cd.total_shares,
+cd.cumulative_amount,
+cd.cumulative_shares
+FROM
+CumulativeDeposits cd
 ORDER BY
-    ac."date",
-    ac.token;
+cd."date",
+cd.token;
     `);
 
   const rEthDeposits: DailyTokenData[] = [];
   const cbEthDeposits: DailyTokenData[] = [];
   const stEthDeposits: DailyTokenData[] = [];
+  const beaconChainDeposits: DailyTokenData[] = [];
 
   const array = response.toArray();
 
   // @ts-ignore
   array.forEach((ele) => {
-    if (ele.token === RETH_ADDRESS.toLowerCase()) {
+    if (ele.token === RETH_ADDRESS) {
       rEthDeposits.push(ele);
-    } else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
+    } else if (ele.token === CBETH_ADDRESS) {
       cbEthDeposits.push(ele);
-    } else if (ele.token === STETH_ADDRESS.toLowerCase()) {
+    } else if (ele.token === STETH_ADDRESS) {
       stEthDeposits.push(ele);
+    } else {
+      beaconChainDeposits.push(ele);
     }
   });
 
   return {
     statusCode: 200,
-    body: JSON.stringify([stEthDeposits, cbEthDeposits, rEthDeposits]),
+    body: JSON.stringify({
+      stEthDeposits,
+      cbEthDeposits,
+      rEthDeposits,
+      beaconChainDeposits,
+    }),
   };
 };
 
@@ -130,9 +157,9 @@ export const getStrategyDepositLeaderBoard = async (
         ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
     FROM eth.eigenlayer.strategy_manager_deposits
     WHERE token IN (
-        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
-        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',
-        '0xae78736cd615f374d3085123a210448e74fc6393'
+        '${STETH_ADDRESS}',
+        '${CBETH_ADDRESS}',
+        '${RETH_ADDRESS}'
     )
     GROUP BY depositor, token
 )
@@ -141,14 +168,13 @@ export const getStrategyDepositLeaderBoard = async (
     WHERE rn <= 50;
 `);
 
-  const rEth: DailyTokenData[] = [];
-  const cbEth: DailyTokenData[] = [];
-  const stEth: DailyTokenData[] = [];
+  const rEthDeposits: DailyTokenData[] = [];
+  const cbEthDeposits: DailyTokenData[] = [];
+  const stEthDeposits: DailyTokenData[] = [];
 
-  const array = response.toArray();
+  const deposits = response.toArray();
 
-  // @ts-ignore
-  array.forEach((ele) => {
+  deposits.forEach((ele) => {
     ele = {
       total_amount: ele.total_amount,
       total_staked_shares: ele.total_shares,
@@ -157,17 +183,17 @@ export const getStrategyDepositLeaderBoard = async (
     };
 
     if (ele.token === RETH_ADDRESS.toLowerCase()) {
-      rEth.push(ele);
+      rEthDeposits.push(ele);
     } else if (ele.token === CBETH_ADDRESS.toLowerCase()) {
-      cbEth.push(ele);
+      cbEthDeposits.push(ele);
     } else if (ele.token === STETH_ADDRESS.toLowerCase()) {
-      stEth.push(ele);
+      stEthDeposits.push(ele);
     }
   });
 
   return {
     statusCode: 200,
-    body: JSON.stringify([stEth, cbEth, rEth]),
+    body: JSON.stringify([stEthDeposits, cbEthDeposits, rEthDeposits]),
   };
 };
 
@@ -183,9 +209,9 @@ export const getWithdrawals = async (
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM eth.eigenlayer.strategy_manager_withdrawal_completed
     WHERE token IN (
-        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
-        '0xbe9895146f7af43049ca1c1ae358b0541ea49704',
-        '0xae78736cd615f374d3085123a210448e74fc6393'
+        '${STETH_ADDRESS}',
+        '${CBETH_ADDRESS}',
+        '${RETH_ADDRESS}'
     )
     AND receive_as_tokens
     GROUP BY "date", token
@@ -251,9 +277,9 @@ DailyValidatorWithdrawals AS (
     ac.token;
       `);
 
-  const rEthWithdrawls: any[] = [];
-  const cbEthWithdrawls: any[] = [];
-  const stEthWithdrawls: any[] = [];
+  const rEthWithdrawls: DailyTokenWithdrawals[] = [];
+  const cbEthWithdrawls: DailyTokenWithdrawals[] = [];
+  const stEthWithdrawls: DailyTokenWithdrawals[] = [];
 
   const array = response.toArray();
 

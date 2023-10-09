@@ -2,5 +2,5 @@ import { SpiceClient } from "@spiceai/spice";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const spiceClient = new SpiceClient(process.env.SPICE || "");
+const spiceClient = new SpiceClient(process.env.SPICE_API_KEY || "");
 export default spiceClient;

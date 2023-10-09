@@ -1,4 +1,4 @@
-service: aws-node-http-api-typescript
+service: spice-ai-serverless
 frameworkVersion: "3"
 
 provider:
@@ -37,14 +37,6 @@ functions:
     events:
       - httpApi:
           path: /stakersBeaconChainEth
-          method: get
-  dailyBeaconChainETHDeposit:
-    handler: handler.dailyBeaconChainETHDeposit
-    runtime: nodejs14.x
-    timeout: 12
-    events:
-      - httpApi:
-          path: /dailyBeaconChainETHDeposit
           method: get
   getStrategyDepositLeaderBoard:
     handler: handler.getStrategyDepositLeaderBoard

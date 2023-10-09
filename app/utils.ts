@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { supabase, supabaseUnwrap } from "../lib/supabaseClient";
 import {
   RocketTokenRETH__factory,
   StakedTokenV1__factory,
@@ -60,12 +59,18 @@ export async function getDashboardData() {
       )
     ) / 1e18;
 
-  const depositDataPromise = axios.get<DailyTokenData[][]>(
-    `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/deposits`
+  interface Deposits {
+    stEthDeposits: DailyTokenData[];
+    cbEthDeposits: DailyTokenData[];
+    rEthDeposits: DailyTokenData[];
+    beaconChainDeposits: DailyTokenData[];
+  }
+  const depositDataPromise = axios.get<Deposits>(
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`
   );
 
   const withdrawDataPromise = axios.get<DailyTokenData[][]>(
-    `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/withdrawls`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawls`
   );
 
   const [depositDataResponse, withdrawDataResponse] = await Promise.all([
@@ -74,22 +79,17 @@ export async function getDashboardData() {
   ]);
 
   const depositData = depositDataResponse.data;
+
   const withdrawData = withdrawDataResponse.data;
+  console.log(depositData.cbEthDeposits);
 
-  const cumulatativeDepositData: DailyTokenData[][] =
-    structuredClone(depositData);
-
-  cumulatativeDepositData.map((ele) =>
-    ele.map((value, index, arr) => {
-      const cumulativeAmount =
-        index == 0
-          ? value.total_amount
-          : value.total_amount! + arr[index - 1].total_amount!;
-      // @ts-ignore
-      value.total_amount = cumulativeAmount;
-      return value;
-    })
-  );
+  const cumulatativeDepositData: DailyTokenData[][] = [
+    [
+      ...depositData.stEthDeposits,
+      ...depositData.cbEthDeposits,
+      ...depositData.rEthDeposits,
+    ],
+  ];
 
   const cumulatativeWithdrawData: DailyTokenData[][] =
     structuredClone(withdrawData);
@@ -105,65 +105,56 @@ export async function getDashboardData() {
     })
   );
 
-  const beaconChainEthDepositsResponse = (
-    await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/dailyBeaconChainETHDeposit`
-    )
-  ).data;
-
-  const beaconChainEthDeposits = beaconChainEthDepositsResponse.map((e) => {
-    return { date: e.date, total_amount: e.daily_added_effective_balance };
-  });
-
-  const cumulativeBeaconChainEthDeposits = beaconChainEthDepositsResponse.map(
-    (e) => {
-      return {
-        date: e.date,
-        total_amount: e.cumulative_daily_effective_balance,
-      };
-    }
-  );
-
   const totalStakedBeaconChainEth = JSON.parse(
     (
       await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/totalStakedBeconChainEth`
+        `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeconChainEth`
       )
     ).data
   )[0].final_balance;
 
   const stakersBeaconChainEth = (
     await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/stakersBeaconChainEth`
+      `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`
     )
   ).data;
 
-  const chartDataDepositsDaily = extractAmountsAndTimestamps(...depositData);
+  const chartDataDepositsDaily = extractAmountsAndTimestamps(
+    false,
+    depositData.stEthDeposits,
+    depositData.cbEthDeposits,
+    depositData.rEthDeposits
+  );
 
   const chartDataDepositsCumulative = extractAmountsAndTimestamps(
+    true,
     ...cumulatativeDepositData
   );
 
   // all bool values herafter are for test purpose only for now
   const chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
-    beaconChainEthDeposits
+    false,
+    depositData.beaconChainDeposits
   );
 
   const chartDataBeaconStakesCumulative = extractAmountsAndTimestamps(
-    cumulativeBeaconChainEthDeposits
+    true,
+    depositData.beaconChainDeposits
   );
 
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
+    false,
     ...withdrawData
   );
 
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
+    false,
     ...cumulatativeWithdrawData
   );
 
   const depositDataStakers: DailyTokenData[][] = await (
     await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVERLESS_URL}/getStrategyDepositLeaderBoard`
+      `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`
     )
   ).data;
 
@@ -173,7 +164,6 @@ export async function getDashboardData() {
 
   const stakersREth = depositDataStakers[2] || [];
 
-  console.log(stakersStEth);
   const rEthSharesRate =
     Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
   const stEthSharesRate =
