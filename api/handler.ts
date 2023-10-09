@@ -150,7 +150,6 @@ CumulativeDeposits AS (
 export const getStrategyDepositLeaderBoard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  console.log("here");
   const response = await SpiceClient.query(`
   WITH ranked_deposits AS (
     SELECT
