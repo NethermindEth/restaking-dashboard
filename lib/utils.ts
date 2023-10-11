@@ -1,9 +1,9 @@
 export interface DailyTokenData {
-  date: string | null;
-  total_amount: number | null;
-  total_shares: number | null;
-  cumulative_amount: number | null;
-  cumulative_shares: number | null;
+  date: string;
+  total_amount: number;
+  total_shares: number;
+  cumulative_amount: number;
+  cumulative_shares: number;
 }
 
 export interface LeaderboardUserData {
@@ -24,7 +24,7 @@ export interface Deposits {
   beaconChainDeposits: DailyTokenData[];
 }
 
-export interface Withdraws {
+export interface Withdrawls {
   stEthWithdrawls: DailyTokenData[];
   cbEthWithdrawls: DailyTokenData[];
   rEthWithdrawls: DailyTokenData[];
@@ -56,11 +56,11 @@ export function extractAmountsAndTimestamps(
   amounts: number[][];
   timestamps: string[];
 } {
-  const amounts = data.map((tokenData) => {
-    tokenData.map((el) => {
-      return cumulative ? el.cumulative_amount! : el.total_amount!;
-    });
-  });
+  const amounts = data.map((tokenData) =>
+    tokenData.map((el) =>
+      cumulative ? el.cumulative_amount! : el.total_amount!
+    )
+  );
 
   const dates = data
     .map((tokenData) => tokenData.map((el) => el.date))

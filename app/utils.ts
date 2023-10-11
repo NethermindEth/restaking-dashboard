@@ -8,7 +8,7 @@ import {
   DailyTokenData,
   LeaderboardUserData,
   Deposits,
-  Withdraws,
+  Withdrawls,
   extractAmountsAndTimestamps,
 } from "@/lib/utils";
 import axios from "axios";
@@ -65,7 +65,7 @@ export async function getDashboardData() {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`
   );
 
-  const withdrawDataPromise = axios.get<Withdraws>(
+  const withdrawDataPromise = axios.get<Withdrawls>(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawls`
   );
 
@@ -78,21 +78,6 @@ export async function getDashboardData() {
 
   const withdrawData = withdrawDataResponse.data;
 
-  const cumulatativeDepositData: DailyTokenData[][] = [
-    [
-      ...depositData.stEthDeposits,
-      ...depositData.cbEthDeposits,
-      ...depositData.rEthDeposits,
-    ],
-  ];
-
-  const cumulatativeWithdrawData: DailyTokenData[][] = [
-    [
-      ...withdrawData.stEthWithdrawls,
-      ...withdrawData.cbEthWithdrawls,
-      ...withdrawData.rEthWithdrawls,
-    ],
-  ];
   const totalStakedBeaconChainEth = JSON.parse(
     (
       await axios.get(
@@ -110,13 +95,15 @@ export async function getDashboardData() {
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
     false,
     depositData.stEthDeposits,
-    depositData.cbEthDeposits,
-    depositData.rEthDeposits
+    depositData.rEthDeposits,
+    depositData.cbEthDeposits
   );
 
   const chartDataDepositsCumulative = extractAmountsAndTimestamps(
     true,
-    ...cumulatativeDepositData
+    depositData.stEthDeposits,
+    depositData.rEthDeposits,
+    depositData.cbEthDeposits
   );
 
   // all bool values herafter are for test purpose only for now
@@ -133,13 +120,15 @@ export async function getDashboardData() {
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
     false,
     withdrawData.stEthWithdrawls,
-    withdrawData.cbEthWithdrawls,
-    withdrawData.rEthWithdrawls
+    withdrawData.rEthWithdrawls,
+    withdrawData.cbEthWithdrawls
   );
 
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
-    false,
-    ...cumulatativeWithdrawData
+    true,
+    withdrawData.stEthWithdrawls,
+    withdrawData.rEthWithdrawls,
+    withdrawData.cbEthWithdrawls
   );
 
   const depositDataStakers = (
@@ -191,8 +180,8 @@ export async function getDashboardData() {
 
   const groupedStakers = [
     ...stakersBeaconChainEthConverted,
-    ...stakersREthConverted,
     ...stakersStEthConverted,
+    ...stakersREthConverted,
     ...stakersCbEthConverted,
   ]
     .reduce((acc, cur) => {

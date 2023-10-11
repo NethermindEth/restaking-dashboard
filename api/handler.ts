@@ -24,9 +24,9 @@ export const getDeposits = async (
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM eth.eigenlayer.strategy_manager_deposits
     WHERE token IN (
-        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
-        '0xBe9895146f7AF43049ca1c1AE358B0541Ea49704',
-        '0xae78736Cd615f374D3085123A210448E74Fc6393'
+        '${STETH_ADDRESS}',
+        '${CBETH_ADDRESS}',
+        '${RETH_ADDRESS}'
     )
     GROUP BY "date", token
 ),
@@ -62,11 +62,11 @@ DateSeries AS (
     WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
 ),
 TokenSeries AS (
-    SELECT '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' AS token
+    SELECT '${STETH_ADDRESS}' AS token
     UNION ALL
-        SELECT '0xBe9895146f7AF43049ca1c1AE358B0541Ea49704'
+        SELECT '${CBETH_ADDRESS}'
     UNION ALL
-        SELECT '0xae78736Cd615f374D3085123A210448E74Fc6393'
+        SELECT '${RETH_ADDRESS}'
     UNION ALL
         SELECT NULL
 ),
