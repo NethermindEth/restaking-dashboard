@@ -13,11 +13,11 @@ import {
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
 import {
-  DailyTokenData,
   LeaderboardUserData,
   Deposits,
   Withdrawls,
   extractAmountsAndTimestamps,
+  DepositStakersData,
 } from "@/lib/utils";
 import axios from "axios";
 
@@ -64,20 +64,20 @@ export async function getDashboardData() {
 
   const stakersREthConverted: LeaderboardUserData[] = stakersREth.map((d) => ({
     depositor: d.depositor!,
-    totalStaked: d.total_staked_shares! * rEthSharesRate * rEthRate,
+    totalStaked: d.totalStaked! * rEthSharesRate * rEthRate,
   }));
 
   const stakersStEthConverted: LeaderboardUserData[] = stakersStEth.map(
     (d) => ({
       depositor: d.depositor!,
-      totalStaked: d.total_staked_shares! * stEthSharesRate,
+      totalStaked: d.totalStaked! * stEthSharesRate,
     })
   );
 
   const stakersCbEthConverted: LeaderboardUserData[] = stakersCbEth.map(
     (d) => ({
       depositor: d.depositor!,
-      totalStaked: d.total_staked_shares! * cbEthSharesRate * cbEthRate,
+      totalStaked: d.totalStaked! * cbEthSharesRate * cbEthRate,
     })
   );
 
@@ -129,16 +129,16 @@ async function fetchData() {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawls`
   );
 
+  const depositDataStakersPromise = axios.get<DepositStakersData>(
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`
+  );
+
   const totalStakedBeaconChainEthPromise = axios.get(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeconChainEth`
   );
 
   const stakersBeaconChainEthPromise = axios.get(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`
-  );
-
-  const depositDataStakersPromise = axios.get<LeaderboardUserData>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`
   );
 
   const [
@@ -177,7 +177,7 @@ async function fetchData() {
 function generateChartData(
   depositData: Deposits,
   withdrawData: Withdrawls,
-  depositDataStakers: Deposits
+  depositDataStakers: DepositStakersData
 ) {
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
     false,

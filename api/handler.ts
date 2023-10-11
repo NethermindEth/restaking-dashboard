@@ -208,8 +208,8 @@ export const getWithdrawals = async (
     )
     AND receive_as_tokens
     GROUP BY "date", token
-),
-DailyValidatorWithdrawals AS (
+   ),
+  DailyValidatorWithdrawals AS (
     SELECT
         TO_DATE(1606845623 + 32 * 12 * exit_epoch) as "date",
         NULL as token,
@@ -223,34 +223,34 @@ DailyValidatorWithdrawals AS (
             LEFT(vl.withdrawal_credentials, 4) = '0x01' AND vl.withdrawal_credentials = ep.withdrawal_credential
         GROUP BY "date"
     ),
-    DailyWithdrawals AS (
-        SELECT * FROM DailyTokenWithdrawals UNION ALL SELECT * FROM DailyValidatorWithdrawals
+  DailyWithdrawals AS (
+      SELECT * FROM DailyTokenWithdrawals UNION ALL SELECT * FROM DailyValidatorWithdrawals
     ),
-    MinDate AS (
-        SELECT MIN("date") AS min_date FROM DailyTokenWithdrawals
+  MinDate AS (
+      SELECT MIN("date") AS min_date FROM DailyTokenWithdrawals
     ),
-    DateSeries AS (
-        SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
-        FROM eth.blocks
-        WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
+  DateSeries AS (
+      SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
+      FROM eth.blocks
+      WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
-    TokenSeries AS (
-        SELECT '${STETH_ADDRESS}' AS token
-        UNION ALL
-            SELECT '${RETH_ADDRESS}'
-        UNION ALL
-            SELECT '${CBETH_ADDRESS}'
-        UNION ALL
-            SELECT NULL
+  TokenSeries AS (
+      SELECT '${STETH_ADDRESS}' AS token
+      UNION ALL
+          SELECT '${RETH_ADDRESS}'
+      UNION ALL
+          SELECT '${CBETH_ADDRESS}'
+      UNION ALL
+          SELECT NULL
     ),
-    AllCombinations AS (
-        SELECT 
-            ds."date", 
-            ts.token
-        FROM 
-            DateSeries ds
-        CROSS JOIN 
-            TokenSeries ts
+  AllCombinations AS (
+    SELECT 
+        ds."date", 
+        ts.token
+    FROM 
+        DateSeries ds
+    CROSS JOIN 
+        TokenSeries ts
     ),
   CumulativeWithdrawls AS (
       SELECT
@@ -320,12 +320,12 @@ DailyValidatorWithdrawals AS (
 
 export async function totalStakedBeaconChainEth() {
   try {
-    const result =
-      await spiceClient.query(`SELECT SUM(effective_balance)/POW(10,9) as final_balance
-                FROM eth.beacon.validators
-                JOIN eth.eigenlayer.eigenpods
-                ON eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential AND effective_balance!='0'
-            `);
+    const result = await spiceClient.query(`
+          SELECT SUM(effective_balance)/POW(10,9) as final_balance
+          FROM eth.beacon.validators
+          JOIN eth.eigenlayer.eigenpods
+          ON eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential AND effective_balance!='0'
+      `);
     return { statusCode: 200, body: JSON.stringify(result.toString()) };
   } catch (err: any) {
     console.log(err);
@@ -337,18 +337,19 @@ export async function stakersBeaconChainEth() {
   try {
     const result = await spiceClient.query(`
     SELECT 
-    eth.eigenlayer.eigenpods.pod_owner,
-    SUM(eth.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
-FROM 
-    eth.beacon.validators
-JOIN 
-    eth.eigenlayer.eigenpods
-ON 
-    eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential 
+        eth.eigenlayer.eigenpods.pod_owner,
+        SUM(eth.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
+    FROM 
+        eth.beacon.validators
+    JOIN 
+        eth.eigenlayer.eigenpods
+    ON 
+        eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential 
     AND eth.beacon.validators.effective_balance != '0'
-GROUP BY 
-    eth.eigenlayer.eigenpods.pod_owner
-ORDER BY total_effective_balance DESC;`);
+    GROUP BY 
+        eth.eigenlayer.eigenpods.pod_owner
+    ORDER BY total_effective_balance DESC;
+    `);
 
     return {
       statusCode: 200,
