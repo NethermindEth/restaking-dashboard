@@ -1,6 +1,6 @@
 {
-  "name": "stripe-ai-sererless",
-  "description": "Serverless code to handle Strip Ai query requests",
+  "name": "spice-ai-sererless",
+  "description": "Serverless code to handle Spice Ai query requests",
   "version": "1.0.0",
   "dependencies": {
     "@spiceai/spice": "^0.5.1",
