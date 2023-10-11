@@ -158,16 +158,15 @@ export const getStrategyDepositLeaderBoard = async (
     WHERE rn <= 50;
 `);
 
-  const rEthDeposits: DailyTokenData[] = [];
-  const cbEthDeposits: DailyTokenData[] = [];
-  const stEthDeposits: DailyTokenData[] = [];
+  const rEthDeposits: LeaderboardUserData[] = [];
+  const cbEthDeposits: LeaderboardUserData[] = [];
+  const stEthDeposits: LeaderboardUserData[] = [];
 
   const deposits = response.toArray();
 
   deposits.forEach((ele) => {
     ele = {
-      total_amount: ele.total_amount,
-      total_staked_shares: ele.total_shares,
+      totalStaked: ele.total_shares,
       depositor: ele.depositor,
       token: ele.token,
     };

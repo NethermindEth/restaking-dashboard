@@ -11,6 +11,12 @@ export interface LeaderboardUserData {
   totalStaked: number;
 }
 
+export interface DepositStakersData {
+  stEthDeposits: LeaderboardUserData[];
+  cbEthDeposits: LeaderboardUserData[];
+  rEthDeposits: LeaderboardUserData[];
+}
+
 export interface DailyTokenWithdrawals {
   date: string | null;
   total_amount: number | null;
