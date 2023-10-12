@@ -158,9 +158,8 @@ async function fetchData() {
   const depositData = depositDataResponse.data;
   const withdrawData = withdrawDataResponse.data;
 
-  const totalStakedBeaconChainEth = JSON.parse(
-    totalStakedBeaconResponse.data
-  )[0].final_balance;
+  const totalStakedBeaconChainEth =
+    totalStakedBeaconResponse.data[0].final_balance;
 
   const stakersBeaconChainEth = stakersBeaconChainEthResponse.data;
   const depositDataStakers = depositDataStakersResponse.data;

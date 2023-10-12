@@ -326,7 +326,7 @@ export async function totalStakedBeaconChainEth() {
           JOIN eth.eigenlayer.eigenpods
           ON eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential AND effective_balance!='0'
       `);
-    return { statusCode: 200, body: JSON.stringify(result.toString()) };
+    return { statusCode: 200, body: result.toString() };
   } catch (err: any) {
     console.log(err);
     throw err;
