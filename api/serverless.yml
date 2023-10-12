@@ -14,13 +14,13 @@ functions:
       - httpApi:
           path: /deposits
           method: get
-  getWithdrawls:
+  getWithdrawals:
     handler: handler.getWithdrawals
     runtime: nodejs14.x
     timeout: 12
     events:
       - httpApi:
-          path: /withdrawls
+          path: /withdrawals
           method: get
   totalStakedBeaconChainEth:
     handler: handler.totalStakedBeaconChainEth

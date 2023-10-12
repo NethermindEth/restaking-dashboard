@@ -15,7 +15,7 @@ import {
 import {
   LeaderboardUserData,
   Deposits,
-  Withdrawls,
+  Withdrawals,
   extractAmountsAndTimestamps,
   DepositStakersData,
 } from "@/lib/utils";
@@ -125,8 +125,8 @@ async function fetchData() {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`
   );
 
-  const withdrawDataPromise = axios.get<Withdrawls>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawls`
+  const withdrawDataPromise = axios.get<Withdrawals>(
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals`
   );
 
   const depositDataStakersPromise = axios.get<DepositStakersData>(
@@ -176,7 +176,7 @@ async function fetchData() {
 
 function generateChartData(
   depositData: Deposits,
-  withdrawData: Withdrawls,
+  withdrawData: Withdrawals,
   depositDataStakers: DepositStakersData
 ) {
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
@@ -206,16 +206,16 @@ function generateChartData(
 
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
     false,
-    withdrawData.stEthWithdrawls,
-    withdrawData.rEthWithdrawls,
-    withdrawData.cbEthWithdrawls
+    withdrawData.stEthWithdrawals,
+    withdrawData.rEthWithdrawals,
+    withdrawData.cbEthWithdrawals
   );
 
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
     true,
-    withdrawData.stEthWithdrawls,
-    withdrawData.rEthWithdrawls,
-    withdrawData.cbEthWithdrawls
+    withdrawData.stEthWithdrawals,
+    withdrawData.rEthWithdrawals,
+    withdrawData.cbEthWithdrawals
   );
 
   const stakersStEth = depositDataStakers.stEthDeposits || [];

@@ -252,7 +252,7 @@ export const getWithdrawals = async (
     CROSS JOIN 
         TokenSeries ts
     ),
-  CumulativeWithdrawls AS (
+  CumulativeWithdrawals AS (
       SELECT
           ac."date",
           ac.token,
@@ -277,16 +277,16 @@ export const getWithdrawals = async (
     cd.cumulative_amount,
     cd.cumulative_shares
   FROM
-    CumulativeWithdrawls cd
+    CumulativeWithdrawals cd
   ORDER BY
     cd."date",
     cd.token;
   `);
 
-  const rEthWithdrawls: DailyTokenWithdrawals[] = [];
-  const cbEthWithdrawls: DailyTokenWithdrawals[] = [];
-  const stEthWithdrawls: DailyTokenWithdrawals[] = [];
-  const beaconChainWithdrawls: DailyTokenWithdrawals[] = [];
+  const rEthWithdrawals: DailyTokenWithdrawals[] = [];
+  const cbEthWithdrawals: DailyTokenWithdrawals[] = [];
+  const stEthWithdrawals: DailyTokenWithdrawals[] = [];
+  const beaconChainWithdrawals: DailyTokenWithdrawals[] = [];
 
   const array = response.toArray();
 
@@ -294,26 +294,26 @@ export const getWithdrawals = async (
   array.forEach((ele) => {
     switch (ele.token) {
       case RETH_ADDRESS:
-        rEthWithdrawls.push(ele);
+        rEthWithdrawals.push(ele);
         break;
       case CBETH_ADDRESS:
-        cbEthWithdrawls.push(ele);
+        cbEthWithdrawals.push(ele);
         break;
       case STETH_ADDRESS:
-        stEthWithdrawls.push(ele);
+        stEthWithdrawals.push(ele);
         break;
       default:
-        beaconChainWithdrawls.push(ele);
+        beaconChainWithdrawals.push(ele);
     }
   });
 
   return {
     statusCode: 200,
     body: JSON.stringify({
-      stEthWithdrawls,
-      cbEthWithdrawls,
-      rEthWithdrawls,
-      beaconChainWithdrawls,
+      stEthWithdrawals,
+      cbEthWithdrawals,
+      rEthWithdrawals,
+      beaconChainWithdrawals,
     }),
   };
 };

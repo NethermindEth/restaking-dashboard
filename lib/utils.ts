@@ -30,11 +30,11 @@ export interface Deposits {
   beaconChainDeposits: DailyTokenData[];
 }
 
-export interface Withdrawls {
-  stEthWithdrawls: DailyTokenData[];
-  cbEthWithdrawls: DailyTokenData[];
-  rEthWithdrawls: DailyTokenData[];
-  beaconChainWithdrawls: DailyTokenData[];
+export interface Withdrawals {
+  stEthWithdrawals: DailyTokenData[];
+  cbEthWithdrawals: DailyTokenData[];
+  rEthWithdrawals: DailyTokenData[];
+  beaconChainWithdrawals: DailyTokenData[];
 }
 
 export function roundToDecimalPlaces(

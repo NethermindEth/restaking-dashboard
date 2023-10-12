@@ -1,5 +1,5 @@
 {
-  "name": "spice-ai-sererless",
+  "name": "spice-ai-serverless",
   "description": "Serverless code to handle Spice Ai query requests",
   "version": "1.0.0",
   "dependencies": {
