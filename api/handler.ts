@@ -4,7 +4,7 @@ import {
   DailyTokenData,
   DailyTokenWithdrawals,
   LeaderboardUserData,
-} from "@/lib/utils";
+} from "./utils";
 
 const STETH_ADDRESS =
   "0xae7ab96520de3a18e5e111b5eaab095312d7fe84".toLowerCase();
@@ -217,8 +217,8 @@ export const getWithdrawals = async (
     FROM eth.eigenlayer.strategy_manager_withdrawal_completed
     WHERE token IN (
          '${STETH_ADDRESS}',
-         '${CBETH_ADDRESS}'
-         '${RETH_ADDRESS}'
+          '${CBETH_ADDRESS}',
+          '${RETH_ADDRESS}'
     )
     AND receive_as_tokens
     GROUP BY "date", token
@@ -248,15 +248,15 @@ export const getWithdrawals = async (
       FROM eth.blocks
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
-TokenSeries AS (
-    SELECT '${STETH_ADDRESS}' AS token
-    UNION ALL
-    SELECT '${CBETH_ADDRESS}'
-    UNION ALL
-        SELECT '${RETH_ADDRESS}'
-    UNION ALL
-        SELECT NULL
-),
+  TokenSeries AS (
+      SELECT '${STETH_ADDRESS}' AS token
+      UNION ALL
+      SELECT '${CBETH_ADDRESS}'
+      UNION ALL
+          SELECT '${RETH_ADDRESS}'
+      UNION ALL
+          SELECT NULL
+  ),
   AllCombinations AS (
     SELECT 
         ds."date", 
@@ -283,22 +283,22 @@ TokenSeries AS (
       AND
           (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
     ),
-  Last30DaysData AS (
+    Last30DaysData AS (
       SELECT * FROM CumulativeWithdrawals as cd
       WHERE cd."date" >= DATE_ADD(CURRENT_DATE, -30)
     )
-  SELECT
-    ldd."date",
-    ldd.token,
-    ldd.total_amount,
-    ldd.total_shares,
-    ldd.cumulative_amount,
-    ldd.cumulative_shares
-  FROM
-    Last30DaysData ldd
-  ORDER BY
-    ldd."date",
-    ldd.token;
+    SELECT
+      ldd."date",
+      ldd.token,
+      ldd.total_amount,
+      ldd.total_shares,
+      ldd.cumulative_amount,
+      ldd.cumulative_shares
+    FROM
+      Last30DaysData ldd
+    ORDER BY
+      ldd."date",
+      ldd.token;
   `);
 
   const rEthWithdrawals: DailyTokenWithdrawals[] = [];
