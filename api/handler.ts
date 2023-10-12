@@ -29,75 +29,89 @@ export const getDeposits = async (
         '${RETH_ADDRESS}'
     )
     GROUP BY "date", token
-),
-NonCoalescedDailyValidatorDeposits AS (
-    SELECT
-        TO_DATE(GREATEST(
-            COALESCE(ep.block_timestamp, 0),
-            1606824023 + 32 * 12 * activation_eligibility_epoch,
-            COALESCE(bte.block_timestamp, 0)
-        )) as "date",
-        NULL as token,
-        count(*) * 32 AS total_amount,
-        count(*) * 32 AS total_shares
-    FROM eth.beacon.validators vl
-    INNER JOIN eth.eigenlayer.eigenpods ep
-        ON vl.withdrawal_credentials = ep.withdrawal_credential
-    LEFT JOIN eth.beacon.bls_to_execution_changes bte
-        ON bte.validator_index = vl.validator_index
-    GROUP BY "date"
-),
-NonCoalescedDailyDeposits AS (
-    SELECT * FROM NonCoalescedDailyTokenDeposits UNION ALL SELECT * FROM NonCoalescedDailyValidatorDeposits
-),
-MinDate AS (
-    SELECT MIN("date") AS min_date FROM NonCoalescedDailyDeposits
-),
-Series AS (
-    SELECT ROW_NUMBER() OVER () as number FROM eth.recent_transactions
-),
-DateSeries AS (
-    SELECT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
-    FROM Series
-    WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
-),
-TokenSeries AS (
-    SELECT '${STETH_ADDRESS}' AS token
-    UNION ALL
-        SELECT '${CBETH_ADDRESS}'
-    UNION ALL
-        SELECT '${RETH_ADDRESS}'
-    UNION ALL
-        SELECT NULL
-),
-TokenDateCoalesceSeries AS (
-    SELECT
-        ds."date",
-        ts.token
-    FROM DateSeries ds
-    CROSS JOIN TokenSeries ts
-),
-CoalescedDailyDeposits AS (
-    SELECT
-        tdcs."date",
-        tdcs.token,
-        COALESCE(ncdd.total_amount, 0) AS total_amount,
-        COALESCE(ncdd.total_shares, 0) AS total_shares
-    FROM TokenDateCoalesceSeries tdcs
-    LEFT JOIN NonCoalescedDailyDeposits ncdd
-        ON tdcs."date" = ncdd."date" AND (tdcs.token = ncdd.token OR (tdcs.token IS NULL AND ncdd.token IS NULL))
-)
-SELECT
-    cdd."date",
-    cdd.token,
-    cdd.total_amount,
-    cdd.total_shares,
-    SUM(COALESCE(cdd.total_amount, 0)) OVER (PARTITION BY cdd.token ORDER BY cdd."date") AS cumulative_amount,
-    SUM(COALESCE(cdd.total_shares, 0)) OVER (PARTITION BY cdd.token ORDER BY cdd."date") AS cumulative_shares
-FROM CoalescedDailyDeposits cdd
-ORDER BY
-    cdd."date",
-    cdd.token;
+  ),
+  NonCoalescedDailyValidatorDeposits AS (
+      SELECT
+          TO_DATE(GREATEST(
+              COALESCE(ep.block_timestamp, 0),
+              1606824023 + 32 * 12 * activation_eligibility_epoch,
+              COALESCE(bte.block_timestamp, 0)
+          )) as "date",
+          NULL as token,
+          count(*) * 32 AS total_amount,
+          count(*) * 32 AS total_shares
+      FROM eth.beacon.validators vl
+      INNER JOIN eth.eigenlayer.eigenpods ep
+          ON vl.withdrawal_credentials = ep.withdrawal_credential
+      LEFT JOIN eth.beacon.bls_to_execution_changes bte
+          ON bte.validator_index = vl.validator_index
+      GROUP BY "date"
+  ),
+  NonCoalescedDailyDeposits AS (
+      SELECT * FROM NonCoalescedDailyTokenDeposits UNION ALL SELECT * FROM NonCoalescedDailyValidatorDeposits
+  ),
+  MinDate AS (
+      SELECT MIN("date") AS min_date FROM NonCoalescedDailyDeposits
+  ),
+  Series AS (
+      SELECT ROW_NUMBER() OVER () as number FROM eth.recent_transactions
+  ),
+  DateSeries AS (
+      SELECT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
+      FROM Series
+      WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
+  ),
+  TokenSeries AS (
+      SELECT '${STETH_ADDRESS}' AS token
+      UNION ALL
+      SELECT '${CBETH_ADDRESS}'
+      UNION ALL
+          SELECT '${RETH_ADDRESS}'
+      UNION ALL
+          SELECT NULL
+  ),
+  TokenDateCoalesceSeries AS (
+      SELECT
+          ds."date",
+          ts.token
+      FROM DateSeries ds
+      CROSS JOIN TokenSeries ts
+  ),
+  CoalescedDailyDeposits AS (
+      SELECT
+          tdcs."date",
+          tdcs.token,
+          COALESCE(ncdd.total_amount, 0) AS total_amount,
+          COALESCE(ncdd.total_shares, 0) AS total_shares
+      FROM TokenDateCoalesceSeries tdcs
+      LEFT JOIN NonCoalescedDailyDeposits ncdd
+          ON tdcs."date" = ncdd."date" AND (tdcs.token = ncdd.token OR (tdcs.token IS NULL AND ncdd.token IS NULL))
+  ),
+  CumulativeDeposits AS (
+      SELECT
+          cdd."date",
+          cdd.token,
+          cdd.total_amount,
+          cdd.total_shares,
+          SUM(COALESCE(cdd.total_amount, 0)) OVER (PARTITION BY cdd.token ORDER BY cdd."date") AS cumulative_amount,
+          SUM(COALESCE(cdd.total_shares, 0)) OVER (PARTITION BY cdd.token ORDER BY cdd."date") AS cumulative_shares
+      FROM CoalescedDailyDeposits cdd
+  ),
+  Last30DaysData AS (
+    SELECT * FROM CumulativeDeposits as ldd
+    WHERE ldd."date" >= DATE_ADD(CURRENT_DATE, -30)
+  )
+  SELECT
+      ldd."date",
+      ldd.token,
+      ldd.total_amount,
+      ldd.total_shares,
+      ldd.cumulative_amount,
+      ldd.cumulative_shares
+  FROM Last30DaysData ldd
+  ORDER BY
+      ldd."date",
+      ldd.token;
   `);
 
   const rEthDeposits: DailyTokenData[] = [];
@@ -202,9 +216,9 @@ export const getWithdrawals = async (
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM eth.eigenlayer.strategy_manager_withdrawal_completed
     WHERE token IN (
-        '${STETH_ADDRESS}',
-        '${CBETH_ADDRESS}',
-        '${RETH_ADDRESS}'
+         '${STETH_ADDRESS}',
+         '${CBETH_ADDRESS}'
+         '${RETH_ADDRESS}'
     )
     AND receive_as_tokens
     GROUP BY "date", token
@@ -234,15 +248,15 @@ export const getWithdrawals = async (
       FROM eth.blocks
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
-  TokenSeries AS (
-      SELECT '${STETH_ADDRESS}' AS token
-      UNION ALL
-          SELECT '${RETH_ADDRESS}'
-      UNION ALL
-          SELECT '${CBETH_ADDRESS}'
-      UNION ALL
-          SELECT NULL
-    ),
+TokenSeries AS (
+    SELECT '${STETH_ADDRESS}' AS token
+    UNION ALL
+    SELECT '${CBETH_ADDRESS}'
+    UNION ALL
+        SELECT '${RETH_ADDRESS}'
+    UNION ALL
+        SELECT NULL
+),
   AllCombinations AS (
     SELECT 
         ds."date", 
@@ -268,19 +282,23 @@ export const getWithdrawals = async (
           ac."date" = td."date"
       AND
           (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
+    ),
+  Last30DaysData AS (
+      SELECT * FROM CumulativeWithdrawals as cd
+      WHERE cd."date" >= DATE_ADD(CURRENT_DATE, -30)
     )
   SELECT
-    cd."date",
-    cd.token,
-    cd.total_amount,
-    cd.total_shares,
-    cd.cumulative_amount,
-    cd.cumulative_shares
+    ldd."date",
+    ldd.token,
+    ldd.total_amount,
+    ldd.total_shares,
+    ldd.cumulative_amount,
+    ldd.cumulative_shares
   FROM
-    CumulativeWithdrawals cd
+    Last30DaysData ldd
   ORDER BY
-    cd."date",
-    cd.token;
+    ldd."date",
+    ldd.token;
   `);
 
   const rEthWithdrawals: DailyTokenWithdrawals[] = [];
