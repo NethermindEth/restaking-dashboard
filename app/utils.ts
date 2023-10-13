@@ -134,7 +134,7 @@ async function fetchData() {
   );
 
   const totalStakedBeaconChainEthPromise = axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeconChainEth`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`
   );
 
   const stakersBeaconChainEthPromise = axios.get(

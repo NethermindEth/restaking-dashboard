@@ -28,7 +28,7 @@ functions:
     timeout: 15
     events:
       - httpApi:
-          path: /totalStakedBeconChainEth
+          path: /totalStakedBeaconChainEth
           method: get
   stakersBeaconChainEth:
     handler: handler.stakersBeaconChainEth
