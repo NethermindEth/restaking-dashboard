@@ -4,17 +4,17 @@ import {
   DailyTokenData,
   DailyTokenWithdrawals,
   LeaderboardUserData,
+  getContractAddresses,
 } from "./utils";
-
-const STETH_ADDRESS =
-  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84".toLowerCase();
-const CBETH_ADDRESS =
-  "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704".toLowerCase();
-const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393".toLowerCase();
 
 export const getDeposits = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const params = event.queryStringParameters;
+  const chain = params ? params.chain : "eth";
+  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
+    getContractAddresses(chain);
+
   const response = await spiceClient.query(`
   WITH NonCoalescedDailyTokenDeposits AS (
     SELECT
@@ -22,7 +22,7 @@ export const getDeposits = async (
         token,
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares
-    FROM eth.eigenlayer.strategy_manager_deposits
+    FROM ${chain}.eigenlayer.strategy_manager_deposits
     WHERE token IN (
         '${STETH_ADDRESS}',
         '${CBETH_ADDRESS}',
@@ -40,10 +40,10 @@ export const getDeposits = async (
           NULL as token,
           count(*) * 32 AS total_amount,
           count(*) * 32 AS total_shares
-      FROM eth.beacon.validators vl
-      INNER JOIN eth.eigenlayer.eigenpods ep
+      FROM ${chain}.beacon.validators vl
+      INNER JOIN ${chain}.eigenlayer.eigenpods ep
           ON vl.withdrawal_credentials = ep.withdrawal_credential
-      LEFT JOIN eth.beacon.bls_to_execution_changes bte
+      LEFT JOIN ${chain}.beacon.bls_to_execution_changes bte
           ON bte.validator_index = vl.validator_index
       GROUP BY "date"
   ),
@@ -54,7 +54,7 @@ export const getDeposits = async (
       SELECT MIN("date") AS min_date FROM NonCoalescedDailyDeposits
   ),
   Series AS (
-      SELECT ROW_NUMBER() OVER () as number FROM eth.recent_transactions
+      SELECT ROW_NUMBER() OVER () as number FROM ${chain}.recent_transactions
   ),
   DateSeries AS (
       SELECT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
@@ -151,6 +151,11 @@ export const getDeposits = async (
 export const getStrategyDepositLeaderBoard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const params = event.queryStringParameters;
+  const chain = params ? params.chain : "eth";
+  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
+    getContractAddresses(chain);
+
   const response = await spiceClient.query(`
   WITH ranked_deposits AS (
     SELECT
@@ -159,7 +164,7 @@ export const getStrategyDepositLeaderBoard = async (
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares,
         ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
-    FROM eth.eigenlayer.strategy_manager_deposits
+    FROM ${chain}.eigenlayer.strategy_manager_deposits
     WHERE token IN (
         '${STETH_ADDRESS}',
         '${CBETH_ADDRESS}',
@@ -207,6 +212,11 @@ export const getStrategyDepositLeaderBoard = async (
 export const getWithdrawals = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const params = event.queryStringParameters;
+  const chain = params ? params.chain : "eth";
+  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
+    getContractAddresses(chain);
+
   const response = await spiceClient.query(`
   WITH DailyTokenWithdrawals AS (
     SELECT
@@ -214,7 +224,7 @@ export const getWithdrawals = async (
         token,
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares
-    FROM eth.eigenlayer.strategy_manager_withdrawal_completed
+    FROM ${chain}.eigenlayer.strategy_manager_withdrawal_completed
     WHERE token IN (
          '${STETH_ADDRESS}',
           '${CBETH_ADDRESS}',
@@ -230,9 +240,9 @@ export const getWithdrawals = async (
         count(*) * 32 AS total_amount,
         count(*) * 32 AS total_shares
         FROM
-            eth.beacon.validators vl
+            ${chain}.beacon.validators vl
         INNER JOIN
-            eth.eigenlayer.eigenpods ep
+            ${chain}.eigenlayer.eigenpods ep
         ON
             LEFT(vl.withdrawal_credentials, 4) = '0x01' AND vl.withdrawal_credentials = ep.withdrawal_credential
         GROUP BY "date"
@@ -245,7 +255,7 @@ export const getWithdrawals = async (
     ),
   DateSeries AS (
       SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
-      FROM eth.blocks
+      FROM ${chain}.blocks
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
   TokenSeries AS (
@@ -336,13 +346,18 @@ export const getWithdrawals = async (
   };
 };
 
-export async function totalStakedBeaconChainEth() {
+export async function totalStakedBeaconChainEth(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const params = event.queryStringParameters;
+  const chain = params ? params.chain : "eth";
+
   try {
     const result = await spiceClient.query(`
           SELECT SUM(effective_balance)/POW(10,9) as final_balance
-          FROM eth.beacon.validators
-          JOIN eth.eigenlayer.eigenpods
-          ON eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential AND effective_balance!='0'
+          FROM ${chain}.beacon.validators
+          JOIN ${chain}.eigenlayer.eigenpods
+          ON ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential AND effective_balance!='0'
       `);
     return { statusCode: 200, body: result.toString() };
   } catch (err: any) {
@@ -351,21 +366,26 @@ export async function totalStakedBeaconChainEth() {
   }
 }
 
-export async function stakersBeaconChainEth() {
+export async function stakersBeaconChainEth(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const params = event.queryStringParameters;
+  const chain = params ? params.chain : "eth";
+
   try {
     const result = await spiceClient.query(`
     SELECT 
-        eth.eigenlayer.eigenpods.pod_owner,
-        SUM(eth.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
+        ${chain}.eigenlayer.eigenpods.pod_owner,
+        SUM(${chain}.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
     FROM 
-        eth.beacon.validators
+        ${chain}.beacon.validators
     JOIN 
-        eth.eigenlayer.eigenpods
+        ${chain}.eigenlayer.eigenpods
     ON 
-        eth.beacon.validators.withdrawal_credentials = eth.eigenlayer.eigenpods.withdrawal_credential 
-    AND eth.beacon.validators.effective_balance != '0'
+        ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential 
+    AND ${chain}.beacon.validators.effective_balance != '0'
     GROUP BY 
-        eth.eigenlayer.eigenpods.pod_owner
+        ${chain}.eigenlayer.eigenpods.pod_owner
     ORDER BY total_effective_balance DESC;
     `);
 
