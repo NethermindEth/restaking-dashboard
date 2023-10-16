@@ -6,11 +6,11 @@ import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
 import StackedBar from "./charts/StackedBar";
 import LeaderBoard from "./leaderboard";
-import { roundToDecimalPlaces } from "@/lib/utils";
 import Disclaimer from "./Disclaimer";
 import Loader from "./Loader";
-import { getDashboardData } from "../utils";
 import Error from "./Error";
+import { getDashboardData } from "../utils";
+import { roundToDecimalPlaces } from "@/lib/utils";
 
 export default function Data() {
   const [network, updateNetwork] = useState("eth");

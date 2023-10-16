@@ -1,5 +1,6 @@
 import Data from "./components/Data";
 import Image from "next/image";
+
 export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
