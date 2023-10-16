@@ -11,6 +11,7 @@ export const getDeposits = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const params = event.queryStringParameters;
+
   const chain = params ? params.chain : "eth";
   const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
     getContractAddresses(chain);

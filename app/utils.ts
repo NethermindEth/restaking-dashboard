@@ -21,14 +21,14 @@ import {
 } from "@/lib/utils";
 import axios from "axios";
 
-export async function getDashboardData() {
+export async function getDashboardData(network?: string) {
   const {
     depositData,
     withdrawData,
     totalStakedBeaconChainEth,
     stakersBeaconChainEth,
     depositDataStakers,
-  } = await fetchData();
+  } = await fetchData(network);
 
   const {
     chartDataDepositsDaily,
@@ -120,25 +120,51 @@ export async function getDashboardData() {
   };
 }
 
-async function fetchData() {
+async function fetchData(network?: string) {
+  console.log(network);
   const depositDataPromise = axios.get<Deposits>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`,
+    {
+      params: {
+        chain: network,
+      },
+    }
   );
 
   const withdrawDataPromise = axios.get<Withdrawals>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals`,
+    {
+      params: {
+        chain: network,
+      },
+    }
   );
 
   const depositDataStakersPromise = axios.get<DepositStakersData>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`,
+    {
+      params: {
+        chain: network,
+      },
+    }
   );
 
   const totalStakedBeaconChainEthPromise = axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`,
+    {
+      params: {
+        chain: network,
+      },
+    }
   );
 
   const stakersBeaconChainEthPromise = axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`,
+    {
+      params: {
+        chain: network,
+      },
+    }
   );
 
   const [
