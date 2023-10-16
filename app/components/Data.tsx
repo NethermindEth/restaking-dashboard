@@ -12,16 +12,6 @@ import Loader from "./Loader";
 import { getDashboardData } from "../utils";
 import Error from "./Error";
 
-async function fetchData(network: string) {
-  try {
-    const data = await getDashboardData(network);
-    return data;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
-
 export default function Data() {
   const [network, updateNetwork] = useState("eth");
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -29,13 +19,17 @@ export default function Data() {
 
   useEffect(() => {
     setDashboardData(null);
-    fetchData(network).then((data) => {
-      if (data) {
+
+    async function fetchData() {
+      try {
+        const data = await getDashboardData(network);
         setDashboardData(data);
-      } else {
+      } catch (error) {
         setError("Something went wrong! Try reloading the page");
       }
-    });
+    }
+
+    fetchData();
   }, [network]);
 
   return (
