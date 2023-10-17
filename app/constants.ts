@@ -11,3 +11,37 @@ export const RETH_STRATEGY_ADDRESS =
 
 export const MAX_LEADERBOARD_SIZE = 50;
 export const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");
+
+export const networkTokens = (network: string) => {
+  switch (network) {
+    case "eth": {
+      return {
+        stEth: {
+          image: "/steth.webp",
+          color: "data-card-steth",
+        },
+        rEth: {
+          image: "/reth.webp",
+          color: "data-card-reth",
+        },
+        cbEth: {
+          image: "/cbeth.png",
+          color: "data-card-cbeth",
+        },
+      };
+    }
+    case "goerli": {
+      return {
+        stEth: {
+          image: "/steth_logo.webp",
+        },
+        rEth: {
+          image: "/reth.webp",
+        },
+      };
+    }
+    default: {
+      throw Error("Invalid token");
+    }
+  }
+};

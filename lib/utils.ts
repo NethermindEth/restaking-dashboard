@@ -67,13 +67,15 @@ export function extractAmountsAndTimestamps(
   amounts: number[][];
   timestamps: string[];
 } {
-  const amounts = data.map((tokenData) =>
+  const nonEmptyData = data.filter((tokenData) => tokenData.length > 0);
+
+  const amounts = nonEmptyData.map((tokenData) =>
     tokenData.map((el) =>
       cumulative ? el.cumulative_amount! : el.total_amount!
     )
   );
 
-  const dates = data
+  const dates = nonEmptyData
     .map((tokenData) => tokenData.map((el) => el.date))
     .sort((a, b) => a.length - b.length)[0];
 

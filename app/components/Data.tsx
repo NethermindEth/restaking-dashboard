@@ -11,9 +11,10 @@ import Loader from "./Loader";
 import Error from "./Error";
 import { getDashboardData } from "../utils";
 import { roundToDecimalPlaces } from "@/lib/utils";
+import { networkTokens } from "../constants";
 
 export default function Data() {
-  const [network, updateNetwork] = useState("goerli");
+  const [network, updateNetwork] = useState("eth");
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [error, setError] = useState("");
 
@@ -47,6 +48,7 @@ export default function Data() {
                 className="form-control"
                 value={network}
                 onChange={(e) => {
+                  setDashboardData(null);
                   updateNetwork(e.target.value);
                 }}
               >
@@ -56,38 +58,19 @@ export default function Data() {
             </div>
           </div>
           <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
-            <div className="data-card data-card-steth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-              <span className="inline-block">
-                <Image
-                  src={"/steth_logo.webp"}
-                  alt="stETH"
-                  width={48}
-                  height={48}
-                />
-              </span>
-              <p className="text-sm md:text-base">Staked stETH</p>
-              <p className="md:text-xl">
-                {roundToDecimalPlaces(dashboardData.stEthTvl)}
-              </p>
-            </div>
-            <div className="data-card data-card-reth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-              <span className="inline-block ">
-                <Image src={"/reth.webp"} alt="rETH" width={48} height={48} />
-              </span>
-              <p className="text-sm md:text-base">Staked rETH</p>
-              <p className="md:text-xl">
-                {roundToDecimalPlaces(dashboardData.rEthTvl)}
-              </p>
-            </div>
-            <div className="data-card data-card-cbeth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
-              <span className="inline-block ">
-                <Image src={"/cbeth.png"} alt="cbETH" width={48} height={48} />
-              </span>
-              <p className="text-sm md:text-base">Staked cbETH</p>
-              <p className="md:text-xl">
-                {roundToDecimalPlaces(dashboardData.cbEthTvl)}
-              </p>
-            </div>
+            {Object.entries(networkTokens(network)).map(([key, value]) => (
+              <div
+                className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+              >
+                <span className="inline-block">
+                  <Image src={value.image} alt={key} width={48} height={48} />
+                </span>
+                <p className="text-sm md:text-base">Staked {key}</p>
+                <p className="md:text-xl">
+                  {roundToDecimalPlaces(dashboardData[`${key}Tvl`])}
+                </p>
+              </div>
+            ))}
             <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
               <span className="inline-block">
                 <Image
@@ -116,7 +99,7 @@ export default function Data() {
                     amounts: dashboardData.chartDataDepositsCumulative.amounts,
                     timestamps:
                       dashboardData.chartDataDepositsCumulative.timestamps,
-                    namedLabels: ["stETH", "rETH", "cbETH"],
+                    namedLabels: Object.keys(networkTokens(network)),
                   }}
                 />
               </div>
@@ -128,7 +111,7 @@ export default function Data() {
                   data={{
                     amounts: dashboardData.chartDataDepositsDaily.amounts,
                     labels: dashboardData.chartDataDepositsDaily.timestamps,
-                    namedLabels: ["stETH", "rETH", "cbETH"],
+                    namedLabels: Object.keys(networkTokens(network)),
                   }}
                   title="Deposited tokens by day"
                 />
@@ -147,7 +130,7 @@ export default function Data() {
                       dashboardData.chartDataWithdrawalsCumulative.amounts,
                     timestamps:
                       dashboardData.chartDataWithdrawalsCumulative.timestamps,
-                    namedLabels: ["stETH", "rETH", "cbETH"],
+                    namedLabels: Object.keys(networkTokens(network)),
                   }}
                 />
               </div>
@@ -160,7 +143,7 @@ export default function Data() {
                   data={{
                     amounts: dashboardData.chartDataWithdrawalsDaily.amounts,
                     labels: dashboardData.chartDataWithdrawalsDaily.timestamps,
-                    namedLabels: ["stETH", "rETH", "cbETH"],
+                    namedLabels: Object.keys(networkTokens(network)),
                   }}
                   title="Token Withdrawals by day"
                 />

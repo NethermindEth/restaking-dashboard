@@ -125,7 +125,7 @@ async function fetchData(network?: string) {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`,
     {
       params: {
-        chain: "eth",
+        chain: network,
       },
     }
   );
