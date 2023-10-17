@@ -22,7 +22,7 @@ export const getDeposits = async (
 ): Promise<APIGatewayProxyResult> => {
   const { queryStringParameters: { chain } } = getDepositsSchema.parse(event);
 
-  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } = getContractAddresses(chain);
+  const { stEthAddress, cbEthAddress, rEthAddress } = getContractAddresses(chain);
 
   const response = await spiceClient.query(`
   WITH NonCoalescedDailyTokenDeposits AS (
@@ -33,9 +33,9 @@ export const getDeposits = async (
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM ${chain}.eigenlayer.strategy_manager_deposits
     WHERE token IN (
-        '${STETH_ADDRESS}',
-        '${CBETH_ADDRESS}',
-        '${RETH_ADDRESS}'
+        '${stEthAddress}',
+        '${cbEthAddress}',
+        '${rEthAddress}'
     )
     GROUP BY "date", token
   ),
@@ -71,11 +71,11 @@ export const getDeposits = async (
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
   ),
   TokenSeries AS (
-      SELECT '${STETH_ADDRESS}' AS token
+      SELECT '${stEthAddress}' AS token
       UNION ALL
-      SELECT '${CBETH_ADDRESS}'
+      SELECT '${cbEthAddress}'
       UNION ALL
-          SELECT '${RETH_ADDRESS}'
+          SELECT '${rEthAddress}'
       UNION ALL
           SELECT NULL
   ),
@@ -132,13 +132,13 @@ export const getDeposits = async (
 
   array.forEach((ele) => {
     switch (ele.token) {
-      case RETH_ADDRESS:
+      case rEthAddress:
         rEthDeposits.push(ele);
         break;
-      case CBETH_ADDRESS:
+      case cbEthAddress:
         cbEthDeposits.push(ele);
         break;
-      case STETH_ADDRESS:
+      case stEthAddress:
         stEthDeposits.push(ele);
         break;
       case null:
@@ -170,7 +170,7 @@ export const getStrategyDepositLeaderBoard = async (
 ): Promise<APIGatewayProxyResult> => {
   const { queryStringParameters: { chain } } = getStrategyDepositLeaderBoardSchema.parse(event);
 
-  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } = getContractAddresses(chain);
+  const { stEthAddress, cbEthAddress, rEthAddress } = getContractAddresses(chain);
 
   const response = await spiceClient.query(`
   WITH ranked_deposits AS (
@@ -182,9 +182,9 @@ export const getStrategyDepositLeaderBoard = async (
         ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
     FROM ${chain}.eigenlayer.strategy_manager_deposits
     WHERE token IN (
-        '${STETH_ADDRESS}',
-        '${CBETH_ADDRESS}',
-        '${RETH_ADDRESS}'
+        '${stEthAddress}',
+        '${cbEthAddress}',
+        '${rEthAddress}'
     )
     GROUP BY depositor, token
 )
@@ -207,13 +207,13 @@ export const getStrategyDepositLeaderBoard = async (
     };
 
     switch (ele.token) {
-      case RETH_ADDRESS:
+      case rEthAddress:
         rEthDeposits.push(ele);
         break;
-      case CBETH_ADDRESS:
+      case cbEthAddress:
         cbEthDeposits.push(ele);
         break;
-      case STETH_ADDRESS:
+      case stEthAddress:
         stEthDeposits.push(ele);
         break;
     }
@@ -238,7 +238,7 @@ export const getWithdrawals = async (
 ): Promise<APIGatewayProxyResult> => {
   const { queryStringParameters: { chain } } = getWithdrawalsSchema.parse(event);
 
-  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
+  const { stEthAddress, cbEthAddress, rEthAddress } =
     getContractAddresses(chain);
 
   const response = await spiceClient.query(`
@@ -250,9 +250,9 @@ export const getWithdrawals = async (
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM ${chain}.eigenlayer.strategy_manager_withdrawal_completed
     WHERE token IN (
-         '${STETH_ADDRESS}',
-          '${CBETH_ADDRESS}',
-          '${RETH_ADDRESS}'
+         '${stEthAddress}',
+          '${cbEthAddress}',
+          '${rEthAddress}'
     )
     AND receive_as_tokens
     GROUP BY "date", token
@@ -283,11 +283,11 @@ export const getWithdrawals = async (
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
   TokenSeries AS (
-      SELECT '${STETH_ADDRESS}' AS token
+      SELECT '${stEthAddress}' AS token
       UNION ALL
-      SELECT '${CBETH_ADDRESS}'
+      SELECT '${cbEthAddress}'
       UNION ALL
-          SELECT '${RETH_ADDRESS}'
+          SELECT '${rEthAddress}'
       UNION ALL
           SELECT NULL
   ),
@@ -345,13 +345,13 @@ export const getWithdrawals = async (
   // @ts-ignore
   array.forEach((ele) => {
     switch (ele.token) {
-      case RETH_ADDRESS:
+      case rEthAddress:
         rEthWithdrawals.push(ele);
         break;
-      case CBETH_ADDRESS:
+      case cbEthAddress:
         cbEthWithdrawals.push(ele);
         break;
-      case STETH_ADDRESS:
+      case stEthAddress:
         stEthWithdrawals.push(ele);
         break;
       default:
