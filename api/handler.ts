@@ -200,7 +200,7 @@ export const getStrategyDepositLeaderBoard = async (
   const deposits = response.toArray();
 
   deposits.forEach((ele) => {
-    ele = {
+    const entry = {
       totalStaked: ele.total_shares,
       depositor: ele.depositor,
       token: ele.token,
@@ -208,13 +208,13 @@ export const getStrategyDepositLeaderBoard = async (
 
     switch (ele.token) {
       case rEthAddress:
-        rEthDeposits.push(ele);
+        rEthDeposits.push(entry);
         break;
       case cbEthAddress:
-        cbEthDeposits.push(ele);
+        cbEthDeposits.push(entry);
         break;
       case stEthAddress:
-        stEthDeposits.push(ele);
+        stEthDeposits.push(entry);
         break;
     }
   });
