@@ -11,10 +11,15 @@ export interface LeaderboardUserData {
   totalStaked: number;
 }
 
-export interface DepositStakersData {
-  stEthDeposits: LeaderboardUserData[];
-  cbEthDeposits: LeaderboardUserData[];
-  rEthDeposits: LeaderboardUserData[];
+export interface DepositStakerData {
+  depositor: string;
+  total_shares: number;
+}
+
+export interface DepositStakers {
+  stEthDeposits: DepositStakerData[];
+  cbEthDeposits: DepositStakerData[];
+  rEthDeposits: DepositStakerData[];
 }
 
 export interface DailyTokenWithdrawals {

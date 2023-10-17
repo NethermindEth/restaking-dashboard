@@ -25,7 +25,7 @@ export const getDeposits = async (
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
 
-  const response = await spiceClient.query(`
+  const response = (await spiceClient.query(`
   WITH NonCoalescedDailyTokenDeposits AS (
     SELECT
         TO_DATE(block_timestamp) AS "date",
@@ -113,38 +113,21 @@ export const getDeposits = async (
   ORDER BY
       ldd."date",
       ldd.token;
-  `);
+  `)).toArray();
 
-  const rEthDeposits: DailyTokenData[] = [];
-  const cbEthDeposits: DailyTokenData[] = [];
-  const stEthDeposits: DailyTokenData[] = [];
-  const beaconChainDeposits: DailyTokenData[] = [];
+  const groupedResponse = response.reduce((acc, el) => {
+    if (!acc[el.token]) acc[el.token] = [];
 
-  const array = response.toArray();
-
-  array.forEach((ele) => {
-    switch (ele.token) {
-      case rEthAddress:
-        rEthDeposits.push(ele);
-        break;
-      case cbEthAddress:
-        cbEthDeposits.push(ele);
-        break;
-      case stEthAddress:
-        stEthDeposits.push(ele);
-        break;
-      case null:
-        beaconChainDeposits.push(ele);
-    }
-  });
+    acc[el.token].push(el);
+  }, {});
 
   return {
     statusCode: 200,
     body: JSON.stringify({
-      stEthDeposits,
-      cbEthDeposits,
-      rEthDeposits,
-      beaconChainDeposits,
+      stEthDeposits: stEthAddress ? groupedResponse[stEthAddress] : null,
+      cbEthDeposits: cbEthAddress ? groupedResponse[cbEthAddress] : null,
+      rEthDeposits: rEthAddress ? groupedResponse[rEthAddress] : null,
+      beaconChainDeposits: groupedResponse["null"],
     }),
   };
 };
@@ -165,7 +148,7 @@ export const getStrategyDepositLeaderBoard = async (
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
 
-  const response = await spiceClient.query(`
+  const response = (await spiceClient.query(`
   WITH ranked_deposits AS (
     SELECT
         depositor,
@@ -176,41 +159,25 @@ export const getStrategyDepositLeaderBoard = async (
     FROM ${chain}.eigenlayer.strategy_manager_deposits
     WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
     GROUP BY depositor, token
-)
+  )
     SELECT *
     FROM ranked_deposits
     WHERE rn <= 50;
-`);
+  `)).toArray();
 
-  const rEthDeposits: LeaderboardUserData[] = [];
-  const cbEthDeposits: LeaderboardUserData[] = [];
-  const stEthDeposits: LeaderboardUserData[] = [];
+  const groupedResponse = response.reduce((acc, el) => {
+    if (!acc[el.token]) acc[el.token] = [];
 
-  const deposits = response.toArray();
-
-  deposits.forEach((ele) => {
-    const entry = {
-      totalStaked: ele.total_shares,
-      depositor: ele.depositor,
-      token: ele.token,
-    };
-
-    switch (ele.token) {
-      case rEthAddress:
-        rEthDeposits.push(entry);
-        break;
-      case cbEthAddress:
-        cbEthDeposits.push(entry);
-        break;
-      case stEthAddress:
-        stEthDeposits.push(entry);
-        break;
-    }
-  });
+    acc[el.token].push(el);
+  }, {});
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ stEthDeposits, cbEthDeposits, rEthDeposits }),
+    body: JSON.stringify({
+      stEthDeposits: stEthAddress ? groupedResponse[stEthAddress] : null,
+      cbEthDeposits: cbEthAddress ? groupedResponse[cbEthAddress] : null,
+      rEthDeposits: rEthAddress ? groupedResponse[rEthAddress] : null,
+    }),
   };
 };
 
@@ -230,7 +197,7 @@ export const getWithdrawals = async (
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
 
-  const response = await spiceClient.query(`
+  const response = (await spiceClient.query(`
   WITH DailyTokenWithdrawals AS (
     SELECT
         TO_DATE(block_timestamp) AS "date",
@@ -313,39 +280,21 @@ export const getWithdrawals = async (
     ORDER BY
       ldd."date",
       ldd.token;
-  `);
+  `)).toArray();
 
-  const rEthWithdrawals: DailyTokenWithdrawals[] = [];
-  const cbEthWithdrawals: DailyTokenWithdrawals[] = [];
-  const stEthWithdrawals: DailyTokenWithdrawals[] = [];
-  const beaconChainWithdrawals: DailyTokenWithdrawals[] = [];
+  const groupedResponse = response.reduce((acc, el) => {
+    if (!acc[el.token]) acc[el.token] = [];
 
-  const array = response.toArray();
-
-  // @ts-ignore
-  array.forEach((ele) => {
-    switch (ele.token) {
-      case rEthAddress:
-        rEthWithdrawals.push(ele);
-        break;
-      case cbEthAddress:
-        cbEthWithdrawals.push(ele);
-        break;
-      case stEthAddress:
-        stEthWithdrawals.push(ele);
-        break;
-      default:
-        beaconChainWithdrawals.push(ele);
-    }
-  });
+    acc[el.token].push(el);
+  }, {});
 
   return {
     statusCode: 200,
     body: JSON.stringify({
-      stEthWithdrawals,
-      cbEthWithdrawals,
-      rEthWithdrawals,
-      beaconChainWithdrawals,
+      stEthWithdrawals: stEthAddress ? groupedResponse[stEthAddress] : null,
+      cbEthWithdrawals: cbEthAddress ? groupedResponse[cbEthAddress] : null,
+      rEthWithdrawals: rEthAddress ? groupedResponse[rEthAddress] : null,
+      beaconChainWithdrawals: groupedResponse["null"],
     }),
   };
 };

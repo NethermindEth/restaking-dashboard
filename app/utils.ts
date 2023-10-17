@@ -17,7 +17,7 @@ import {
   Deposits,
   Withdrawals,
   extractAmountsAndTimestamps,
-  DepositStakersData,
+  DepositStakers,
 } from "@/lib/utils";
 import axios from "axios";
 
@@ -27,7 +27,7 @@ export async function getDashboardData() {
     withdrawData,
     totalStakedBeaconChainEth,
     stakersBeaconChainEth,
-    depositDataStakers,
+    depositStakersData,
   } = await fetchData();
 
   const {
@@ -40,7 +40,7 @@ export async function getDashboardData() {
     stakersStEth,
     stakersCbEth,
     stakersREth,
-  } = generateChartData(depositData, withdrawData, depositDataStakers);
+  } = generateChartData(depositData, withdrawData, depositStakersData);
 
   const {
     stEthSharesRate,
@@ -63,21 +63,21 @@ export async function getDashboardData() {
     });
 
   const stakersREthConverted: LeaderboardUserData[] = stakersREth.map((d) => ({
-    depositor: d.depositor!,
-    totalStaked: d.totalStaked! * rEthSharesRate * rEthRate,
+    depositor: d.depositor,
+    totalStaked: d.total_shares * rEthSharesRate * rEthRate,
   }));
 
   const stakersStEthConverted: LeaderboardUserData[] = stakersStEth.map(
     (d) => ({
-      depositor: d.depositor!,
-      totalStaked: d.totalStaked! * stEthSharesRate,
+      depositor: d.depositor,
+      totalStaked: d.total_shares * stEthSharesRate,
     })
   );
 
   const stakersCbEthConverted: LeaderboardUserData[] = stakersCbEth.map(
     (d) => ({
-      depositor: d.depositor!,
-      totalStaked: d.totalStaked! * cbEthSharesRate * cbEthRate,
+      depositor: d.depositor,
+      totalStaked: d.total_shares! * cbEthSharesRate * cbEthRate,
     })
   );
 
@@ -139,7 +139,7 @@ async function fetchData() {
     }
   );
 
-  const depositDataStakersPromise = axios.get<DepositStakersData>(
+  const depositStakersDataPromise = axios.get<DepositStakers>(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`,
     {
       params: {
@@ -171,13 +171,13 @@ async function fetchData() {
     withdrawDataResponse,
     totalStakedBeaconResponse,
     stakersBeaconChainEthResponse,
-    depositDataStakersResponse,
+    depositStakersDataResponse,
   ] = await Promise.all([
     depositDataPromise,
     withdrawDataPromise,
     totalStakedBeaconChainEthPromise,
     stakersBeaconChainEthPromise,
-    depositDataStakersPromise,
+    depositStakersDataPromise,
   ]);
 
   const depositData = depositDataResponse.data;
@@ -187,21 +187,21 @@ async function fetchData() {
     totalStakedBeaconResponse.data[0].final_balance;
 
   const stakersBeaconChainEth = stakersBeaconChainEthResponse.data;
-  const depositDataStakers = depositDataStakersResponse.data;
+  const depositStakersData = depositStakersDataResponse.data;
 
   return {
     depositData,
     withdrawData,
     totalStakedBeaconChainEth,
     stakersBeaconChainEth,
-    depositDataStakers,
+    depositStakersData,
   };
 }
 
 function generateChartData(
   depositData: Deposits,
   withdrawData: Withdrawals,
-  depositDataStakers: DepositStakersData
+  depositStakersData: DepositStakers
 ) {
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
     false,
@@ -242,11 +242,11 @@ function generateChartData(
     withdrawData.cbEthWithdrawals
   );
 
-  const stakersStEth = depositDataStakers.stEthDeposits || [];
+  const stakersStEth = depositStakersData.stEthDeposits || [];
 
-  const stakersCbEth = depositDataStakers.cbEthDeposits || [];
+  const stakersCbEth = depositStakersData.cbEthDeposits || [];
 
-  const stakersREth = depositDataStakers.rEthDeposits || [];
+  const stakersREth = depositStakersData.rEthDeposits || [];
 
   return {
     chartDataDepositsDaily,
