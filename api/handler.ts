@@ -259,7 +259,7 @@ export const getWithdrawals = async (
    ),
   DailyValidatorWithdrawals AS (
     SELECT
-        TO_DATE(1606845623 + 32 * 12 * exit_epoch) as "date",
+        TO_DATE(1606824023 + 32 * 12 * exit_epoch) as "date",
         NULL as token,
         count(*) * 32 AS total_amount,
         count(*) * 32 AS total_shares
