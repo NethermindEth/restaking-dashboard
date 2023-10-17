@@ -11,9 +11,9 @@ import {
 
 const getDepositsSchema = z.object({
   queryStringParameters: z.object({
-    chain: z.enum(supportedChains).default("mainnet"),
+    chain: z.enum(supportedChains).default("eth"),
   }).default({
-    chain: "mainnet",
+    chain: "eth",
   }),
 });
 
@@ -159,9 +159,9 @@ export const getDeposits = async (
 
 const getStrategyDepositLeaderBoardSchema = z.object({
   queryStringParameters: z.object({
-    chain: z.enum(supportedChains).default("mainnet"),
+    chain: z.enum(supportedChains).default("eth"),
   }).default({
-    chain: "mainnet",
+    chain: "eth",
   }),
 });
 
@@ -227,9 +227,9 @@ export const getStrategyDepositLeaderBoard = async (
 
 const getWithdrawalsSchema = z.object({
   queryStringParameters: z.object({
-    chain: z.enum(supportedChains).default("mainnet"),
+    chain: z.enum(supportedChains).default("eth"),
   }).default({
-    chain: "mainnet",
+    chain: "eth",
   }),
 });
 
@@ -372,9 +372,9 @@ export const getWithdrawals = async (
 
 const totalStakedBeaconChainEthSchema = z.object({
   queryStringParameters: z.object({
-    chain: z.enum(supportedChains).default("mainnet"),
+    chain: z.enum(supportedChains).default("eth"),
   }).default({
-    chain: "mainnet",
+    chain: "eth",
   }),
 });
 
@@ -399,9 +399,9 @@ export async function totalStakedBeaconChainEth(
 
 const stakersBeaconChainEthSchema = z.object({
   queryStringParameters: z.object({
-    chain: z.enum(supportedChains).default("mainnet"),
+    chain: z.enum(supportedChains).default("eth"),
   }).default({
-    chain: "mainnet",
+    chain: "eth",
   }),
 });
 

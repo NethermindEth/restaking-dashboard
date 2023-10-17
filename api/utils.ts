@@ -17,12 +17,12 @@ export interface LeaderboardUserData {
   totalStaked: number;
 }
 
-export const supportedChains = ["mainnet", "goerli"] as const;
+export const supportedChains = ["eth", "goerli"] as const;
 export type Chain = typeof supportedChains[number];
 
 export function getContractAddresses(chain: Chain) {
   switch (chain) {
-    case "mainnet":
+    case "eth":
       return {
         stEthAddress: "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
         cbEthAddress: "0x7c6b91d9be155a6db01f749217d76ff02a7227f2",
