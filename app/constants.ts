@@ -8,5 +8,6 @@ export const CBETH_STRATEGY_ADDRESS =
   "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc";
 export const RETH_STRATEGY_ADDRESS =
   "0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2";
+
 export const MAX_LEADERBOARD_SIZE = 50;
 export const provider = new ethers.JsonRpcProvider("https://rpc.ankr.com/eth");

@@ -21,14 +21,14 @@ import {
 } from "@/lib/utils";
 import axios from "axios";
 
-export async function getDashboardData() {
+export async function getDashboardData(network?: string) {
   const {
     depositData,
     withdrawData,
     totalStakedBeaconChainEth,
     stakersBeaconChainEth,
     depositStakersData,
-  } = await fetchData();
+  } = await fetchData(network);
 
   const {
     chartDataDepositsDaily,
@@ -120,7 +120,7 @@ export async function getDashboardData() {
   };
 }
 
-async function fetchData() {
+async function fetchData(network?: string) {
   const depositDataPromise = axios.get<Deposits>(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`,
     {
@@ -134,16 +134,16 @@ async function fetchData() {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals`,
     {
       params: {
-        chain: "eth",
+        chain: network,
       },
     }
   );
 
-  const depositStakersDataPromise = axios.get<DepositStakers>(
+  const depositStakersDataPromise = axios.get(
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`,
     {
       params: {
-        chain: "eth",
+        chain: network,
       },
     }
   );
@@ -152,7 +152,7 @@ async function fetchData() {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`,
     {
       params: {
-        chain: "eth",
+        chain: network,
       },
     }
   );
@@ -161,7 +161,7 @@ async function fetchData() {
     `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`,
     {
       params: {
-        chain: "eth",
+        chain: network,
       },
     }
   );
@@ -205,41 +205,41 @@ function generateChartData(
 ) {
   const chartDataDepositsDaily = extractAmountsAndTimestamps(
     false,
-    depositData.stEthDeposits,
-    depositData.rEthDeposits,
-    depositData.cbEthDeposits
+    depositData.stEthDeposits || [],
+    depositData.rEthDeposits || [],
+    depositData.cbEthDeposits || []
   );
 
   const chartDataDepositsCumulative = extractAmountsAndTimestamps(
     true,
-    depositData.stEthDeposits,
-    depositData.rEthDeposits,
-    depositData.cbEthDeposits
+    depositData.stEthDeposits || [],
+    depositData.rEthDeposits || [],
+    depositData.cbEthDeposits || []
   );
 
   // all bool values herafter are for test purpose only for now
   const chartDataBeaconStakesDaily = extractAmountsAndTimestamps(
     false,
-    depositData.beaconChainDeposits
+    depositData.beaconChainDeposits || []
   );
 
   const chartDataBeaconStakesCumulative = extractAmountsAndTimestamps(
     true,
-    depositData.beaconChainDeposits
+    depositData.beaconChainDeposits || []
   );
 
   const chartDataWithdrawalsDaily = extractAmountsAndTimestamps(
     false,
-    withdrawData.stEthWithdrawals,
-    withdrawData.rEthWithdrawals,
-    withdrawData.cbEthWithdrawals
+    withdrawData.stEthWithdrawals || [],
+    withdrawData.rEthWithdrawals || [],
+    withdrawData.cbEthWithdrawals || []
   );
 
   const chartDataWithdrawalsCumulative = extractAmountsAndTimestamps(
     true,
-    withdrawData.stEthWithdrawals,
-    withdrawData.rEthWithdrawals,
-    withdrawData.cbEthWithdrawals
+    withdrawData.stEthWithdrawals || [],
+    withdrawData.rEthWithdrawals || [],
+    withdrawData.cbEthWithdrawals || []
   );
 
   const stakersStEth = depositStakersData.stEthDeposits || [];

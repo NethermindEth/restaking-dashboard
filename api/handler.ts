@@ -18,14 +18,17 @@ const getDepositsSchema = z.object({
 export const getDeposits = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const { queryStringParameters: { chain } } = getDepositsSchema.parse(event);
+  const {
+    queryStringParameters: { chain },
+  } = getDepositsSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
 
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
-  const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
+  const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
-  const response = (await spiceClient.query(`
+  const response = (
+    await spiceClient.query(`
   WITH NonCoalescedDailyTokenDeposits AS (
     SELECT
         TO_DATE(block_timestamp) AS "date",
@@ -33,7 +36,7 @@ export const getDeposits = async (
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM ${chain}.eigenlayer.strategy_manager_deposits
-    WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
+    WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
     GROUP BY "date", token
   ),
   NonCoalescedDailyValidatorDeposits AS (
@@ -69,7 +72,7 @@ export const getDeposits = async (
   ),
   TokenSeries AS (
       SELECT NULL AS token
-      ${tokenAddressList.map(addr => `UNION ALL SELECT '${addr}'`).join("\n")}
+      ${tokenAddressList.map((addr) => `UNION ALL SELECT '${addr}'`).join("\n")}
   ),
   TokenDateCoalesceSeries AS (
       SELECT
@@ -113,12 +116,15 @@ export const getDeposits = async (
   ORDER BY
       ldd."date",
       ldd.token;
-  `)).toArray();
+  `)
+  ).toArray();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
 
     acc[el.token].push(el);
+
+    return acc;
   }, {});
 
   return {
@@ -135,20 +141,23 @@ export const getDeposits = async (
 const getStrategyDepositLeaderBoardSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
-  })
+  }),
 });
 
 export const getStrategyDepositLeaderBoard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const { queryStringParameters: { chain } } = getStrategyDepositLeaderBoardSchema.parse(event);
+  const {
+    queryStringParameters: { chain },
+  } = getStrategyDepositLeaderBoardSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
 
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
-  const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
+  const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
-  const response = (await spiceClient.query(`
+  const response = (
+    await spiceClient.query(`
   WITH ranked_deposits AS (
     SELECT
         depositor,
@@ -157,18 +166,25 @@ export const getStrategyDepositLeaderBoard = async (
         SUM(shares) / POWER(10, 18) AS total_shares,
         ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
     FROM ${chain}.eigenlayer.strategy_manager_deposits
-    WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
+    WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
     GROUP BY depositor, token
   )
     SELECT *
     FROM ranked_deposits
     WHERE rn <= 50;
-  `)).toArray();
+  `)
+  ).toArray();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
+    acc[el.token].push({
+      depositor: el.depositor,
+      token: el.token,
+      total_amount: el.total_amount,
+      total_shares: el.total_shares,
+    });
 
-    acc[el.token].push(el);
+    return acc;
   }, {});
 
   return {
@@ -184,20 +200,23 @@ export const getStrategyDepositLeaderBoard = async (
 const getWithdrawalsSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
-  })
+  }),
 });
 
 export const getWithdrawals = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const { queryStringParameters: { chain } } = getWithdrawalsSchema.parse(event);
+  const {
+    queryStringParameters: { chain },
+  } = getWithdrawalsSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
 
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
-  const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
+  const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
-  const response = (await spiceClient.query(`
+  const response = (
+    await spiceClient.query(`
   WITH DailyTokenWithdrawals AS (
     SELECT
         TO_DATE(block_timestamp) AS "date",
@@ -205,7 +224,7 @@ export const getWithdrawals = async (
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM ${chain}.eigenlayer.strategy_manager_withdrawal_completed
-    WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
+    WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
     AND receive_as_tokens
     GROUP BY "date", token
    ),
@@ -236,7 +255,7 @@ export const getWithdrawals = async (
     ),
   TokenSeries AS (
       SELECT NULL AS token
-      ${tokenAddressList.map(addr => `UNION ALL SELECT '${addr}'`).join("\n")}
+      ${tokenAddressList.map((addr) => `UNION ALL SELECT '${addr}'`).join("\n")}
   ),
   AllCombinations AS (
     SELECT 
@@ -280,12 +299,15 @@ export const getWithdrawals = async (
     ORDER BY
       ldd."date",
       ldd.token;
-  `)).toArray();
+  `)
+  ).toArray();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
 
     acc[el.token].push(el);
+
+    return acc;
   }, {});
 
   return {
@@ -302,13 +324,15 @@ export const getWithdrawals = async (
 const totalStakedBeaconChainEthSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
-  })
+  }),
 });
 
 export async function totalStakedBeaconChainEth(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const { queryStringParameters: { chain } } = totalStakedBeaconChainEthSchema.parse(event);
+  const {
+    queryStringParameters: { chain },
+  } = totalStakedBeaconChainEthSchema.parse(event);
 
   try {
     const result = await spiceClient.query(`
@@ -327,13 +351,15 @@ export async function totalStakedBeaconChainEth(
 const stakersBeaconChainEthSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
-  })
+  }),
 });
 
 export async function stakersBeaconChainEth(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const { queryStringParameters: { chain } } = stakersBeaconChainEthSchema.parse(event);
+  const {
+    queryStringParameters: { chain },
+  } = stakersBeaconChainEthSchema.parse(event);
 
   try {
     const result = await spiceClient.query(`
