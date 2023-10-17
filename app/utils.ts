@@ -122,23 +122,48 @@ export async function getDashboardData() {
 
 async function fetchData() {
   const depositDataPromise = axios.get<Deposits>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits`,
+    {
+      params: {
+        chain: "eth",
+      },
+    }
   );
 
   const withdrawDataPromise = axios.get<Withdrawals>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals`,
+    {
+      params: {
+        chain: "eth",
+      },
+    }
   );
 
   const depositDataStakersPromise = axios.get<DepositStakersData>(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`,
+    {
+      params: {
+        chain: "eth",
+      },
+    }
   );
 
   const totalStakedBeaconChainEthPromise = axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`,
+    {
+      params: {
+        chain: "eth",
+      },
+    }
   );
 
   const stakersBeaconChainEthPromise = axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/stakersBeaconChainEth`,
+    {
+      params: {
+        chain: "eth",
+      },
+    }
   );
 
   const [
