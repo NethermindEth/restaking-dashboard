@@ -1,19 +1,28 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { z } from "zod";
 import spiceClient from "./spice";
 import {
   DailyTokenData,
   DailyTokenWithdrawals,
   LeaderboardUserData,
   getContractAddresses,
+  supportedChains,
 } from "./utils";
+
+const getDepositsSchema = z.object({
+  queryStringParameters: z.object({
+    chain: z.enum(supportedChains).default("mainnet"),
+  }).default({
+    chain: "mainnet",
+  }),
+});
 
 export const getDeposits = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const params = event.queryStringParameters;
-  const chain = params ? params.chain : "eth";
-  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
-    getContractAddresses(chain);
+  const { queryStringParameters: { chain } } = getDepositsSchema.parse(event);
+
+  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } = getContractAddresses(chain);
 
   const response = await spiceClient.query(`
   WITH NonCoalescedDailyTokenDeposits AS (
@@ -148,13 +157,20 @@ export const getDeposits = async (
   };
 };
 
+const getStrategyDepositLeaderBoardSchema = z.object({
+  queryStringParameters: z.object({
+    chain: z.enum(supportedChains).default("mainnet"),
+  }).default({
+    chain: "mainnet",
+  }),
+});
+
 export const getStrategyDepositLeaderBoard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const params = event.queryStringParameters;
-  const chain = params ? params.chain : "eth";
-  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
-    getContractAddresses(chain);
+  const { queryStringParameters: { chain } } = getStrategyDepositLeaderBoardSchema.parse(event);
+
+  const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } = getContractAddresses(chain);
 
   const response = await spiceClient.query(`
   WITH ranked_deposits AS (
@@ -209,11 +225,19 @@ export const getStrategyDepositLeaderBoard = async (
   };
 };
 
+const getWithdrawalsSchema = z.object({
+  queryStringParameters: z.object({
+    chain: z.enum(supportedChains).default("mainnet"),
+  }).default({
+    chain: "mainnet",
+  }),
+});
+
 export const getWithdrawals = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const params = event.queryStringParameters;
-  const chain = params ? params.chain : "eth";
+  const { queryStringParameters: { chain } } = getWithdrawalsSchema.parse(event);
+
   const { STETH_ADDRESS, CBETH_ADDRESS, RETH_ADDRESS } =
     getContractAddresses(chain);
 
@@ -346,11 +370,18 @@ export const getWithdrawals = async (
   };
 };
 
+const totalStakedBeaconChainEthSchema = z.object({
+  queryStringParameters: z.object({
+    chain: z.enum(supportedChains).default("mainnet"),
+  }).default({
+    chain: "mainnet",
+  }),
+});
+
 export async function totalStakedBeaconChainEth(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const params = event.queryStringParameters;
-  const chain = params ? params.chain : "eth";
+  const { queryStringParameters: { chain } } = totalStakedBeaconChainEthSchema.parse(event);
 
   try {
     const result = await spiceClient.query(`
@@ -366,11 +397,18 @@ export async function totalStakedBeaconChainEth(
   }
 }
 
+const stakersBeaconChainEthSchema = z.object({
+  queryStringParameters: z.object({
+    chain: z.enum(supportedChains).default("mainnet"),
+  }).default({
+    chain: "mainnet",
+  }),
+});
+
 export async function stakersBeaconChainEth(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
-  const params = event.queryStringParameters;
-  const chain = params ? params.chain : "eth";
+  const { queryStringParameters: { chain } } = stakersBeaconChainEthSchema.parse(event);
 
   try {
     const result = await spiceClient.query(`
