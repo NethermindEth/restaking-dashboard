@@ -22,7 +22,10 @@ export const getDeposits = async (
 ): Promise<APIGatewayProxyResult> => {
   const { queryStringParameters: { chain } } = getDepositsSchema.parse(event);
 
-  const { stEthAddress, cbEthAddress, rEthAddress } = getContractAddresses(chain);
+  const tokenAddresses = getContractAddresses(chain);
+
+  const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
+  const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
 
   const response = await spiceClient.query(`
   WITH NonCoalescedDailyTokenDeposits AS (
@@ -32,11 +35,7 @@ export const getDeposits = async (
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM ${chain}.eigenlayer.strategy_manager_deposits
-    WHERE token IN (
-        '${stEthAddress}',
-        '${cbEthAddress}',
-        '${rEthAddress}'
-    )
+    WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
     GROUP BY "date", token
   ),
   NonCoalescedDailyValidatorDeposits AS (
@@ -71,13 +70,8 @@ export const getDeposits = async (
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
   ),
   TokenSeries AS (
-      SELECT '${stEthAddress}' AS token
-      UNION ALL
-      SELECT '${cbEthAddress}'
-      UNION ALL
-          SELECT '${rEthAddress}'
-      UNION ALL
-          SELECT NULL
+      SELECT NULL AS token
+      ${tokenAddressList.map(addr => `UNION ALL SELECT '${addr}'`).join("\n")}
   ),
   TokenDateCoalesceSeries AS (
       SELECT
@@ -170,7 +164,10 @@ export const getStrategyDepositLeaderBoard = async (
 ): Promise<APIGatewayProxyResult> => {
   const { queryStringParameters: { chain } } = getStrategyDepositLeaderBoardSchema.parse(event);
 
-  const { stEthAddress, cbEthAddress, rEthAddress } = getContractAddresses(chain);
+  const tokenAddresses = getContractAddresses(chain);
+
+  const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
+  const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
 
   const response = await spiceClient.query(`
   WITH ranked_deposits AS (
@@ -181,11 +178,7 @@ export const getStrategyDepositLeaderBoard = async (
         SUM(shares) / POWER(10, 18) AS total_shares,
         ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
     FROM ${chain}.eigenlayer.strategy_manager_deposits
-    WHERE token IN (
-        '${stEthAddress}',
-        '${cbEthAddress}',
-        '${rEthAddress}'
-    )
+    WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
     GROUP BY depositor, token
 )
     SELECT *
@@ -238,8 +231,10 @@ export const getWithdrawals = async (
 ): Promise<APIGatewayProxyResult> => {
   const { queryStringParameters: { chain } } = getWithdrawalsSchema.parse(event);
 
-  const { stEthAddress, cbEthAddress, rEthAddress } =
-    getContractAddresses(chain);
+  const tokenAddresses = getContractAddresses(chain);
+
+  const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
+  const tokenAddressList = Object.values(tokenAddresses).filter(el => el);
 
   const response = await spiceClient.query(`
   WITH DailyTokenWithdrawals AS (
@@ -249,11 +244,7 @@ export const getWithdrawals = async (
         SUM(token_amount) / POWER(10, 18) AS total_amount,
         SUM(shares) / POWER(10, 18) AS total_shares
     FROM ${chain}.eigenlayer.strategy_manager_withdrawal_completed
-    WHERE token IN (
-         '${stEthAddress}',
-          '${cbEthAddress}',
-          '${rEthAddress}'
-    )
+    WHERE token IN (${tokenAddressList.map(addr => `'${addr}'`).join(",")})
     AND receive_as_tokens
     GROUP BY "date", token
    ),
@@ -283,13 +274,8 @@ export const getWithdrawals = async (
       WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
     ),
   TokenSeries AS (
-      SELECT '${stEthAddress}' AS token
-      UNION ALL
-      SELECT '${cbEthAddress}'
-      UNION ALL
-          SELECT '${rEthAddress}'
-      UNION ALL
-          SELECT NULL
+      SELECT NULL AS token
+      ${tokenAddressList.map(addr => `UNION ALL SELECT '${addr}'`).join("\n")}
   ),
   AllCombinations AS (
     SELECT 
