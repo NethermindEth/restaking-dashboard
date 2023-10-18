@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
+import { cloneDeep } from "lodash";
 
 const tokens = {
   stEth: {
@@ -95,8 +96,8 @@ const LineChart = (data: any) => {
 
     internalChartData.labels = data.data.timestamps;
 
-    internalChartData.datasets = data.data.namedLabels.map(
-      (e: string) => tokens[e]
+    internalChartData.datasets = data.data.namedLabels.map((e: string) =>
+      cloneDeep(tokens[e])
     );
 
     console.log(internalChartData);

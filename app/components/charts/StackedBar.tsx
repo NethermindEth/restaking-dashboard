@@ -43,8 +43,8 @@ export default (data: any) => {
     };
 
     internalChartData.labels = data.data.labels;
-    internalChartData.datasets = data.data.namedLabels.map(
-      (e: string) => tokens[e]
+    internalChartData.datasets = data.data.namedLabels.map((e: string) =>
+      cloneDeep(tokens[e])
     );
 
     internalChartData.datasets.forEach((dataset, index) => {

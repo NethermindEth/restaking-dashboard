@@ -18,14 +18,14 @@ export interface LeaderboardUserData {
 }
 
 export const supportedChains = ["eth", "goerli"] as const;
-export type Chain = typeof supportedChains[number];
+export type Chain = (typeof supportedChains)[number];
 
 export function getContractAddresses(chain: Chain) {
   switch (chain) {
     case "eth":
       return {
         stEthAddress: "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        cbEthAddress: "0x7c6b91d9be155a6db01f749217d76ff02a7227f2",
+        cbEthAddress: "0xbe9895146f7af43049ca1c1ae358b0541ea49704",
         rEthAddress: "0xae78736cd615f374d3085123a210448e74fc6393",
       };
     case "goerli":

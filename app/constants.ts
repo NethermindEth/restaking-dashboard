@@ -34,9 +34,11 @@ export const networkTokens = (network: string) => {
       return {
         stEth: {
           image: "/steth_logo.webp",
+          color: "data-card-steth",
         },
         rEth: {
           image: "/reth.webp",
+          color: "data-card-reth",
         },
       };
     }

@@ -14,6 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function LeaderBoard(data: any) {
+  console.log(data.boardData.ethStakers);
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,45 +61,25 @@ export default function LeaderBoard(data: any) {
         >
           Total staked
         </button>
-        <button
-          className={`table-button ${
-            activeButton === 3
-              ? "table-button-steth-active"
-              : "table-button-steth-inactive"
-          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
-          onClick={() => {
-            handleToggleContent(data.boardData.stethStakers, 3);
-            setCurrentPage(1);
-          }}
-        >
-          stETH
-        </button>
-        <button
-          className={`table-button ${
-            activeButton === 2
-              ? "table-button-reth-active"
-              : "table-button-reth-inactive"
-          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
-          onClick={() => {
-            handleToggleContent(data.boardData.rethStakers, 2);
-            setCurrentPage(1);
-          }}
-        >
-          rETH
-        </button>
-        <button
-          className={`table-button ${
-            activeButton === 2
-              ? "table-button-cbeth-active"
-              : "table-button-cbeth-inactive"
-          } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
-          onClick={() => {
-            handleToggleContent(data.boardData.cbethStakers, 4);
-            setCurrentPage(1);
-          }}
-        >
-          cbETH
-        </button>
+        {Object.keys(data.boardData.network).map((key, index) => (
+          <button
+            className={`table-button ${
+              activeButton === 3
+                ? `table-button-${key.toLowerCase()}-active`
+                : `table-button-${key.toLowerCase()}-inactive`
+            } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+            onClick={() => {
+              handleToggleContent(
+                data.boardData[`${key.toLowerCase()}Stakers`],
+                index
+              );
+              setCurrentPage(1);
+            }}
+          >
+            {key}
+          </button>
+        ))}
+
         <button
           className={`table-button ${
             activeButton === 1
