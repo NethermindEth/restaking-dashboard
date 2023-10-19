@@ -39,3 +39,11 @@ cd api
 yarn
 serverless offline start
 ```
+
+### More tokens support
+
+To add more tokens for any network:
+
+- Update `app/constants.ts` and `api/utils.ts`
+- In `getRates()` inside `app/utils.ts` add code for the respective token
+- You can get required token addresses from [here](https://github.com/Layr-Labs/eigenlayer-contracts/blob/master/README.md)
