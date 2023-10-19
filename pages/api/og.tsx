@@ -34,17 +34,17 @@ const beaconEthLogo = fetch(
 ).then((res) => res.arrayBuffer());
 
 export default async function () {
-  const dashboardData = await getDashboardData();
+  const network = "eth"; // TODO: to be made dynamic ?
 
-  const [
-    logoData,
-    stEthLogoData,
-    rEthLogoData,
-    cbEthLogoData,
-    beaconEthLogoData,
-  ] = await Promise.all([logo, stEthLogo, rEthLogo, cbEthLogo, beaconEthLogo]);
+  const dashboardData = await getDashboardData(network);
 
-  const network = "eth";
+  const logos = await Promise.all([
+    logo,
+    stEthLogo,
+    rEthLogo,
+    cbEthLogo,
+    beaconEthLogo,
+  ]);
 
   return new ImageResponse(
     (
@@ -75,7 +75,7 @@ export default async function () {
               alt="EigenLayer Logo"
               width="64"
               height="72"
-              src={logoData as unknown as string}
+              src={logos[0] as unknown as string}
             />
             <p tw="text-2xl ml-4">EigenLayer Stats</p>
           </div>
@@ -85,7 +85,7 @@ export default async function () {
           tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
           {Object.entries(getNetworkTokens(network).tokens).map(
-            ([key, value]) => (
+            ([key, value], index) => (
               <div
                 style={{
                   display: "flex",
@@ -98,7 +98,7 @@ export default async function () {
               >
                 <img
                   tw="mx-auto"
-                  src={stEthLogoData as unknown as string}
+                  src={logos[index + 1] as unknown as string}
                   alt="stETH"
                   width="48"
                   height="48"
@@ -124,7 +124,7 @@ export default async function () {
           >
             <img
               tw="mx-auto"
-              src={beaconEthLogoData as unknown as string}
+              src={logos[4] as unknown as string}
               alt="ETH"
               width="48"
               height="48"
@@ -147,7 +147,7 @@ export default async function () {
   );
 }
 
-async function getDashboardData() {
+async function getDashboardData(network = "eth") {
   const networkData = getNetworkTokens(network);
 
   const provider = getProvider(networkData.url);
