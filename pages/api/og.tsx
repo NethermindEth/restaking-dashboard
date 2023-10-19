@@ -156,12 +156,9 @@ async function getDashboardData(network = "eth") {
     ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)
     : null;
 
-  const rEthRate = rEth ? Number(await rEth.getExchangeRate()) / 1e18 : 0;
-
   const cbEth = networkToken["cbEth"]
     ? StakedTokenV1__factory.connect(networkToken["cbEth"].address, provider)
     : null;
-  const cbEthRate = cbEth ? Number(await cbEth.exchangeRate()) / 1e18 : 0;
 
   const stEthStrategy = networkToken["stEth"]
     ? StrategyBaseTVLLimits__factory.connect(
