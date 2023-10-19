@@ -7,7 +7,6 @@ import {
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
 import { ImageResponse } from "@vercel/og";
-import axios from "axios";
 
 export const config = {
   runtime: "edge",
@@ -205,12 +204,22 @@ async function getDashboardData(network = "eth") {
       ) / 1e18
     : 0;
 
-  const totalStakedBeaconResponse = await axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeconChainEth`
-  );
+  let totalStakedBeaconChainEth = 0;
+  try {
+    const url = `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`;
+    const params = new URLSearchParams({ chain: network });
 
-  const totalStakedBeaconChainEth =
-    totalStakedBeaconResponse.data[0].final_balance;
+    const fullURL = `${url}?${params.toString()}`;
+    const response = await fetch(fullURL);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    totalStakedBeaconChainEth = (await response.json())[0].final_balance;
+  } catch (error) {
+    console.error(error);
+  }
 
   return {
     stEthTvl,
