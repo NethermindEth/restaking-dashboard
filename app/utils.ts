@@ -275,10 +275,9 @@ async function getRates(network = "eth") {
   const rEth = networkToken["rEth"]
     ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)
     : null;
-  console.log(rEth);
+
   const rEthRate = rEth ? Number(await rEth.getExchangeRate()) / 1e18 : 0;
 
-  console.log(networkToken["cbEth"]);
   const cbEth = networkToken["cbEth"]
     ? StakedTokenV1__factory.connect(networkToken["cbEth"].address, provider)
     : null;

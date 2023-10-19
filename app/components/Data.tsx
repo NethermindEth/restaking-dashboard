@@ -60,22 +60,19 @@ export default function Data() {
             </div>
           </div>
           <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
-            {Object.entries(tokens).map(([key, value]) => {
-              console.log(key, value, dashboardData);
-              return (
-                <div
-                  className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
-                >
-                  <span className="inline-block">
-                    <Image src={value.image} alt={key} width={48} height={48} />
-                  </span>
-                  <p className="text-sm md:text-base">Staked {key}</p>
-                  <p className="md:text-xl">
-                    {roundToDecimalPlaces(dashboardData[`${key}Tvl`])}
-                  </p>
-                </div>
-              );
-            })}
+            {Object.entries(tokens).map(([key, value]) => (
+              <div
+                className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+              >
+                <span className="inline-block">
+                  <Image src={value.image} alt={key} width={48} height={48} />
+                </span>
+                <p className="text-sm md:text-base">Staked {key}</p>
+                <p className="md:text-xl">
+                  {roundToDecimalPlaces(dashboardData[`${key}Tvl`])}
+                </p>
+              </div>
+            ))}
             <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
               <span className="inline-block">
                 <Image

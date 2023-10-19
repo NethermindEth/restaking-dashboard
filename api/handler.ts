@@ -187,8 +187,6 @@ export const getStrategyDepositLeaderBoard = async (
     return acc;
   }, {});
 
-  console.log(cbEthAddress, groupedResponse[cbEthAddress]);
-
   return {
     statusCode: 200,
     body: JSON.stringify({

@@ -100,8 +100,6 @@ const LineChart = (data: any) => {
       cloneDeep(tokens[e])
     );
 
-    console.log(internalChartData);
-
     internalChartData.datasets?.forEach((dataset, index) => {
       dataset.data = data.data.amounts[index];
       dataset.label = data.data.namedLabels[index];
