@@ -325,16 +325,7 @@ async function getRates(network = "eth") {
   const cbEthSharesRate = cbEthStrategy
     ? Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18
     : 0;
-  console.log(
-    rEthSharesRate,
-    stEthSharesRate,
-    cbEthSharesRate,
-    rEthRate,
-    cbEthRate,
-    stEthTvl,
-    rEthTvl,
-    cbEthTvl
-  );
+
   return {
     rEthSharesRate,
     stEthSharesRate,
