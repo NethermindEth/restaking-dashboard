@@ -26,8 +26,15 @@ const dataConfig = {
 const PieChart = (data: any) => {
   const chartData = useMemo(() => {
     const internalChartData = dataConfig;
-    internalChartData.datasets[0].data = data.data.amounts;
-    internalChartData.labels = data.data.labels;
+    const filteredAmounts = data.data.amounts.filter(
+      (amount, index) => amount !== 0
+    );
+    const filteredLabels = data.data.labels.filter(
+      (_, index) => data.data.amounts[index] !== 0
+    );
+
+    internalChartData.datasets[0].data = filteredAmounts;
+    internalChartData.labels = filteredLabels;
     return internalChartData;
   }, [data]);
 

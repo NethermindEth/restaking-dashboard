@@ -5,7 +5,7 @@ import {
   RETH_ADDRESS,
   RETH_STRATEGY_ADDRESS,
   STETH_STRATEGY_ADDRESS,
-  provider,
+  networkTokens,
 } from "./constants";
 import {
   RocketTokenRETH__factory,
@@ -20,6 +20,11 @@ import {
   DepositStakers,
 } from "@/lib/utils";
 import axios from "axios";
+import { ethers } from "ethers";
+
+function getProvider(url: string) {
+  return new ethers.JsonRpcProvider(url);
+}
 
 export async function getDashboardData(network?: string) {
   const {
@@ -51,7 +56,7 @@ export async function getDashboardData(network?: string) {
     stEthTvl,
     rEthTvl,
     cbEthTvl,
-  } = await getRates();
+  } = await getRates(network);
 
   const stakersBeaconChainEthConverted: LeaderboardUserData[] =
     // @ts-ignore
@@ -261,52 +266,84 @@ function generateChartData(
   };
 }
 
-async function getRates() {
-  const rEth = RocketTokenRETH__factory.connect(RETH_ADDRESS, provider);
-  const rEthRate = Number(await rEth.getExchangeRate()) / 1e18;
+async function getRates(network = "eth") {
+  const networks = networkTokens(network);
 
-  const cbEth = StakedTokenV1__factory.connect(CBETH_ADDRESS, provider);
-  const cbEthRate = Number(await cbEth.exchangeRate()) / 1e18;
+  const provider = getProvider(networks.url);
+  const networkToken = networks.tokens;
 
-  const stEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    STETH_STRATEGY_ADDRESS,
-    provider
-  );
-  const rEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    RETH_STRATEGY_ADDRESS,
-    provider
-  );
-  const cbEthStrategy = StrategyBaseTVLLimits__factory.connect(
-    CBETH_STRATEGY_ADDRESS,
-    provider
-  );
+  const rEth = networkToken["rEth"]
+    ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)
+    : null;
+  console.log(rEth);
+  const rEthRate = rEth ? Number(await rEth.getExchangeRate()) / 1e18 : 0;
 
-  const stEthTvl =
-    Number(
-      await stEthStrategy.sharesToUnderlyingView(
-        await stEthStrategy.totalShares()
+  console.log(networkToken["cbEth"]);
+  const cbEth = networkToken["cbEth"]
+    ? StakedTokenV1__factory.connect(networkToken["cbEth"].address, provider)
+    : null;
+  const cbEthRate = cbEth ? Number(await cbEth.exchangeRate()) / 1e18 : 0;
+
+  const stEthStrategy = networkToken["stEth"]
+    ? StrategyBaseTVLLimits__factory.connect(
+        networkToken["stEth"].strategyAddress,
+        provider
       )
-    ) / 1e18;
-  const rEthTvl =
-    Number(
-      await rEthStrategy.sharesToUnderlyingView(
-        await rEthStrategy.totalShares()
+    : null;
+  const rEthStrategy = networkToken["rEth"]
+    ? StrategyBaseTVLLimits__factory.connect(
+        networkToken["rEth"].strategyAddress,
+        provider
       )
-    ) / 1e18;
-  const cbEthTvl =
-    Number(
-      await cbEthStrategy.sharesToUnderlyingView(
-        await cbEthStrategy.totalShares()
+    : null;
+  const cbEthStrategy = networkToken["cbEth"]
+    ? StrategyBaseTVLLimits__factory.connect(
+        networkToken["cbEth"].strategyAddress,
+        provider
       )
-    ) / 1e18;
+    : null;
 
-  const rEthSharesRate =
-    Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
-  const stEthSharesRate =
-    Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
-  const cbEthSharesRate =
-    Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18;
+  const stEthTvl = stEthStrategy
+    ? Number(
+        await stEthStrategy.sharesToUnderlyingView(
+          await stEthStrategy.totalShares()
+        )
+      ) / 1e18
+    : 0;
+  const rEthTvl = rEthStrategy
+    ? Number(
+        await rEthStrategy.sharesToUnderlyingView(
+          await rEthStrategy.totalShares()
+        )
+      ) / 1e18
+    : 0;
+  const cbEthTvl = cbEthStrategy
+    ? Number(
+        await cbEthStrategy.sharesToUnderlyingView(
+          await cbEthStrategy.totalShares()
+        )
+      ) / 1e18
+    : 0;
 
+  const rEthSharesRate = rEthStrategy
+    ? Number(await rEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18
+    : 0;
+  const stEthSharesRate = stEthStrategy
+    ? Number(await stEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18
+    : 0;
+  const cbEthSharesRate = cbEthStrategy
+    ? Number(await cbEthStrategy.sharesToUnderlyingView(BigInt(1e18))) / 1e18
+    : 0;
+  console.log(
+    rEthSharesRate,
+    stEthSharesRate,
+    cbEthSharesRate,
+    rEthRate,
+    cbEthRate,
+    stEthTvl,
+    rEthTvl,
+    cbEthTvl
+  );
   return {
     rEthSharesRate,
     stEthSharesRate,

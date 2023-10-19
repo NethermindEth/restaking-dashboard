@@ -34,10 +34,12 @@ export default function Data() {
     fetchData();
   }, [network]);
 
+  const tokens = networkTokens(network).tokens;
+
   return (
     <>
       {!!error && <Error message={error} />}
-      {!dashboardData ? (
+      {!error && !dashboardData ? (
         <Loader />
       ) : (
         <>
@@ -58,19 +60,22 @@ export default function Data() {
             </div>
           </div>
           <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
-            {Object.entries(networkTokens(network)).map(([key, value]) => (
-              <div
-                className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
-              >
-                <span className="inline-block">
-                  <Image src={value.image} alt={key} width={48} height={48} />
-                </span>
-                <p className="text-sm md:text-base">Staked {key}</p>
-                <p className="md:text-xl">
-                  {roundToDecimalPlaces(dashboardData[`${key}Tvl`])}
-                </p>
-              </div>
-            ))}
+            {Object.entries(tokens).map(([key, value]) => {
+              console.log(key, value, dashboardData);
+              return (
+                <div
+                  className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+                >
+                  <span className="inline-block">
+                    <Image src={value.image} alt={key} width={48} height={48} />
+                  </span>
+                  <p className="text-sm md:text-base">Staked {key}</p>
+                  <p className="md:text-xl">
+                    {roundToDecimalPlaces(dashboardData[`${key}Tvl`])}
+                  </p>
+                </div>
+              );
+            })}
             <div className="data-card data-card-eth grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center">
               <span className="inline-block">
                 <Image
@@ -99,7 +104,7 @@ export default function Data() {
                     amounts: dashboardData.chartDataDepositsCumulative.amounts,
                     timestamps:
                       dashboardData.chartDataDepositsCumulative.timestamps,
-                    namedLabels: Object.keys(networkTokens(network)),
+                    namedLabels: Object.keys(tokens),
                   }}
                 />
               </div>
@@ -111,7 +116,7 @@ export default function Data() {
                   data={{
                     amounts: dashboardData.chartDataDepositsDaily.amounts,
                     labels: dashboardData.chartDataDepositsDaily.timestamps,
-                    namedLabels: Object.keys(networkTokens(network)),
+                    namedLabels: Object.keys(tokens),
                   }}
                   title="Deposited tokens by day"
                 />
@@ -130,7 +135,7 @@ export default function Data() {
                       dashboardData.chartDataWithdrawalsCumulative.amounts,
                     timestamps:
                       dashboardData.chartDataWithdrawalsCumulative.timestamps,
-                    namedLabels: Object.keys(networkTokens(network)),
+                    namedLabels: Object.keys(tokens),
                   }}
                 />
               </div>
@@ -143,7 +148,7 @@ export default function Data() {
                   data={{
                     amounts: dashboardData.chartDataWithdrawalsDaily.amounts,
                     labels: dashboardData.chartDataWithdrawalsDaily.timestamps,
-                    namedLabels: Object.keys(networkTokens(network)),
+                    namedLabels: Object.keys(tokens),
                   }}
                   title="Token Withdrawals by day"
                 />
@@ -206,7 +211,7 @@ export default function Data() {
 
             <LeaderBoard
               boardData={{
-                network: networkTokens(network),
+                network: tokens,
                 ethStakers: dashboardData.groupedStakers,
                 stethStakers: dashboardData.stakersStEthConverted,
                 rethStakers: dashboardData.stakersREthConverted,
