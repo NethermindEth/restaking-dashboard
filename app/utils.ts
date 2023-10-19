@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 import { ethers } from "ethers";
 
-function getProvider(url: string) {
+export function getProvider(url: string) {
   return new ethers.JsonRpcProvider(url);
 }
 
@@ -259,10 +259,10 @@ function generateChartData(
 }
 
 async function getRates(network = "eth") {
-  const networks = getNetworkTokens(network);
+  const networkData = getNetworkTokens(network);
 
-  const provider = getProvider(networks.url);
-  const networkToken = networks.tokens;
+  const provider = getProvider(networkData.url);
+  const networkToken = networkData.tokens;
 
   const rEth = networkToken["rEth"]
     ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)

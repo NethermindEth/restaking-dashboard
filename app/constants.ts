@@ -4,7 +4,7 @@ export const getNetworkTokens = (network: string) => {
   switch (network) {
     case "eth": {
       return {
-        url: process.env.NEXT_PUBLIC_MAINNET_URL,
+        url: process.env.NEXT_PUBLIC_MAINNET_URL || "",
         tokens: {
           stEth: {
             strategyAddress: "0x93c4b944D05dfe6df7645A86cd2206016c51564D",
@@ -30,7 +30,7 @@ export const getNetworkTokens = (network: string) => {
     case "goerli": {
       // TODO: update strategy addresses
       return {
-        url: process.env.NEXT_PUBLIC_GOERLI_URL,
+        url: process.env.NEXT_PUBLIC_GOERLI_URL || "",
         tokens: {
           stEth: {
             strategyAddress: "0xB613E78E2068d7489bb66419fB1cfa11275d14da",

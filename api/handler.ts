@@ -1,13 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 import spiceClient from "./spice";
-import {
-  DailyTokenData,
-  DailyTokenWithdrawals,
-  LeaderboardUserData,
-  getContractAddresses,
-  supportedChains,
-} from "./utils";
+import { getContractAddresses, supportedChains } from "./utils";
 
 const getDepositsSchema = z.object({
   queryStringParameters: z.object({
