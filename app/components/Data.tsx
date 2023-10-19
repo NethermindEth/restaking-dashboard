@@ -208,7 +208,7 @@ export default function Data() {
 
             <LeaderBoard
               boardData={{
-                network: tokens,
+                network: networkTokens,
                 ethStakers: dashboardData.groupedStakers,
                 stethStakers: dashboardData.stakersStEthConverted,
                 rethStakers: dashboardData.stakersREthConverted,

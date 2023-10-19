@@ -9,7 +9,7 @@ export const getNetworkTokens = (network: string) => {
           stEth: {
             strategyAddress: "0x93c4b944D05dfe6df7645A86cd2206016c51564D",
             address: "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-            image: "/steth.webp",
+            image: "/steth_logo.webp",
             color: "data-card-steth",
           },
           rEth: {
@@ -28,7 +28,6 @@ export const getNetworkTokens = (network: string) => {
       };
     }
     case "goerli": {
-      // TODO: update strategy addresses
       return {
         url: process.env.NEXT_PUBLIC_GOERLI_URL || "",
         tokens: {
