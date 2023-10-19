@@ -1,12 +1,4 @@
-import {
-  CBETH_ADDRESS,
-  CBETH_STRATEGY_ADDRESS,
-  MAX_LEADERBOARD_SIZE,
-  RETH_ADDRESS,
-  RETH_STRATEGY_ADDRESS,
-  STETH_STRATEGY_ADDRESS,
-  networkTokens,
-} from "./constants";
+import { MAX_LEADERBOARD_SIZE, getNetworkTokens } from "./constants";
 import {
   RocketTokenRETH__factory,
   StakedTokenV1__factory,
@@ -267,7 +259,7 @@ function generateChartData(
 }
 
 async function getRates(network = "eth") {
-  const networks = networkTokens(network);
+  const networks = getNetworkTokens(network);
 
   const provider = getProvider(networks.url);
   const networkToken = networks.tokens;

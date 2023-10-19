@@ -10,8 +10,8 @@ import Disclaimer from "./Disclaimer";
 import Loader from "./Loader";
 import Error from "./Error";
 import { getDashboardData } from "../utils";
+import { getNetworkTokens } from "../constants";
 import { roundToDecimalPlaces } from "@/lib/utils";
-import { networkTokens } from "../constants";
 
 export default function Data() {
   const [network, updateNetwork] = useState("eth");
@@ -34,7 +34,7 @@ export default function Data() {
     fetchData();
   }, [network]);
 
-  const tokens = networkTokens(network).tokens;
+  const networkTokens = getNetworkTokens(network).tokens;
 
   return (
     <>
@@ -60,7 +60,7 @@ export default function Data() {
             </div>
           </div>
           <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
-            {Object.entries(tokens).map(([key, value]) => (
+            {Object.entries(networkTokens).map(([key, value]) => (
               <div
                 className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
               >
@@ -101,7 +101,7 @@ export default function Data() {
                     amounts: dashboardData.chartDataDepositsCumulative.amounts,
                     timestamps:
                       dashboardData.chartDataDepositsCumulative.timestamps,
-                    namedLabels: Object.keys(tokens),
+                    namedLabels: Object.keys(networkTokens),
                   }}
                 />
               </div>
@@ -113,7 +113,7 @@ export default function Data() {
                   data={{
                     amounts: dashboardData.chartDataDepositsDaily.amounts,
                     labels: dashboardData.chartDataDepositsDaily.timestamps,
-                    namedLabels: Object.keys(tokens),
+                    namedLabels: Object.keys(networkTokens),
                   }}
                   title="Deposited tokens by day"
                 />
@@ -132,7 +132,7 @@ export default function Data() {
                       dashboardData.chartDataWithdrawalsCumulative.amounts,
                     timestamps:
                       dashboardData.chartDataWithdrawalsCumulative.timestamps,
-                    namedLabels: Object.keys(tokens),
+                    namedLabels: Object.keys(networkTokens),
                   }}
                 />
               </div>
@@ -145,7 +145,7 @@ export default function Data() {
                   data={{
                     amounts: dashboardData.chartDataWithdrawalsDaily.amounts,
                     labels: dashboardData.chartDataWithdrawalsDaily.timestamps,
-                    namedLabels: Object.keys(tokens),
+                    namedLabels: Object.keys(networkTokens),
                   }}
                   title="Token Withdrawals by day"
                 />

@@ -14,7 +14,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function LeaderBoard(data: any) {
-  console.log(data.boardData.ethStakers);
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
