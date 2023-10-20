@@ -5,7 +5,7 @@ import Image from "next/image";
 import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
 import StackedBar from "./charts/StackedBar";
-import Leaderboard from "./leaderboard";
+import Leaderboard from "./Leaderboard";
 import Loader from "./Loader";
 import Error from "./Error";
 import { getDashboardData } from "../utils";
