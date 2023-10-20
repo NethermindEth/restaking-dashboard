@@ -1,5 +1,6 @@
-import Data from "./components/Data";
 import Image from "next/image";
+import Data from "./components/Data";
+import Disclaimer from "./components/Disclaimer";
 
 export default async function Home() {
   return (
@@ -18,6 +19,19 @@ export default async function Home() {
         </div>
       </div>
       <Data />
+      <div className="mt-32">
+        <p className="flex items-center">
+          <span className="pr-2">Made with ❤️ at Nethermind </span>
+          <Image
+            src={"/nethermind.png"}
+            width={32}
+            height={32}
+            alt={"Nethermind logo"}
+            style={{ display: "inline-block" }}
+          />
+        </p>
+        <Disclaimer />
+      </div>
     </main>
   );
 }

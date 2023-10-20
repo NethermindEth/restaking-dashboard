@@ -6,7 +6,6 @@ import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
 import StackedBar from "./charts/StackedBar";
 import LeaderBoard from "./leaderboard";
-import Disclaimer from "./Disclaimer";
 import Loader from "./Loader";
 import Error from "./Error";
 import { getDashboardData } from "../utils";
@@ -218,19 +217,6 @@ export default function Data() {
               }}
               title="Restaking Leaderboard"
             />
-          </div>
-          <div className="mt-32">
-            <p className="flex items-center">
-              <span className="pr-2">Made with ❤️ at Nethermind </span>
-              <Image
-                src={"/nethermind.png"}
-                width={32}
-                height={32}
-                alt={"Nethermind logo"}
-                style={{ display: "inline-block" }}
-              />
-            </p>
-            <Disclaimer />
           </div>
         </>
       )}
