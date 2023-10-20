@@ -1,9 +1,9 @@
 ## Setup
 
-Run this command to initialize a new project in a new working directory.
+Install the project dependencies.
 
 ```
-npm install
+yarn
 ```
 
 ## Usage
