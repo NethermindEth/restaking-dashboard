@@ -27,10 +27,10 @@ const PieChart = (data: any) => {
   const chartData = useMemo(() => {
     const internalChartData = dataConfig;
     const filteredAmounts = data.data.amounts.filter(
-      (amount, index) => amount !== 0
+      (amount: number) => amount !== 0
     );
     const filteredLabels = data.data.labels.filter(
-      (_, index) => data.data.amounts[index] !== 0
+      (_: any, index: number) => data.data.amounts[index] !== 0
     );
 
     internalChartData.datasets[0].data = filteredAmounts;
