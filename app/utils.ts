@@ -13,6 +13,9 @@ import {
 } from "@/lib/utils";
 import axios from "axios";
 
+export const supportedTokens = ["stEth", "rEth", "cbEth"] as const;
+export type SupportedToken = (typeof supportedTokens)[number];
+
 export async function getDashboardData(network?: string) {
   const {
     depositData,

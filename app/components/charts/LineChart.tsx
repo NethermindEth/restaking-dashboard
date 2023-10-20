@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
 import { cloneDeep } from "lodash";
+import { SupportedToken } from "@/app/utils";
 
 const tokens = {
   stEth: {
@@ -96,7 +97,7 @@ const LineChart = (data: any) => {
 
     internalChartData.labels = data.data.timestamps;
 
-    internalChartData.datasets = data.data.namedLabels.map((e: string) =>
+    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken | "ETH") =>
       cloneDeep(tokens[e])
     );
 
