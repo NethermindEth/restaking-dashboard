@@ -137,7 +137,7 @@ async function fetchData(network?: string) {
   );
 
   const depositStakersDataPromise = axios.get(
-    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderBoard`,
+    `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/getStrategyDepositLeaderboard`,
     {
       params: {
         chain: network,

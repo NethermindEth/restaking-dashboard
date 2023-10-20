@@ -5,7 +5,7 @@ import Image from "next/image";
 import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
 import StackedBar from "./charts/StackedBar";
-import LeaderBoard from "./leaderboard";
+import Leaderboard from "./leaderboard";
 import Loader from "./Loader";
 import Error from "./Error";
 import { getDashboardData } from "../utils";
@@ -205,7 +205,7 @@ export default function Data() {
               />
             </div>
 
-            <LeaderBoard
+            <Leaderboard
               boardData={{
                 network: networkTokens,
                 ethStakers: dashboardData.groupedStakers,

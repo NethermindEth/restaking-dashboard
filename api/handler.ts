@@ -132,18 +132,18 @@ export const getDeposits = async (
   };
 };
 
-const getStrategyDepositLeaderBoardSchema = z.object({
+const getStrategyDepositLeaderboardSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
   }),
 });
 
-export const getStrategyDepositLeaderBoard = async (
+export const getStrategyDepositLeaderboard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const {
     queryStringParameters: { chain },
-  } = getStrategyDepositLeaderBoardSchema.parse(event);
+  } = getStrategyDepositLeaderboardSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
 

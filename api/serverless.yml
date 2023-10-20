@@ -38,13 +38,13 @@ functions:
       - httpApi:
           path: /stakersBeaconChainEth
           method: get
-  getStrategyDepositLeaderBoard:
-    handler: handler.getStrategyDepositLeaderBoard
+  getStrategyDepositLeaderboard:
+    handler: handler.getStrategyDepositLeaderboard
     runtime: nodejs14.x
     timeout: 15
     events:
       - httpApi:
-          path: /getStrategyDepositLeaderBoard
+          path: /getStrategyDepositLeaderboard
           method: get
 
 useDotenv: true
