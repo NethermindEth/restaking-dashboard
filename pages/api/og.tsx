@@ -82,31 +82,35 @@ export default async function () {
           style={{ display: "flex" }}
           tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
-          {Object.keys(getNetworkTokens(network)).map((key, index) => (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                color: "rgba(235, 235, 235, 1)",
-                backgroundColor: "rgb(26, 12, 109)",
-                textAlign: "center",
-              }}
-              tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
-            >
-              <img
-                tw="mx-auto"
-                src={logos[index + 1] as unknown as string}
-                alt="stETH"
-                width="48"
-                height="48"
-              />
-              <p tw="text-base mx-auto">Staked {key}</p>
-              <p tw="text-xl mx-auto">
-                {" "}
-                {roundToDecimalPlaces(dashboardData[`${key}Tvl`])}
-              </p>
-            </div>
-          ))}
+          {Object.keys(getNetworkTokens(network)).map((key, index) => {
+            const token = key as keyof ReturnType<typeof getNetworkTokens>;
+
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  color: "rgba(235, 235, 235, 1)",
+                  backgroundColor: "rgb(26, 12, 109)",
+                  textAlign: "center",
+                }}
+                tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
+              >
+                <img
+                  tw="mx-auto"
+                  src={logos[index + 1] as unknown as string}
+                  alt="stETH"
+                  width="48"
+                  height="48"
+                />
+                <p tw="text-base mx-auto">Staked {key}</p>
+                <p tw="text-xl mx-auto">
+                  {" "}
+                  {roundToDecimalPlaces(dashboardData[`${token}Tvl`])}
+                </p>
+              </div>
+            );
+          })}
 
           <div
             style={{
