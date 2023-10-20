@@ -47,7 +47,7 @@ export const getNetworkTokens = (network: string) => {
       };
     }
     default: {
-      throw Error("Invalid token");
+      throw Error("Invalid network");
     }
   }
 };
