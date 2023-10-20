@@ -2,8 +2,8 @@
 
 This project is composed of two parts:
 
-- A [Next.js](https://nextjs.org/) frontend bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app)
-- A serverless backend that in turn queries Spice AI to fetch data/.
+- A [Next.js](https://nextjs.org/) frontend bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+- A serverless backend that fetches data from [Spice AI](https://spice.xyz).
 
 ## Getting Started with the Next.js App
 
