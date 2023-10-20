@@ -152,31 +152,27 @@ export const getStrategyDepositLeaderBoard = async (
 
   const response = (
     await spiceClient.query(`
-  WITH ranked_deposits AS (
-    SELECT
-        depositor,
-        token,
-        SUM(token_amount) / POWER(10, 18) AS total_amount,
-        SUM(shares) / POWER(10, 18) AS total_shares,
-        ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
-    FROM ${chain}.eigenlayer.strategy_manager_deposits
-    WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
-    GROUP BY depositor, token
-  )
-    SELECT *
-    FROM ranked_deposits
-    WHERE rn <= 50;
-  `)
+      WITH ranked_deposits AS (
+        SELECT
+            depositor,
+            token,
+            SUM(token_amount) / POWER(10, 18) AS total_amount,
+            SUM(shares) / POWER(10, 18) AS total_shares,
+            ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
+        FROM ${chain}.eigenlayer.strategy_manager_deposits
+        WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
+        GROUP BY depositor, token
+      )
+        SELECT depositor, token, total_amount, total_shares
+        FROM ranked_deposits
+        WHERE rn <= 50;
+    `)
   ).toArray();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
-    acc[el.token].push({
-      depositor: el.depositor,
-      token: el.token,
-      total_amount: el.total_amount,
-      total_shares: el.total_shares,
-    });
+
+    acc[el.token].push(el);
 
     return acc;
   }, {});
