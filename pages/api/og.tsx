@@ -1,5 +1,4 @@
-import { getNetworkTokens } from "@/app/constants";
-import { getProvider } from "@/app/utils";
+import { getNetworkProvider, getNetworkTokens } from "@/app/constants";
 import { roundToDecimalPlaces } from "@/lib/utils";
 import {
   RocketTokenRETH__factory,
@@ -83,7 +82,7 @@ export default async function () {
           style={{ display: "flex" }}
           tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
-          {Object.entries(getNetworkTokens(network).tokens).map(
+          {Object.entries(getNetworkTokens(network)).map(
             ([key, value], index) => (
               <div
                 style={{
@@ -147,10 +146,8 @@ export default async function () {
 }
 
 async function getDashboardData(network = "eth") {
-  const networkData = getNetworkTokens(network);
-
-  const provider = getProvider(networkData.url);
-  const networkToken = networkData.tokens;
+  const networkToken = getNetworkTokens(network);
+  const provider = getNetworkProvider(network);
 
   const rEth = networkToken["rEth"]
     ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)

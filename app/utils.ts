@@ -1,4 +1,4 @@
-import { MAX_LEADERBOARD_SIZE, getNetworkTokens } from "./constants";
+import { MAX_LEADERBOARD_SIZE, getNetworkProvider, getNetworkTokens } from "./constants";
 import {
   RocketTokenRETH__factory,
   StakedTokenV1__factory,
@@ -12,11 +12,6 @@ import {
   DepositStakers,
 } from "@/lib/utils";
 import axios from "axios";
-import { ethers } from "ethers";
-
-export function getProvider(url: string) {
-  return new ethers.JsonRpcProvider(url);
-}
 
 export async function getDashboardData(network?: string) {
   const {
@@ -259,10 +254,9 @@ function generateChartData(
 }
 
 async function getRates(network = "eth") {
-  const networkData = getNetworkTokens(network);
+  const networkToken = getNetworkTokens(network);
 
-  const provider = getProvider(networkData.url);
-  const networkToken = networkData.tokens;
+  const provider = getNetworkProvider(network);
 
   const rEth = networkToken["rEth"]
     ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)

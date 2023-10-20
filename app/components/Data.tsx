@@ -33,7 +33,7 @@ export default function Data() {
     fetchData();
   }, [network]);
 
-  const networkTokens = getNetworkTokens(network).tokens;
+  const networkTokens = getNetworkTokens(network);
 
   return (
     <>
