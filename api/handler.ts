@@ -324,20 +324,16 @@ export async function totalStakedBeaconChainEth(
     queryStringParameters: { chain },
   } = totalStakedBeaconChainEthSchema.parse(event);
 
-  try {
-    const result = await spiceClient.query(`
-      SELECT SUM(effective_balance) / POW(10,9) as final_balance
-      FROM ${chain}.beacon.validators
-      JOIN ${chain}.eigenlayer.eigenpods
-      ON
-        ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential
-        AND effective_balance != '0';
-    `);
-    return { statusCode: 200, body: result.toString() };
-  } catch (err: any) {
-    console.log(err);
-    throw err;
-  }
+  const result = await spiceClient.query(`
+    SELECT SUM(effective_balance) / POW(10,9) as final_balance
+    FROM ${chain}.beacon.validators
+    JOIN ${chain}.eigenlayer.eigenpods
+    ON
+      ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential
+      AND effective_balance != '0';
+  `);
+
+  return { statusCode: 200, body: result.toString() };
 }
 
 const stakersBeaconChainEthSchema = z.object({
@@ -353,29 +349,24 @@ export async function stakersBeaconChainEth(
     queryStringParameters: { chain },
   } = stakersBeaconChainEthSchema.parse(event);
 
-  try {
-    const result = await spiceClient.query(`
-      SELECT 
-          ${chain}.eigenlayer.eigenpods.pod_owner,
-          SUM(${chain}.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
-      FROM 
-          ${chain}.beacon.validators
-      JOIN 
-          ${chain}.eigenlayer.eigenpods
-      ON 
-          ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential 
-          AND ${chain}.beacon.validators.effective_balance != '0'
-      GROUP BY 
-          ${chain}.eigenlayer.eigenpods.pod_owner
-      ORDER BY total_effective_balance DESC;
-    `);
+  const result = await spiceClient.query(`
+    SELECT 
+        ${chain}.eigenlayer.eigenpods.pod_owner,
+        SUM(${chain}.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
+    FROM 
+        ${chain}.beacon.validators
+    JOIN 
+        ${chain}.eigenlayer.eigenpods
+    ON 
+        ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential 
+        AND ${chain}.beacon.validators.effective_balance != '0'
+    GROUP BY 
+        ${chain}.eigenlayer.eigenpods.pod_owner
+    ORDER BY total_effective_balance DESC;
+  `);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result.toArray()),
-    };
-  } catch (err: any) {
-    console.log(err);
-    throw err;
-  }
+  return {
+    statusCode: 200,
+    body: JSON.stringify(result.toArray()),
+  };
 }
