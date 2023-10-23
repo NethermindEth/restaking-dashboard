@@ -15,7 +15,7 @@ if (process.env.NEXT_PUBLIC_GOERLI_URL === undefined) {
 }
 
 export const GOERLI_PROVIDER = new ethers.JsonRpcProvider(
-  process.env.NEXT_PUBLIC_MAINNET_URL,
+  process.env.NEXT_PUBLIC_GOERLI_URL,
 );
 
 export const getNetworkProvider = (network: string) => {
