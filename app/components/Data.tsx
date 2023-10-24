@@ -9,7 +9,7 @@ import Leaderboard from "./Leaderboard";
 import Loader from "./Loader";
 import Error from "./Error";
 
-import { SupportedNetwork, SupportedToken } from "../utils";
+import { SupportedNetwork, SupportedToken } from "@/app/utils/types";
 import { getNetworkTokens } from "../constants";
 import { useDeposits } from "./hooks/useDeposits";
 import { useLeaderboard } from "./hooks/useLeaderboard";

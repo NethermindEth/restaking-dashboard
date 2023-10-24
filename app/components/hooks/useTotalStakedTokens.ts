@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import { IERC20__factory } from "@/typechain";
-import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils";
+import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
 import { getNetworkTokens, getNetworkProvider } from "@/app/constants";
 import { getTotalStakedBeacon } from "@/app/utils/api/totalStakedBeacon";
 

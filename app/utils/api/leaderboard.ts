@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { SupportedNetwork, TokenRecord } from "@/app/utils";
+import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
 
 export interface ApiLeaderboardEntry {
   depositor: `0x${string}`;

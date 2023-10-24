@@ -3,7 +3,7 @@ import "chart.js/auto";
 import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import { cloneDeep } from "lodash";
-import { SupportedToken } from "@/app/utils";
+import { SupportedToken } from "@/app/utils/types";
 
 const tokens = {
   stEth: {

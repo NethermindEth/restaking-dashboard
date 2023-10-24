@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
 import { cloneDeep } from "lodash";
-import { SupportedToken, TokenRecord } from "@/app/utils";
+import { SupportedToken, TokenRecord } from "@/app/utils/types";
 
 const tokens = {
   stEth: {

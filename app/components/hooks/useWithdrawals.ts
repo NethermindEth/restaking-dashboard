@@ -1,4 +1,4 @@
-import { SupportedNetwork } from "@/app/utils";
+import { SupportedNetwork } from "@/app/utils/types";
 import { ApiWithdrawalsResponse, getWithdrawals } from "@/app/utils/api/withdrawals";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 

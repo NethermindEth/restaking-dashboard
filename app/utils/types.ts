@@ -1,4 +1,3 @@
-
 export const supportedTokens = ["stEth", "rEth", "cbEth", "beacon"] as const;
 export type SupportedToken = (typeof supportedTokens)[number];
 

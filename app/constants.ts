@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { SupportedNetwork, TokenInfo, TokenRecord } from "./utils";
+import { SupportedNetwork, TokenInfo, TokenRecord } from "@/app/utils/types";
 
 export const MAX_LEADERBOARD_SIZE = 50;
 

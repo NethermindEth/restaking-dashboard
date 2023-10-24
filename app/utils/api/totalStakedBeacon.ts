@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { SupportedNetwork } from "@/app/utils";
+import { SupportedNetwork } from "@/app/utils/types";
 
 export interface ApiTotalStakedBeaconResponse {
   totalStakedBeacon: number;

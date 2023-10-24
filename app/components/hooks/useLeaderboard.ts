@@ -1,4 +1,4 @@
-import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils";
+import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useShareRates } from "./useShareRates";
 import { getLeaderboard } from "@/app/utils/api/leaderboard";

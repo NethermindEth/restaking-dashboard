@@ -1,4 +1,4 @@
-import { SupportedNetwork } from "@/app/utils";
+import { SupportedNetwork } from "@/app/utils/types";
 import { ApiDepositsResponse, getDeposits } from "@/app/utils/api/deposits";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 

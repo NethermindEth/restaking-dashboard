@@ -1,5 +1,5 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
-import { SupportedNetwork, TokenRecord } from "@/app/utils";
+import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
 import {
   RocketTokenRETH__factory,
   StakedTokenV1__factory,
