@@ -3,7 +3,9 @@ frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs14.x  	
+  apiGateway:
+    minimumCompressionSize: 1024
 
 functions:
   getDeposits:
