@@ -5,7 +5,7 @@ import {
   StakedTokenV1__factory,
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
-import { getNetworkTokens, getNetworkProvider } from "@/app/constants";
+import { getNetworkTokens, getNetworkProvider } from "@/app/utils/constants";
 
 export function useShareRates(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {
   const result = useQuery({

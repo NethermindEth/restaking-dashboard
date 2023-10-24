@@ -2,7 +2,7 @@ import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/type
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useShareRates } from "./useShareRates";
 import { getLeaderboard } from "@/app/utils/api/leaderboard";
-import { MAX_LEADERBOARD_SIZE } from "@/app/constants";
+import { MAX_LEADERBOARD_SIZE } from "@/app/utils/constants";
 
 export interface LeaderboardStaker {
   depositor: `0x${string}`;

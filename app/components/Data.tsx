@@ -10,7 +10,7 @@ import Loader from "./Loader";
 import Error from "./Error";
 
 import { SupportedNetwork, SupportedToken } from "@/app/utils/types";
-import { getNetworkTokens } from "../constants";
+import { getNetworkTokens } from "@/app/utils/constants";
 import { useDeposits } from "./hooks/useDeposits";
 import { useLeaderboard } from "./hooks/useLeaderboard";
 import { useWithdrawals } from "./hooks/useWithdrawals";
