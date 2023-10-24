@@ -1,4 +1,5 @@
 "use client";
+import { cloneDeep } from "lodash";
 import { useMemo } from "react";
 import { Pie } from "react-chartjs-2";
 
@@ -25,7 +26,7 @@ const dataConfig = {
 
 const PieChart = (data: any) => {
   const chartData = useMemo(() => {
-    const internalChartData = dataConfig;
+    const internalChartData = cloneDeep(dataConfig);
     const filteredAmounts = data.data.amounts.filter(
       (amount: number) => amount !== 0
     );
