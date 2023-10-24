@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { SupportedNetwork, TokenInfo, TokenRecord } from "./utils";
 
 export const MAX_LEADERBOARD_SIZE = 50;
 
@@ -18,7 +19,7 @@ export const GOERLI_PROVIDER = new ethers.JsonRpcProvider(
   process.env.NEXT_PUBLIC_GOERLI_URL,
 );
 
-export const getNetworkProvider = (network: string) => {
+export const getNetworkProvider = (network: SupportedNetwork) => {
   switch (network) {
     case "eth":
       return ETH_MAINNET_PROVIDER;
@@ -29,7 +30,7 @@ export const getNetworkProvider = (network: string) => {
   }
 };
 
-export const getNetworkTokens = (network: string) => {
+export const getNetworkTokens = (network: SupportedNetwork): Partial<TokenRecord<TokenInfo>> => {
   switch (network) {
     case "eth":
       return {
