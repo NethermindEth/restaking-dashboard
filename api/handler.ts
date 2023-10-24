@@ -129,7 +129,7 @@ export const getDeposits = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      timestamps: Array.from(new Set(response.map(el => el.date))),
+      timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       deposits: {
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
         cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
@@ -372,7 +372,7 @@ export const getWithdrawals = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      timestamps: Array.from(new Set(response.map(el => el.date))),
+      timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       withdrawals: {
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
         cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
