@@ -22,29 +22,21 @@ functions:
       - httpApi:
           path: /withdrawals
           method: get
-  totalStakedBeaconChainEth:
-    handler: handler.totalStakedBeaconChainEth
+  getTotalStakedBeacon:
+    handler: handler.getTotalStakedBeacon
     runtime: nodejs14.x
     timeout: 15
     events:
       - httpApi:
-          path: /totalStakedBeaconChainEth
+          path: /totalStakedBeacon
           method: get
-  stakersBeaconChainEth:
-    handler: handler.stakersBeaconChainEth
+  getLeaderboard:
+    handler: handler.getLeaderboard
     runtime: nodejs14.x
     timeout: 15
     events:
       - httpApi:
-          path: /stakersBeaconChainEth
-          method: get
-  getStrategyDepositLeaderboard:
-    handler: handler.getStrategyDepositLeaderboard
-    runtime: nodejs14.x
-    timeout: 15
-    events:
-      - httpApi:
-          path: /getStrategyDepositLeaderboard
+          path: /leaderboard
           method: get
 
 useDotenv: true

@@ -116,7 +116,12 @@ export const getDeposits = async (
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
 
-    acc[el.token].push(el);
+    acc[el.token].push({
+      totalAmount: el.total_amount,
+      totalShares: el.total_shares,
+      cumulativeAmount: el.cumulative_amount,
+      cumulativeShares: el.cumulative_shares,
+    });
 
     return acc;
   }, {});
@@ -124,26 +129,29 @@ export const getDeposits = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      stEthDeposits: stEthAddress ? groupedResponse[stEthAddress] : null,
-      cbEthDeposits: cbEthAddress ? groupedResponse[cbEthAddress] : null,
-      rEthDeposits: rEthAddress ? groupedResponse[rEthAddress] : null,
-      beaconChainDeposits: groupedResponse["null"],
+      timestamps: Array.from(new Set(response.map(el => el.date))),
+      deposits: {
+        stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
+        cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
+        rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
+        beacon: groupedResponse["null"],
+      },
     }),
   };
 };
 
-const getStrategyDepositLeaderboardSchema = z.object({
+const getLeaderboardSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
   }),
 });
 
-export const getStrategyDepositLeaderboard = async (
+export const getLeaderboard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const {
     queryStringParameters: { chain },
-  } = getStrategyDepositLeaderboardSchema.parse(event);
+  } = getLeaderboardSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
 
@@ -152,27 +160,80 @@ export const getStrategyDepositLeaderboard = async (
 
   const response = (
     await spiceClient.query(`
-      WITH ranked_deposits AS (
-        SELECT
-            depositor,
-            token,
-            SUM(token_amount) / POWER(10, 18) AS total_amount,
-            SUM(shares) / POWER(10, 18) AS total_shares,
-            ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
-        FROM ${chain}.eigenlayer.strategy_manager_deposits
-        WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
-        GROUP BY depositor, token
+      WITH token_deposits AS (
+          SELECT
+              depositor,
+              token,
+              SUM(shares) / POWER(10, 18) AS total_shares
+          FROM ${chain}.eigenlayer.strategy_manager_deposits
+          WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
+          GROUP BY depositor, token
+      ),
+      token_withdrawals AS (
+          SELECT
+              depositor,
+              token,
+              SUM(shares) / POWER(10, 18) AS total_shares
+          FROM ${chain}.eigenlayer.strategy_manager_withdrawal_completed
+          WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
+          GROUP BY depositor, token
+      ),
+      token_depositors AS (
+          SELECT
+              d.depositor,
+              d.token,
+              COALESCE(d.total_shares, 0) - COALESCE(w.total_shares, 0) as total_shares
+          FROM token_deposits d
+          LEFT JOIN token_withdrawals w ON d.depositor = w.depositor AND d.token = w.token
+      ),
+      ranked_token_depositors AS (
+          SELECT
+              depositor,
+              token,
+              total_shares
+          FROM (
+            SELECT
+                depositor,
+                token,
+                total_shares,
+                ROW_NUMBER() OVER (PARTITION BY token ORDER BY total_shares DESC) AS rn
+            FROM token_depositors
+          )
+          WHERE rn <= 50
+      ),
+      ranked_beacon_depositors AS (
+          SELECT pod_owner AS depositor, NULL AS token, total_effective_balance AS total_shares
+          FROM (
+              SELECT 
+                  pod_owner,
+                  SUM(effective_balance) / POWER(10,9) AS total_effective_balance,
+                  ROW_NUMBER() OVER (ORDER BY total_effective_balance DESC) AS rn
+              FROM ${chain}.beacon.validators v
+              JOIN 
+                  ${chain}.eigenlayer.eigenpods e
+                  ON v.withdrawal_credentials = e.withdrawal_credential AND v.effective_balance != '0'
+              GROUP BY 
+                  e.pod_owner
+          )
+          WHERE rn <= 50
+      ),
+      ranked_deposits AS (
+          SELECT * FROM ranked_token_depositors
+          UNION ALL
+          SELECT * FROM ranked_beacon_depositors
       )
-        SELECT depositor, token, total_amount, total_shares
-        FROM ranked_deposits
-        WHERE rn <= 50;
+      SELECT depositor, token, total_shares
+      FROM ranked_deposits;
     `)
   ).toArray();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
 
-    acc[el.token].push(el);
+    acc[el.token].push({
+      depositor: el.depositor,
+      totalShares: el.total_shares,
+    });
 
     return acc;
   }, {});
@@ -180,9 +241,12 @@ export const getStrategyDepositLeaderboard = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      stEthDeposits: stEthAddress ? groupedResponse[stEthAddress] : null,
-      cbEthDeposits: cbEthAddress ? groupedResponse[cbEthAddress] : null,
-      rEthDeposits: rEthAddress ? groupedResponse[rEthAddress] : null,
+      leaderboard: {
+        stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
+        cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
+        rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
+        beacon: groupedResponse["null"],
+      },
     }),
   };
 };
@@ -295,7 +359,12 @@ export const getWithdrawals = async (
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
 
-    acc[el.token].push(el);
+    acc[el.token].push({
+      totalAmount: el.total_amount,
+      totalShares: el.total_shares,
+      cumulativeAmount: el.cumulative_amount,
+      cumulativeShares: el.cumulative_shares,
+    });
 
     return acc;
   }, {});
@@ -303,70 +372,47 @@ export const getWithdrawals = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      stEthWithdrawals: stEthAddress ? groupedResponse[stEthAddress] : null,
-      cbEthWithdrawals: cbEthAddress ? groupedResponse[cbEthAddress] : null,
-      rEthWithdrawals: rEthAddress ? groupedResponse[rEthAddress] : null,
-      beaconChainWithdrawals: groupedResponse["null"],
+      timestamps: Array.from(new Set(response.map(el => el.date))),
+      withdrawals: {
+        stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
+        cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
+        rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
+        beacon: groupedResponse["null"],
+      },
     }),
   };
 };
 
-const totalStakedBeaconChainEthSchema = z.object({
+const getTotalStakedBeaconSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
   }),
 });
 
-export async function totalStakedBeaconChainEth(
+export async function getTotalStakedBeacon(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const {
     queryStringParameters: { chain },
-  } = totalStakedBeaconChainEthSchema.parse(event);
+  } = getTotalStakedBeaconSchema.parse(event);
 
-  const result = await spiceClient.query(`
-    SELECT SUM(effective_balance) / POW(10,9) as final_balance
-    FROM ${chain}.beacon.validators
-    JOIN ${chain}.eigenlayer.eigenpods
-    ON
-      ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential
-      AND effective_balance != '0';
-  `);
+  const result = (await spiceClient.query(`
+      SELECT SUM(effective_balance) / POW(10,9) as total_staked
+      FROM ${chain}.beacon.validators
+      JOIN ${chain}.eigenlayer.eigenpods
+      ON
+          ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential
+          AND effective_balance != '0';
+  `)).get(0);
 
-  return { statusCode: 200, body: result.toString() };
-}
-
-const stakersBeaconChainEthSchema = z.object({
-  queryStringParameters: z.object({
-    chain: z.enum(supportedChains),
-  }),
-});
-
-export async function stakersBeaconChainEth(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
-  const {
-    queryStringParameters: { chain },
-  } = stakersBeaconChainEthSchema.parse(event);
-
-  const result = await spiceClient.query(`
-    SELECT 
-        ${chain}.eigenlayer.eigenpods.pod_owner,
-        SUM(${chain}.beacon.validators.effective_balance) / POWER(10,9) AS total_effective_balance
-    FROM 
-        ${chain}.beacon.validators
-    JOIN 
-        ${chain}.eigenlayer.eigenpods
-    ON 
-        ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential 
-        AND ${chain}.beacon.validators.effective_balance != '0'
-    GROUP BY 
-        ${chain}.eigenlayer.eigenpods.pod_owner
-    ORDER BY total_effective_balance DESC;
-  `);
+  if (!result) {
+    throw new Error("Unexpected empty result");
+  }
 
   return {
     statusCode: 200,
-    body: JSON.stringify(result.toArray()),
+    body: JSON.stringify({
+      totalStakedBeacon: result.get(0)!.total_staked,
+    }),
   };
 }
