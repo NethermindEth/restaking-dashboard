@@ -403,7 +403,7 @@ export async function getTotalStakedBeacon(
       ON
           ${chain}.beacon.validators.withdrawal_credentials = ${chain}.eigenlayer.eigenpods.withdrawal_credential
           AND effective_balance != '0';
-  `)).get(0);
+  `)).toArray();
 
   if (!result) {
     throw new Error("Unexpected empty result");
@@ -412,7 +412,7 @@ export async function getTotalStakedBeacon(
   return {
     statusCode: 200,
     body: JSON.stringify({
-      totalStakedBeacon: result.get(0)!.total_staked,
+      totalStakedBeacon: result[0].total_staked,
     }),
   };
 }
