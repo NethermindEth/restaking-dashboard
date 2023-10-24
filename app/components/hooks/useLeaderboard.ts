@@ -2,6 +2,7 @@ import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/type
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useShareRates } from "./useShareRates";
 import { getLeaderboard } from "@/app/utils/api/leaderboard";
+import { MAX_LEADERBOARD_SIZE } from "@/app/constants";
 
 export interface LeaderboardStaker {
   depositor: `0x${string}`;
@@ -44,7 +45,7 @@ export function useLeaderboard(network: SupportedNetwork): UseQueryResult<Leader
 
           return acc;
         }, {} as Record<string, LeaderboardStaker>)
-      ).sort((a, b) => b.totalEth - a.totalEth).slice(0, 50);
+      ).sort((a, b) => b.totalEth - a.totalEth).slice(0, MAX_LEADERBOARD_SIZE);
 
       return {
         partial,
