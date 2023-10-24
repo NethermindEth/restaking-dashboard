@@ -9,7 +9,8 @@ export function useDeposits(network: SupportedNetwork): UseQueryResult<ApiDeposi
       const { data } = await getDeposits(network);
 
       return data;
-    }
+    },
+    retry: false,
   });
 
   return result;

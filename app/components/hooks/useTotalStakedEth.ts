@@ -21,6 +21,7 @@ export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<Tok
       };
     },
     enabled: !!rates && !!totalStakedTokens,
+    retry: false,
   });
 
   return result;

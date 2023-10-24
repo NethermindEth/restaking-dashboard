@@ -43,6 +43,7 @@ export function useTotalStakedTokens(network: SupportedNetwork): UseQueryResult<
         beacon: await results.beacon,
       };
     },
+    retry: false,
   });
 
   return result;

@@ -60,6 +60,7 @@ export function useShareRates(network: SupportedNetwork): UseQueryResult<TokenRe
         beacon: 1,
       };
     },
+    retry: false,
   });
 
   return result;

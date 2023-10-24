@@ -10,6 +10,7 @@ export function useWithdrawals(network: SupportedNetwork): UseQueryResult<ApiWit
 
       return data;
     },
+    retry: false,
   });
 
   return result;

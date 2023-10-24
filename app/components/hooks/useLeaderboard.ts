@@ -52,6 +52,7 @@ export function useLeaderboard(network: SupportedNetwork): UseQueryResult<Leader
       };
     },
     enabled: !!rates,
+    retry: false,
   });
 
   return result;
