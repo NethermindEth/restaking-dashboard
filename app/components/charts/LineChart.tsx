@@ -1,9 +1,10 @@
 "use client";
+
 import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
 import { cloneDeep } from "lodash";
-import { SupportedToken } from "@/app/utils";
+import { SupportedToken, TokenRecord } from "@/app/utils";
 
 const tokens = {
   stEth: {
@@ -66,8 +67,8 @@ const tokens = {
     pointHitRadius: 10,
     data: [],
   },
-  ETH: {
-    label: "Stacked ETH",
+  beacon: {
+    label: "Beacon Chain ETH",
     fill: false,
     lineTension: 0.1,
     backgroundColor: "rgba(254, 156, 147, 0.6)",
@@ -86,7 +87,7 @@ const tokens = {
     pointHitRadius: 10,
     data: [],
   },
-};
+} as TokenRecord<any>;
 
 const LineChart = (data: any) => {
   const chartData = useMemo(() => {
@@ -97,7 +98,7 @@ const LineChart = (data: any) => {
 
     internalChartData.labels = data.data.timestamps;
 
-    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken | "ETH") =>
+    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken) =>
       cloneDeep(tokens[e])
     );
 

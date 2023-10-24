@@ -1,46 +1,31 @@
 "use client";
 
-import {
-  LeaderboardUserData,
-  getEtherscanAddressUrl,
-  getShortenedAddress,
-  roundToDecimalPlaces,
-} from "@/lib/utils";
+import { getEtherscanAddressUrl, getShortenedAddress} from "@/lib/utils";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { LeaderboardStaker } from "./hooks/useLeaderboard";
 
 export default function Leaderboard(data: any) {
   const [activeData, setActiveData] = useState(data.boardData.ethStakers);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const tabKeys = ["totals", ...Object.keys(data.boardData.network)].map(el => el.toLowerCase());
+
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
 
-  const handleToggleContent = (data: LeaderboardUserData[], index: number) => {
+  const handleToggleContent = (data: LeaderboardStaker[], index: number) => {
     setActiveData(data);
     setActiveButton(index);
   };
 
   const getActiveTabName = (activeButton: number) => {
-    switch (activeButton) {
-      case 0:
-        return "totals";
-      case 1:
-        return "beacon";
-      case 2:
-        return "reth";
-      case 3:
-        return "steth";
-      case 4:
-        return "cbeth";
-      default:
-        return "";
-    }
+    return (tabKeys[activeButton] || "").toLowerCase();
   };
 
   return (
@@ -62,36 +47,23 @@ export default function Leaderboard(data: any) {
         </button>
         {Object.keys(data.boardData.network).map((key, index) => (
           <button
+            key={index}
             className={`table-button ${
-              activeButton === 3
+              activeButton === (index + 1)
                 ? `table-button-${key.toLowerCase()}-active`
                 : `table-button-${key.toLowerCase()}-inactive`
             } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
             onClick={() => {
               handleToggleContent(
                 data.boardData[`${key.toLowerCase()}Stakers`],
-                index
+                index + 1
               );
               setCurrentPage(1);
             }}
           >
-            {key}
+            {data.boardData.network[key].label}
           </button>
         ))}
-
-        <button
-          className={`table-button ${
-            activeButton === 1
-              ? "table-button-beacon-active"
-              : "table-button-beacon-inactive"
-          } py-3 px-4 grow border rounded focus:outline-none text-sm shadow-lg`}
-          onClick={() => {
-            handleToggleContent(data.boardData.beaconchainethStakers, 1);
-            setCurrentPage(1);
-          }}
-        >
-          Beacon Chain ETH
-        </button>
       </div>
       {activeData?.length ? (
         <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
@@ -109,7 +81,7 @@ export default function Leaderboard(data: any) {
               </tr>
             </thead>
             <tbody>
-              {(activeData as LeaderboardUserData[])
+              {(activeData as LeaderboardStaker[])
                 .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
                 .map((userData, index) => (
                   <tr className="border-b-2" key={index}>
@@ -137,7 +109,7 @@ export default function Leaderboard(data: any) {
                       {userData.depositor}
                     </td>
                     <td className="py-4 px-4 text-right text-sm">
-                      {roundToDecimalPlaces(userData.totalStaked)}
+                      {userData.totalEth.toFixed(2)}
                     </td>
                   </tr>
                 ))}

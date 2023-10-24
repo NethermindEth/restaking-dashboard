@@ -27,7 +27,7 @@ const tokens = {
     borderColor: ["rgba(0, 153, 153, 1)"],
     borderWidth: 1,
   },
-  ETH: {
+  beacon: {
     label: "Beacon Chain Eth",
     data: [],
     backgroundColor: "rgba(254, 156, 147, 0.6)",
@@ -43,8 +43,8 @@ export default (data: any) => {
       datasets: [] as any[],
     };
 
-    internalChartData.labels = data.data.labels;
-    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken | "ETH") =>
+    internalChartData.labels = data.data.timestamps;
+    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken) =>
       cloneDeep(tokens[e])
     );
 
