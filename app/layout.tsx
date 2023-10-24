@@ -1,5 +1,7 @@
 import "./globals.css";
 
+import Providers from "@/app/providers";
+
 const title = "EigenLayer Restaking Dashboard";
 const description = "Visualise EigenLayer staking and withdrawals in Mainnet";
 const url =
@@ -43,7 +45,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }

@@ -1,15 +1,53 @@
-"use client";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
 import Image from "next/image";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Data from "./components/Data";
 import Disclaimer from "./components/Disclaimer";
+import { supportedNetworks } from "./utils/types";
+import { prefetchingGetShareRatesQueryKey, prefetchingQueryShareRates } from "./components/hooks/useShareRates";
+import { prefetchingGetTotalStakedTokensQueryKey, prefetchingQueryTotalStakedTokens } from "./components/hooks/useTotalStakedTokens";
+import { prefetchingGetDepositsQueryKey, prefetchingQueryDeposits } from "./components/hooks/useDeposits";
+import { prefetchingGetLeaderboardQueryKey, prefetchingQueryLeaderboard } from "./components/hooks/useLeaderboard";
+import { prefetchingGetTotalStakedEthQueryKey, prefetchingQueryTotalStakedEth } from "./components/hooks/useTotalStakedEth";
+import { prefetchingGetWithdrawalsQueryKey, prefetchingQueryWithdrawals } from "./components/hooks/useWithdrawals";
 
-const queryClient = new QueryClient();
+export default async function Home() {
+  const queryClient = new QueryClient();
 
-export default function Home() {
+  // prefetching data for static site generation
+  await Promise.all(supportedNetworks.map(async (network) => {
+    await queryClient.prefetchQuery({
+      queryKey: prefetchingGetShareRatesQueryKey(network, queryClient),
+      queryFn: () => prefetchingQueryShareRates(network, queryClient),
+    });
+
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: prefetchingGetDepositsQueryKey(network, queryClient),
+        queryFn: () => prefetchingQueryDeposits(network, queryClient),
+      }),
+      queryClient.prefetchQuery({
+        queryKey: prefetchingGetLeaderboardQueryKey(network, queryClient),
+        queryFn: () => prefetchingQueryLeaderboard(network, queryClient),
+      }),
+      queryClient.prefetchQuery({
+        queryKey: prefetchingGetTotalStakedTokensQueryKey(network, queryClient),
+        queryFn: () => prefetchingQueryTotalStakedTokens(network, queryClient),
+      }).then(() => {
+        return queryClient.prefetchQuery({
+          queryKey: prefetchingGetTotalStakedEthQueryKey(network, queryClient),
+          queryFn: () => prefetchingQueryTotalStakedEth(network, queryClient),
+        });
+      }),
+      queryClient.prefetchQuery({
+        queryKey: prefetchingGetWithdrawalsQueryKey(network, queryClient),
+        queryFn: () => prefetchingQueryWithdrawals(network, queryClient),
+      }),
+    ]);
+  }));
+
   return (
-    <QueryClientProvider client={queryClient}>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
         <div>
           <div className="z-10 max-w-5xl items-center justify-between font-mono text-sm">
@@ -39,6 +77,6 @@ export default function Home() {
           <Disclaimer />
         </div>
       </main>
-    </QueryClientProvider>
+    </HydrationBoundary>
   );
 }

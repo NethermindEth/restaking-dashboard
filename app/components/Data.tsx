@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+
 import LineChart from "./charts/LineChart";
 import PieChart from "./charts/PieChart";
 import StackedBar from "./charts/StackedBar";
