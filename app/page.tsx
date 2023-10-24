@@ -2,7 +2,7 @@ import Image from "next/image";
 import Data from "./components/Data";
 import Disclaimer from "./components/Disclaimer";
 
-export default async function Home() {
+export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
       <div>
