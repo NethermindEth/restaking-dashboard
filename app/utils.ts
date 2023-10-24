@@ -22,6 +22,7 @@ export type SupportedNetwork = (typeof supportedNetworks)[number];
 export type TokenRecord<T> = Record<SupportedToken | "beacon", T>;
 
 export interface TokenInfo {
+  label: string;
   strategyAddress: `0x${string}`;
   address: `0x${string}`;
   image: string;
