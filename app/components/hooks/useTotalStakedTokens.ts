@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { UseQueryResult, useQuery } from "react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import { IERC20__factory } from "@/typechain";
 import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils";
 import { getNetworkTokens, getNetworkProvider } from "@/app/constants";
@@ -12,34 +12,37 @@ async function getStrategyTvl(tokenAddress: `0x${string}`, strategyAddress: `0x$
 }
 
 export function useTotalStakedTokens(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {
-  const result = useQuery(["totalStakedTokens", network], async () => {
-    const networkTokens = getNetworkTokens(network);
-    const provider = getNetworkProvider(network);
-    
-    const results = supportedTokens.reduce((acc, token) => {
-      if (token == "beacon") {
-        acc[token] = getTotalStakedBeacon(network).then(({ data }) => data.totalStakedBeacon);
-        return acc;
-      }
-
-      const networkToken = networkTokens[token];
-
-      if (!networkToken) {
-        acc[token] = null;
-        return acc;
-      }
+  const result = useQuery({
+    queryKey: ["totalStakedTokens", network],
+    queryFn: async () => {
+      const networkTokens = getNetworkTokens(network);
+      const provider = getNetworkProvider(network);
       
-      acc[token] = getStrategyTvl(networkToken.address, networkToken.strategyAddress, provider);
+      const results = supportedTokens.reduce((acc, token) => {
+        if (token == "beacon") {
+          acc[token] = getTotalStakedBeacon(network).then(({ data }) => data.totalStakedBeacon);
+          return acc;
+        }
 
-      return acc;
-    }, {} as TokenRecord<Promise<number> | null>);
+        const networkToken = networkTokens[token];
 
-    return {
-      stEth: await results.stEth,
-      rEth: await results.rEth,
-      cbEth: await results.cbEth,
-      beacon: await results.beacon,
-    };
+        if (!networkToken) {
+          acc[token] = null;
+          return acc;
+        }
+        
+        acc[token] = getStrategyTvl(networkToken.address, networkToken.strategyAddress, provider);
+
+        return acc;
+      }, {} as TokenRecord<Promise<number> | null>);
+
+      return {
+        stEth: await results.stEth,
+        rEth: await results.rEth,
+        cbEth: await results.cbEth,
+        beacon: await results.beacon,
+      };
+    },
   });
 
   return result;
