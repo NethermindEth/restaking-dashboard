@@ -30,7 +30,7 @@ export function prefetchingGetLeaderboardQueryKey(network: SupportedNetwork, que
 export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRates): Promise<LeaderboardData> {
   if (!rates) throw new Error("Rates were not yet fetched");
 
-  const { data: result } = await getLeaderboard(network);
+  const result = await getLeaderboard(network);
   const partial = {} as TokenRecord<LeaderboardStaker[] | null>;
 
   supportedTokens.forEach(token => {

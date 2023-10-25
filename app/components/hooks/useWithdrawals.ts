@@ -12,9 +12,7 @@ export function prefetchingGetWithdrawalsQueryKey(network: SupportedNetwork, _: 
 }
 
 export async function queryWithdrawals(network: SupportedNetwork): Promise<ApiWithdrawalsResponse> {
-  const { data } = await getWithdrawals(network);
-
-  return data;
+  return await getWithdrawals(network);
 }
 
 export async function prefetchingQueryWithdrawals(network: SupportedNetwork, _: QueryClient): Promise<ApiWithdrawalsResponse> {

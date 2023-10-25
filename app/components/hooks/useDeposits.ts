@@ -12,9 +12,7 @@ export function prefetchingGetDepositsQueryKey(network: SupportedNetwork, _: Que
 }
 
 export async function queryDeposits(network: SupportedNetwork): Promise<ApiDepositsResponse> {
-  const { data } = await getDeposits(network);
-
-  return data;
+  return await getDeposits(network);
 }
 
 export async function prefetchingQueryDeposits(network: SupportedNetwork, _: QueryClient): Promise<ApiDepositsResponse> {

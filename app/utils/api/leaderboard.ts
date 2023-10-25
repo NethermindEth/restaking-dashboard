@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from "axios";
 import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
 
 export interface ApiLeaderboardEntry {
@@ -10,10 +9,8 @@ export interface ApiLeaderboardResponse {
   leaderboard: TokenRecord<ApiLeaderboardEntry[] | null>;
 }
 
-export function getLeaderboard(network: SupportedNetwork): Promise<AxiosResponse<ApiLeaderboardResponse>> {
-  return axios.get<ApiLeaderboardResponse>(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/leaderboard`, {
-    params: {
-      chain: network,
-    },
-  });
+export function getLeaderboard(network: SupportedNetwork): Promise<ApiLeaderboardResponse> {
+  return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/leaderboard?${new URLSearchParams({
+    chain: network,
+  })}`).then(resp => resp.json());
 }

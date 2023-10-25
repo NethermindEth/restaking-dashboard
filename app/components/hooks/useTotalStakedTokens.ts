@@ -26,7 +26,7 @@ export async function queryTotalStakedTokens(network: SupportedNetwork): Promise
   
   const results = supportedTokens.reduce((acc, token) => {
     if (token == "beacon") {
-      acc[token] = getTotalStakedBeacon(network).then(({ data }) => data.totalStakedBeacon);
+      acc[token] = getTotalStakedBeacon(network).then((data) => data.totalStakedBeacon);
       return acc;
     }
 
