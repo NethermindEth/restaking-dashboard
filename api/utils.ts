@@ -2,6 +2,9 @@
 export const supportedChains = ["eth", "goerli"] as const;
 export type Chain = (typeof supportedChains)[number];
 
+export const supportedTimelines = ["1w", "1m", "1y", "full"] as const;
+export type Timeline = (typeof supportedTimelines)[number];
+
 export function getContractAddresses(chain: Chain) {
   switch (chain) {
     case "eth":
@@ -20,3 +23,10 @@ export function getContractAddresses(chain: Chain) {
       throw new Error(`Unknown network '${chain}'`);
   }
 }
+
+export const timelineToDays: Readonly<Record<Timeline, number>> = {
+  "1w": 7,
+  "1m": 30,
+  "1y": 365,
+  "full": Infinity,
+};

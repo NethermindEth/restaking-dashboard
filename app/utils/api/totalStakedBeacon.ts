@@ -7,5 +7,6 @@ export interface ApiTotalStakedBeaconResponse {
 export function getTotalStakedBeacon(network: SupportedNetwork): Promise<ApiTotalStakedBeaconResponse> {
   return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeacon?${new URLSearchParams({
     chain: network,
+    timeline: "1m",
   })}`).then(resp => resp.json());
 }

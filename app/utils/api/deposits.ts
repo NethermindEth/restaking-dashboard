@@ -15,5 +15,6 @@ export interface ApiDepositsResponse {
 export function getDeposits(network: SupportedNetwork): Promise<ApiDepositsResponse> {
   return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits?${new URLSearchParams({
     chain: network,
+    timeline: "1m",
   })}`).then(resp => resp.json());
 }

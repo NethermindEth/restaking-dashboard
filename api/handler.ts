@@ -1,11 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 import spiceClient from "./spice";
-import { getContractAddresses, supportedChains } from "./utils";
+import { getContractAddresses, supportedChains, supportedTimelines, timelineToDays } from "./utils";
 
 const getDepositsSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
+    timeline: z.enum(supportedTimelines),
   }),
 });
 
@@ -13,13 +14,15 @@ export const getDeposits = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const {
-    queryStringParameters: { chain },
+    queryStringParameters: { chain, timeline },
   } = getDepositsSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
-
+  
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
+
+  const days = timelineToDays[timeline];
 
   const response = (
     await spiceClient.query(`
@@ -95,21 +98,21 @@ export const getDeposits = async (
               SUM(COALESCE(cdd.total_shares, 0)) OVER (PARTITION BY cdd.token ORDER BY cdd."date") AS cumulative_shares
           FROM CoalescedDailyDeposits cdd
       ),
-      Last30DaysData AS (
-        SELECT * FROM CumulativeDeposits as ldd
-        WHERE ldd."date" >= DATE_ADD(CURRENT_DATE, -30)
+      TimelineDeposits AS (
+        SELECT * FROM CumulativeDeposits as cd
+        ${(days !== Infinity)? `WHERE cd."date" >= DATE_ADD(CURRENT_DATE, -${days})` : ""}
       )
       SELECT
-          ldd."date",
-          ldd.token,
-          ldd.total_amount,
-          ldd.total_shares,
-          ldd.cumulative_amount,
-          ldd.cumulative_shares
-      FROM Last30DaysData ldd
+          td."date",
+          td.token,
+          td.total_amount,
+          td.total_shares,
+          td.cumulative_amount,
+          td.cumulative_shares
+      FROM TimelineDeposits td
       ORDER BY
-          ldd."date",
-          ldd.token;
+          td."date",
+          td.token;
     `)
   ).toArray();
 
@@ -143,6 +146,7 @@ export const getDeposits = async (
 const getLeaderboardSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
+    timeline: z.enum(supportedTimelines),
   }),
 });
 
@@ -150,13 +154,15 @@ export const getLeaderboard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const {
-    queryStringParameters: { chain },
+    queryStringParameters: { chain, timeline },
   } = getLeaderboardSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
-
+  
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
+
+  const days = timelineToDays[timeline];
 
   const response = (
     await spiceClient.query(`
@@ -254,6 +260,7 @@ export const getLeaderboard = async (
 const getWithdrawalsSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
+    timeline: z.enum(supportedTimelines),
   }),
 });
 
@@ -261,13 +268,15 @@ export const getWithdrawals = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const {
-    queryStringParameters: { chain },
+    queryStringParameters: { chain, timeline },
   } = getWithdrawalsSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
-
+  
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
+
+  const days = timelineToDays[timeline];
 
   const response = (
     await spiceClient.query(`
@@ -337,22 +346,22 @@ export const getWithdrawals = async (
           AND
               (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
       ),
-      Last30DaysData AS (
-          SELECT * FROM CumulativeWithdrawals as cd
-          WHERE cd."date" >= DATE_ADD(CURRENT_DATE, -30)
+      TimelineWithdrawals AS (
+          SELECT * FROM CumulativeWithdrawals as cw
+          ${(days !== Infinity)? `WHERE cw."date" >= DATE_ADD(CURRENT_DATE, -${days})` : ""}
       )
       SELECT
-        ldd."date",
-        ldd.token,
-        ldd.total_amount,
-        ldd.total_shares,
-        ldd.cumulative_amount,
-        ldd.cumulative_shares
+        tw."date",
+        tw.token,
+        tw.total_amount,
+        tw.total_shares,
+        tw.cumulative_amount,
+        tw.cumulative_shares
       FROM
-        Last30DaysData ldd
+        TimelineWithdrawals tw
       ORDER BY
-        ldd."date",
-        ldd.token;
+        tw."date",
+        tw.token;
     `)
   ).toArray();
 
@@ -386,6 +395,7 @@ export const getWithdrawals = async (
 const getTotalStakedBeaconSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
+    timeline: z.enum(supportedTimelines),
   }),
 });
 
@@ -393,7 +403,7 @@ export async function getTotalStakedBeacon(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const {
-    queryStringParameters: { chain },
+    queryStringParameters: { chain, timeline },
   } = getTotalStakedBeaconSchema.parse(event);
 
   const result = (await spiceClient.query(`
