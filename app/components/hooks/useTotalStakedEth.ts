@@ -18,7 +18,7 @@ export function prefetchingGetTotalStakedEthQueryKey(network: SupportedNetwork, 
   return getTotalStakedEthQueryKey(network, rates, totalStakedTokens);
 }
 
-export async function queryTotalStakedEth(network: SupportedNetwork, rates: ShareRates, totalStakedTokens: TokenRecord<number | null>): Promise<TokenRecord<number | null>> {
+export async function queryTotalStakedEth(rates: ShareRates, totalStakedTokens: TokenRecord<number | null>): Promise<TokenRecord<number | null>> {
   if (!rates) throw new Error("Rates were not yet fetched");
   if (!totalStakedTokens) throw new Error("Total staked tokens were not yet fetched");
 
@@ -37,7 +37,7 @@ export async function prefetchingQueryTotalStakedEth(network: SupportedNetwork, 
   const totalStakedTokens: TokenRecord<number | null> | undefined = queryClient.getQueryData(prefetchingGetTotalStakedTokensQueryKey(network, queryClient));
   if (!totalStakedTokens) throw new Error("Rates were not yet fetched");
 
-  return await queryTotalStakedEth(network, rates, totalStakedTokens);
+  return await queryTotalStakedEth(rates, totalStakedTokens);
 }
 
 export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {
@@ -46,7 +46,7 @@ export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<Tok
 
   const result = useQuery({
     queryKey: ["totalStakedEth", network, rates, totalStakedTokens],
-    queryFn: () => queryTotalStakedEth(network, rates!, totalStakedTokens!),
+    queryFn: () => queryTotalStakedEth(rates!, totalStakedTokens!),
     enabled: !!rates && !!totalStakedTokens,
     retry: false,
   });
