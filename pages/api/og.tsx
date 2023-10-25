@@ -1,48 +1,41 @@
-import { getNetworkProvider, getNetworkTokens } from "@/app/constants";
-import { roundToDecimalPlaces } from "@/lib/utils";
-import {
-  RocketTokenRETH__factory,
-  StakedTokenV1__factory,
-  StrategyBaseTVLLimits__factory,
-} from "@/typechain";
 import { ImageResponse } from "@vercel/og";
+
+import { queryTotalStakedTokens } from "@/app/components/hooks/useTotalStakedTokens";
+import { getNetworkTokens } from "@/app/utils/constants";
+import { SupportedToken } from "@/app/utils/types";
 
 export const config = {
   runtime: "edge",
 };
 
-const logo = fetch(new URL("../../public/logo.png", import.meta.url)).then(
-  (res) => res.arrayBuffer()
-);
+async function fetchImage(publicUrl: string) : Promise<ArrayBuffer> {
+  const resp = await fetch(
+    new URL(
+      `../../public${publicUrl.startsWith("/")? "" : "/"}${publicUrl}`,
+      import.meta.url
+    )
+  );
 
-const stEthLogo = fetch(
-  new URL("../../public/steth_logo.png", import.meta.url)
-).then((res) => res.arrayBuffer());
+  return await resp.arrayBuffer();
+}
 
-const rEthLogo = fetch(new URL("../../public/reth.png", import.meta.url)).then(
-  (res) => res.arrayBuffer()
-);
+export default async function handler() {
+  const network = "eth";
+  const networkTokenData = getNetworkTokens(network);
+  
+  const eigenlayerDashboardLogo = await fetchImage("logo.png");
 
-const cbEthLogo = fetch(
-  new URL("../../public/cbeth.png", import.meta.url)
-).then((res) => res.arrayBuffer());
+  const tokenLogos = Object.fromEntries(
+    await Promise.all(
+      Object.entries(networkTokenData).map(
+        async ([token, info]): Promise<[SupportedToken, ArrayBuffer]> => {
+          return [token as SupportedToken, await fetchImage(info.image)]
+        }
+      )
+    )
+  );
 
-const beaconEthLogo = fetch(
-  new URL("../../public/beaconChainETH.png", import.meta.url)
-).then((res) => res.arrayBuffer());
-
-export default async function () {
-  const network = "eth"; // TODO: to be made dynamic ?
-
-  const dashboardData = await getDashboardData(network);
-
-  const logos = await Promise.all([
-    logo,
-    stEthLogo,
-    rEthLogo,
-    cbEthLogo,
-    beaconEthLogo,
-  ]);
+  const tvl = await queryTotalStakedTokens(network);
 
   return new ImageResponse(
     (
@@ -73,7 +66,7 @@ export default async function () {
               alt="EigenLayer Logo"
               width="64"
               height="72"
-              src={logos[0] as unknown as string}
+              src={eigenlayerDashboardLogo as unknown as string}
             />
             <p tw="text-2xl ml-4">EigenLayer Stats</p>
           </div>
@@ -82,58 +75,30 @@ export default async function () {
           style={{ display: "flex" }}
           tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
-          {Object.keys(getNetworkTokens(network)).map((key, index) => {
-            const token = key as keyof ReturnType<typeof getNetworkTokens>;
-
-            return (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  color: "rgba(235, 235, 235, 1)",
-                  backgroundColor: "rgb(26, 12, 109)",
-                  textAlign: "center",
-                }}
-                tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
-              >
-                <img
-                  tw="mx-auto"
-                  src={logos[index + 1] as unknown as string}
-                  alt="stETH"
-                  width="48"
-                  height="48"
-                />
-                <p tw="text-base mx-auto">Staked {key}</p>
-                <p tw="text-xl mx-auto">
-                  {" "}
-                  {roundToDecimalPlaces(dashboardData[`${token}Tvl`])}
-                </p>
-              </div>
-            );
-          })}
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              color: "rgb(26, 12, 109)",
-              backgroundColor: "rgb(254, 156, 147)",
-              textAlign: "center",
-            }}
-            tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
-          >
-            <img
-              tw="mx-auto"
-              src={logos[4] as unknown as string}
-              alt="ETH"
-              width="48"
-              height="48"
-            />
-            <p tw="text-base mx-auto">Beacon Chain ETH</p>
-            <p tw="text-xl mx-auto">
-              {roundToDecimalPlaces(dashboardData.totalStakedBeaconChainEth)}
-            </p>
-          </div>
+          {Object.entries(networkTokenData).map(([token, tokenInfo]) => (
+            <div
+              className={tokenInfo.color}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+              tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
+              key={tokenInfo.label}
+            >
+              <img
+                tw="mx-auto"
+                src={tokenLogos as unknown as string}
+                alt="stETH"
+                width="48"
+                height="48"
+              />
+              <p tw="text-base mx-auto">Staked {tokenInfo.label}</p>
+              <p tw="text-xl mx-auto">
+                {tvl[token as SupportedToken] || ""}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     ),
@@ -145,82 +110,4 @@ export default async function () {
       },
     }
   );
-}
-
-async function getDashboardData(network = "eth") {
-  const networkToken = getNetworkTokens(network);
-  const provider = getNetworkProvider(network);
-
-  const rEth = networkToken["rEth"]
-    ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)
-    : null;
-
-  const cbEth = networkToken["cbEth"]
-    ? StakedTokenV1__factory.connect(networkToken["cbEth"].address, provider)
-    : null;
-
-  const stEthStrategy = networkToken["stEth"]
-    ? StrategyBaseTVLLimits__factory.connect(
-        networkToken["stEth"].strategyAddress,
-        provider
-      )
-    : null;
-  const rEthStrategy = networkToken["rEth"]
-    ? StrategyBaseTVLLimits__factory.connect(
-        networkToken["rEth"].strategyAddress,
-        provider
-      )
-    : null;
-  const cbEthStrategy = networkToken["cbEth"]
-    ? StrategyBaseTVLLimits__factory.connect(
-        networkToken["cbEth"].strategyAddress,
-        provider
-      )
-    : null;
-
-  const stEthTvl = stEthStrategy
-    ? Number(
-        await stEthStrategy.sharesToUnderlyingView(
-          await stEthStrategy.totalShares()
-        )
-      ) / 1e18
-    : 0;
-  const rEthTvl = rEthStrategy
-    ? Number(
-        await rEthStrategy.sharesToUnderlyingView(
-          await rEthStrategy.totalShares()
-        )
-      ) / 1e18
-    : 0;
-  const cbEthTvl = cbEthStrategy
-    ? Number(
-        await cbEthStrategy.sharesToUnderlyingView(
-          await cbEthStrategy.totalShares()
-        )
-      ) / 1e18
-    : 0;
-
-  let totalStakedBeaconChainEth = 0;
-  try {
-    const url = `${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/totalStakedBeaconChainEth`;
-    const params = new URLSearchParams({ chain: network });
-
-    const fullURL = `${url}?${params.toString()}`;
-    const response = await fetch(fullURL);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    totalStakedBeaconChainEth = (await response.json())[0].final_balance;
-  } catch (error) {
-    console.error(error);
-  }
-
-  return {
-    stEthTvl,
-    rEthTvl,
-    cbEthTvl,
-    totalStakedBeaconChainEth,
-  };
 }
