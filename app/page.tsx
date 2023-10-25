@@ -3,48 +3,13 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 import Image from "next/image";
 import Data from "./components/Data";
 import Disclaimer from "./components/Disclaimer";
-import { supportedNetworks } from "./utils/types";
-import { prefetchingGetShareRatesQueryKey, prefetchingQueryShareRates } from "./components/hooks/useShareRates";
-import { prefetchingGetTotalStakedTokensQueryKey, prefetchingQueryTotalStakedTokens } from "./components/hooks/useTotalStakedTokens";
-import { prefetchingGetDepositsQueryKey, prefetchingQueryDeposits } from "./components/hooks/useDeposits";
-import { prefetchingGetLeaderboardQueryKey, prefetchingQueryLeaderboard } from "./components/hooks/useLeaderboard";
-import { prefetchingGetTotalStakedEthQueryKey, prefetchingQueryTotalStakedEth } from "./components/hooks/useTotalStakedEth";
-import { prefetchingGetWithdrawalsQueryKey, prefetchingQueryWithdrawals } from "./components/hooks/useWithdrawals";
+import { prefetchApiData } from "./utils/prefetching";
 
 export default async function Home() {
   const queryClient = new QueryClient();
 
   // prefetching data for static site generation
-  await Promise.all(supportedNetworks.map(async (network) => {
-    await queryClient.prefetchQuery({
-      queryKey: prefetchingGetShareRatesQueryKey(network, queryClient),
-      queryFn: () => prefetchingQueryShareRates(network, queryClient),
-    });
-
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: prefetchingGetDepositsQueryKey(network, queryClient),
-        queryFn: () => prefetchingQueryDeposits(network, queryClient),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: prefetchingGetLeaderboardQueryKey(network, queryClient),
-        queryFn: () => prefetchingQueryLeaderboard(network, queryClient),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: prefetchingGetTotalStakedTokensQueryKey(network, queryClient),
-        queryFn: () => prefetchingQueryTotalStakedTokens(network, queryClient),
-      }).then(() => {
-        return queryClient.prefetchQuery({
-          queryKey: prefetchingGetTotalStakedEthQueryKey(network, queryClient),
-          queryFn: () => prefetchingQueryTotalStakedEth(network, queryClient),
-        });
-      }),
-      queryClient.prefetchQuery({
-        queryKey: prefetchingGetWithdrawalsQueryKey(network, queryClient),
-        queryFn: () => prefetchingQueryWithdrawals(network, queryClient),
-      }),
-    ]);
-  }));
+  await prefetchApiData(queryClient);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
