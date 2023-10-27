@@ -181,6 +181,7 @@ export default function Data() {
           <PieChart
             data={{
               amounts: networkTokens.map(token => totalStakedEthData[token]?.toFixed(2)),
+              tokens: networkTokens,
               labels: networkTokens.map(token => networkTokenData[token]?.label),
             }}
           />
