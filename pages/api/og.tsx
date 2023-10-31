@@ -1,7 +1,7 @@
 import { ImageResponse } from "@vercel/og";
 
 import { queryTotalStakedTokens } from "@/app/components/hooks/useTotalStakedTokens";
-import { getNetworkTokens } from "@/app/utils/constants";
+import { getNetworkTokens, getTokenInfo } from "@/app/utils/constants";
 import { SupportedToken } from "@/app/utils/types";
 
 export const config = {
@@ -21,17 +21,15 @@ async function fetchImage(publicUrl: string) : Promise<ArrayBuffer> {
 
 export default async function handler() {
   const network = "eth";
-  const networkTokenData = getNetworkTokens(network);
+  const tokens = getNetworkTokens(network);
   
   const eigenlayerDashboardLogo = await fetchImage("logo.png");
 
   const tokenLogos = Object.fromEntries(
     await Promise.all(
-      Object.entries(networkTokenData).map(
-        async ([token, info]): Promise<[SupportedToken, ArrayBuffer]> => {
-          return [token as SupportedToken, await fetchImage(info.image)]
-        }
-      )
+      tokens.map(async (token) => {
+        return [token as SupportedToken, await fetchImage(getTokenInfo(token).image)]
+      })
     )
   );
 
@@ -75,16 +73,16 @@ export default async function handler() {
           style={{ display: "flex" }}
           tw="my-8 mx-8 w-screen flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-around"
         >
-          {Object.entries(networkTokenData).map(([token, tokenInfo]) => (
+          {tokens.map((token) => (
             <div
-              className={tokenInfo.color}
+              className={getTokenInfo(token).color}
               style={{
                 display: "flex",
                 flexDirection: "column",
                 textAlign: "center",
               }}
               tw="grow mt-0 py-8 px-18 mx-4 shadow-lg rounded-md text-center"
-              key={tokenInfo.label}
+              key={getTokenInfo(token).label}
             >
               <img
                 tw="mx-auto"
@@ -93,7 +91,7 @@ export default async function handler() {
                 width="48"
                 height="48"
               />
-              <p tw="text-base mx-auto">Staked {tokenInfo.label}</p>
+              <p tw="text-base mx-auto">Staked {getTokenInfo(token).label}</p>
               <p tw="text-xl mx-auto">
                 {tvl[token as SupportedToken] || ""}
               </p>
