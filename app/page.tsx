@@ -7,13 +7,7 @@ import Data from "./components/Data";
 import Disclaimer from "./components/Disclaimer";
 import { prefetchApiData } from "./utils/prefetching";
 
-const getQueryClient = cache(() => new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity,
-    },
-  },
-}));
+const getQueryClient = cache(() => new QueryClient());
 
 let prefetched = false;
 
