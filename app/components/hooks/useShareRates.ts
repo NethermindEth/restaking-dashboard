@@ -1,4 +1,4 @@
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
 import {
@@ -12,10 +12,6 @@ export type ShareRates = TokenRecord<number | null>;
 
 export function getShareRatesQueryKey(network: SupportedNetwork): any[] {
   return ["shareRates", network];
-}
-
-export function prefetchingGetShareRatesQueryKey(network: SupportedNetwork, _: QueryClient): any[] {
-  return getShareRatesQueryKey(network);
 }
 
 export async function queryShareRates(network: SupportedNetwork, _: boolean = false): Promise<ShareRates> {
@@ -67,10 +63,6 @@ export async function queryShareRates(network: SupportedNetwork, _: boolean = fa
     cbEth: cbEthStrategy ? cbEthSharesRate * cbEthRate : null,
     beacon: 1,
   };
-}
-
-export async function prefetchingQueryShareRates(network: SupportedNetwork, _: QueryClient): Promise<ShareRates> {
-  return await queryShareRates(network, true);
 }
 
 export function useShareRates(network: SupportedNetwork): UseQueryResult<ShareRates> {

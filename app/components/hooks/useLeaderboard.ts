@@ -1,7 +1,7 @@
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
-import { ShareRates, prefetchingGetShareRatesQueryKey, useShareRates } from "./useShareRates";
+import { ShareRates, useShareRates } from "./useShareRates";
 import { getLeaderboard } from "@/app/utils/api/leaderboard";
 import { MAX_LEADERBOARD_SIZE } from "@/app/utils/constants";
 
@@ -17,14 +17,6 @@ export interface LeaderboardData {
 
 export function getLeaderboardQueryKey(network: SupportedNetwork, rates?: ShareRates): any[] {
   return ["leaderboard", network, rates];
-}
-
-export function prefetchingGetLeaderboardQueryKey(network: SupportedNetwork, queryClient: QueryClient): any[] {
-  const rates: ShareRates | undefined = queryClient.getQueryData(prefetchingGetShareRatesQueryKey(network, queryClient));
-
-  if (!rates) throw new Error("Rates were not yet fetched");
-
-  return getLeaderboardQueryKey(network, rates);
 }
 
 export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRates, _: boolean = false): Promise<LeaderboardData> {
@@ -59,14 +51,6 @@ export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRa
     partial,
     total,
   };
-}
-
-export async function prefetchingQueryLeaderboard(network: SupportedNetwork, queryClient: QueryClient): Promise<LeaderboardData> {
-  const rates: ShareRates | undefined = queryClient.getQueryData(prefetchingGetShareRatesQueryKey(network, queryClient));
-
-  if (!rates) throw new Error("Rates were not yet fetched");
-
-  return await queryLeaderboard(network, rates, true);
 }
 
 export function useLeaderboard(network: SupportedNetwork): UseQueryResult<LeaderboardData> {

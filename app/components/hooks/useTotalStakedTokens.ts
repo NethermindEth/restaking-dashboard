@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { IERC20__factory } from "@/typechain";
 import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
@@ -14,10 +14,6 @@ async function getStrategyTvl(tokenAddress: `0x${string}`, strategyAddress: `0x$
 
 export function getTotalStakedTokensQueryKey(network: SupportedNetwork): any[] {
   return ["totalStakedTokens", network];
-}
-
-export function prefetchingGetTotalStakedTokensQueryKey(network: SupportedNetwork, _: QueryClient): any[] {
-  return getTotalStakedTokensQueryKey(network);
 }
 
 export async function queryTotalStakedTokens(network: SupportedNetwork, _: boolean = false): Promise<TokenRecord<number | null>> {
@@ -48,10 +44,6 @@ export async function queryTotalStakedTokens(network: SupportedNetwork, _: boole
     cbEth: await results.cbEth,
     beacon: await results.beacon,
   };
-}
-
-export async function prefetchingQueryTotalStakedTokens(network: SupportedNetwork, _: QueryClient): Promise<TokenRecord<number | null>> {
-  return await queryTotalStakedTokens(network, true);
 }
 
 export function useTotalStakedTokens(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {

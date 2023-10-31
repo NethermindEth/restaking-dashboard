@@ -1,8 +1,8 @@
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
-import { ShareRates, prefetchingGetShareRatesQueryKey, useShareRates } from "./useShareRates";
-import { useTotalStakedTokens, prefetchingGetTotalStakedTokensQueryKey } from "./useTotalStakedTokens";
+import { ShareRates, useShareRates } from "./useShareRates";
+import { useTotalStakedTokens } from "./useTotalStakedTokens";
 
 export function getTotalStakedEthQueryKey(
   network: SupportedNetwork,
@@ -10,16 +10,6 @@ export function getTotalStakedEthQueryKey(
   totalStakedTokens: TokenRecord<number | null>,
 ): any[] {
   return ["totalStakedEth", network, rates, totalStakedTokens];
-}
-
-export function prefetchingGetTotalStakedEthQueryKey(network: SupportedNetwork, queryClient: QueryClient): any[] {
-  const rates: ShareRates | undefined = queryClient.getQueryData(prefetchingGetShareRatesQueryKey(network, queryClient));
-  if (!rates) throw new Error("Rates were not yet fetched");
-
-  const totalStakedTokens: TokenRecord<number | null> | undefined = queryClient.getQueryData(prefetchingGetTotalStakedTokensQueryKey(network, queryClient));
-  if (!totalStakedTokens) throw new Error("Rates were not yet fetched");
-
-  return getTotalStakedEthQueryKey(network, rates, totalStakedTokens);
 }
 
 export async function queryTotalStakedEth(
@@ -36,16 +26,6 @@ export async function queryTotalStakedEth(
     cbEth: totalStakedTokens.cbEth ? totalStakedTokens.cbEth * rates.cbEth! : null,
     beacon: totalStakedTokens.beacon,
   };
-}
-
-export async function prefetchingQueryTotalStakedEth(network: SupportedNetwork, queryClient: QueryClient): Promise<TokenRecord<number | null>> {
-  const rates: ShareRates | undefined = queryClient.getQueryData(prefetchingGetShareRatesQueryKey(network, queryClient));
-  if (!rates) throw new Error("Rates were not yet fetched");
-
-  const totalStakedTokens: TokenRecord<number | null> | undefined = queryClient.getQueryData(prefetchingGetTotalStakedTokensQueryKey(network, queryClient));
-  if (!totalStakedTokens) throw new Error("Rates were not yet fetched");
-
-  return await queryTotalStakedEth(rates, totalStakedTokens, true);
 }
 
 export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {
