@@ -1,15 +1,30 @@
+import Image from "next/image";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { cache } from "react";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
-import Image from "next/image";
 import Data from "./components/Data";
 import Disclaimer from "./components/Disclaimer";
 import { prefetchApiData } from "./utils/prefetching";
 
-export default async function Home() {
-  const queryClient = new QueryClient();
+const getQueryClient = cache(() => new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+}));
 
-  // prefetching data for static site generation
-  await prefetchApiData(queryClient);
+let prefetched = false;
+
+export default async function Home() {
+  const queryClient = getQueryClient();
+  const isBuild = process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD;
+
+  if (((isBuild && !prefetched) || !isBuild) && process.env.NODE_ENV === "production") {
+    prefetched = true;
+    await prefetchApiData(queryClient);
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
