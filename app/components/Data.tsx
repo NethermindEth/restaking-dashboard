@@ -3,51 +3,25 @@
 import { useState } from "react";
 import Image from "next/image";
 
-import LineChart from "./charts/LineChart";
-import PieChart from "./charts/PieChart";
-import StackedBar from "./charts/StackedBar";
-import Leaderboard from "./Leaderboard";
-import Loader from "./Loader";
-import Error from "./Error";
-
-import { SupportedNetwork, SupportedToken } from "@/app/utils/types";
-import { getNetworkTokens } from "@/app/utils/constants";
-import { useDeposits } from "./hooks/useDeposits";
-import { useLeaderboard } from "./hooks/useLeaderboard";
-import { useWithdrawals } from "./hooks/useWithdrawals";
-import { useTotalStakedEth } from "./hooks/useTotalStakedEth";
-import { useTotalStakedTokens } from "./hooks/useTotalStakedTokens";
+import { SupportedNetwork } from "@/app/utils/types";
+import { getNetworkTokens, getTokenInfo } from "@/app/utils/constants";
+import { useTotalStakedTokens } from "@/app/components/hooks/useTotalStakedTokens";
+import StrategyDepositsChart from "@/app/components/charts/CumulativeStrategyDepositsChart";
+import CumulativeStrategyDepositsChart from "@/app/components/charts/CumulativeStrategyDepositsChart";
+import CumulativeStrategyWithdrawalsChart from "@/app/components/charts/CumulativeStrategyWithdrawalsChart";
+import StrategyWithdrawalsChart from "@/app/components/charts/StrategyWithdrawalsChart";
+import CumulativeBeaconDepositsChart from "@/app/components/charts/CumulativeBeaconDepositsChart";
+import BeaconDepositsChart from "@/app/components/charts/BeaconDepositsChart";
+import DistributionChart from "@/app/components/charts/DistributionChart";
+import Leaderboard from "@/app/components/Leaderboard";
 
 export default function Data() {
   const [network, setNetwork] = useState<SupportedNetwork>("eth");
-  
-  const { data: depositsData, error: depositsError, isLoading: depositsLoading } = useDeposits(network);
-  const { data: withdrawalsData, error: withdrawalsError, isLoading: withdrawalsLoading } = useWithdrawals(network);
-  const { data: leaderboardData, error: leaderboardError, isLoading: leaderboardLoading } = useLeaderboard(network);
-  const { data: totalStakedEthData, error: totalStakedEthError, isLoading: totalStakedEthLoading } = useTotalStakedEth(network);
+
   const { data: totalStakedTokensData, error: totalStakedTokensError, isLoading: totalStakedTokensLoading } = useTotalStakedTokens(network);
+  const tokens = getNetworkTokens(network);
 
-  const error = [depositsError, withdrawalsError, leaderboardError, totalStakedEthError, totalStakedTokensError].some(el => el);
-  const loading = [depositsLoading, withdrawalsLoading, leaderboardLoading, totalStakedEthLoading, totalStakedTokensLoading].some(el => el);
-
-  const networkTokenData = getNetworkTokens(network);
-  const networkTokens = Object.keys(networkTokenData) as SupportedToken[];
-  const networkStrategyTokens = networkTokens.filter(el => el !== "beacon") as Exclude<SupportedToken, "beacon">[];
-
-  if (error) {
-    return <Error message="Something went wrong! Try reloading the page." />;
-  }
-
-  if (
-    loading
-    || depositsData == null
-    || withdrawalsData == null
-    || leaderboardData == null
-    || totalStakedEthData == null
-    || totalStakedTokensData == null
-  ) {
-    return <Loader />;
-  }
+  if (!totalStakedTokensData) return <></>;
 
   return (
     <>
@@ -67,17 +41,17 @@ export default function Data() {
         </div>
       </div>
       <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
-        {Object.entries(networkTokenData).map(([key, value]) => (
+        {tokens.map(token => (
           <div
-            key={key}
-            className={`data-card ${value.color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+            key={token}
+            className={`data-card ${getTokenInfo(token).color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
           >
             <span className="inline-block">
-              <Image src={value.image} alt={key} width={48} height={48} />
+              <Image src={getTokenInfo(token).image} alt={getTokenInfo(token).label} width={48} height={48} />
             </span>
-            <p className="text-sm md:text-base">Staked {value.label}</p>
+            <p className="text-sm md:text-base">Staked {getTokenInfo(token).label}</p>
             <p className="md:text-xl">
-              {totalStakedTokensData[key as SupportedToken]?.toFixed(2)}
+              {totalStakedTokensData[token]?.toFixed(2)}
             </p>
           </div>
         ))}
@@ -89,27 +63,13 @@ export default function Data() {
             Cumulative deposited tokens by day
           </h3>
           <div className="chart-2">
-            <LineChart
-              data={{
-                title: "Cumulative deposited tokens by day",
-                amounts: networkStrategyTokens.map((token) => depositsData.deposits[token as SupportedToken]?.map(el => el.cumulativeAmount.toFixed(2))),
-                timestamps: depositsData.timestamps,
-                namedLabels: networkStrategyTokens,
-              }}
-            />
+            <CumulativeStrategyDepositsChart network={network} />
           </div>
         </div>
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">Deposited tokens by day</h3>
           <div className="chart-staked-lst-date">
-            <StackedBar
-              data={{
-                amounts: networkStrategyTokens.map((token) => depositsData.deposits[token as SupportedToken]?.map(el => el.totalAmount.toFixed(2))),
-                timestamps: depositsData.timestamps,
-                namedLabels: networkStrategyTokens,
-              }}
-              title="Deposited tokens by day"
-            />
+            <StrategyDepositsChart network={network} />
           </div>
         </div>
 
@@ -118,28 +78,14 @@ export default function Data() {
             Cumulative Token Withdrawals by day
           </h3>
           <div className="chart-2">
-            <LineChart
-              data={{
-                title: "Cumulative Token Withdrawals by day",
-                amounts: networkStrategyTokens.map((token) => withdrawalsData.withdrawals[token as SupportedToken]?.map(el => el.cumulativeAmount.toFixed(2))),
-                timestamps: withdrawalsData.timestamps,
-                namedLabels: networkStrategyTokens,
-              }}
-            />
+            <CumulativeStrategyWithdrawalsChart network={network} />
           </div>
         </div>
 
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">Token Withdrawals by day</h3>
           <div className="chart-staked-lst-date">
-            <StackedBar
-              data={{
-                amounts: networkStrategyTokens.map((token) => withdrawalsData.withdrawals[token as SupportedToken]?.map(el => el.totalAmount.toFixed(2))),
-                timestamps: withdrawalsData.timestamps,
-                namedLabels: networkStrategyTokens,
-              }}
-              title="Token Withdrawals by day"
-            />
+            <StrategyWithdrawalsChart network={network} />
           </div>
         </div>
 
@@ -148,14 +94,7 @@ export default function Data() {
             Cumulative Beacon Chain ETH in EigenPods by day
           </h3>
           <div className="chart-2">
-            <LineChart
-              data={{
-                title: "Cumulative Token Withdrawals by day",
-                amounts: [depositsData.deposits.beacon?.map(el => el.cumulativeAmount.toFixed(2))],
-                timestamps: depositsData.timestamps,
-                namedLabels: ["beacon"],
-              }}
-            />
+            <CumulativeBeaconDepositsChart network={network} />
           </div>
         </div>
 
@@ -164,40 +103,16 @@ export default function Data() {
             Added Beacon Chain ETH to EigenPods by day
           </h3>
           <div className="chart-staked-lst-date">
-            <StackedBar
-              data={{
-                title: "Cumulative Token Withdrawals by day",
-                amounts: [depositsData.deposits.beacon?.map(el => el.totalAmount.toFixed(2))],
-                timestamps: depositsData.timestamps,
-                namedLabels: ["beacon"],
-              }}
-              title="Token Withdrawals by day"
-            />
+            <BeaconDepositsChart network={network} />
           </div>
         </div>
 
         <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
           <h3 className="text-center text-xl">Staked ETH Distribution</h3>
-          <PieChart
-            data={{
-              amounts: networkTokens.map(token => totalStakedEthData[token]?.toFixed(2)),
-              tokens: networkTokens,
-              labels: networkTokens.map(token => networkTokenData[token]?.label),
-            }}
-          />
+          <DistributionChart network={network} />
         </div>
 
-        <Leaderboard
-          boardData={{
-            network: networkTokenData,
-            ethStakers: leaderboardData.total,
-            stethStakers: leaderboardData.partial.stEth,
-            rethStakers: leaderboardData.partial.rEth,
-            cbethStakers: leaderboardData.partial.cbEth,
-            beaconStakers: leaderboardData.partial.beacon,
-          }}
-          title="Restaking Leaderboard"
-        />
+        <Leaderboard network={network} />
       </div>
     </>
   );

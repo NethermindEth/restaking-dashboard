@@ -1,20 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { LeaderboardStaker } from "@/app/components/hooks/useLeaderboard";
-import { getEtherscanAddressUrl, getShortenedAddress} from "@/app/utils/address";
 
-export default function Leaderboard(data: any) {
-  const [activeData, setActiveData] = useState(data.boardData.ethStakers);
+import { LeaderboardStaker, useLeaderboard } from "@/app/components/hooks/useLeaderboard";
+import { getEtherscanAddressUrl, getShortenedAddress} from "@/app/utils/address";
+import { SupportedNetwork } from "@/app/utils/types";
+import { getNetworkTokens, getTokenInfo } from "@/app/utils/constants";
+
+interface LeaderboardProps {
+  network: SupportedNetwork;
+}
+
+export default function Leaderboard({ network }: LeaderboardProps) {
+  const { data: leaderboardData } = useLeaderboard(network);
+
+  const [activeData, setActiveData] = useState<LeaderboardStaker[]>([]);
   const [activeButton, setActiveButton] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const tabKeys = ["totals", ...Object.keys(data.boardData.network)].map(el => el.toLowerCase());
+  useEffect(() => {
+    if (!leaderboardData) return;
+
+    setActiveData(leaderboardData.total);
+    setActiveButton(0);
+    setCurrentPage(1);
+  }, [network, leaderboardData]);
+
+  if (!leaderboardData) return <></>;
+
+  const tokens = getNetworkTokens(network);
+  const tokenLabels = tokens.map(token => getTokenInfo(token).label);
+
+  const tabKeys = ["totals", ...tokenLabels].map(el => el.toLowerCase());
 
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(activeData.length / PAGE_SIZE);
@@ -30,7 +52,7 @@ export default function Leaderboard(data: any) {
 
   return (
     <div className="mt-16 w-full">
-      <h3 className="text-center text-xl">{data.title}</h3>
+      <h3 className="text-center text-xl">Restaking Leaderboard</h3>
       <div className="flex flex-col lg:flex-row mt-3 w-full">
         <button
           className={`table-button ${
@@ -39,29 +61,29 @@ export default function Leaderboard(data: any) {
               : "table-button-totals-inactive"
           } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
           onClick={() => {
-            handleToggleContent(data.boardData.ethStakers, 0);
+            handleToggleContent(leaderboardData.total, 0);
             setCurrentPage(1);
           }}
         >
           Total staked
         </button>
-        {Object.keys(data.boardData.network).map((key, index) => (
+        {tokens.map((token, idx) => (
           <button
-            key={index}
+            key={token}
             className={`table-button ${
-              activeButton === (index + 1)
-                ? `table-button-${key.toLowerCase()}-active`
-                : `table-button-${key.toLowerCase()}-inactive`
+              activeButton === (idx + 1)
+                ? `table-button-${token.toLowerCase()}-active`
+                : `table-button-${token.toLowerCase()}-inactive`
             } py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
             onClick={() => {
               handleToggleContent(
-                data.boardData[`${key.toLowerCase()}Stakers`],
-                index + 1
+                leaderboardData.partial[token]!,
+                idx + 1
               );
               setCurrentPage(1);
             }}
           >
-            {data.boardData.network[key].label}
+            {tokenLabels[idx]}
           </button>
         ))}
       </div>

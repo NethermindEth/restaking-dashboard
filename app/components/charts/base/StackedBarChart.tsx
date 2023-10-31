@@ -1,59 +1,56 @@
 "use client";
+
 import "chart.js/auto";
 import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
-import { cloneDeep } from "lodash";
-import { SupportedToken } from "@/app/utils/types";
+import { ChartData } from "chart.js/auto";
 
-const tokens = {
+import { SupportedToken, TokenRecord } from "@/app/utils/types";
+import { getTokenInfo } from "@/app/utils/constants";
+
+const tokenDatasets: TokenRecord<ChartData<"bar">["datasets"][number]> = {
   stEth: {
-    label: "stEth",
-    data: [],
     backgroundColor: ["rgba(26, 12, 109, 0.6)"],
     borderColor: ["rgba(26, 12, 109, 1)"],
     borderWidth: 1,
+    data: [],
   },
   rEth: {
-    label: "rEth",
-    data: [],
     backgroundColor: ["rgba(255, 184, 0, 0.6)"],
     borderColor: ["rgba(255, 184, 0, 1)"],
     borderWidth: 1,
+    data: [],
   },
   cbEth: {
-    label: "cbEth",
-    data: [],
     backgroundColor: ["rgba(0, 153, 153, 0.6)"],
     borderColor: ["rgba(0, 153, 153, 1)"],
     borderWidth: 1,
+    data: [],
   },
   beacon: {
-    label: "Beacon Chain Eth",
-    data: [],
     backgroundColor: "rgba(254, 156, 147, 0.6)",
     borderColor: ["rgba(254, 156, 147, 1)"],
     borderWidth: 1,
+    data: [],
   },
 };
 
-export default (data: any) => {
-  const chartData = useMemo(() => {
-    const internalChartData = {
-      labels: [] as string[],
-      datasets: [] as any[],
-    };
+export interface StackedBarChartProps {
+  title: string;
+  tokens: SupportedToken[];
+  amounts: Array<string | number>[];
+  timestamps: string[];
+}
 
-    internalChartData.labels = data.data.timestamps;
-    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken) =>
-      cloneDeep(tokens[e])
-    );
-
-    internalChartData.datasets.forEach((dataset, index) => {
-      dataset.data = data.data.amounts[index];
-      dataset.label = data.data.namedLabels[index];
-    });
-    return internalChartData;
-  }, [data]);
+export default function StackedBarChart({ title, tokens, amounts, timestamps }: StackedBarChartProps) {
+  const chartData = useMemo(() => ({
+    labels: timestamps,
+    datasets: tokens.map((token, idx) => ({
+      ...tokenDatasets[token],
+      label: getTokenInfo(token).label,
+      data: amounts[idx],
+    })),
+  }), [title, tokens, amounts, timestamps]);
 
   return (
     <Bar
