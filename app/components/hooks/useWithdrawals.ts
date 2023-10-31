@@ -11,8 +11,8 @@ export function prefetchingGetWithdrawalsQueryKey(network: SupportedNetwork, _: 
   return getWithdrawalsQueryKey(network);
 }
 
-export async function queryWithdrawals(network: SupportedNetwork, isPrefetch: boolean = false): Promise<ApiWithdrawalsResponse> {
-  return await getWithdrawals(network, (isPrefetch)? { next: { revalidate: Infinity } } : undefined);
+export async function queryWithdrawals(network: SupportedNetwork, _: boolean = false): Promise<ApiWithdrawalsResponse> {
+  return await getWithdrawals(network);
 }
 
 export async function prefetchingQueryWithdrawals(network: SupportedNetwork, _: QueryClient): Promise<ApiWithdrawalsResponse> {

@@ -11,8 +11,8 @@ export function prefetchingGetDepositsQueryKey(network: SupportedNetwork, _: Que
   return getDepositsQueryKey(network);
 }
 
-export async function queryDeposits(network: SupportedNetwork, isPrefetch: boolean = false): Promise<ApiDepositsResponse> {
-  return await getDeposits(network, (isPrefetch)? { next: { revalidate: Infinity } } : undefined);
+export async function queryDeposits(network: SupportedNetwork, _: boolean = false): Promise<ApiDepositsResponse> {
+  return await getDeposits(network);
 }
 
 export async function prefetchingQueryDeposits(network: SupportedNetwork, _: QueryClient): Promise<ApiDepositsResponse> {
