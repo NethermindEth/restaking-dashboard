@@ -12,9 +12,9 @@ export interface ApiWithdrawalsResponse {
   withdrawals: TokenRecord<ApiWithdrawalsEntry[] | null>;
 }
 
-export function getWithdrawals(network: SupportedNetwork): Promise<ApiWithdrawalsResponse> {
+export function getWithdrawals(network: SupportedNetwork, requestInit?: RequestInit): Promise<ApiWithdrawalsResponse> {
   return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals?${new URLSearchParams({
     chain: network,
     timeline: "1m",
-  })}`).then(resp => resp.json());
+  })}`, requestInit).then(resp => resp.json());
 }

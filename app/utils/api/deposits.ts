@@ -12,9 +12,9 @@ export interface ApiDepositsResponse {
   deposits: TokenRecord<ApiDepositsEntry[] | null>;
 }
 
-export function getDeposits(network: SupportedNetwork): Promise<ApiDepositsResponse> {
+export function getDeposits(network: SupportedNetwork, requestInit?: RequestInit): Promise<ApiDepositsResponse> {
   return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits?${new URLSearchParams({
     chain: network,
     timeline: "1m",
-  })}`).then(resp => resp.json());
+  })}`, requestInit).then(resp => resp.json());
 }
