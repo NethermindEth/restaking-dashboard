@@ -18,7 +18,7 @@ export function prefetchingGetShareRatesQueryKey(network: SupportedNetwork, _: Q
   return getShareRatesQueryKey(network);
 }
 
-export async function queryShareRates(network: SupportedNetwork): Promise<ShareRates> {
+export async function queryShareRates(network: SupportedNetwork, _: boolean = false): Promise<ShareRates> {
   const networkToken = getNetworkTokens(network);
   const provider = getNetworkProvider(network);
 
@@ -70,7 +70,7 @@ export async function queryShareRates(network: SupportedNetwork): Promise<ShareR
 }
 
 export async function prefetchingQueryShareRates(network: SupportedNetwork, _: QueryClient): Promise<ShareRates> {
-  return await queryShareRates(network);
+  return await queryShareRates(network, true);
 }
 
 export function useShareRates(network: SupportedNetwork): UseQueryResult<ShareRates> {

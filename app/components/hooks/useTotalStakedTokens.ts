@@ -20,13 +20,16 @@ export function prefetchingGetTotalStakedTokensQueryKey(network: SupportedNetwor
   return getTotalStakedTokensQueryKey(network);
 }
 
-export async function queryTotalStakedTokens(network: SupportedNetwork): Promise<TokenRecord<number | null>> {
+export async function queryTotalStakedTokens(network: SupportedNetwork, isPrefetch: boolean = false): Promise<TokenRecord<number | null>> {
   const networkTokens = getNetworkTokens(network);
   const provider = getNetworkProvider(network);
   
   const results = supportedTokens.reduce((acc, token) => {
     if (token == "beacon") {
-      acc[token] = getTotalStakedBeacon(network).then((data) => data.totalStakedBeacon);
+      acc[token] = getTotalStakedBeacon(
+        network,
+        (isPrefetch)? { next: { revalidate: Infinity } } : undefined,
+      ).then((data) => data.totalStakedBeacon);
       return acc;
     }
 
@@ -51,7 +54,7 @@ export async function queryTotalStakedTokens(network: SupportedNetwork): Promise
 }
 
 export async function prefetchingQueryTotalStakedTokens(network: SupportedNetwork, _: QueryClient): Promise<TokenRecord<number | null>> {
-  return await queryTotalStakedTokens(network);
+  return await queryTotalStakedTokens(network, true);
 }
 
 export function useTotalStakedTokens(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {

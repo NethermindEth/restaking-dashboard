@@ -4,7 +4,11 @@ import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
 import { ShareRates, prefetchingGetShareRatesQueryKey, useShareRates } from "./useShareRates";
 import { useTotalStakedTokens, prefetchingGetTotalStakedTokensQueryKey } from "./useTotalStakedTokens";
 
-export function getTotalStakedEthQueryKey(network: SupportedNetwork, rates: ShareRates, totalStakedTokens: TokenRecord<number | null>): any[] {
+export function getTotalStakedEthQueryKey(
+  network: SupportedNetwork,
+  rates: ShareRates,
+  totalStakedTokens: TokenRecord<number | null>,
+): any[] {
   return ["totalStakedEth", network, rates, totalStakedTokens];
 }
 
@@ -18,7 +22,11 @@ export function prefetchingGetTotalStakedEthQueryKey(network: SupportedNetwork, 
   return getTotalStakedEthQueryKey(network, rates, totalStakedTokens);
 }
 
-export async function queryTotalStakedEth(rates: ShareRates, totalStakedTokens: TokenRecord<number | null>): Promise<TokenRecord<number | null>> {
+export async function queryTotalStakedEth(
+  rates: ShareRates,
+  totalStakedTokens: TokenRecord<number | null>,
+  _: boolean = false,
+): Promise<TokenRecord<number | null>> {
   if (!rates) throw new Error("Rates were not yet fetched");
   if (!totalStakedTokens) throw new Error("Total staked tokens were not yet fetched");
 
@@ -37,7 +45,7 @@ export async function prefetchingQueryTotalStakedEth(network: SupportedNetwork, 
   const totalStakedTokens: TokenRecord<number | null> | undefined = queryClient.getQueryData(prefetchingGetTotalStakedTokensQueryKey(network, queryClient));
   if (!totalStakedTokens) throw new Error("Rates were not yet fetched");
 
-  return await queryTotalStakedEth(rates, totalStakedTokens);
+  return await queryTotalStakedEth(rates, totalStakedTokens, true);
 }
 
 export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {

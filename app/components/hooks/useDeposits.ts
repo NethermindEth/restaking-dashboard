@@ -11,12 +11,12 @@ export function prefetchingGetDepositsQueryKey(network: SupportedNetwork, _: Que
   return getDepositsQueryKey(network);
 }
 
-export async function queryDeposits(network: SupportedNetwork): Promise<ApiDepositsResponse> {
-  return await getDeposits(network);
+export async function queryDeposits(network: SupportedNetwork, isPrefetch: boolean = false): Promise<ApiDepositsResponse> {
+  return await getDeposits(network, (isPrefetch)? { next: { revalidate: Infinity } } : undefined);
 }
 
 export async function prefetchingQueryDeposits(network: SupportedNetwork, _: QueryClient): Promise<ApiDepositsResponse> {
-  return await queryDeposits(network);
+  return await queryDeposits(network, true);
 }
 
 export function useDeposits(network: SupportedNetwork): UseQueryResult<ApiDepositsResponse> {
