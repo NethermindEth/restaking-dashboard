@@ -3,7 +3,7 @@ import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { IERC20__factory } from "@/typechain";
 import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
-import { getNetworkTokens, getNetworkProvider } from "@/app/utils/constants";
+import { getNetworkProvider, getTokenNetworkInfo } from "@/app/utils/constants";
 import { getTotalStakedBeacon } from "@/app/utils/api/totalStakedBeacon";
 
 async function getStrategyTvl(tokenAddress: `0x${string}`, strategyAddress: `0x${string}`, provider: ethers.Provider): Promise<number> {
@@ -17,7 +17,6 @@ export function getTotalStakedTokensQueryKey(network: SupportedNetwork): any[] {
 }
 
 export async function queryTotalStakedTokens(network: SupportedNetwork, _: boolean = false): Promise<TokenRecord<number | null>> {
-  const networkTokens = getNetworkTokens(network);
   const provider = getNetworkProvider(network);
   
   const results = supportedTokens.reduce((acc, token) => {
@@ -26,14 +25,14 @@ export async function queryTotalStakedTokens(network: SupportedNetwork, _: boole
       return acc;
     }
 
-    const networkToken = networkTokens[token];
+    const networkInfo = getTokenNetworkInfo(network, token);
 
-    if (!networkToken) {
+    if (!networkInfo) {
       acc[token] = null;
       return acc;
     }
     
-    acc[token] = getStrategyTvl(networkToken.address, networkToken.strategyAddress, provider);
+    acc[token] = getStrategyTvl(networkInfo.address, networkInfo.strategyAddress, provider);
 
     return acc;
   }, {} as TokenRecord<Promise<number> | null>);
