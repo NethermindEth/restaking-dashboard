@@ -99,6 +99,8 @@ export default function LineChart({ title, amounts, timestamps, tokens}: LineCha
     })),
   }), [title, amounts, timestamps, tokens]);
 
+  const isEmpty = useMemo(() => amounts.every(el => el.length === 0), [amounts]);
+
   return (
     <Line
       data={chartData}
@@ -108,6 +110,15 @@ export default function LineChart({ title, amounts, timestamps, tokens}: LineCha
         responsive: true,
         normalized: true,
         color: "rgb(26, 12, 109)",
+        ...(isEmpty && {
+          scales: {
+            y: {
+              ticks: {
+                display: false,
+              },
+            },
+          }
+        }),
       }}
     />
   );

@@ -10,12 +10,21 @@ export interface StrategyWithdrawalsChartProps {
 }
 
 export default function StrategyWithdrawalsChart({ network }: StrategyWithdrawalsChartProps) {
-  const { data: withdrawalsData, error: withdrawalsError, isLoading: withdrawalsLoading } = useWithdrawals(network);
+  const { data: withdrawalsData, isLoading: withdrawalsLoading } = useWithdrawals(network);
   
   const networkStrategyTokens = getNetworkStrategyTokens(network);
 
-  if (!withdrawalsData) {
-    return <></>
+  if (!withdrawalsData || withdrawalsLoading) {
+    return (
+      <div className="w-full mx-auto loading-pulse">
+        <StackedBarChart
+          title="EigenPod deposits by day"
+          amounts={networkStrategyTokens.map(() => [])}
+          timestamps={[]}
+          tokens={networkStrategyTokens}
+        />
+      </div>
+    )
   }
 
   return (

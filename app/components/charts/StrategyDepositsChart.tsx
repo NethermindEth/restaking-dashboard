@@ -10,12 +10,21 @@ export interface StrategyDepositsChartProps {
 }
 
 export default function StrategyDepositsChart({ network }: StrategyDepositsChartProps) {
-  const { data: depositsData, error: depositsError, isLoading: depositsLoading } = useDeposits(network);
+  const { data: depositsData, isLoading: depositsLoading } = useDeposits(network);
   
   const networkStrategyTokens = getNetworkStrategyTokens(network);
 
-  if (!depositsData) {
-    return <></>
+  if (!depositsData || depositsLoading) {
+    return (
+      <div className="w-full mx-auto loading-pulse">
+        <StackedBarChart
+          title="EigenPod deposits by day"
+          amounts={networkStrategyTokens.map(() => [])}
+          timestamps={[]}
+          tokens={networkStrategyTokens}
+        />
+      </div>
+    )
   }
 
   return (

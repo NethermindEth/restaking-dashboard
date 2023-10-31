@@ -9,10 +9,19 @@ export interface BeaconDepositsChartProps {
 }
 
 export default function BeaconDepositsChart({ network }: BeaconDepositsChartProps) {
-  const { data: depositsData, error: depositsError, isLoading: depositsLoading } = useDeposits(network);
+  const { data: depositsData, isLoading: depositsLoading } = useDeposits(network);
 
-  if (!depositsData) {
-    return <></>
+  if (!depositsData || depositsLoading) {
+    return (
+      <div className="w-full mx-auto loading-pulse">
+        <StackedBarChart
+          title="EigenPod deposits by day"
+          amounts={[[]]}
+          timestamps={[]}
+          tokens={["beacon"]}
+        />
+      </div>
+    )
   }
 
   return (

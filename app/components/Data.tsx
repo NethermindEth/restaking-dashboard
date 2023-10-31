@@ -18,10 +18,8 @@ import Leaderboard from "@/app/components/Leaderboard";
 export default function Data() {
   const [network, setNetwork] = useState<SupportedNetwork>("eth");
 
-  const { data: totalStakedTokensData, error: totalStakedTokensError, isLoading: totalStakedTokensLoading } = useTotalStakedTokens(network);
+  const { data: totalStakedTokensData } = useTotalStakedTokens(network);
   const tokens = getNetworkTokens(network);
-
-  if (!totalStakedTokensData) return <></>;
 
   return (
     <>
@@ -44,14 +42,14 @@ export default function Data() {
         {tokens.map(token => (
           <div
             key={token}
-            className={`data-card ${getTokenInfo(token).color} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+            className={`data-card ${getTokenInfo(token).color} ${(!totalStakedTokensData)? "loading-pulse" : ""} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
           >
             <span className="inline-block">
               <Image src={getTokenInfo(token).image} alt={getTokenInfo(token).label} width={48} height={48} />
             </span>
             <p className="text-sm md:text-base">Staked {getTokenInfo(token).label}</p>
             <p className="md:text-xl">
-              {totalStakedTokensData[token]?.toFixed(2)}
+              {totalStakedTokensData && totalStakedTokensData[token]?.toFixed(2)}
             </p>
           </div>
         ))}

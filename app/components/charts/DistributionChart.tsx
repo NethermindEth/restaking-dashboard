@@ -10,12 +10,19 @@ export interface DistributionChartProps {
 }
 
 export default function DistributionChart({ network }: DistributionChartProps) {
-  const { data: totalStakedEthData, error: totalStakedEthError, isLoading: totalStakedEthLoading } = useTotalStakedEth(network);
+  const { data: totalStakedEthData, isLoading: totalStakedEthLoading } = useTotalStakedEth(network);
   
   const tokens = getNetworkTokens(network);
 
-  if (!totalStakedEthData) {
-    return <></>
+  if (!totalStakedEthData || totalStakedEthLoading) {
+    return (
+      <div className="w-full mx-auto loading-pulse">
+        <PieChart
+          amounts={tokens.map(() => 0)}
+          tokens={tokens}
+        />
+      </div>
+    )
   }
 
   return (

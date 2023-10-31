@@ -52,6 +52,8 @@ export default function StackedBarChart({ title, tokens, amounts, timestamps }: 
     })),
   }), [title, tokens, amounts, timestamps]);
 
+  const isEmpty = useMemo(() => amounts.every(el => el.length === 0), [amounts]);
+
   return (
     <Bar
       data={chartData}
@@ -61,7 +63,7 @@ export default function StackedBarChart({ title, tokens, amounts, timestamps }: 
         normalized: true,
         scales: {
           x: { stacked: true, min: 0 },
-          y: { stacked: true },
+          y: { stacked: true, ...(isEmpty && { ticks: { display: false } }) },
         },
         color: "rgb(26, 12, 109)",
       }}
