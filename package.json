@@ -27,7 +27,7 @@
     "http": "^0.0.1-security",
     "lodash": "^4.17.21",
     "next": "^13.5.6",
-    "postcss": "8.4.22",
+    "postcss": "^8.4.31",
     "react": "18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-chartjs-2": "^5.2.0",
@@ -40,7 +40,10 @@
     "@typechain/ethers-v6": "^0.3.0",
     "@types/lodash": "^4.14.194",
     "@types/react-modal": "^3.16.0",
+    "bufferutil": "^4.0.7",
     "encoding": "^0.1.13",
-    "typechain": "^8.1.1"
+    "supports-color": "^8.1.1",
+    "typechain": "^8.1.1",
+    "utf-8-validate": "^5.0.10"
   }
 }
