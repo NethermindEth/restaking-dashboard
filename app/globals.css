@@ -176,7 +176,21 @@ tbody tr:hover {
   align-items: center;
 
 }
+
 .close-btn{
   color: rgb(var(--whitish));
   background-color: rgb(var(--accent-color));
+}
+
+.loading-pulse {
+  animation: loading-pulse-animation 1.8s ease-in-out infinite;
+}
+
+@keyframes loading-pulse-animation {
+  0%, 100% {
+    opacity: .65;
+  }
+  50% {
+    opacity: .6;
+  }
 }

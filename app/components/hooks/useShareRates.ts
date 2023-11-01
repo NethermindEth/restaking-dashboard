@@ -1,4 +1,4 @@
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
 import {
@@ -6,7 +6,7 @@ import {
   StakedTokenV1__factory,
   StrategyBaseTVLLimits__factory,
 } from "@/typechain";
-import { getNetworkTokens, getNetworkProvider } from "@/app/utils/constants";
+import { getNetworkProvider, getTokenNetworkInfo } from "@/app/utils/constants";
 
 export type ShareRates = TokenRecord<number | null>;
 
@@ -14,39 +14,34 @@ export function getShareRatesQueryKey(network: SupportedNetwork): any[] {
   return ["shareRates", network];
 }
 
-export function prefetchingGetShareRatesQueryKey(network: SupportedNetwork, _: QueryClient): any[] {
-  return getShareRatesQueryKey(network);
-}
-
-export async function queryShareRates(network: SupportedNetwork): Promise<ShareRates> {
-  const networkToken = getNetworkTokens(network);
+export async function queryShareRates(network: SupportedNetwork, _: boolean = false): Promise<ShareRates> {
   const provider = getNetworkProvider(network);
 
-  const rEth = networkToken["rEth"]
-    ? RocketTokenRETH__factory.connect(networkToken["rEth"].address, provider)
+  const rEth = getTokenNetworkInfo(network, "rEth")
+    ? RocketTokenRETH__factory.connect(getTokenNetworkInfo(network, "rEth")!.address, provider)
     : null;
   const rEthRate = rEth ? Number(await rEth.getExchangeRate()) / 1e18 : 0;
 
-  const cbEth = networkToken["cbEth"]
-    ? StakedTokenV1__factory.connect(networkToken["cbEth"].address, provider)
+  const cbEth = getTokenNetworkInfo(network, "cbEth")
+    ? StakedTokenV1__factory.connect(getTokenNetworkInfo(network, "cbEth")!.address, provider)
     : null;
   const cbEthRate = cbEth ? Number(await cbEth.exchangeRate()) / 1e18 : 0;
 
-  const stEthStrategy = networkToken["stEth"]
+  const stEthStrategy = getTokenNetworkInfo(network, "stEth")
     ? StrategyBaseTVLLimits__factory.connect(
-        networkToken["stEth"].strategyAddress,
+        getTokenNetworkInfo(network, "stEth")!.strategyAddress,
         provider
       )
     : null;
-  const rEthStrategy = networkToken["rEth"]
+  const rEthStrategy = getTokenNetworkInfo(network, "rEth")
     ? StrategyBaseTVLLimits__factory.connect(
-        networkToken["rEth"].strategyAddress,
+        getTokenNetworkInfo(network, "rEth")!.strategyAddress,
         provider
       )
     : null;
-  const cbEthStrategy = networkToken["cbEth"]
+  const cbEthStrategy = getTokenNetworkInfo(network, "cbEth")
     ? StrategyBaseTVLLimits__factory.connect(
-        networkToken["cbEth"].strategyAddress,
+        getTokenNetworkInfo(network, "cbEth")!.strategyAddress,
         provider
       )
     : null;
@@ -67,10 +62,6 @@ export async function queryShareRates(network: SupportedNetwork): Promise<ShareR
     cbEth: cbEthStrategy ? cbEthSharesRate * cbEthRate : null,
     beacon: 1,
   };
-}
-
-export async function prefetchingQueryShareRates(network: SupportedNetwork, _: QueryClient): Promise<ShareRates> {
-  return await queryShareRates(network);
 }
 
 export function useShareRates(network: SupportedNetwork): UseQueryResult<ShareRates> {

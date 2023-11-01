@@ -7,16 +7,8 @@ export function getDepositsQueryKey(network: SupportedNetwork): any[] {
   return ["deposits", network];
 }
 
-export function prefetchingGetDepositsQueryKey(network: SupportedNetwork, _: QueryClient): any[] {
-  return getDepositsQueryKey(network);
-}
-
-export async function queryDeposits(network: SupportedNetwork): Promise<ApiDepositsResponse> {
+export async function queryDeposits(network: SupportedNetwork, _: boolean = false): Promise<ApiDepositsResponse> {
   return await getDeposits(network);
-}
-
-export async function prefetchingQueryDeposits(network: SupportedNetwork, _: QueryClient): Promise<ApiDepositsResponse> {
-  return await queryDeposits(network);
 }
 
 export function useDeposits(network: SupportedNetwork): UseQueryResult<ApiDepositsResponse> {

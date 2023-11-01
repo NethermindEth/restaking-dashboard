@@ -3,14 +3,13 @@
 import { useMemo } from "react";
 import "chart.js/auto";
 import { Line } from "react-chartjs-2";
-import { cloneDeep } from "lodash";
 import { SupportedToken, TokenRecord } from "@/app/utils/types";
+import { ChartData } from "chart.js/auto";
+import { getTokenInfo } from "@/app/utils/constants";
 
-const tokens = {
+const tokenDatasets: TokenRecord<ChartData<"line">["datasets"][number]> = {
   stEth: {
-    label: "stEth",
     fill: false,
-    lineTension: 0.1,
     pointStyle: "rect",
     backgroundColor: "rgba(26, 12, 109, 0.6)",
     borderColor: "rgba(26, 12, 109, 1)",
@@ -28,9 +27,7 @@ const tokens = {
     data: [],
   },
   rEth: {
-    label: "rEth",
     fill: false,
-    lineTension: 0.1,
     pointStyle: "rect",
     backgroundColor: "rgba(255, 184, 0, 0.6)",
     borderColor: "rgb(255, 184, 0)",
@@ -48,9 +45,7 @@ const tokens = {
     data: [],
   },
   cbEth: {
-    label: "cbETH",
     fill: false,
-    lineTension: 0.1,
     backgroundColor: "rgba(0, 153, 153, 0.6)",
     borderColor: "rgba(0, 153, 153, 1)",
     pointStyle: "rect",
@@ -68,9 +63,7 @@ const tokens = {
     data: [],
   },
   beacon: {
-    label: "Beacon Chain ETH",
     fill: false,
-    lineTension: 0.1,
     backgroundColor: "rgba(254, 156, 147, 0.6)",
     borderColor: "rgba(254, 156, 147, 1)",
     pointStyle: "rect",
@@ -87,41 +80,46 @@ const tokens = {
     pointHitRadius: 10,
     data: [],
   },
-} as TokenRecord<any>;
+};
 
-const LineChart = (data: any) => {
-  const chartData = useMemo(() => {
-    const internalChartData = {
-      labels: [] as string[],
-      datasets: [] as any[],
-    };
+export interface LineChartProps {
+  title: string;
+  amounts: Array<string | number>[];
+  timestamps: string[];
+  tokens: SupportedToken[];
+}
 
-    internalChartData.labels = data.data.timestamps;
+export default function LineChart({ title, amounts, timestamps, tokens}: LineChartProps) {
+  const chartData = useMemo(() => ({
+    labels: timestamps,
+    datasets: tokens.map((token, idx) => ({
+      ...tokenDatasets[token],
+      label: getTokenInfo(token).label,
+      data: amounts[idx],
+    })),
+  }), [title, amounts, timestamps, tokens]);
 
-    internalChartData.datasets = data.data.namedLabels.map((e: SupportedToken) =>
-      cloneDeep(tokens[e])
-    );
-
-    internalChartData.datasets?.forEach((dataset, index) => {
-      dataset.data = data.data.amounts[index];
-      dataset.label = data.data.namedLabels[index];
-    });
-
-    return internalChartData;
-  }, [data]);
+  const isEmpty = useMemo(() => amounts.every(el => el.length === 0), [amounts]);
 
   return (
     <Line
       data={chartData}
-      title={data.title}
+      title={title}
       options={{
         maintainAspectRatio: true,
         responsive: true,
         normalized: true,
         color: "rgb(26, 12, 109)",
+        ...(isEmpty && {
+          scales: {
+            y: {
+              ticks: {
+                display: false,
+              },
+            },
+          }
+        }),
       }}
     />
   );
 };
-
-export default LineChart;
