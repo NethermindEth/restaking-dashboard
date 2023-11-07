@@ -13,7 +13,6 @@ export interface TokenInfo {
   classId: string;
   label: string;
   image: string;
-  color: string;
 }
 
 export interface TokenNetworkInfo {

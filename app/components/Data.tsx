@@ -42,7 +42,7 @@ export default function Data() {
         {tokens.map(token => (
           <div
             key={token}
-            className={`data-card ${getTokenInfo(token).color} ${(!totalStakedTokensData)? "loading-pulse" : ""} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+            className={`data-card data-card-${getTokenInfo(token).classId} ${(!totalStakedTokensData)? "loading-pulse" : ""} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
           >
             <span className="inline-block">
               <Image src={getTokenInfo(token).image} alt={getTokenInfo(token).label} width={48} height={48} />
