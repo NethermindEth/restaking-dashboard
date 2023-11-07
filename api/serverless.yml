@@ -16,6 +16,11 @@ functions:
       - http:
           path: /deposits
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
   getWithdrawals:
     handler: handler.getWithdrawals
     runtime: nodejs18.x
@@ -24,6 +29,11 @@ functions:
       - http:
           path: /withdrawals
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
   getTotalStakedBeacon:
     handler: handler.getTotalStakedBeacon
     runtime: nodejs18.x
@@ -32,6 +42,11 @@ functions:
       - http:
           path: /totalStakedBeacon
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
   getLeaderboard:
     handler: handler.getLeaderboard
     runtime: nodejs18.x
@@ -40,6 +55,11 @@ functions:
       - http:
           path: /leaderboard
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
 
 useDotenv: true
 
