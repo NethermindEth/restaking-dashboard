@@ -3,14 +3,14 @@ frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs14.x  	
+  runtime: nodejs18.x
   apiGateway:
     minimumCompressionSize: 1024
 
 functions:
   getDeposits:
     handler: handler.getDeposits
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 20
     events:
       - httpApi:
@@ -18,7 +18,7 @@ functions:
           method: get
   getWithdrawals:
     handler: handler.getWithdrawals
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 20
     events:
       - httpApi:
@@ -26,7 +26,7 @@ functions:
           method: get
   getTotalStakedBeacon:
     handler: handler.getTotalStakedBeacon
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 20
     events:
       - httpApi:
@@ -34,7 +34,7 @@ functions:
           method: get
   getLeaderboard:
     handler: handler.getLeaderboard
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 20
     events:
       - httpApi:
