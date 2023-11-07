@@ -18,7 +18,7 @@ interface LeaderboardProps {
 }
 
 export default function Leaderboard({ network }: LeaderboardProps) {
-  const { data: leaderboardData } = useLeaderboard(network);
+  const { data: leaderboardData, isLoading: isLeaderboardLoading } = useLeaderboard(network);
 
   const PAGE_SIZE = 10;
 
@@ -30,10 +30,8 @@ export default function Leaderboard({ network }: LeaderboardProps) {
   const tokens = getNetworkTokens(network);
 
   useEffect(() => {
-    if (!leaderboardData) return;
-
     setActiveTab("total");
-  }, [network, leaderboardData]);
+  }, [network]);
 
   useEffect(() => {
     if (!leaderboardData) return;
@@ -69,73 +67,85 @@ export default function Leaderboard({ network }: LeaderboardProps) {
           </button>
         ))}
       </div>
-      {activeData?.length ? (
-        <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
-          <table className="table w-full border-collapse">
-            <thead
-              className={`text-base table-head table-head-${(activeTab === "total") ? "total" : getTokenInfo(activeTab).classId}`}
-            >
-              <tr>
-                <th className="py-3 px-4 text-left">Rank</th>
-                <th className="py-3 px-4 text-left">Address</th>
-                <th className="py-3 px-4 text-right">Total Staked</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeData.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
-                .map((userData, index) => (
-                  <tr className="border-b-2" key={index}>
-                    <td className="py-4 px-4 text-left text-md">
-                      {currentPage * PAGE_SIZE + index + 1}
+      <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
+        <table className="table w-full border-collapse">
+          <thead className={`text-base table-head table-head-${(activeTab === "total") ? "total" : getTokenInfo(activeTab).classId}`}>
+            <tr>
+              <th className="py-3 px-4 text-left">Rank</th>
+              <th className="py-3 px-4 text-left">Address</th>
+              <th className="py-3 px-4 text-right">Total Staked</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(activeData.length && activeData.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
+              .map((userData, idx) => (
+                <tr className="border-b-2" key={idx}>
+                  <td className="py-4 px-4 text-left text-md">
+                    {currentPage * PAGE_SIZE + idx + 1}
+                  </td>
+                  <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
+                    <td className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden">
+                      {
+                        userData.depositor?.endsWith(".eth")
+                          ? userData.depositor
+                          : getShortenedAddress(userData.depositor, 4, 6)
+                      }
                     </td>
-                    <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
-                      <td className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden">
-                        {
-                          userData.depositor?.endsWith(".eth")
-                            ? userData.depositor
-                            : getShortenedAddress(userData.depositor, 4, 6)
-                        }
-                      </td>
-                    </Link>
-                    <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
-                      <td className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell">
-                        {userData.depositor}
-                      </td>
-                    </Link>
-                    <td className="py-4 px-4 text-right text-sm">
-                      {userData.totalEth.toFixed(2)}
+                  </Link>
+                  <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
+                    <td className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell">
+                      {userData.depositor}
                     </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+                  </Link>
+                  <td className="py-4 px-4 text-right text-sm">
+                    {userData.totalEth.toFixed(2)}
+                  </td>
+                </tr>
+              ))) || null}
+              {(!activeData.length && isLeaderboardLoading && Array.from({ length: PAGE_SIZE }).map((_, idx) => (
+                <tr className="border-b-2 animate-pulse" key={idx}>
+                  <td className="py-4 px-4 text-left text-md">
+                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-300 w-50"></div>
+                  </td>
+                  <td className="py-4 px-4 text-left text-sm font-normal w-full table-cell">
+                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-300"></div>
+                  </td>
+                  <td className="py-4 px-4 text-right text-sm">
+                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-300 w-24"></div>
+                  </td>
+                </tr>
+              ))) || null}
+          </tbody>
+        </table>
 
-          <div className=" pagination flex justify-center items-center mt-4 pb-6">
-            <button
-              className={`${currentPage === 0 ? "disabled-arrow" : ""}`}
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 0}
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
+        <div className=" pagination flex justify-center items-center mt-4 pb-6">
+          <button
+            className={`${currentPage === 0 ? "disabled-arrow" : ""}`}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={!activeData.length || currentPage === 0}
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          {(activeData.length)? (
             <p className="mx-4">
               Page {currentPage + 1} of {totalPages}
             </p>
-            <button
-              className={`${
-                currentPage === totalPages ? "disabled-arrow" : ""
-              }`}
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages - 1}
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
+          ) : (
+            <p className="mx-4">
+              Page 1 of 1
+            </p>
+          )}
+          <button
+            className={`${
+              currentPage === totalPages ? "disabled-arrow" : ""
+            }`}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={!activeData.length || currentPage === totalPages - 1}
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
         </div>
-      ) : (
-        <p className="py-6 px-6 text-left text-sm">No staker yet</p>
-      )}
+      </div>
     </div>
   );
 }
