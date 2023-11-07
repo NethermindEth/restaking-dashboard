@@ -46,7 +46,7 @@ h3 {
 }
 
 .table-button-totals-active,
-.table-head-totals {
+.table-head-total {
   color: rgb(var(--whitish));
   background-color: rgba(46, 46, 46, 1);
 }
