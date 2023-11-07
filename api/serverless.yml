@@ -13,7 +13,7 @@ functions:
     runtime: nodejs18.x
     timeout: 20
     events:
-      - httpApi:
+      - http:
           path: /deposits
           method: get
   getWithdrawals:
@@ -21,7 +21,7 @@ functions:
     runtime: nodejs18.x
     timeout: 20
     events:
-      - httpApi:
+      - http:
           path: /withdrawals
           method: get
   getTotalStakedBeacon:
@@ -29,7 +29,7 @@ functions:
     runtime: nodejs18.x
     timeout: 20
     events:
-      - httpApi:
+      - http:
           path: /totalStakedBeacon
           method: get
   getLeaderboard:
@@ -37,7 +37,7 @@ functions:
     runtime: nodejs18.x
     timeout: 20
     events:
-      - httpApi:
+      - http:
           path: /leaderboard
           method: get
 
