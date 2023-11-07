@@ -49,8 +49,6 @@ export default function Leaderboard({ network }: LeaderboardProps) {
     setCurrentPage(0);
   }, [activeTab, leaderboardData]);
 
-  if (!leaderboardData) return <></>;
-
   return (
     <div className="mt-16 w-full">
       <h3 className="text-center text-xl">Restaking Leaderboard</h3>
@@ -80,7 +78,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
               <tr>
                 <th className="py-3 px-4 text-left">Rank</th>
                 <th className="py-3 px-4 text-left">Address</th>
-                <th className="py-3 px-4 text-left">Total Staked</th>
+                <th className="py-3 px-4 text-right">Total Staked</th>
                 <th></th>
               </tr>
             </thead>
