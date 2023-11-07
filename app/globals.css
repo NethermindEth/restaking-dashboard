@@ -36,7 +36,7 @@ body {
   background-color: rgb(var(--tertiary-accent-color));
 }
 
-.data-card-eth {
+.data-card-beacon {
   color: rgb(var(--accent-color));
   background-color: rgb(var(--tertiary-bg-rgb));
 }

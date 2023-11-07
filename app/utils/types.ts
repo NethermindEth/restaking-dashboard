@@ -10,6 +10,7 @@ export type SupportedNetwork = (typeof supportedNetworks)[number];
 export type TokenRecord<T> = Record<SupportedToken | "beacon", T>;
 
 export interface TokenInfo {
+  classId: string;
   label: string;
   image: string;
   color: string;
