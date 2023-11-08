@@ -9,11 +9,18 @@ export type SupportedNetwork = (typeof supportedNetworks)[number];
 
 export type TokenRecord<T> = Record<SupportedToken | "beacon", T>;
 
+export const timeline = ["1w", "1m", "1y", "full"] as const;
+export type Timeline = (typeof timeline)[number];
+
+export const timeRange = ["daily", "weekly", "monthly"] as const;
+export type TimeRange = (typeof timeRange)[number];
+
 export interface TokenInfo {
   label: string;
   image: string;
   color: string;
 }
+
 
 export interface TokenNetworkInfo {
   strategyAddress: `0x${string}`;

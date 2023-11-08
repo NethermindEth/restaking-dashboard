@@ -1,4 +1,5 @@
-import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
+import { SupportedNetwork, TimeRange, Timeline, TokenRecord } from "@/app/utils/types";
+import { groupWithdrawalsByTime } from "@/app/utils/groupByTime";
 
 export interface ApiWithdrawalsEntry {
   totalAmount: number;
@@ -12,9 +13,11 @@ export interface ApiWithdrawalsResponse {
   withdrawals: TokenRecord<ApiWithdrawalsEntry[] | null>;
 }
 
-export function getWithdrawals(network: SupportedNetwork, requestInit?: RequestInit): Promise<ApiWithdrawalsResponse> {
-  return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals?${new URLSearchParams({
+export async function getWithdrawals(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline, requestInit?: RequestInit): Promise<ApiWithdrawalsResponse> {
+  const resp = await fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals?${new URLSearchParams({
     chain: network,
-    timeline: "1m",
-  })}`, requestInit).then(resp => resp.json());
+    timeline,
+  })}`, requestInit);
+  const data = await resp.json();
+  return groupWithdrawalsByTime(data, timeRange);
 }

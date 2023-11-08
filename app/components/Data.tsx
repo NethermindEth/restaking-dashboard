@@ -6,17 +6,26 @@ import Image from "next/image";
 import { SupportedNetwork } from "@/app/utils/types";
 import { getNetworkTokens, getTokenInfo } from "@/app/utils/constants";
 import { useTotalStakedTokens } from "@/app/components/hooks/useTotalStakedTokens";
-import StrategyDepositsChart from "@/app/components/charts/CumulativeStrategyDepositsChart";
 import CumulativeStrategyDepositsChart from "@/app/components/charts/CumulativeStrategyDepositsChart";
+import StrategyDepositsChart from "@/app/components/charts/StrategyDepositsChart";
 import CumulativeStrategyWithdrawalsChart from "@/app/components/charts/CumulativeStrategyWithdrawalsChart";
 import StrategyWithdrawalsChart from "@/app/components/charts/StrategyWithdrawalsChart";
 import CumulativeBeaconDepositsChart from "@/app/components/charts/CumulativeBeaconDepositsChart";
 import BeaconDepositsChart from "@/app/components/charts/BeaconDepositsChart";
 import DistributionChart from "@/app/components/charts/DistributionChart";
 import Leaderboard from "@/app/components/Leaderboard";
+import TimelineSelector from "@/app/components/TimelineSelector";
 
 export default function Data() {
   const [network, setNetwork] = useState<SupportedNetwork>("eth");
+  const [timeline, setTimeline] = useState<any>({});
+
+  const handleTimelineChange = (name: string, values: Object) => {
+    setTimeline((prevValues: any) => ({
+      ...prevValues,
+      [name]: values,
+    }));
+  }
 
   const { data: totalStakedTokensData } = useTotalStakedTokens(network);
   const tokens = getNetworkTokens(network);
@@ -24,7 +33,7 @@ export default function Data() {
   return (
     <>
       <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none lgmb-12">
-        <h2>Select Network:</h2>
+        <h2 className="mr-2">Select Network:</h2>
         <div className="form-group">
           <select
             className="form-control"
@@ -42,7 +51,7 @@ export default function Data() {
         {tokens.map(token => (
           <div
             key={token}
-            className={`data-card ${getTokenInfo(token).color} ${(!totalStakedTokensData)? "loading-pulse" : ""} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+            className={`data-card ${getTokenInfo(token).color} ${(!totalStakedTokensData) ? "loading-pulse" : ""} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
           >
             <span className="inline-block">
               <Image src={getTokenInfo(token).image} alt={getTokenInfo(token).label} width={48} height={48} />
@@ -57,51 +66,53 @@ export default function Data() {
 
       <div className="staking-dashboard w-full md:w-3/4 lg:w-2/3 2xl:w-1/2">
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">
-            Cumulative deposited tokens by day
-          </h3>
+          <h3 className="text-center text-xl">Cumulative deposited tokens</h3>
+          <TimelineSelector name="deposit" onTimelineChange={handleTimelineChange} />
           <div className="chart-2">
-            <CumulativeStrategyDepositsChart network={network} />
+            <CumulativeStrategyDepositsChart network={network} timeRange={timeline["deposit"]?.timeRange ?? "daily"} timeline={timeline["deposit"]?.timeline ?? "1m"} />
           </div>
         </div>
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Deposited tokens by day</h3>
+          <h3 className="text-center text-xl">Deposited tokens</h3>
+          <TimelineSelector name="depositCumulative" onTimelineChange={handleTimelineChange} />
           <div className="chart-staked-lst-date">
-            <StrategyDepositsChart network={network} />
+            <StrategyDepositsChart network={network} timeRange={timeline["depositCumulative"]?.timeRange ?? "daily"} timeline={timeline["depositCumulative"]?.timeline ?? "1m"} />
           </div>
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">
-            Cumulative Token Withdrawals by day
-          </h3>
+          <h3 className="text-center text-xl">Cumulative Token Withdrawals</h3>
+          <TimelineSelector name="withdrawalCumulative" onTimelineChange={handleTimelineChange} />
           <div className="chart-2">
-            <CumulativeStrategyWithdrawalsChart network={network} />
+            <CumulativeStrategyWithdrawalsChart network={network} timeRange={timeline["withdrawalCumulative"]?.timeRange ?? "daily"} timeline={timeline["withdrawalCumulative"]?.timeline ?? "1m"} />
           </div>
         </div>
 
         <div className="charts-homepage mt-16">
-          <h3 className="text-center text-xl">Token Withdrawals by day</h3>
+          <h3 className="text-center text-xl">Token Withdrawals</h3>
+          <TimelineSelector name="withdrawal" onTimelineChange={handleTimelineChange} />
           <div className="chart-staked-lst-date">
-            <StrategyWithdrawalsChart network={network} />
+            <StrategyWithdrawalsChart network={network} timeRange={timeline["withdrawal"]?.timeRange ?? "daily"} timeline={timeline["withdrawal"]?.timeline ?? "1m"} />
           </div>
         </div>
 
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Cumulative Beacon Chain ETH in EigenPods by day
+            Cumulative Beacon Chain ETH in EigenPods
           </h3>
+          <TimelineSelector name="beaconCumulative" onTimelineChange={handleTimelineChange} />
           <div className="chart-2">
-            <CumulativeBeaconDepositsChart network={network} />
+            <CumulativeBeaconDepositsChart network={network} timeRange={timeline["beaconCumulative"]?.timeRange ?? "daily"} timeline={timeline["beaconCumulative"]?.timeline ?? "1m"} />
           </div>
         </div>
 
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">
-            Added Beacon Chain ETH to EigenPods by day
+            Beacon Chain ETH Added to EigenPods
           </h3>
+          <TimelineSelector name="beacon" onTimelineChange={handleTimelineChange} />
           <div className="chart-staked-lst-date">
-            <BeaconDepositsChart network={network} />
+            <BeaconDepositsChart network={network} timeRange={timeline["beacon"]?.timeRange ?? "daily"} timeline={timeline["beacon"]?.timeline ?? "1m"} />
           </div>
         </div>
 

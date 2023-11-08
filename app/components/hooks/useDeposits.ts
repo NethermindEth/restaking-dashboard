@@ -1,20 +1,20 @@
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
-import { SupportedNetwork } from "@/app/utils/types";
+import { SupportedNetwork, TimeRange, Timeline } from "@/app/utils/types";
 import { ApiDepositsResponse, getDeposits } from "@/app/utils/api/deposits";
 
-export function getDepositsQueryKey(network: SupportedNetwork): any[] {
-  return ["deposits", network];
+export function getDepositsQueryKey(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline): any[] {
+  return ["deposits", network, timeRange, timeline];
 }
 
-export async function queryDeposits(network: SupportedNetwork, _: boolean = false): Promise<ApiDepositsResponse> {
-  return await getDeposits(network);
+export async function queryDeposits(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline, _: boolean = false): Promise<ApiDepositsResponse> {
+  return await getDeposits(network, timeRange, timeline);
 }
 
-export function useDeposits(network: SupportedNetwork): UseQueryResult<ApiDepositsResponse> {
+export function useDeposits(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline): UseQueryResult<ApiDepositsResponse> {
   const result = useQuery({
-    queryKey: getDepositsQueryKey(network),
-    queryFn: () => queryDeposits(network),
+    queryKey: getDepositsQueryKey(network, timeRange, timeline),
+    queryFn: () => queryDeposits(network, timeRange, timeline),
     retry: false,
   });
 
