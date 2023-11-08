@@ -11,7 +11,7 @@ functions:
   getDeposits:
     handler: handler.getDeposits
     runtime: nodejs14.x
-    timeout: 20
+    timeout: 40
     events:
       - httpApi:
           path: /deposits
@@ -19,7 +19,7 @@ functions:
   getWithdrawals:
     handler: handler.getWithdrawals
     runtime: nodejs14.x
-    timeout: 20
+    timeout: 40
     events:
       - httpApi:
           path: /withdrawals
@@ -27,7 +27,7 @@ functions:
   getTotalStakedBeacon:
     handler: handler.getTotalStakedBeacon
     runtime: nodejs14.x
-    timeout: 20
+    timeout: 40
     events:
       - httpApi:
           path: /totalStakedBeacon
@@ -35,7 +35,7 @@ functions:
   getLeaderboard:
     handler: handler.getLeaderboard
     runtime: nodejs14.x
-    timeout: 20
+    timeout: 40
     events:
       - httpApi:
           path: /leaderboard
