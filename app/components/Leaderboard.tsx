@@ -83,20 +83,20 @@ export default function Leaderboard({ network }: LeaderboardProps) {
                   <td className="py-4 px-4 text-left text-md">
                     {currentPage * PAGE_SIZE + idx + 1}
                   </td>
-                  <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
-                    <td className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden">
+                  <td className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden">
+                    <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
                       {
                         userData.depositor?.endsWith(".eth")
                           ? userData.depositor
                           : getShortenedAddress(userData.depositor, 4, 6)
                       }
-                    </td>
-                  </Link>
-                  <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
-                    <td className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell">
+                    </Link>
+                  </td>
+                  <td className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell">
+                    <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
                       {userData.depositor}
-                    </td>
-                  </Link>
+                    </Link>
+                  </td>
                   <td className="py-4 px-4 text-right text-sm">
                     {userData.totalEth.toFixed(2)}
                   </td>
