@@ -3,19 +3,24 @@ import { ApiDepositsResponse, ApiDepositsEntry } from "@/app/utils/api/deposits"
 import { ApiWithdrawalsResponse, ApiWithdrawalsEntry } from "@/app/utils/api/withdrawals";
 import { TimeRange, TokenRecord } from "@/app/utils/types";
 
+function keysOf<T extends Object>(obj: T): Array<keyof T> {
+  return Array.from(Object.keys(obj)) as any;
+}
+
 export function groupDepositsByTime(data: ApiDepositsResponse, timeRange: TimeRange): ApiDepositsResponse {
   if (timeRange === "daily") {
     return data
   }
+  
   const result = {
     timestamps: [],
     deposits: {} as TokenRecord<ApiDepositsEntry[] | null>
   };
 
-  Object.keys(data.deposits).forEach(token => data.deposits[token as keyof TokenRecord<ApiDepositsEntry[] | null>] === null && delete data.deposits[token as keyof TokenRecord<ApiDepositsEntry[] | null>]);
+  keysOf(data.deposits).forEach(token => data.deposits[token] === null && delete data.deposits[token]);
 
-  Object.keys(data.deposits).forEach(token => {
-    result.deposits[token as keyof TokenRecord<ApiDepositsEntry[] | null>] = [];
+  keysOf(data.deposits).forEach(token => {
+    result.deposits[token] = [];
   });
 
   let currentTime = '';
@@ -40,12 +45,12 @@ export function groupDepositsByTime(data: ApiDepositsResponse, timeRange: TimeRa
     if (time !== currentTime) {
       if (currentTime !== '') {
         result.timestamps.push(currentTime as never);
-        Object.keys(data.deposits).forEach(token => {
-          result.deposits[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.push({
-            totalAmount: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.totalAmount,
-            totalShares: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.totalShares,
-            cumulativeAmount: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.cumulativeAmount,
-            cumulativeShares: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.cumulativeShares
+        keysOf(data.deposits).forEach(token => {
+          result.deposits[token]!.push({
+            totalAmount: timelyData[token]!.totalAmount,
+            totalShares: timelyData[token]!.totalShares,
+            cumulativeAmount: timelyData[token]!.cumulativeAmount,
+            cumulativeShares: timelyData[token]!.cumulativeShares
           });
         });
       }
@@ -53,8 +58,8 @@ export function groupDepositsByTime(data: ApiDepositsResponse, timeRange: TimeRa
       currentTime = time;
       timelyData = {} as TokenRecord<ApiDepositsEntry | null>;;
 
-      Object.keys(data.deposits).forEach(token => {
-        timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>] = {
+      keysOf(data.deposits).forEach(token => {
+        timelyData[token] = {
           totalAmount: 0,
           totalShares: 0,
           cumulativeAmount: 0,
@@ -63,22 +68,22 @@ export function groupDepositsByTime(data: ApiDepositsResponse, timeRange: TimeRa
       });
     }
 
-    Object.keys(data.deposits).forEach(token => {
-      const entry = data.deposits[token as keyof TokenRecord<ApiDepositsEntry[] | null>]![i];
-      timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.totalAmount += entry.totalAmount;
-      timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.totalShares += entry.totalShares;
-      timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.cumulativeAmount = entry.cumulativeAmount;
-      timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.cumulativeShares = entry.cumulativeShares;
+    keysOf(data.deposits).forEach(token => {
+      const entry = data.deposits[token]![i];
+      timelyData[token]!.totalAmount += entry.totalAmount;
+      timelyData[token]!.totalShares += entry.totalShares;
+      timelyData[token]!.cumulativeAmount = entry.cumulativeAmount;
+      timelyData[token]!.cumulativeShares = entry.cumulativeShares;
     });
 
     if (i === data.timestamps.length - 1) {
       result.timestamps.push(currentTime as never);
-      Object.keys(data.deposits).forEach(token => {
-        result.deposits[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.push({
-          totalAmount: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.totalAmount,
-          totalShares: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.totalShares,
-          cumulativeAmount: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.cumulativeAmount,
-          cumulativeShares: timelyData[token as keyof TokenRecord<ApiDepositsEntry[] | null>]!.cumulativeShares
+      keysOf(data.deposits).forEach(token => {
+        result.deposits[token]!.push({
+          totalAmount: timelyData[token]!.totalAmount,
+          totalShares: timelyData[token]!.totalShares,
+          cumulativeAmount: timelyData[token]!.cumulativeAmount,
+          cumulativeShares: timelyData[token]!.cumulativeShares
         });
       });
     }
@@ -96,10 +101,10 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse, timeRange: 
     withdrawals: {} as TokenRecord<ApiWithdrawalsEntry[] | null>
   };
 
-  Object.keys(data.withdrawals).forEach(token => data.withdrawals[token as keyof TokenRecord<ApiDepositsEntry[] | null>] === null && delete data.withdrawals[token as keyof TokenRecord<ApiDepositsEntry[] | null>]);
+  keysOf(data.withdrawals).forEach(token => data.withdrawals[token] === null && delete data.withdrawals[token]);
 
-  Object.keys(data.withdrawals).forEach(token => {
-    result.withdrawals[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>] = [];
+  keysOf(data.withdrawals).forEach(token => {
+    result.withdrawals[token] = [];
   });
 
   let currentTime = '';
@@ -124,12 +129,12 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse, timeRange: 
     if (time !== currentTime) {
       if (currentTime !== '') {
         result.timestamps.push(currentTime as never);
-        Object.keys(data.withdrawals).forEach(token => {
-          result.withdrawals[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.push({
-            totalAmount: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.totalAmount,
-            totalShares: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.totalShares,
-            cumulativeAmount: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.cumulativeAmount,
-            cumulativeShares: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.cumulativeShares
+        keysOf(data.withdrawals).forEach(token => {
+          result.withdrawals[token]!.push({
+            totalAmount: timelyData[token]!.totalAmount,
+            totalShares: timelyData[token]!.totalShares,
+            cumulativeAmount: timelyData[token]!.cumulativeAmount,
+            cumulativeShares: timelyData[token]!.cumulativeShares
           });
         });
       }
@@ -137,8 +142,8 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse, timeRange: 
       currentTime = time;
       timelyData = {} as TokenRecord<ApiWithdrawalsEntry | null>;;
 
-      Object.keys(data.withdrawals).forEach(token => {
-        timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>] = {
+      keysOf(data.withdrawals).forEach(token => {
+        timelyData[token] = {
           totalAmount: 0,
           totalShares: 0,
           cumulativeAmount: 0,
@@ -147,22 +152,22 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse, timeRange: 
       });
     }
 
-    Object.keys(data.withdrawals).forEach(token => {
-      const entry = data.withdrawals[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]![i];
-      timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.totalAmount += entry.totalAmount;
-      timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.totalShares += entry.totalShares;
-      timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.cumulativeAmount = entry.cumulativeAmount;
-      timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.cumulativeShares = entry.cumulativeShares;
+    keysOf(data.withdrawals).forEach(token => {
+      const entry = data.withdrawals[token]![i];
+      timelyData[token]!.totalAmount += entry.totalAmount;
+      timelyData[token]!.totalShares += entry.totalShares;
+      timelyData[token]!.cumulativeAmount = entry.cumulativeAmount;
+      timelyData[token]!.cumulativeShares = entry.cumulativeShares;
     });
 
     if (i === data.timestamps.length - 1) {
       result.timestamps.push(currentTime as never);
-      Object.keys(data.withdrawals).forEach(token => {
-        result.withdrawals[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.push({
-          totalAmount: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.totalAmount,
-          totalShares: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.totalShares,
-          cumulativeAmount: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.cumulativeAmount,
-          cumulativeShares: timelyData[token as keyof TokenRecord<ApiWithdrawalsEntry[] | null>]!.cumulativeShares
+      keysOf(data.withdrawals).forEach(token => {
+        result.withdrawals[token]!.push({
+          totalAmount: timelyData[token]!.totalAmount,
+          totalShares: timelyData[token]!.totalShares,
+          cumulativeAmount: timelyData[token]!.cumulativeAmount,
+          cumulativeShares: timelyData[token]!.cumulativeShares
         });
       });
     }
