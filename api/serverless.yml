@@ -1,48 +1,97 @@
 service: spice-ai-serverless
 frameworkVersion: "3"
 
+custom:
+  apiGatewayCaching:
+    enabled: true
+    ttlInSeconds: 600
+
 provider:
   name: aws
-  runtime: nodejs14.x  	
+  runtime: nodejs18.x
   apiGateway:
     minimumCompressionSize: 1024
 
 functions:
   getDeposits:
     handler: handler.getDeposits
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 40
     events:
-      - httpApi:
+      - http:
           path: /deposits
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.querystring.chain
+              - name: request.querystring.timeline
+
   getWithdrawals:
     handler: handler.getWithdrawals
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 40
     events:
-      - httpApi:
+      - http:
           path: /withdrawals
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.querystring.chain
+              - name: request.querystring.timeline
+
   getTotalStakedBeacon:
     handler: handler.getTotalStakedBeacon
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 40
     events:
-      - httpApi:
+      - http:
           path: /totalStakedBeacon
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.querystring.chain
+              - name: request.querystring.timeline
+
   getLeaderboard:
     handler: handler.getLeaderboard
-    runtime: nodejs14.x
+    runtime: nodejs18.x
     timeout: 40
     events:
-      - httpApi:
+      - http:
           path: /leaderboard
           method: get
+          request:
+            parameters:
+              querystrings:
+                chain: true
+                timeline: true
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.querystring.chain
+              - name: request.querystring.timeline
 
 useDotenv: true
 
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
+  - serverless-api-gateway-caching

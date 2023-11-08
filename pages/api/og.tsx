@@ -75,7 +75,7 @@ export default async function handler() {
         >
           {tokens.map((token) => (
             <div
-              className={getTokenInfo(token).color}
+              className={`data-card-${getTokenInfo(token).classId}`}
               style={{
                 display: "flex",
                 flexDirection: "column",

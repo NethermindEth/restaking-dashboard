@@ -16,9 +16,9 @@ export const timeRange = ["daily", "weekly", "monthly"] as const;
 export type TimeRange = (typeof timeRange)[number];
 
 export interface TokenInfo {
+  classId: string;
   label: string;
   image: string;
-  color: string;
 }
 
 

@@ -32,24 +32,24 @@ export function getNetworkProvider(network: SupportedNetwork) {
 
 export const TOKEN_INFO: TokenRecord<TokenInfo> = {
   stEth: {
+    classId: "steth",
     label: "stEth",
     image: "/steth_logo.webp",
-    color: "data-card-steth",
   },
   rEth: {
+    classId: "reth",
     label: "rEth",
     image: "/reth.webp",
-    color: "data-card-reth",
   },
   cbEth: {
+    classId: "cbeth",
     label: "cbEth",
     image: "/cbeth.png",
-    color: "data-card-cbeth",
   },
   beacon: {
+    classId: "beacon",
     label: "Beacon Chain ETH",
     image: "/beaconChainETH.png",
-    color: "data-card-eth",
   },
 };
 
