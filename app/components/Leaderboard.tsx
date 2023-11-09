@@ -36,14 +36,12 @@ export default function Leaderboard({ network }: LeaderboardProps) {
   useEffect(() => {
     if (!leaderboardData) return;
 
-    if (activeTab === "total") {
-      setActiveData(leaderboardData.total);
-    }
-    else {
-      setActiveData(leaderboardData.partial[activeTab] || []);
-    }
+    const selectedData = (activeTab === "total")
+      ? leaderboardData.total
+      : leaderboardData.partial[activeTab] || [];
     
-    setTotalPages(Math.ceil(activeData.length / PAGE_SIZE));
+    setActiveData(selectedData);
+    setTotalPages(Math.ceil(selectedData.length / PAGE_SIZE));
     setCurrentPage(0);
   }, [activeTab, leaderboardData]);
 
