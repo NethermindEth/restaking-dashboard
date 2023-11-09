@@ -82,12 +82,10 @@ functions:
             parameters:
               querystrings:
                 chain: true
-                timeline: true
           caching:
             enabled: true
             cacheKeyParameters:
               - name: request.querystring.chain
-              - name: request.querystring.timeline
 
 useDotenv: true
 

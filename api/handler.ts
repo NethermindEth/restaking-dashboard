@@ -146,7 +146,6 @@ export const getDeposits = async (
 const getLeaderboardSchema = z.object({
   queryStringParameters: z.object({
     chain: z.enum(supportedChains),
-    timeline: z.enum(supportedTimelines),
   }),
 });
 
@@ -154,15 +153,13 @@ export const getLeaderboard = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const {
-    queryStringParameters: { chain, timeline },
+    queryStringParameters: { chain },
   } = getLeaderboardSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
   
   const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
-
-  const days = timelineToDays[timeline];
 
   const response = (
     await spiceClient.query(`
