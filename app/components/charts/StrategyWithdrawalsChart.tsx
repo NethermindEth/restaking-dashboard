@@ -2,9 +2,9 @@
 
 import { SupportedNetwork, SupportedToken, TimeRange, Timeline } from "@/app/utils/types";
 import { getNetworkStrategyTokens } from "@/app/utils/constants";
-import { useWithdrawals } from "@/app/components/hooks/useWithdrawals";
+import useWithdrawals from "@/app/components/hooks/useWithdrawals";
 import StackedBarChart from "@/app/components/charts/base/StackedBarChart";
-import { useWithdrawalsGrouping } from "@/app/components/hooks/useWithdrawalsGrouping";
+import useWithdrawalsGrouping from "@/app/components/hooks/useWithdrawalsGrouping";
 
 export interface StrategyWithdrawalsChartProps {
   network: SupportedNetwork;
@@ -14,11 +14,11 @@ export interface StrategyWithdrawalsChartProps {
 
 export default function StrategyWithdrawalsChart({ network, timeRange, timeline }: StrategyWithdrawalsChartProps) {
   const { data: rawWithdrawalsData, isLoading: rawWithdrawalsLoading } = useWithdrawals(network, timeline);
-  const { data: withdrawalsData, isLoading: withdrawalsLoading } = useWithdrawalsGrouping(rawWithdrawalsData, timeRange)
+  const { data: withdrawalsData } = useWithdrawalsGrouping(rawWithdrawalsData, timeRange)
   
   const networkStrategyTokens = getNetworkStrategyTokens(network);
 
-  if (!withdrawalsData || !rawWithdrawalsData || withdrawalsLoading || rawWithdrawalsLoading) {
+  if (!withdrawalsData || !rawWithdrawalsData || rawWithdrawalsLoading) {
     return (
       <div className="w-full mx-auto loading-pulse">
         <StackedBarChart
