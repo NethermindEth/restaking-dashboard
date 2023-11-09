@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 
 import { SupportedNetwork } from "@/app/utils/types";
-import { getNetworkTokens, getTokenInfo } from "@/app/utils/constants";
+import { DEFAULT_TIMELINE, DEFAULT_TIMERANGE, getNetworkTokens, getTokenInfo } from "@/app/utils/constants";
 import { useTotalStakedTokens } from "@/app/components/hooks/useTotalStakedTokens";
 import CumulativeStrategyDepositsChart from "@/app/components/charts/CumulativeStrategyDepositsChart";
 import StrategyDepositsChart from "@/app/components/charts/StrategyDepositsChart";
@@ -68,14 +68,14 @@ export default function Data() {
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">Cumulative deposited tokens</h3>
           <div className="chart-2">
-            <CumulativeStrategyDepositsChart network={network} timeRange={timeline["deposit"]?.timeRange ?? "daily"} timeline={timeline["deposit"]?.timeline ?? "1y"} />
+            <CumulativeStrategyDepositsChart network={network} timeRange={timeline["deposit"]?.timeRange ?? DEFAULT_TIMERANGE} timeline={timeline["deposit"]?.timeline ?? DEFAULT_TIMELINE} />
           </div>
           <TimelineSelector name="deposit" onTimelineChange={handleTimelineChange} />
         </div>
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">Deposited tokens</h3>
           <div className="chart-staked-lst-date">
-            <StrategyDepositsChart network={network} timeRange={timeline["depositCumulative"]?.timeRange ?? "daily"} timeline={timeline["depositCumulative"]?.timeline ?? "1y"} />
+            <StrategyDepositsChart network={network} timeRange={timeline["depositCumulative"]?.timeRange ?? DEFAULT_TIMERANGE} timeline={timeline["depositCumulative"]?.timeline ?? DEFAULT_TIMELINE} />
           </div>
           <TimelineSelector name="depositCumulative" onTimelineChange={handleTimelineChange} />
         </div>
@@ -83,7 +83,7 @@ export default function Data() {
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">Cumulative Token Withdrawals</h3>
           <div className="chart-2">
-            <CumulativeStrategyWithdrawalsChart network={network} timeRange={timeline["withdrawalCumulative"]?.timeRange ?? "daily"} timeline={timeline["withdrawalCumulative"]?.timeline ?? "1y"} />
+            <CumulativeStrategyWithdrawalsChart network={network} timeRange={timeline["withdrawalCumulative"]?.timeRange ?? DEFAULT_TIMERANGE} timeline={timeline["withdrawalCumulative"]?.timeline ?? DEFAULT_TIMELINE} />
           </div>
           <TimelineSelector name="withdrawalCumulative" onTimelineChange={handleTimelineChange} />
         </div>
@@ -91,7 +91,7 @@ export default function Data() {
         <div className="charts-homepage mt-16">
           <h3 className="text-center text-xl">Token Withdrawals</h3>
           <div className="chart-staked-lst-date">
-            <StrategyWithdrawalsChart network={network} timeRange={timeline["withdrawal"]?.timeRange ?? "daily"} timeline={timeline["withdrawal"]?.timeline ?? "1y"} />
+            <StrategyWithdrawalsChart network={network} timeRange={timeline["withdrawal"]?.timeRange ?? DEFAULT_TIMERANGE} timeline={timeline["withdrawal"]?.timeline ?? DEFAULT_TIMELINE} />
           </div>
           <TimelineSelector name="withdrawal" onTimelineChange={handleTimelineChange} />
         </div>
@@ -101,7 +101,7 @@ export default function Data() {
             Cumulative Beacon Chain ETH in EigenPods
           </h3>
           <div className="chart-2">
-            <CumulativeBeaconDepositsChart network={network} timeRange={timeline["beaconCumulative"]?.timeRange ?? "daily"} timeline={timeline["beaconCumulative"]?.timeline ?? "1y"} />
+            <CumulativeBeaconDepositsChart network={network} timeRange={timeline["beaconCumulative"]?.timeRange ?? DEFAULT_TIMERANGE} timeline={timeline["beaconCumulative"]?.timeline ?? DEFAULT_TIMELINE} />
           </div>
           <TimelineSelector name="beaconCumulative" onTimelineChange={handleTimelineChange} />
         </div>
@@ -111,7 +111,7 @@ export default function Data() {
             Beacon Chain ETH Added to EigenPods
           </h3>
           <div className="chart-staked-lst-date">
-            <BeaconDepositsChart network={network} timeRange={timeline["beacon"]?.timeRange ?? "daily"} timeline={timeline["beacon"]?.timeline ?? "1y"} />
+            <BeaconDepositsChart network={network} timeRange={timeline["beacon"]?.timeRange ?? DEFAULT_TIMERANGE} timeline={timeline["beacon"]?.timeline ?? DEFAULT_TIMELINE} />
           </div>
           <TimelineSelector name="beacon" onTimelineChange={handleTimelineChange} />
         </div>

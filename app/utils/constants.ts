@@ -2,6 +2,8 @@ import { ethers } from "ethers";
 import { TokenNetworkInfo, SupportedNetwork, SupportedToken, TokenInfo, TokenRecord } from "@/app/utils/types";
 
 export const MAX_LEADERBOARD_SIZE = 50;
+export const DEFAULT_TIMELINE = "1y"
+export const DEFAULT_TIMERANGE = "daily"
 
 if (process.env.NEXT_PUBLIC_MAINNET_URL === undefined) {
   throw new Error("NEXT_PUBLIC_MAINNET_URL env variable not set");

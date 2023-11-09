@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Timeline, TimeRange } from "@/app/utils/types";
+import { DEFAULT_TIMELINE, DEFAULT_TIMERANGE } from "@/app/utils/constants";
 
 export default function TimelineSelector({ name, onTimelineChange }: { name: string, onTimelineChange: Function }) {
     const [values, setValues] = useState<{
         timeline: Timeline,
         timeRange: TimeRange
     }>({
-        timeline: "1y",
-        timeRange: "daily",
+        timeline: DEFAULT_TIMELINE,
+        timeRange: DEFAULT_TIMERANGE,
     });
 
     const handleInputChange = (field: string, value: string) => {
