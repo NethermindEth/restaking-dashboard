@@ -7,8 +7,8 @@ function keysOf<T extends Object>(obj: T): Array<keyof T> {
   return Array.from(Object.keys(obj)) as any;
 }
 
-export function groupDepositsByTime(data: ApiDepositsResponse, timeRange: TimeRange): ApiDepositsResponse {
-  if (timeRange === "daily") {
+export function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: TimeRange): ApiDepositsResponse | undefined {
+  if (timeRange === "daily" || data === undefined) {
     return data
   }
   
@@ -92,8 +92,8 @@ export function groupDepositsByTime(data: ApiDepositsResponse, timeRange: TimeRa
   return result;
 }
 
-export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse, timeRange: TimeRange): ApiWithdrawalsResponse {
-  if (timeRange === "daily") {
+export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined, timeRange: TimeRange): ApiWithdrawalsResponse | undefined {
+  if (timeRange === "daily" || data === undefined) {
     return data
   }
   const result = {

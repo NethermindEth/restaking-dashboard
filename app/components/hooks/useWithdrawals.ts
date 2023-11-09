@@ -1,20 +1,20 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
-import { SupportedNetwork, TimeRange, Timeline } from "@/app/utils/types";
+import { SupportedNetwork, Timeline } from "@/app/utils/types";
 import { ApiWithdrawalsResponse, getWithdrawals } from "@/app/utils/api/withdrawals";
 
-export function getWithdrawalsQueryKey(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline): any[] {
-  return ["withdrawals", network, timeRange, timeline];
+export function getWithdrawalsQueryKey(network: SupportedNetwork, timeline: Timeline): any[] {
+  return ["withdrawals", network, timeline];
 }
 
-export async function queryWithdrawals(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline, _: boolean = false): Promise<ApiWithdrawalsResponse> {
-  return await getWithdrawals(network, timeRange, timeline);
+export async function queryWithdrawals(network: SupportedNetwork, timeline: Timeline, _: boolean = false): Promise<ApiWithdrawalsResponse> {
+  return await getWithdrawals(network, timeline);
 }
 
-export function useWithdrawals(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline): UseQueryResult<ApiWithdrawalsResponse> {
+export function useWithdrawals(network: SupportedNetwork, timeline: Timeline): UseQueryResult<ApiWithdrawalsResponse> {
   const result = useQuery({
-    queryKey: getWithdrawalsQueryKey(network, timeRange, timeline),
-    queryFn: () => queryWithdrawals(network, timeRange, timeline),
+    queryKey: getWithdrawalsQueryKey(network, timeline),
+    queryFn: () => queryWithdrawals(network, timeline),
     retry: false,
   });
 

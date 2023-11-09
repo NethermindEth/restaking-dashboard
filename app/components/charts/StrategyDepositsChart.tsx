@@ -4,6 +4,7 @@ import { SupportedNetwork, SupportedToken, TimeRange, Timeline } from "@/app/uti
 import { getNetworkStrategyTokens } from "@/app/utils/constants";
 import { useDeposits } from "@/app/components/hooks/useDeposits";
 import StackedBarChart from "@/app/components/charts/base/StackedBarChart";
+import { useDepositsGrouping } from "@/app/components/hooks/useDepositsGrouping";
 
 export interface StrategyDepositsChartProps {
   network: SupportedNetwork;
@@ -12,11 +13,12 @@ export interface StrategyDepositsChartProps {
 }
 
 export default function StrategyDepositsChart({ network, timeRange, timeline }: StrategyDepositsChartProps) {
-  const { data: depositsData, isLoading: depositsLoading } = useDeposits(network, timeRange, timeline);
+  const { data: rawDepositsData, isLoading: rawDepositsLoading } = useDeposits(network, timeline);
+  const { data: depositsData, isLoading: depositsLoading } = useDepositsGrouping(rawDepositsData, timeRange)
   
   const networkStrategyTokens = getNetworkStrategyTokens(network);
 
-  if (!depositsData || depositsLoading) {
+  if (!depositsData || !rawDepositsData || depositsLoading || rawDepositsLoading) {
     return (
       <div className="w-full mx-auto loading-pulse">
         <StackedBarChart

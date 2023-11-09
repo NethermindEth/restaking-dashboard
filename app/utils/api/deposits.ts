@@ -1,5 +1,4 @@
-import { SupportedNetwork, TokenRecord, TimeRange, Timeline } from "@/app/utils/types";
-import { groupDepositsByTime } from "@/app/utils/groupByTime";
+import { SupportedNetwork, TokenRecord, Timeline } from "@/app/utils/types";
 
 export interface ApiDepositsEntry {
   totalAmount: number;
@@ -13,11 +12,10 @@ export interface ApiDepositsResponse {
   deposits: TokenRecord<ApiDepositsEntry[] | null>;
 }
 
-export async function getDeposits(network: SupportedNetwork, timeRange: TimeRange, timeline: Timeline, requestInit?: RequestInit): Promise<ApiDepositsResponse> {
+export async function getDeposits(network: SupportedNetwork, timeline: Timeline, requestInit?: RequestInit): Promise<ApiDepositsResponse> {
   const resp = await fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits?${new URLSearchParams({
     chain: network,
     timeline,
   })}`, requestInit);
-  const data = await resp.json();
-  return groupDepositsByTime(data, timeRange);
+  return await resp.json();
 }

@@ -4,6 +4,7 @@ import { SupportedNetwork, SupportedToken, TimeRange, Timeline } from "@/app/uti
 import { useWithdrawals } from "@/app/components/hooks/useWithdrawals";
 import LineChart from "@/app/components/charts/base/LineChart";
 import { getNetworkStrategyTokens } from "@/app/utils/constants";
+import { useWithdrawalsGrouping } from "@/app/components/hooks/useWithdrawalsGrouping";
 
 export interface CumulativeStrategyWithdrawalsChartProps {
   network: SupportedNetwork;
@@ -12,11 +13,12 @@ export interface CumulativeStrategyWithdrawalsChartProps {
 }
 
 export default function CumulativeStrategyWithdrawalsChart({ network, timeRange, timeline }: CumulativeStrategyWithdrawalsChartProps) {
-  const { data: withdrawalsData, isLoading: withdrawalsLoading } = useWithdrawals(network, timeRange, timeline);
+  const { data: rawWithdrawalsData, isLoading: rawWithdrawalsLoading } = useWithdrawals(network, timeline);
+  const { data: withdrawalsData, isLoading: withdrawalsLoading } = useWithdrawalsGrouping(rawWithdrawalsData, timeRange)
   
   const networkStrategyTokens = getNetworkStrategyTokens(network);
 
-  if (!withdrawalsData || withdrawalsLoading) {
+  if (!withdrawalsData || !rawWithdrawalsData || withdrawalsLoading || rawWithdrawalsLoading) {
     return (
       <div className="w-full mx-auto loading-pulse">
         <LineChart

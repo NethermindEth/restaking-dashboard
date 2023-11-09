@@ -3,6 +3,7 @@
 import { SupportedNetwork, TimeRange, Timeline } from "@/app/utils/types";
 import { useDeposits } from "@/app/components/hooks/useDeposits";
 import LineChart from "@/app/components/charts/base/LineChart";
+import { useDepositsGrouping } from "@/app/components/hooks/useDepositsGrouping";
 
 export interface BeaconDepositsChartProps {
   network: SupportedNetwork;
@@ -11,9 +12,10 @@ export interface BeaconDepositsChartProps {
 }
 
 export default function CumulativeBeaconDepositsChart({ network, timeRange, timeline }: BeaconDepositsChartProps) {
-  const { data: depositsData, isLoading: depositsLoading } = useDeposits(network, timeRange, timeline);
+  const { data: rawDepositsData, isLoading: rawDepositsLoading } = useDeposits(network, timeline);
+  const { data: depositsData, isLoading: depositsLoading } = useDepositsGrouping(rawDepositsData, timeRange)
 
-  if (!depositsData || depositsLoading) {
+  if (!depositsData || !rawDepositsData || depositsLoading || rawDepositsLoading) {
     return (
       <div className="w-full mx-auto loading-pulse">
         <LineChart
