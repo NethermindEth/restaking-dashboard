@@ -24,6 +24,7 @@ export const getDeposits = async (
 
   const days = timelineToDays[timeline];
 
+  const startTime = performance.now();
   const response = (
     await spiceClient.query(`
       WITH NonCoalescedDailyTokenDeposits AS (
@@ -115,6 +116,7 @@ export const getDeposits = async (
           td.token;
     `)
   ).toArray();
+  const endTime = performance.now();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
@@ -132,6 +134,7 @@ export const getDeposits = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
+      duration: endTime - startTime,
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       deposits: {
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
@@ -277,18 +280,19 @@ export const getWithdrawals = async (
 
   const response = (
     await spiceClient.query(`
-      WITH DailyTokenWithdrawals AS (
+      WITH NonCoalescedDailyTokenWithdrawals AS (
         SELECT
             TO_DATE(block_timestamp) AS "date",
             token,
             SUM(token_amount) / POWER(10, 18) AS total_amount,
             SUM(shares) / POWER(10, 18) AS total_shares
         FROM ${chain}.eigenlayer.strategy_manager_withdrawal_completed
-        WHERE token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
-        AND receive_as_tokens
+        WHERE
+          token IN (${tokenAddressList.map((addr) => `'${addr}'`).join(",")})
+          AND receive_as_tokens
         GROUP BY "date", token
       ),
-      DailyValidatorWithdrawals AS (
+      NonCoalescedDailyValidatorWithdrawals AS (
         SELECT
             TO_DATE(1606824023 + 32 * 12 * exit_epoch) as "date",
             NULL as token,
@@ -299,66 +303,69 @@ export const getWithdrawals = async (
         INNER JOIN
             ${chain}.eigenlayer.eigenpods ep
         ON
-            LEFT(vl.withdrawal_credentials, 4) = '0x01' AND vl.withdrawal_credentials = ep.withdrawal_credential
+            vl.withdrawal_credentials = ep.withdrawal_credential
         GROUP BY "date"
       ),
-      DailyWithdrawals AS (
-          SELECT * FROM DailyTokenWithdrawals UNION ALL SELECT * FROM DailyValidatorWithdrawals
+      NonCoalescedDailyWithdrawals AS (
+          SELECT * FROM NonCoalescedDailyTokenWithdrawals UNION ALL SELECT * FROM NonCoalescedDailyValidatorWithdrawals
       ),
       MinDate AS (
-          SELECT MIN("date") AS min_date FROM DailyTokenWithdrawals
+          SELECT MIN("date") AS min_date FROM NonCoalescedDailyWithdrawals
+      ),
+      Series AS (
+          SELECT ROW_NUMBER() OVER () as number FROM ${chain}.recent_transactions
       ),
       DateSeries AS (
-          SELECT DISTINCT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
-          FROM ${chain}.blocks
+          SELECT DATE_ADD((SELECT min_date FROM MinDate), number) AS "date"
+          FROM Series
           WHERE number <= DATEDIFF(CURRENT_DATE, (SELECT min_date FROM MinDate))
       ),
       TokenSeries AS (
           SELECT NULL AS token
           ${tokenAddressList.map((addr) => `UNION ALL SELECT '${addr}'`).join("\n")}
       ),
-      AllCombinations AS (
-        SELECT 
-            ds."date", 
-            ts.token
-        FROM 
-            DateSeries ds
-        CROSS JOIN 
-            TokenSeries ts
+      TokenDateCoalesceSeries AS (
+          SELECT
+              ds."date",
+              ts.token
+          FROM DateSeries ds
+          CROSS JOIN TokenSeries ts
+      ),
+      CoalescedDailyWithdrawals AS (
+          SELECT
+              tdcs."date",
+              tdcs.token,
+              COALESCE(ncdw.total_amount, 0) AS total_amount,
+              COALESCE(ncdw.total_shares, 0) AS total_shares
+          FROM TokenDateCoalesceSeries tdcs
+          LEFT JOIN NonCoalescedDailyWithdrawals ncdw
+              ON tdcs."date" = ncdw."date" AND (tdcs.token = ncdw.token OR (tdcs.token IS NULL AND ncdw.token IS NULL))
       ),
       CumulativeWithdrawals AS (
           SELECT
-              ac."date",
-              ac.token,
-              COALESCE(td.total_amount, 0) AS total_amount,
-              COALESCE(td.total_shares, 0) AS total_shares,
-              SUM(COALESCE(td.total_amount, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_amount,
-              SUM(COALESCE(td.total_shares, 0)) OVER (PARTITION BY ac.token ORDER BY ac."date") AS cumulative_shares
-          FROM
-              AllCombinations ac
-          LEFT JOIN
-            DailyWithdrawals td
-          ON
-              ac."date" = td."date"
-          AND
-              (ac.token = td.token OR (ac.token IS NULL AND td.token IS NULL))
+              cdw."date",
+              cdw.token,
+              cdw.total_amount,
+              cdw.total_shares,
+              SUM(COALESCE(cdw.total_amount, 0)) OVER (PARTITION BY cdw.token ORDER BY cdw."date") AS cumulative_amount,
+              SUM(COALESCE(cdw.total_shares, 0)) OVER (PARTITION BY cdw.token ORDER BY cdw."date") AS cumulative_shares
+          FROM CoalescedDailyWithdrawals cdw
       ),
       TimelineWithdrawals AS (
-          SELECT * FROM CumulativeWithdrawals as cw
-          ${(days !== Infinity)? `WHERE cw."date" >= DATE_ADD(CURRENT_DATE, -${days})` : ""}
+        SELECT * FROM CumulativeWithdrawals as cw
+        ${(days !== Infinity)? `WHERE cw."date" >= DATE_ADD(CURRENT_DATE, -${days})` : ""}
       )
       SELECT
-        tw."date",
-        tw.token,
-        tw.total_amount,
-        tw.total_shares,
-        tw.cumulative_amount,
-        tw.cumulative_shares
-      FROM
-        TimelineWithdrawals tw
+          tw."date",
+          tw.token,
+          tw.total_amount,
+          tw.total_shares,
+          tw.cumulative_amount,
+          tw.cumulative_shares
+      FROM TimelineWithdrawals tw
       ORDER BY
-        tw."date",
-        tw.token;
+          tw."date",
+          tw.token;
     `)
   ).toArray();
 
