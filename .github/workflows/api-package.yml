@@ -21,6 +21,9 @@ on:
         default: "v0.0.0"
 env:
     NODE_VERSION: "18.X"
+permissions:
+  contents: write
+  packages: write
 jobs:
   build-package:
     name: "Development deployment"
