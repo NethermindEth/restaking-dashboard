@@ -1,0 +1,68 @@
+name: "Build Serverless Package"
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "The branch, tag or SHA to checkout"
+        type: string
+        required: true
+        default: "master"
+      stage:
+        description: "The environment to deploy to"
+        type: choice
+        required: true
+        options:
+          - "dev"
+          - "prod"
+      tag:
+        description: "The tag to release"
+        type: string
+        required: true
+        default: "v0.0.0"
+env:
+    NODE_VERSION: "18.X"
+jobs:
+  build-package:
+    name: "Development deployment"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Checkout to deploymnt ref"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ github.env.NODE_VERSION}}
+      - name: "Install yarn globally"
+        run: npm install --global yarn
+      - name: "Install dependencies"
+        working-directory: ./api
+        run: yarn install
+      - name: "Package serverless"
+        working-directory: ./api
+        run: npx serverless package --package ./build --stage ${{ github.event.inputs.stage }} && ls -la
+      - uses: actions/upload-artifact@v3
+        with:
+          name: restaking-dashboard-api-${{ github.event.inputs.stage }}
+          path: ./api/build
+  publish-github:
+    name: "Release and upload API Serverless package to Github Releases"
+    needs: build-package
+    runs-on: ubuntu-22.04
+    env:
+      VERSION: ${{ github.event.inputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download packages
+        uses: actions/download-artifact@v3
+        with:
+          path: /tmp/package
+      - name: Upload release to Github Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/tmp/package/*"
+          draft: true
+          tag: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.tag }}

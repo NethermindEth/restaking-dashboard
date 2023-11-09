@@ -36,14 +36,12 @@ export default function Leaderboard({ network }: LeaderboardProps) {
   useEffect(() => {
     if (!leaderboardData) return;
 
-    if (activeTab === "total") {
-      setActiveData(leaderboardData.total);
-    }
-    else {
-      setActiveData(leaderboardData.partial[activeTab] || []);
-    }
+    const selectedData = (activeTab === "total")
+      ? leaderboardData.total
+      : leaderboardData.partial[activeTab] || [];
     
-    setTotalPages(Math.ceil(activeData.length / PAGE_SIZE));
+    setActiveData(selectedData);
+    setTotalPages(Math.ceil(selectedData.length / PAGE_SIZE));
     setCurrentPage(0);
   }, [activeTab, leaderboardData]);
 
@@ -68,12 +66,12 @@ export default function Leaderboard({ network }: LeaderboardProps) {
         ))}
       </div>
       <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
-        <table className="table w-full border-collapse">
+        <table className="table table-fixed w-full border-collapse">
           <thead className={`text-base table-head table-head-${(activeTab === "total") ? "total" : getTokenInfo(activeTab).classId}`}>
             <tr>
-              <th className="py-3 px-4 text-left">Rank</th>
-              <th className="py-3 px-4 text-left">Address</th>
-              <th className="py-3 px-4 text-right">Total Staked</th>
+              <th className="py-3 px-4 text-left w-1/6">Rank</th>
+              <th className="py-3 px-4 text-left w-3/6 sm:w-4/6">Address</th>
+              <th className="py-3 px-4 text-right w-2/6 sm:w-1/6">Total Staked</th>
             </tr>
           </thead>
           <tbody>
@@ -83,20 +81,20 @@ export default function Leaderboard({ network }: LeaderboardProps) {
                   <td className="py-4 px-4 text-left text-md">
                     {currentPage * PAGE_SIZE + idx + 1}
                   </td>
-                  <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
-                    <td className="py-4 px-4 text-left text-sm font-normal w-full table-cell lg:hidden">
-                      {
-                        userData.depositor?.endsWith(".eth")
-                          ? userData.depositor
-                          : getShortenedAddress(userData.depositor, 4, 6)
-                      }
-                    </td>
-                  </Link>
-                  <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
-                    <td className="py-4 px-4 text-left text-sm font-normal w-full hidden lg:table-cell">
-                      {userData.depositor}
-                    </td>
-                  </Link>
+                  <td className="py-4 px-4 text-left text-sm font-normal table-cell truncate">
+                    <Link href={getEtherscanAddressUrl(userData.depositor)} target="_blank">
+                      <span className="sm:hidden">
+                        {
+                          userData.depositor?.endsWith(".eth")
+                            ? userData.depositor
+                            : getShortenedAddress(userData.depositor, 4, 6)
+                        }
+                      </span>
+                      <span className="hidden sm:inline-block">
+                        {userData.depositor}
+                      </span>
+                    </Link>
+                  </td>
                   <td className="py-4 px-4 text-right text-sm">
                     {userData.totalEth.toFixed(2)}
                   </td>

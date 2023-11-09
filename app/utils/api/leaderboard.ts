@@ -12,6 +12,5 @@ export interface ApiLeaderboardResponse {
 export function getLeaderboard(network: SupportedNetwork, requestInit?: RequestInit): Promise<ApiLeaderboardResponse> {
   return fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/leaderboard?${new URLSearchParams({
     chain: network,
-    timeline: "1m",
   })}`, requestInit).then(resp => resp.json());
 }
