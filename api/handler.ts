@@ -24,7 +24,6 @@ export const getDeposits = async (
 
   const days = timelineToDays[timeline];
 
-  const startTime = performance.now();
   const response = (
     await spiceClient.query(`
       WITH NonCoalescedDailyTokenDeposits AS (
@@ -116,7 +115,6 @@ export const getDeposits = async (
           td.token;
     `)
   ).toArray();
-  const endTime = performance.now();
 
   const groupedResponse = response.reduce((acc, el) => {
     if (!acc[el.token]) acc[el.token] = [];
@@ -134,7 +132,6 @@ export const getDeposits = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      duration: endTime - startTime,
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       deposits: {
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
