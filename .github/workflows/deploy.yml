@@ -21,6 +21,9 @@ jobs:
   deploy:
     name: "Development deployment"
     runs-on: ubuntu-22.04
+    permissions: 
+      id-token: write
+      contents: read
     steps:
       - name: "Checkout to deployment ref"
         uses: actions/checkout@v4
