@@ -3,20 +3,20 @@ import { TokenNetworkInfo, SupportedNetwork, SupportedToken, TokenInfo, TokenRec
 
 export const MAX_LEADERBOARD_SIZE = 50;
 
-if (process.env.NEXT_PUBLIC_MAINNET_URL === undefined) {
-  throw new Error("NEXT_PUBLIC_MAINNET_URL env variable not set");
+if (process.env.NEXT_PUBLIC_MAINNET_RPC_URL === undefined) {
+  throw new Error("NEXT_PUBLIC_MAINNET_RPC_URL env variable not set");
 }
 
 export const ETH_MAINNET_PROVIDER = new ethers.JsonRpcProvider(
-  process.env.NEXT_PUBLIC_MAINNET_URL,
+  process.env.NEXT_PUBLIC_MAINNET_RPC_URL,
 );
 
-if (process.env.NEXT_PUBLIC_GOERLI_URL === undefined) {
-  throw new Error("NEXT_PUBLIC_GOERLI_URL env variable not set");
+if (process.env.NEXT_PUBLIC_GOERLI_RPC_URL === undefined) {
+  throw new Error("NEXT_PUBLIC_GOERLI_RPC_URL env variable not set");
 }
 
 export const GOERLI_PROVIDER = new ethers.JsonRpcProvider(
-  process.env.NEXT_PUBLIC_GOERLI_URL,
+  process.env.NEXT_PUBLIC_GOERLI_RPC_URL,
 );
 
 export function getNetworkProvider(network: SupportedNetwork) {
