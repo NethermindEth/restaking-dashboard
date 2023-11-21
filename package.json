@@ -3,21 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "next lint",
-    "postinstall": "typechain --target ethers-v6 --out-dir typechain abi/*.json",
-    "generate-supabase-typechain": "typechain --target ethers-v6 --out-dir supabase/functions/typechain abi/*.json && find supabase/functions/typechain -type f -name \"*.ts\" -exec sed -i 's|\"./factories\"|\"./factories/index.ts\"|g' {} + && find supabase/functions/typechain -type f -name \\*.ts -exec sed -i 's|\"ethers\"|\"https://esm.sh/ethers@6\"|g' {} + && find supabase/functions/typechain -type f -name \"*.ts\" -exec sed -i -E '/from\\s+\"(\\.\\/|\\.+\\/)/ { /ts\";$/! { /factories\"$/ { s/(from\\s+\"((\\.\\/|\\.+\\/)[^\"]+))\"/\\1\\/index.ts\"/g; }; /factories\"$/! { s/(from\\s+\"((\\.\\/|\\.+\\/)[^\"]+))\"/\\1.ts\"/g; }; }; }' {} \\;"
+    "postinstall": "typechain --target ethers-v6 --out-dir typechain abi/*.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@supabase/supabase-js": "^2.20.0",
-    "@types/node": "18.15.11",
-    "@types/react": "18.0.37",
-    "@types/react-dom": "18.0.11",
+    "@tanstack/react-query": "^5.0.5",
     "@vercel/og": "^0.5.3",
     "autoprefixer": "10.4.14",
     "bottleneck": "^2.19.5",
@@ -25,23 +21,18 @@
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "ethers": "^6.3.0",
-    "lodash": "^4.17.21",
-    "next": "13.3.0",
+    "next": "^13.5.6",
     "postcss": "8.4.22",
     "react": "18.2.0",
-    "react-bootstrap": "^2.7.4",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "18.2.0",
     "react-modal": "^3.16.1",
     "tailwindcss": "3.3.1",
     "typescript": "5.0.4"
   },
   "devDependencies": {
     "@typechain/ethers-v6": "^0.3.0",
-    "@types/lodash": "^4.14.194",
+    "@types/react": "18.0.37",
     "@types/react-modal": "^3.16.0",
-    "encoding": "^0.1.13",
-    "supabase": "^1.51.0",
     "typechain": "^8.1.1"
   }
 }
