@@ -11,6 +11,9 @@ provider:
   runtime: nodejs18.x
   apiGateway:
     minimumCompressionSize: 1024
+  stackTags:
+    Team: "nubia"
+    Project: "restaking-dashboard"
 
 functions:
   getDeposits:
@@ -93,3 +96,4 @@ plugins:
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-api-gateway-caching
+  - serverless-plugin-resource-tagging
