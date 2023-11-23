@@ -21,6 +21,9 @@ jobs:
   deploy:
     name: "Development deployment"
     runs-on: ubuntu-22.04
+    permissions: 
+      id-token: write
+      contents: read
     steps:
       - name: "Checkout to deployment ref"
         uses: actions/checkout@v4
@@ -38,7 +41,7 @@ jobs:
       - name: "Setup Node.js"
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ github.env.NODE_VERSION}}
+          node-version: ${{ env.NODE_VERSION}}
 
       - name: "Install yarn globally"
         run: npm install --global yarn
@@ -49,4 +52,4 @@ jobs:
 
       - name: "Deploy serverless"
         working-directory: "./api"
-        run: npx serverless deploy --conceal --region ${{ github.env.AWS_REGION}} --stage ${{ github.event.inputs.stage }}
+        run: npx serverless deploy --conceal --region ${{ env.AWS_REGION}} --stage ${{ github.event.inputs.stage }}
