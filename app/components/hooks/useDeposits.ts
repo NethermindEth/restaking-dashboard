@@ -8,7 +8,7 @@ function getDepositsQueryKey(network: SupportedNetwork, timeline: Timeline): any
 }
 
 async function queryDeposits(network: SupportedNetwork, timeline: Timeline, _: boolean = false): Promise<ApiDepositsResponse> {
-  return await getDeposits(network, timeline);
+  return await getDeposits({ network, timeline });
 }
 
 export default function useDeposits(network: SupportedNetwork, timeline: Timeline): UseQueryResult<ApiDepositsResponse> {

@@ -9,11 +9,11 @@ export type SupportedNetwork = (typeof supportedNetworks)[number];
 
 export type TokenRecord<T> = Record<SupportedToken | "beacon", T>;
 
-export const timeline = ["1w", "1m", "1y", "full"] as const;
-export type Timeline = (typeof timeline)[number];
+export const supportedTimelines = ["1w", "1m", "1y", "full"] as const;
+export type Timeline = (typeof supportedTimelines)[number];
 
-export const timeRange = ["daily", "weekly", "monthly"] as const;
-export type TimeRange = (typeof timeRange)[number];
+export const supportedTimeRanges = ["daily", "weekly", "monthly"] as const;
+export type TimeRange = (typeof supportedTimeRanges)[number];
 
 export interface TokenInfo {
   classId: string;

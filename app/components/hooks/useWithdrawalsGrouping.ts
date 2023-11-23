@@ -31,9 +31,6 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined,
     let time
 
     if (timeRange === "weekly") {
-      // const weekStart = entryDate.clone().startOf('week');
-      // const weekEnd = entryDate.clone().endOf('week');
-      // time = `${weekStart.format('YYYY-MM-DD')} to ${weekEnd.format('YYYY-MM-DD')}`;
       time = entryDate.clone().startOf('week').format('YYYY-MM-DD');
     } else if (timeRange === "monthly") {
       time = entryDate.format('MMMM YYYY');
