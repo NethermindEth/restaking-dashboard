@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SupportedTimeline, SupportedTimeRange } from "@/app/utils/types";
-import { DEFAULT_TIMELINE, DEFAULT_TIMERANGE } from "@/app/utils/constants";
+import { DEFAULT_TIMELINE, DEFAULT_TIME_RANGE } from "@/app/utils/constants";
 
 export default function TimelineSelector({ name, onTimelineChange }: { name: string, onTimelineChange: Function }) {
     const [values, setValues] = useState<{
@@ -8,7 +8,7 @@ export default function TimelineSelector({ name, onTimelineChange }: { name: str
         timeRange: SupportedTimeRange
     }>({
         timeline: DEFAULT_TIMELINE,
-        timeRange: DEFAULT_TIMERANGE,
+        timeRange: DEFAULT_TIME_RANGE,
     });
 
     const handleInputChange = (field: string, value: string) => {

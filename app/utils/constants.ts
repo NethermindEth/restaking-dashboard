@@ -11,7 +11,7 @@ import {
 
 export const MAX_LEADERBOARD_SIZE = 50;
 export const DEFAULT_TIMELINE: SupportedTimeline = "1y";
-export const DEFAULT_TIMERANGE: SupportedTimeRange = "daily";
+export const DEFAULT_TIME_RANGE: SupportedTimeRange = "daily";
 
 if (process.env.NEXT_PUBLIC_MAINNET_RPC_URL === undefined) {
   throw new Error("NEXT_PUBLIC_MAINNET_RPC_URL env variable not set");
