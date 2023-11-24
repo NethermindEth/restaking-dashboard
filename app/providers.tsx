@@ -8,8 +8,8 @@ export default function Providers({ children }: { children: ReactNode }) {
     defaultOptions: {
       queries: {
         staleTime: 10 * 60 * 1000,
-      }
-    }
+      },
+    },
   });
 
   return (

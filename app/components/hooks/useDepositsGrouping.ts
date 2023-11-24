@@ -9,12 +9,12 @@ function keysOf<T extends Object>(obj: T): Array<keyof T> {
 
 function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: TimeRange): ApiDepositsResponse | undefined {
   if (timeRange === "daily" || data === undefined) {
-    return data
+    return data;
   }
   
   const result = {
     timestamps: [],
-    deposits: {} as TokenRecord<ApiDepositsEntry[] | null>
+    deposits: {} as TokenRecord<ApiDepositsEntry[] | null>,
   };
 
   keysOf(data.deposits).forEach(token => data.deposits[token] === null && delete data.deposits[token]);
@@ -29,14 +29,14 @@ function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: T
   data.timestamps.forEach((timestamp, i) => {
     const entryDate = moment(timestamp);
 
-    let time
+    let time;
 
     if (timeRange === "weekly") {
       time = entryDate.clone().startOf('week').format('YYYY-MM-DD');
     } else if (timeRange === "monthly") {
       time = entryDate.format('MMMM YYYY');
     } else {
-      throw Error("Invalid time range")
+      throw Error("Invalid time range");
     }
 
     if (time !== currentTime) {
@@ -47,20 +47,20 @@ function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: T
             totalAmount: timelyData[token]!.totalAmount,
             totalShares: timelyData[token]!.totalShares,
             cumulativeAmount: timelyData[token]!.cumulativeAmount,
-            cumulativeShares: timelyData[token]!.cumulativeShares
+            cumulativeShares: timelyData[token]!.cumulativeShares,
           });
         });
       }
 
       currentTime = time;
-      timelyData = {} as TokenRecord<ApiDepositsEntry | null>;;
+      timelyData = {} as TokenRecord<ApiDepositsEntry | null>;
 
       keysOf(data.deposits).forEach(token => {
         timelyData[token] = {
           totalAmount: 0,
           totalShares: 0,
           cumulativeAmount: 0,
-          cumulativeShares: 0
+          cumulativeShares: 0,
         };
       });
     }

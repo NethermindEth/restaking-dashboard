@@ -25,7 +25,7 @@ export default function Data() {
       ...prevValues,
       [name]: values,
     }));
-  }
+  };
 
   const { data: totalStakedTokensData } = useTotalStakedTokens(network);
   const tokens = getNetworkTokens(network);
