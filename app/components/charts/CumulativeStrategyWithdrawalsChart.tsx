@@ -34,7 +34,7 @@ export default function CumulativeStrategyWithdrawalsChart({ network, timeRange,
   return (
     <LineChart
       title="Cumulative Token Withdrawals"
-      amounts={networkStrategyTokens.map((token) => withdrawalsData.withdrawals[token as SupportedToken]!.map(el => el.cumulativeAmount.toFixed(2)))}
+      amounts={networkStrategyTokens.map((token) => (withdrawalsData.withdrawals[token as SupportedToken] ?? []).map(el => el.cumulativeAmount.toFixed(2)))}
       timestamps={withdrawalsData?.timestamps}
       tokens={networkStrategyTokens}
     />

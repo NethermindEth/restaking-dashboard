@@ -34,7 +34,7 @@ export default function StrategyWithdrawalsChart({ network, timeRange, timeline 
   return (
     <StackedBarChart
       title="Token Withdrawals"
-      amounts={networkStrategyTokens.map((token) => withdrawalsData.withdrawals[token as SupportedToken]!.map(el => el.totalAmount.toFixed(2)))}
+      amounts={networkStrategyTokens.map((token) => (withdrawalsData.withdrawals[token as SupportedToken] ?? []).map(el => el.totalAmount.toFixed(2)))}
       timestamps={withdrawalsData?.timestamps}
       tokens={networkStrategyTokens}
     />

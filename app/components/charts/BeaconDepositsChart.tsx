@@ -31,7 +31,7 @@ export default function BeaconDepositsChart({ network, timeRange, timeline }: Be
   return (
     <StackedBarChart
       title="EigenPod deposits"
-      amounts={[depositsData.deposits["beacon"]!.map(el => el.totalAmount.toFixed(2))]}
+      amounts={[(depositsData.deposits["beacon"] ?? []).map(el => el.totalAmount.toFixed(2))]}
       timestamps={depositsData?.timestamps}
       tokens={["beacon"]}
     />

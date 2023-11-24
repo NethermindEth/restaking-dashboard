@@ -34,7 +34,7 @@ export default function CumulativeStrategyDepositsChart({ network, timeRange, ti
   return (
     <LineChart
       title="Cumulative Token Deposits"
-      amounts={networkStrategyTokens.map((token) => depositsData.deposits[token as SupportedToken]!.map(el => el.cumulativeAmount.toFixed(2)))}
+      amounts={networkStrategyTokens.map((token) => (depositsData.deposits[token as SupportedToken] ?? []).map(el => el.cumulativeAmount.toFixed(2)))}
       timestamps={depositsData?.timestamps}
       tokens={networkStrategyTokens}
     />

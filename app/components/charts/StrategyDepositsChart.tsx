@@ -34,7 +34,7 @@ export default function StrategyDepositsChart({ network, timeRange, timeline }: 
   return (
     <StackedBarChart
       title="Token deposits"
-      amounts={networkStrategyTokens.map((token) => depositsData.deposits[token as SupportedToken]!.map(el => el.totalAmount.toFixed(2)))}
+      amounts={networkStrategyTokens.map((token) => (depositsData.deposits[token as SupportedToken] ?? []).map(el => el.totalAmount.toFixed(2)))}
       timestamps={depositsData?.timestamps}
       tokens={networkStrategyTokens}
     />

@@ -27,7 +27,7 @@ export default function DistributionChart({ network }: DistributionChartProps) {
 
   return (
     <PieChart
-      amounts={tokens.map(token => totalStakedEthData[token]!.toFixed(2))}
+      amounts={tokens.map(token => (totalStakedEthData[token] ?? 0).toFixed(2))}
       tokens={tokens}
     />
   );

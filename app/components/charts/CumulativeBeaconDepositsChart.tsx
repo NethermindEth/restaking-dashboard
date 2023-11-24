@@ -31,7 +31,7 @@ export default function CumulativeBeaconDepositsChart({ network, timeRange, time
   return (
     <LineChart
       title="Cumulative EigenPod deposits"
-      amounts={[depositsData.deposits["beacon"]!.map(el => el.cumulativeAmount.toFixed(2))]}
+      amounts={[(depositsData.deposits["beacon"] ?? []).map(el => el.cumulativeAmount.toFixed(2))]}
       timestamps={depositsData?.timestamps}
       tokens={["beacon"]}
     />
