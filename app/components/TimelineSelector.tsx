@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Timeline, TimeRange } from "@/app/utils/types";
+import { SupportedTimeline, SupportedTimeRange } from "@/app/utils/types";
 import { DEFAULT_TIMELINE, DEFAULT_TIMERANGE } from "@/app/utils/constants";
 
 export default function TimelineSelector({ name, onTimelineChange }: { name: string, onTimelineChange: Function }) {
     const [values, setValues] = useState<{
-        timeline: Timeline,
-        timeRange: TimeRange
+        timeline: SupportedTimeline,
+        timeRange: SupportedTimeRange
     }>({
         timeline: DEFAULT_TIMELINE,
         timeRange: DEFAULT_TIMERANGE,

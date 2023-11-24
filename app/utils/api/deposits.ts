@@ -1,4 +1,4 @@
-import { SupportedNetwork, TokenRecord, Timeline } from "@/app/utils/types";
+import { SupportedNetwork, TokenRecord, SupportedTimeline } from "@/app/utils/types";
 
 export interface ApiDepositsEntry {
   totalAmount: number;
@@ -12,7 +12,7 @@ export interface ApiDepositsResponse {
   deposits: TokenRecord<ApiDepositsEntry[] | null>;
 }
 
-export async function getDeposits(network: SupportedNetwork, timeline: Timeline, requestInit?: RequestInit): Promise<ApiDepositsResponse> {
+export async function getDeposits(network: SupportedNetwork, timeline: SupportedTimeline, requestInit?: RequestInit): Promise<ApiDepositsResponse> {
   const resp = await fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/deposits?${new URLSearchParams({
     chain: network,
     timeline,

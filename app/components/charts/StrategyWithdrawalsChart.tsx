@@ -1,6 +1,6 @@
 "use client";
 
-import { SupportedNetwork, SupportedToken, TimeRange, Timeline } from "@/app/utils/types";
+import { SupportedNetwork, SupportedToken, SupportedTimeRange, SupportedTimeline } from "@/app/utils/types";
 import { getNetworkStrategyTokens } from "@/app/utils/constants";
 import useWithdrawals from "@/app/components/hooks/useWithdrawals";
 import StackedBarChart from "@/app/components/charts/base/StackedBarChart";
@@ -8,8 +8,8 @@ import useWithdrawalsGrouping from "@/app/components/hooks/useWithdrawalsGroupin
 
 export interface StrategyWithdrawalsChartProps {
   network: SupportedNetwork;
-  timeline: Timeline;
-  timeRange: TimeRange;
+  timeline: SupportedTimeline;
+  timeRange: SupportedTimeRange;
 }
 
 export default function StrategyWithdrawalsChart({ network, timeRange, timeline }: StrategyWithdrawalsChartProps) {

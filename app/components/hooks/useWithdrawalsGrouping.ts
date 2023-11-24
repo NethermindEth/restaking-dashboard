@@ -1,19 +1,19 @@
 import moment from "moment";
 import { useState, useEffect } from 'react';
 import { ApiWithdrawalsResponse, ApiWithdrawalsEntry } from "@/app/utils/api/withdrawals";
-import { TimeRange, TokenRecord } from "@/app/utils/types";
+import { SupportedTimeRange, TokenRecord } from "@/app/utils/types";
 
 function keysOf<T extends Object>(obj: T): Array<keyof T> {
   return Array.from(Object.keys(obj)) as any;
 }
 
-export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined, timeRange: TimeRange): ApiWithdrawalsResponse | undefined {
+export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined, timeRange: SupportedTimeRange): ApiWithdrawalsResponse | undefined {
   if (timeRange === "daily" || data === undefined) {
-    return data
+    return data;
   }
   const result = {
     timestamps: [],
-    withdrawals: {} as TokenRecord<ApiWithdrawalsEntry[] | null>
+    withdrawals: {} as TokenRecord<ApiWithdrawalsEntry[] | null>,
   };
 
   keysOf(data.withdrawals).forEach(token => data.withdrawals[token] === null && delete data.withdrawals[token]);
@@ -28,14 +28,14 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined,
   data.timestamps.forEach((timestamp, i) => {
     const entryDate = moment(timestamp);
 
-    let time
+    let time;
 
     if (timeRange === "weekly") {
       time = entryDate.clone().startOf('week').format('YYYY-MM-DD');
     } else if (timeRange === "monthly") {
       time = entryDate.format('MMMM YYYY');
     } else {
-      throw Error("Invalid time range")
+      throw Error("Invalid time range");
     }
 
     if (time !== currentTime) {
@@ -46,20 +46,20 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined,
             totalAmount: timelyData[token]!.totalAmount,
             totalShares: timelyData[token]!.totalShares,
             cumulativeAmount: timelyData[token]!.cumulativeAmount,
-            cumulativeShares: timelyData[token]!.cumulativeShares
+            cumulativeShares: timelyData[token]!.cumulativeShares,
           });
         });
       }
 
       currentTime = time;
-      timelyData = {} as TokenRecord<ApiWithdrawalsEntry | null>;;
+      timelyData = {} as TokenRecord<ApiWithdrawalsEntry | null>;
 
       keysOf(data.withdrawals).forEach(token => {
         timelyData[token] = {
           totalAmount: 0,
           totalShares: 0,
           cumulativeAmount: 0,
-          cumulativeShares: 0
+          cumulativeShares: 0,
         };
       });
     }
@@ -79,7 +79,7 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined,
           totalAmount: timelyData[token]!.totalAmount,
           totalShares: timelyData[token]!.totalShares,
           cumulativeAmount: timelyData[token]!.cumulativeAmount,
-          cumulativeShares: timelyData[token]!.cumulativeShares
+          cumulativeShares: timelyData[token]!.cumulativeShares,
         });
       });
     }
@@ -88,7 +88,7 @@ export function groupWithdrawalsByTime(data: ApiWithdrawalsResponse | undefined,
   return result;
 }
 
-const useWithdrawalsGrouping = (rawData: ApiWithdrawalsResponse | undefined, timeRange: TimeRange): { data: ApiWithdrawalsResponse | undefined } => {
+const useWithdrawalsGrouping = (rawData: ApiWithdrawalsResponse | undefined, timeRange: SupportedTimeRange): { data: ApiWithdrawalsResponse | undefined } => {
   const [result, setResult] = useState<ApiWithdrawalsResponse | undefined>(rawData);
 
   useEffect(() => {

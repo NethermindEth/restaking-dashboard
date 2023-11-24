@@ -1,6 +1,6 @@
 "use client";
 
-import { SupportedNetwork, SupportedToken, TimeRange, Timeline } from "@/app/utils/types";
+import { SupportedNetwork, SupportedToken, SupportedTimeRange, SupportedTimeline } from "@/app/utils/types";
 import { getNetworkStrategyTokens } from "@/app/utils/constants";
 import useDeposits from "@/app/components/hooks/useDeposits";
 import LineChart from "@/app/components/charts/base/LineChart";
@@ -8,8 +8,8 @@ import useDepositsGrouping from "@/app/components/hooks/useDepositsGrouping";
 
 export interface CumulativeStrategyDepositsChartProps {
   network: SupportedNetwork;
-  timeline: Timeline;
-  timeRange: TimeRange;
+  timeline: SupportedTimeline;
+  timeRange: SupportedTimeRange;
 }
 
 export default function CumulativeStrategyDepositsChart({ network, timeRange, timeline }: CumulativeStrategyDepositsChartProps) {

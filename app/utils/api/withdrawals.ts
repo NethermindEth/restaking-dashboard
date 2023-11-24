@@ -1,4 +1,4 @@
-import { SupportedNetwork, TimeRange, Timeline, TokenRecord } from "@/app/utils/types";
+import { SupportedNetwork, SupportedTimeRange, SupportedTimeline, TokenRecord } from "@/app/utils/types";
 
 export interface ApiWithdrawalsEntry {
   totalAmount: number;
@@ -12,7 +12,7 @@ export interface ApiWithdrawalsResponse {
   withdrawals: TokenRecord<ApiWithdrawalsEntry[] | null>;
 }
 
-export async function getWithdrawals(network: SupportedNetwork, timeline: Timeline, requestInit?: RequestInit): Promise<ApiWithdrawalsResponse> {
+export async function getWithdrawals(network: SupportedNetwork, timeline: SupportedTimeline, requestInit?: RequestInit): Promise<ApiWithdrawalsResponse> {
   const resp = await fetch(`${process.env.NEXT_PUBLIC_SPICE_PROXY_API_URL}/withdrawals?${new URLSearchParams({
     chain: network,
     timeline,

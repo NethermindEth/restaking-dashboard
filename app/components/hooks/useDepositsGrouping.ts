@@ -1,13 +1,13 @@
 import moment from "moment";
 import { useState, useEffect } from 'react';
 import { ApiDepositsResponse, ApiDepositsEntry } from "@/app/utils/api/deposits";
-import { TimeRange, TokenRecord } from "@/app/utils/types";
+import { SupportedTimeRange, TokenRecord } from "@/app/utils/types";
 
 function keysOf<T extends Object>(obj: T): Array<keyof T> {
   return Array.from(Object.keys(obj)) as any;
 }
 
-function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: TimeRange): ApiDepositsResponse | undefined {
+function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: SupportedTimeRange): ApiDepositsResponse | undefined {
   if (timeRange === "daily" || data === undefined) {
     return data;
   }
@@ -89,7 +89,7 @@ function groupDepositsByTime(data: ApiDepositsResponse | undefined, timeRange: T
   return result;
 }
 
-const useDepositsGrouping = (rawData: ApiDepositsResponse | undefined, timeRange: TimeRange): { data: ApiDepositsResponse | undefined } => {
+const useDepositsGrouping = (rawData: ApiDepositsResponse | undefined, timeRange: SupportedTimeRange): { data: ApiDepositsResponse | undefined } => {
   const [result, setResult] = useState<ApiDepositsResponse | undefined>(rawData);
 
   useEffect(() => {

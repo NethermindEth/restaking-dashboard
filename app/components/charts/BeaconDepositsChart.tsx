@@ -1,14 +1,14 @@
 "use client";
 
-import { SupportedNetwork, TimeRange, Timeline } from "@/app/utils/types";
+import { SupportedNetwork, SupportedTimeRange, SupportedTimeline } from "@/app/utils/types";
 import useDeposits from "@/app/components/hooks/useDeposits";
 import StackedBarChart from "@/app/components/charts/base/StackedBarChart";
 import useDepositsGrouping from "@/app/components/hooks/useDepositsGrouping";
 
 export interface BeaconDepositsChartProps {
   network: SupportedNetwork;
-  timeRange: TimeRange;
-  timeline: Timeline;
+  timeRange: SupportedTimeRange;
+  timeline: SupportedTimeline;
 }
 
 export default function BeaconDepositsChart({ network, timeRange, timeline }: BeaconDepositsChartProps) {
