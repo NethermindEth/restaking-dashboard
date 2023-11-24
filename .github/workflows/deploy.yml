@@ -1,0 +1,52 @@
+name: "Build Serverless Package"
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "The branch, tag or SHA to checkout"
+        type: string
+        required: true
+        default: "master"
+      stage:
+        description: "The environment to deploy to"
+        type: choice
+        required: true
+        options:
+          - "dev"
+          - "prod"
+env:
+  NODE_VERSION: "18.X"
+  AWS_REGION: "us-east-1"
+jobs:
+  deploy:
+    name: "Development deployment"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Checkout to deployment ref"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-duration-seconds: 1200 # Set the session duration as needed
+          role-session-name: RestakingDashboardGithubAction
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ github.env.NODE_VERSION}}
+
+      - name: "Install yarn globally"
+        run: npm install --global yarn
+
+      - name: "Install dependencies"
+        working-directory: ./api
+        run: yarn install
+
+      - name: "Deploy serverless"
+        working-directory: "./api"
+        run: npx serverless deploy --conceal --region ${{ github.env.AWS_REGION}} --stage ${{ github.event.inputs.stage }}
