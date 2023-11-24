@@ -15,12 +15,18 @@ export type Timeline = (typeof supportedTimelines)[number];
 export const supportedTimeRanges = ["daily", "weekly", "monthly"] as const;
 export type TimeRange = (typeof supportedTimeRanges)[number];
 
+export const timelineToDays: Record<Timeline, number> = {
+  "1w": 7,
+  "1m": 30,
+  "1y": 365,
+  "full": Infinity,
+} as const;
+
 export interface TokenInfo {
   classId: string;
   label: string;
   image: string;
 }
-
 
 export interface TokenNetworkInfo {
   strategyAddress: `0x${string}`;
