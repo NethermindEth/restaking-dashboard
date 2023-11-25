@@ -1,20 +1,36 @@
-import { UseQueryResult, useQuery } from "@tanstack/react-query";
+import { QueryClient, UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { SupportedNetwork } from "@/app/utils/types";
+import { SupportedNetwork, SupportedTimeline, supportedTimelines, timelineToDays } from "@/app/utils/types";
 import { ApiWithdrawalsResponse, getWithdrawals } from "@/app/utils/api/withdrawals";
 
-export function getWithdrawalsQueryKey(network: SupportedNetwork): any[] {
-  return ["withdrawals", network];
+function getWithdrawalsQueryKey(network: SupportedNetwork, timeline: SupportedTimeline): any[] {
+  return ["withdrawals", network, timeline];
 }
 
-export async function queryWithdrawals(network: SupportedNetwork, _: boolean = false): Promise<ApiWithdrawalsResponse> {
-  return await getWithdrawals(network);
+async function queryWithdrawals(network: SupportedNetwork, timeline: SupportedTimeline, queryClient: QueryClient): Promise<ApiWithdrawalsResponse> {
+  const higherTimelines = supportedTimelines.slice(supportedTimelines.indexOf(timeline));
+  const entryCount = timelineToDays[timeline];
+
+  for (const higherTimeline of higherTimelines) {
+    const data: ApiWithdrawalsResponse | undefined = queryClient.getQueryData(getWithdrawalsQueryKey(network, higherTimeline));
+
+    if (data) {
+      return {
+        withdrawals: Object.fromEntries(Object.entries(data.withdrawals).map(([tokenName, tokenWithdrawals]) => [tokenName, tokenWithdrawals?.slice(-entryCount)])) as any,
+        timestamps: data.timestamps.slice(-entryCount),
+      };
+    }
+  }
+
+  return await getWithdrawals(network, timeline);
 }
 
-export function useWithdrawals(network: SupportedNetwork): UseQueryResult<ApiWithdrawalsResponse> {
+export default function useWithdrawals(network: SupportedNetwork, timeline: SupportedTimeline): UseQueryResult<ApiWithdrawalsResponse> {
+  const queryClient = useQueryClient();
+
   const result = useQuery({
-    queryKey: getWithdrawalsQueryKey(network),
-    queryFn: () => queryWithdrawals(network),
+    queryKey: getWithdrawalsQueryKey(network, timeline),
+    queryFn: () => queryWithdrawals(network, timeline, queryClient),
     retry: false,
   });
 

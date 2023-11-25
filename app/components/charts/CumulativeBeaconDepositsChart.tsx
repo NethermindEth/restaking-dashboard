@@ -1,21 +1,25 @@
 "use client";
 
-import { SupportedNetwork } from "@/app/utils/types";
-import { useDeposits } from "@/app/components/hooks/useDeposits";
+import { SupportedNetwork, SupportedTimeRange, SupportedTimeline } from "@/app/utils/types";
+import useDeposits from "@/app/components/hooks/useDeposits";
 import LineChart from "@/app/components/charts/base/LineChart";
+import useDepositsGrouping from "@/app/components/hooks/useDepositsGrouping";
 
 export interface BeaconDepositsChartProps {
   network: SupportedNetwork;
+  timeRange: SupportedTimeRange;
+  timeline: SupportedTimeline;
 }
 
-export default function CumulativeBeaconDepositsChart({ network }: BeaconDepositsChartProps) {
-  const { data: depositsData, isLoading: depositsLoading } = useDeposits(network);
+export default function CumulativeBeaconDepositsChart({ network, timeRange, timeline }: BeaconDepositsChartProps) {
+  const { data: rawDepositsData, isLoading: rawDepositsLoading } = useDeposits(network, timeline);
+  const { data: depositsData } = useDepositsGrouping(rawDepositsData, timeRange)
 
-  if (!depositsData || depositsLoading) {
+  if (!depositsData || !rawDepositsData || rawDepositsLoading) {
     return (
       <div className="w-full mx-auto loading-pulse">
         <LineChart
-          title="EigenPod deposits by day"
+          title="Cumulative EigenPod deposits"
           amounts={[[]]}
           timestamps={[]}
           tokens={["beacon"]}
@@ -26,8 +30,8 @@ export default function CumulativeBeaconDepositsChart({ network }: BeaconDeposit
 
   return (
     <LineChart
-      title="Cumulative EigenPod deposits by day"
-      amounts={[depositsData.deposits["beacon"]!.map(el => el.cumulativeAmount.toFixed(2))]}
+      title="Cumulative EigenPod deposits"
+      amounts={[(depositsData.deposits["beacon"] ?? []).map(el => el.cumulativeAmount.toFixed(2))]}
       timestamps={depositsData?.timestamps}
       tokens={["beacon"]}
     />

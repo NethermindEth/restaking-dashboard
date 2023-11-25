@@ -188,9 +188,9 @@ tbody tr:hover {
 
 @keyframes loading-pulse-animation {
   0%, 100% {
-    opacity: .65;
+    opacity: .75;
   }
   50% {
-    opacity: .6;
+    opacity: .25;
   }
 }
