@@ -52,4 +52,6 @@ jobs:
 
       - name: "Deploy serverless"
         working-directory: "./api"
-        run: npx serverless deploy --conceal --region ${{ env.AWS_REGION}} --stage ${{ github.event.inputs.stage }}
+        run: npx serverless deploy --conceal --region ${{ env.AWS_REGION }} --stage ${{ github.event.inputs.stage }}
+        env:
+          SPICE_AI_API_KEY: ${{ secrets.SPICE_AI_API_KEY }}

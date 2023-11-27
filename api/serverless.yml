@@ -14,6 +14,8 @@ provider:
   stackTags:
     Team: "nubia"
     Project: "restaking-dashboard"
+  environment:
+    SPICE_AI_API_KEY: ${env:SPICE_AI_API_KEY}
 
 functions:
   getDeposits:
