@@ -16,6 +16,7 @@ provider:
     Project: "restaking-dashboard"
   environment:
     SPICE_AI_API_KEY: ${env:SPICE_AI_API_KEY}
+    CORS_ORIGIN_WHITELIST: ${env:CORS_ORIGIN_WHITELIST}
 
 functions:
   getDeposits:
@@ -26,6 +27,16 @@ functions:
       - http:
           path: /deposits
           method: get
+          cors:
+            origin: ${env:CORS_ORIGIN_WHITELIST}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
           request:
             parameters:
               querystrings:
@@ -45,6 +56,16 @@ functions:
       - http:
           path: /withdrawals
           method: get
+          cors:
+            origin: ${env:CORS_ORIGIN_WHITELIST}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
           request:
             parameters:
               querystrings:
@@ -64,6 +85,16 @@ functions:
       - http:
           path: /totalStakedBeacon
           method: get
+          cors:
+            origin: ${env:CORS_ORIGIN_WHITELIST}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
           request:
             parameters:
               querystrings:
@@ -83,6 +114,16 @@ functions:
       - http:
           path: /leaderboard
           method: get
+          cors:
+            origin: ${env:CORS_ORIGIN_WHITELIST}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
           request:
             parameters:
               querystrings:

@@ -131,6 +131,10 @@ export const getDeposits = async (
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       deposits: {
@@ -243,6 +247,10 @@ export const getLeaderboard = async (
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       leaderboard: {
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
@@ -381,6 +389,10 @@ export const getWithdrawals = async (
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       withdrawals: {
@@ -422,6 +434,10 @@ export async function getTotalStakedBeacon(
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       totalStakedBeacon: result[0].total_staked,
     }),
