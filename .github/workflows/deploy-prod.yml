@@ -1,4 +1,4 @@
-name: "Build Serverless Package"
+name: "Deploy Serverless PROD"
 on:
   workflow_dispatch:
     inputs:
@@ -7,13 +7,6 @@ on:
         type: string
         required: true
         default: "master"
-      stage:
-        description: "The environment to deploy to"
-        type: choice
-        required: true
-        options:
-          - "dev"
-          - "prod"
 env:
   NODE_VERSION: "18.X"
   AWS_REGION: "us-east-1"
@@ -52,4 +45,7 @@ jobs:
 
       - name: "Deploy serverless"
         working-directory: "./api"
-        run: npx serverless deploy --conceal --region ${{ env.AWS_REGION}} --stage ${{ github.event.inputs.stage }}
+        run: npx serverless deploy --conceal --region ${{ env.AWS_REGION }} --stage prod
+        env:
+          SPICE_AI_API_KEY: ${{ secrets.SPICE_AI_API_KEY }}
+          CORS_ORIGIN_WHITELIST: ${{ secrets.CORS_ORIGIN_WHITELIST_PROD }}
