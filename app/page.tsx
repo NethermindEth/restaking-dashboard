@@ -20,16 +20,36 @@ export default async function Home() {
         </div>
       </div>
       <Data />
-      <div className="mt-32">
+      <div className="mt-32 flex flex-col items-center">
         <p className="flex items-center">
-          <span className="pr-2">Made with ❤️ at Nethermind </span>
-          <Image
-            src={"/nethermind.png"}
-            width={32}
-            height={32}
-            alt={"Nethermind logo"}
-            style={{ display: "inline-block" }}
-          />
+          <span className="mx-1">Made with ❤️ at</span>
+          <a href="https://nethermind.io">
+            Nethermind
+
+            <Image
+              src={"/nethermind.png"}
+              width={32}
+              height={32}
+              alt={"Nethermind logo"}
+              className="mx-1"
+              style={{ display: "inline-block" }}
+            />
+          </a>
+        </p>
+        <p className="flex items-center mt-2">
+          <span className="mx-1">Powered by</span>
+          <a href="https://spice.ai">
+            Spice AI
+
+            <Image
+              src={"/spice.png"}
+              width={20}
+              height={20}
+              alt={"Spice AI logo"}
+              className="mx-2"
+              style={{ display: "inline-block" }}
+            />
+          </a>
         </p>
         <Disclaimer />
       </div>
