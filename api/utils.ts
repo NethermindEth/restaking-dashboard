@@ -30,3 +30,8 @@ export const timelineToDays: Readonly<Record<Timeline, number>> = {
   "1y": 365,
   "full": Infinity,
 };
+
+export const startingEpochTimestamps: Readonly<Record<Chain, number>> = {
+  "eth": 1606824023,
+  "goerli": 1616508000,
+}

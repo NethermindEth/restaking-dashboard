@@ -42,8 +42,8 @@ export default function Data() {
               setNetwork(e.target.value as SupportedNetwork);
             }}
           >
-            <option value="eth">ETH</option>
-            <option value="goerli">GOERLI</option>
+            <option value="eth">Mainnet</option>
+            <option value="goerli">Goerli</option>
           </select>
         </div>
       </div>

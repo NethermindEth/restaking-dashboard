@@ -1,7 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
+
+import {
+  getContractAddresses,
+  startingEpochTimestamps,
+  supportedChains,
+  supportedTimelines,
+  timelineToDays,
+} from "./utils";
 import spiceClient from "./spice";
-import { getContractAddresses, supportedChains, supportedTimelines, timelineToDays } from "./utils";
 
 const getDepositsSchema = z.object({
   queryStringParameters: z.object({
@@ -40,7 +47,7 @@ export const getDeposits = async (
           SELECT
               TO_DATE(GREATEST(
                   COALESCE(ep.block_timestamp, 0),
-                  1606824023 + 32 * 12 * activation_eligibility_epoch,
+                  ${startingEpochTimestamps[chain]} + 32 * 12 * activation_eligibility_epoch,
                   COALESCE(bte.block_timestamp, 0)
               )) as "date",
               NULL as token,
@@ -131,6 +138,10 @@ export const getDeposits = async (
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       deposits: {
@@ -243,6 +254,10 @@ export const getLeaderboard = async (
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       leaderboard: {
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
@@ -291,7 +306,7 @@ export const getWithdrawals = async (
       ),
       NonCoalescedDailyValidatorWithdrawals AS (
         SELECT
-            TO_DATE(1606824023 + 32 * 12 * exit_epoch) as "date",
+            TO_DATE(${startingEpochTimestamps[chain]} + 32 * 12 * exit_epoch) as "date",
             NULL as token,
             count(*) * 32 AS total_amount,
             count(*) * 32 AS total_shares
@@ -381,6 +396,10 @@ export const getWithdrawals = async (
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
       withdrawals: {
@@ -422,6 +441,10 @@ export async function getTotalStakedBeacon(
 
   return {
     statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
     body: JSON.stringify({
       totalStakedBeacon: result[0].total_staked,
     }),
