@@ -133,6 +133,33 @@ functions:
             cacheKeyParameters:
               - name: request.querystring.chain
 
+  getRestakedPointsLeaderboard:
+    handler: handler.getRestakedPointsLeaderboard
+    runtime: nodejs18.x
+    timeout: 30
+    events:
+      - http:
+          path: /restakedPointsLeaderboard
+          method: get
+          cors:
+            origin: ${env:CORS_ORIGIN_WHITELIST}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+          request:
+            parameters:
+              querystrings:
+                chain: true
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.querystring.chain
+
 useDotenv: true
 
 plugins:
