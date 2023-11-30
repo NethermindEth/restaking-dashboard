@@ -10,11 +10,11 @@ import { getNetworkProvider, getTokenNetworkInfo } from "@/app/utils/constants";
 
 export type ShareRates = TokenRecord<number | null>;
 
-export function getShareRatesQueryKey(network: SupportedNetwork): any[] {
-  return ["shareRates", network];
+export function getShareRatesTokensQueryKey(network: SupportedNetwork): any[] {
+  return ["shareRatesTokens", network];
 }
 
-export async function queryShareRates(network: SupportedNetwork, _: boolean = false): Promise<ShareRates> {
+export async function queryShareRatesTokens(network: SupportedNetwork, _: boolean = false): Promise<ShareRates> {
   const provider = getNetworkProvider(network);
 
   const rEth = getTokenNetworkInfo(network, "rEth")
@@ -64,10 +64,48 @@ export async function queryShareRates(network: SupportedNetwork, _: boolean = fa
   };
 }
 
-export function useShareRates(network: SupportedNetwork): UseQueryResult<ShareRates> {
+export function getShareRatesEthQueryKey(network: SupportedNetwork, shareRatesTokens?: ShareRates): any[] {
+  return ["shareRatesEth", network, shareRatesTokens];
+}
+
+export async function queryShareRatesEth(network: SupportedNetwork, shareRatesTokens: ShareRates, _: boolean = false): Promise<ShareRates> {
+  const provider = getNetworkProvider(network);
+
+  const rEth = getTokenNetworkInfo(network, "rEth")
+    ? RocketTokenRETH__factory.connect(getTokenNetworkInfo(network, "rEth")!.address, provider)
+    : null;
+  const rEthRate = rEth ? Number(await rEth.getExchangeRate()) / 1e18 : 0;
+
+  const cbEth = getTokenNetworkInfo(network, "cbEth")
+    ? StakedTokenV1__factory.connect(getTokenNetworkInfo(network, "cbEth")!.address, provider)
+    : null;
+  const cbEthRate = cbEth ? Number(await cbEth.exchangeRate()) / 1e18 : 0;
+
+  return {
+    stEth: shareRatesTokens.stEth ? shareRatesTokens.stEth : null,
+    rEth: shareRatesTokens.rEth ? shareRatesTokens.rEth * rEthRate : null,
+    cbEth: shareRatesTokens.cbEth ? shareRatesTokens.cbEth * cbEthRate : null,
+    beacon: 1,
+  };
+}
+
+export function useShareRatesTokens(network: SupportedNetwork): UseQueryResult<ShareRates> {
   const result = useQuery({
-    queryKey: ["shareRates", network],
-    queryFn: () => queryShareRates(network),
+    queryKey: getShareRatesTokensQueryKey(network),
+    queryFn: () => queryShareRatesTokens(network),
+    retry: false,
+  });
+
+  return result;
+}
+
+export function useShareRatesEth(network: SupportedNetwork): UseQueryResult<ShareRates> {
+  const { data: shareRatesTokens } = useShareRatesTokens(network);
+
+  const result = useQuery({
+    queryKey: getShareRatesEthQueryKey(network, shareRatesTokens),
+    queryFn: () => queryShareRatesEth(network, shareRatesTokens!),
+    enabled: !!shareRatesTokens,
     retry: false,
   });
 

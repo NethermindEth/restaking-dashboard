@@ -1,7 +1,7 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
-import { ShareRates, useShareRates } from "./useShareRates";
+import { ShareRates, useShareRatesEth } from "./useShareRates";
 import { useTotalStakedTokens } from "./useTotalStakedTokens";
 
 export function getTotalStakedEthQueryKey(
@@ -29,7 +29,7 @@ export async function queryTotalStakedEth(
 }
 
 export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {
-  const { data: rates } = useShareRates(network);
+  const { data: rates } = useShareRatesEth(network);
   const { data: totalStakedTokens } = useTotalStakedTokens(network);
 
   const result = useQuery({
