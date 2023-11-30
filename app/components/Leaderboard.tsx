@@ -22,7 +22,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
 
   const PAGE_SIZE = 10;
 
-  const [activeTab, setActiveTab] = useState<"total" | SupportedToken>("total");
+  const [activeTab, setActiveTab] = useState<"total" | "points" | SupportedToken>("total");
   const [activeData, setActiveData] = useState<LeaderboardStaker[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -36,8 +36,11 @@ export default function Leaderboard({ network }: LeaderboardProps) {
   useEffect(() => {
     if (!leaderboardData) return;
 
-    const selectedData = (activeTab === "total")
+    const selectedData =
+      (activeTab === "total")
       ? leaderboardData.total
+      : (activeTab === "points")
+      ? leaderboardData.points
       : leaderboardData.partial[activeTab] || [];
     
     setActiveData(selectedData);
@@ -64,14 +67,20 @@ export default function Leaderboard({ network }: LeaderboardProps) {
             {getTokenInfo(token).label}
           </button>
         ))}
+        <button
+          className={`table-button table-button-points-${(activeTab === "points") ? "active" : "inactive"} py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+          onClick={() => setActiveTab("points")}
+        >
+          Restaked points
+        </button>
       </div>
       <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
         <table className="table table-fixed w-full border-collapse">
-          <thead className={`text-base table-head table-head-${(activeTab === "total") ? "total" : getTokenInfo(activeTab).classId}`}>
+          <thead className={`text-base table-head table-head-${(["total", "points"].includes(activeTab)) ? activeTab : getTokenInfo(activeTab as SupportedToken).classId}`}>
             <tr>
               <th className="py-3 px-4 text-left w-1/6">Rank</th>
               <th className="py-3 px-4 text-left w-3/6 sm:w-4/6">Address</th>
-              <th className="py-3 px-4 text-right w-2/6 sm:w-1/6">Total Staked</th>
+              <th className="py-3 px-4 text-right w-2/6 sm:w-1/6">{(activeTab !== "points")? "Total Staked" : "Total Points"}</th>
             </tr>
           </thead>
           <tbody>
@@ -96,7 +105,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
                     </Link>
                   </td>
                   <td className="py-4 px-4 text-right text-sm">
-                    {userData.totalEth.toFixed(2)}
+                    {userData.amount.toFixed(2)}
                   </td>
                 </tr>
               ))) || null}
