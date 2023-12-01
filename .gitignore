@@ -3,6 +3,7 @@ node_modules/
 .swc/
 .env
 .*.env
+out/
 
 # Logs
 logs
