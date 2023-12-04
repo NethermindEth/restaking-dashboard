@@ -450,3 +450,113 @@ export async function getTotalStakedBeacon(
     }),
   };
 }
+
+const getRestakedPointsLeaderboardSchema = z.object({
+  queryStringParameters: z.object({
+    chain: z.enum(supportedChains),
+  }),
+});
+
+export async function getRestakedPointsLeaderboard(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const {
+    queryStringParameters: { chain },
+  } = getRestakedPointsLeaderboardSchema.parse(event);
+
+  const result = (await spiceClient.query(`
+    WITH TokenDeposits AS (
+        SELECT
+            depositor,
+            token,
+            block_timestamp AS "timestamp",
+            token_amount / POWER(10, 18) AS token_amount
+        FROM eth.eigenlayer.strategy_manager_deposits
+        UNION ALL
+        SELECT
+            ep.pod_owner AS depositor,
+            NULL AS token,
+            GREATEST(
+                COALESCE(ep.block_timestamp, 0),
+                ${startingEpochTimestamps[chain]} + 32 * 12 * activation_eligibility_epoch,
+                COALESCE(bte.block_timestamp, 0)
+            ) AS "timestamp",
+            32 AS token_amount
+        FROM eth.beacon.validators vl
+        INNER JOIN eth.eigenlayer.eigenpods ep
+            ON vl.withdrawal_credentials = ep.withdrawal_credential
+        LEFT JOIN eth.beacon.bls_to_execution_changes bte
+            ON bte.validator_index = vl.validator_index
+    ),
+    TokenDepositsPoints AS (
+        SELECT
+            depositor,
+            token,
+            "timestamp",
+            token_amount * FLOOR((UNIX_TIMESTAMP() - "timestamp") / 3600) AS points_amount
+        FROM TokenDeposits
+    ),
+    TokenWithdrawals AS (
+        SELECT
+            depositor,
+            token,
+            block_timestamp AS "timestamp",
+            token_amount / POWER(10, 18) AS token_amount
+        FROM eth.eigenlayer.strategy_manager_withdrawal_completed
+        UNION ALL
+        SELECT
+            ep.pod_owner AS depositor,
+            NULL AS token,
+            ${startingEpochTimestamps[chain]} + 32 * 12 * exit_epoch AS "timestamp",
+            32 AS token_amount
+        FROM eth.beacon.validators vl
+        INNER JOIN eth.eigenlayer.eigenpods ep
+            ON vl.withdrawal_credentials = ep.withdrawal_credential
+        LEFT JOIN eth.beacon.bls_to_execution_changes bte
+            ON bte.validator_index = vl.validator_index
+        WHERE exit_epoch != '18446744073709551615'
+    ),
+    TokenWithdrawalsPoints AS (
+        SELECT
+            depositor,
+            token,
+            "timestamp",
+            token_amount * FLOOR((UNIX_TIMESTAMP() - "timestamp") / 3600) AS points_amount
+        FROM TokenWithdrawals
+    ),
+    RestakedPointsLeaderboard AS (
+        SELECT 
+            d.depositor, 
+            COALESCE(SUM(d.points_amount), 0) - COALESCE(SUM(w.points_amount), 0) AS total_points
+        FROM 
+            TokenDepositsPoints d
+        FULL OUTER JOIN 
+            TokenWithdrawalsPoints w 
+        ON 
+            d.depositor = w.depositor
+        GROUP BY 
+            d.depositor
+    )
+    SELECT
+      depositor,
+      total_points as "totalPoints"
+    FROM RestakedPointsLeaderboard
+    ORDER BY total_points DESC
+    LIMIT 50;
+  `)).toArray();
+
+  if (!result) {
+    throw new Error("Unexpected empty result");
+  }
+
+  return {
+    statusCode: 200,
+    headers: process.env.CORS_ORIGIN_WHITELIST ? {
+      "Access-Control-Allow-Origin": process.env.CORS_ORIGIN_WHITELIST,
+      "Access-Control-Allow-Credentials": false,
+    } : {},
+    body: JSON.stringify({
+      leaderboard: result,
+    }),
+  };
+}

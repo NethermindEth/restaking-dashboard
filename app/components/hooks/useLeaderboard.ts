@@ -1,37 +1,49 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
-import { ShareRates, useShareRates } from "./useShareRates";
+import { ShareRates, useShareRatesTokens, useShareRatesEth } from "./useShareRates";
 import { getLeaderboard } from "@/app/utils/api/leaderboard";
+import { getRestakedPointsLeaderboard } from "@/app/utils/api/restakedPointsLeaderboard";
 import { MAX_LEADERBOARD_SIZE } from "@/app/utils/constants";
 
 export interface LeaderboardStaker {
   depositor: `0x${string}`;
+  amount: number;
+}
+
+export interface LeaderboardStakerPartial extends LeaderboardStaker {
   totalEth: number;
 }
 
 export interface LeaderboardData {
-  partial: TokenRecord<LeaderboardStaker[] | null>;
+  partial: TokenRecord<LeaderboardStakerPartial[] | null>;
   total: LeaderboardStaker[];
+  points: LeaderboardStaker[];
 }
 
-export function getLeaderboardQueryKey(network: SupportedNetwork, rates?: ShareRates): any[] {
-  return ["leaderboard", network, rates];
+export function getLeaderboardQueryKey(network: SupportedNetwork, shareRatesTokens?: ShareRates, shareRatesEth?: ShareRates): any[] {
+  return ["leaderboard", network, shareRatesTokens, shareRatesEth];
 }
 
-export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRates, _: boolean = false): Promise<LeaderboardData> {
-  if (!rates) throw new Error("Rates were not yet fetched");
-
-  const result = await getLeaderboard(network);
-  const partial = {} as TokenRecord<LeaderboardStaker[] | null>;
+export async function queryLeaderboard(network: SupportedNetwork, shareRatesTokens: ShareRates, shareRatesEth: ShareRates, _: boolean = false): Promise<LeaderboardData> {
+  const [
+    { leaderboard: restakingLeaderboard },
+    { leaderboard: restakedPointsLeaderboard },
+  ] = await Promise.all([
+    getLeaderboard(network),
+    getRestakedPointsLeaderboard(network),
+  ]);
+  
+  const partial = {} as TokenRecord<LeaderboardStakerPartial[] | null>;
 
   supportedTokens.forEach(token => {
-    const leaderboard = result.leaderboard[token];
+    const tokenLeaderboard = restakingLeaderboard[token];
 
-    partial[token] = leaderboard
-      ? leaderboard.map(el => ({
+    partial[token] = tokenLeaderboard
+      ? tokenLeaderboard.map(el => ({
         depositor: el.depositor,
-        totalEth: el.totalShares * rates[token]!,
+        amount: el.totalShares * shareRatesTokens[token]!,
+        totalEth: el.totalShares * shareRatesEth[token]!,
       }))
       : null;
   });
@@ -40,26 +52,28 @@ export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRa
     Object.values(partial).flat().reduce((acc, el) => {
       if (!el) return acc;
 
-      if (!acc[el.depositor]) acc[el.depositor] = { depositor: el.depositor, totalEth: 0 };
-      acc[el.depositor].totalEth += el.totalEth;
+      if (!acc[el.depositor]) acc[el.depositor] = { depositor: el.depositor, amount: 0 };
+      acc[el.depositor].amount += el.totalEth;
 
       return acc;
     }, {} as Record<string, LeaderboardStaker>)
-  ).sort((a, b) => b.totalEth - a.totalEth).slice(0, MAX_LEADERBOARD_SIZE);
+  ).sort((a, b) => b.amount - a.amount).slice(0, MAX_LEADERBOARD_SIZE);
 
   return {
     partial,
     total,
+    points: restakedPointsLeaderboard.map(el => ({ depositor: el.depositor, amount: el.totalPoints })),
   };
 }
 
 export function useLeaderboard(network: SupportedNetwork): UseQueryResult<LeaderboardData> {
-  const { data: rates } = useShareRates(network);
+  const { data: shareRatesTokens } = useShareRatesTokens(network);
+  const { data: shareRatesEth } = useShareRatesEth(network);
 
   const result = useQuery({
-    queryKey: getLeaderboardQueryKey(network, rates),
-    queryFn: () => queryLeaderboard(network, rates!),
-    enabled: !!rates,
+    queryKey: getLeaderboardQueryKey(network, shareRatesTokens, shareRatesEth),
+    queryFn: () => queryLeaderboard(network, shareRatesTokens!, shareRatesEth!),
+    enabled: !!shareRatesTokens && !!shareRatesEth,
     retry: false,
   });
 

@@ -61,6 +61,28 @@ h3 {
   background-color: rgba(46, 46, 46, 0.9);
 }
 
+.table-button-points-active,
+.table-head-total {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 1);
+}
+
+.table-button-points-inactive {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 0.8);
+}
+
+.table-button-points-inactive:hover {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 0.9);
+}
+
+.table-button-points-active,
+.table-head-points {
+  color: rgb(var(--whitish));
+  background-color: rgba(46, 46, 46, 1);
+}
+
 .table-button-steth-active,
 .table-head-steth {
   color: rgb(var(--whitish));
