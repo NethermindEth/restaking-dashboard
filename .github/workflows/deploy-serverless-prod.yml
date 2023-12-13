@@ -12,7 +12,7 @@ env:
   AWS_REGION: "us-east-1"
 jobs:
   deploy:
-    name: "Development deployment"
+    name: "Serverless"
     runs-on: ubuntu-22.04
     permissions: 
       id-token: write
