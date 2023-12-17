@@ -70,6 +70,7 @@ export default function LineChart({ title, amounts, timestamps, tokens}: LineCha
           }
         }),
       }}
+      style={{ height: "300px" }}
     />
   );
 };

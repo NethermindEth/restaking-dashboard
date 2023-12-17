@@ -53,6 +53,7 @@ export default function StackedBarChart({ title, tokens, amounts, timestamps }: 
         },
         color: "rgb(26, 12, 109)",
       }}
+      style={{ height: "300px" }}
     />
   );
 };
