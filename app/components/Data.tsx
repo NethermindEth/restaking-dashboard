@@ -47,7 +47,7 @@ export default function Data() {
           </select>
         </div>
       </div>
-      <div className={`my-8 w-full grid grid-cols-2 md:grid-cols-${Math.min(tokens.length, 4)} lg:grid-cols-${Math.min(tokens.length, 6)} gap-4`}>
+      <div className={`my-8 w-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4`}>
         {tokens.map(token => (
           <div
             key={token}
