@@ -45,49 +45,61 @@ export const TOKEN_INFO: TokenRecord<TokenInfo> = {
     classId: "steth",
     label: "stEth",
     image: "/steth_logo.webp",
+    color: "#4fa1fa",
   },
   rEth: {
     classId: "reth",
     label: "rEth",
     image: "/reth.webp",
+    color: "#ee9d83",
   },
   cbEth: {
     classId: "cbeth",
     label: "cbEth",
     image: "/cbeth.png",
+    color: "#2a54f8",
+  },
   wBEth: {
     classId: "wbeth",
     label: "wBETH",
     image: "/wbeth.png",
+    color: "#ecc946",
+  },
   osEth: {
     classId: "oseth",
     label: "osETH",
     image: "/oseth.png",
+    color: "#345b89",
   },
   swEth: {
     classId: "sweth",
     label: "swETH",
     image: "/sweth.png",
+    color: "#273ba5",
   },
   ankrEth: {
     classId: "ankreth",
     label: "AnkrETH",
     image: "/ankreth.png",
+    color: "#fae84a",
   },
   ethX: {
     classId: "ethx",
     label: "ETHx",
     image: "/ethx.png",
+    color: "#182428",
   },
   oEth: {
     classId: "oeth",
     label: "OETH",
     image: "/oeth.png",
+    color: "#3874ea",
   },
   beacon: {
     classId: "beacon",
     label: "Beacon Chain ETH",
     image: "/beaconChainETH.png",
+    color: "#aad782",
   },
 };
 
