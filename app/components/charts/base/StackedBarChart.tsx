@@ -44,7 +44,7 @@ export default function StackedBarChart({ title, tokens, amounts, timestamps }: 
     <Bar
       data={chartData}
       options={{
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         responsive: true,
         normalized: true,
         scales: {

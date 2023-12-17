@@ -56,7 +56,7 @@ export default function LineChart({ title, amounts, timestamps, tokens}: LineCha
       data={chartData}
       title={title}
       options={{
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         responsive: true,
         normalized: true,
         color: "rgb(26, 12, 109)",
