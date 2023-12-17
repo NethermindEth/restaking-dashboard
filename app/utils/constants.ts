@@ -55,6 +55,34 @@ export const TOKEN_INFO: TokenRecord<TokenInfo> = {
     classId: "cbeth",
     label: "cbEth",
     image: "/cbeth.png",
+  wBEth: {
+    classId: "wbeth",
+    label: "wBETH",
+    image: "/wbeth.png",
+  osEth: {
+    classId: "oseth",
+    label: "osETH",
+    image: "/oseth.png",
+  },
+  swEth: {
+    classId: "sweth",
+    label: "swETH",
+    image: "/sweth.png",
+  },
+  ankrEth: {
+    classId: "ankreth",
+    label: "AnkrETH",
+    image: "/ankreth.png",
+  },
+  ethX: {
+    classId: "ethx",
+    label: "ETHx",
+    image: "/ethx.png",
+  },
+  oEth: {
+    classId: "oeth",
+    label: "OETH",
+    image: "/oeth.png",
   },
   beacon: {
     classId: "beacon",
@@ -77,6 +105,32 @@ export const NETWORK_TOKEN_INFO: Record<SupportedNetwork, Partial<TokenRecord<To
       strategyAddress: "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc",
       address: "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
     },
+    wBEth: {
+      strategyAddress: "0x7CA911E83dabf90C90dD3De5411a10F1A6112184",
+      address: "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
+    },
+    osEth: {
+      strategyAddress: "0x57ba429517c3473B6d34CA9aCd56c0e735b94c02",
+      address: "0xf1C9acDc66974dFB6dEcB12aA385b9cD01190E38",
+      feed: "0x8023518b2192FB5384DAdc596765B3dD1cdFe471",
+    },
+    swEth: {
+      strategyAddress: "0x0Fe4F44beE93503346A3Ac9EE5A26b130a5796d6",
+      address: "0xf951E335afb289353dc249e82926178EaC7DEd78",
+    },
+    ankrEth: {
+      strategyAddress: "0x13760F50a9d7377e4F20CB8CF9e4c26586c658ff",
+      address: "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
+    },
+    ethX: {
+      strategyAddress: "0x9d7eD45EE2E8FC5482fa2428f15C971e6369011d",
+      address: "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",
+      feed: "0xcf5EA1b38380f6aF39068375516Daf40Ed70D299",
+    },
+    oEth: {
+      strategyAddress: "0xa4C637e0F704745D182e4D38cAb7E7485321d059",
+      address: "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
+    },
     beacon: {
       strategyAddress: ethers.ZeroAddress as `0x${string}`,
       address: ethers.ZeroAddress as `0x${string}`,
@@ -90,6 +144,15 @@ export const NETWORK_TOKEN_INFO: Record<SupportedNetwork, Partial<TokenRecord<To
     rEth: {
       strategyAddress: "0x879944A8cB437a5f8061361f82A6d4EED59070b5",
       address: "0x178e141a0e3b34152f73ff610437a7bf9b83267a",
+    },
+    ankrEth: {
+      strategyAddress: "0x98b47798B68b734af53c930495595729E96cdB8E",
+      address: "0x2bBC91e1990F0dc5e5BAD04AaE000Ca97f56990f",
+    },
+    ethX: {
+      strategyAddress: "0x5d1E9DC056C906CBfe06205a39B0D965A6Df7C14",
+      address: "0x3338eCd3ab3d3503c55c931d759fA6d78d287236",
+      feed: "0xd0e400Ec6Ed9C803A9D9D3a602494393E806F823",
     },
     beacon: {
       strategyAddress: ethers.ZeroAddress as `0x${string}`,

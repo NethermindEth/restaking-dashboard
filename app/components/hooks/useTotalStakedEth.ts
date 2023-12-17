@@ -24,6 +24,12 @@ export async function queryTotalStakedEth(
     stEth: totalStakedTokens.stEth ? totalStakedTokens.stEth * rates.stEth! : null,
     rEth: totalStakedTokens.rEth ? totalStakedTokens.rEth * rates.rEth! : null,
     cbEth: totalStakedTokens.cbEth ? totalStakedTokens.cbEth * rates.cbEth! : null,
+    wBEth: totalStakedTokens.wBEth ? totalStakedTokens.wBEth * rates.wBEth! : null,
+    osEth: totalStakedTokens.osEth ? totalStakedTokens.osEth * rates.osEth! : null,
+    swEth: totalStakedTokens.swEth ? totalStakedTokens.swEth * rates.swEth! : null,
+    ankrEth: totalStakedTokens.ankrEth ? totalStakedTokens.ankrEth * rates.ankrEth! : null,
+    ethX: totalStakedTokens.ethX ? totalStakedTokens.ethX * rates.ethX! : null,
+    oEth: totalStakedTokens.oEth ? totalStakedTokens.oEth * rates.oEth! : null,
     beacon: totalStakedTokens.beacon,
   };
 }
