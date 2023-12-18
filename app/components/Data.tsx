@@ -116,7 +116,7 @@ export default function Data() {
           <TimelineSelector name="beacon" onTimelineChange={handleTimelineChange} />
         </div>
 
-        <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
+        <div className="charts-homepage pie-chart-deposits w-full md:w-1/2 mx-auto mt-16">
           <h3 className="text-center text-xl">Staked ETH Distribution</h3>
           <DistributionChart network={network} />
         </div>
