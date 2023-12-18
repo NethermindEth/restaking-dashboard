@@ -4,7 +4,7 @@ frameworkVersion: "3"
 custom:
   apiGatewayCaching:
     enabled: true
-    ttlInSeconds: 600
+    ttlInSeconds: 300
 
 provider:
   name: aws
