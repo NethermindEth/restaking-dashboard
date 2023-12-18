@@ -4071,6 +4071,14 @@ serverless-api-gateway-caching@^1.10.2:
     lodash.get "^4.4.2"
     lodash.isempty "^4.4.0"
 
+serverless-api-gateway-throttling@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/serverless-api-gateway-throttling/-/serverless-api-gateway-throttling-2.0.3.tgz#e679c4fe6bd25bf18d273efa90fa3e05a0d553f3"
+  integrity sha512-Ix7m7Kz0El8z0jETRZMW22frn/cY9R7yHElGj1zriqvAJtwWBZ6Gvinbl2QtxbQVopyOi1dJSzpkraeuGoYErQ==
+  dependencies:
+    lodash.get "^4.4.2"
+    lodash.isempty "^4.4.0"
+
 serverless-offline@^13.2.0:
   version "13.2.1"
   resolved "https://registry.npmjs.org/serverless-offline/-/serverless-offline-13.2.1.tgz"

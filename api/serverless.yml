@@ -4,7 +4,10 @@ frameworkVersion: "3"
 custom:
   apiGatewayCaching:
     enabled: true
-    ttlInSeconds: 600
+    ttlInSeconds: 300
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 40
+    maxConcurrentRequests: 40
 
 provider:
   name: aws
