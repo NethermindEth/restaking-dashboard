@@ -5,6 +5,9 @@ custom:
   apiGatewayCaching:
     enabled: true
     ttlInSeconds: 300
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 40
+    maxConcurrentRequests: 40
 
 provider:
   name: aws
