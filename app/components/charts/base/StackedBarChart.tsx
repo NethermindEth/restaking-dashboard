@@ -5,35 +5,21 @@ import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import { ChartData } from "chart.js/auto";
 
-import { SupportedToken, TokenRecord } from "@/app/utils/types";
+import { SupportedToken, TokenRecord, supportedTokens } from "@/app/utils/types";
 import { getTokenInfo } from "@/app/utils/constants";
 
-const tokenDatasets: TokenRecord<ChartData<"bar">["datasets"][number]> = {
-  stEth: {
-    backgroundColor: ["rgba(26, 12, 109, 0.6)"],
-    borderColor: ["rgba(26, 12, 109, 1)"],
+const tokenDatasets = supportedTokens.reduce((acc, token) => {
+  const info = getTokenInfo(token);
+
+  acc[token] = {
+    backgroundColor: [`${info.color}99`],
+    borderColor: [info.color],
     borderWidth: 1,
     data: [],
-  },
-  rEth: {
-    backgroundColor: ["rgba(255, 184, 0, 0.6)"],
-    borderColor: ["rgba(255, 184, 0, 1)"],
-    borderWidth: 1,
-    data: [],
-  },
-  cbEth: {
-    backgroundColor: ["rgba(0, 153, 153, 0.6)"],
-    borderColor: ["rgba(0, 153, 153, 1)"],
-    borderWidth: 1,
-    data: [],
-  },
-  beacon: {
-    backgroundColor: "rgba(254, 156, 147, 0.6)",
-    borderColor: ["rgba(254, 156, 147, 1)"],
-    borderWidth: 1,
-    data: [],
-  },
-};
+  };
+
+  return acc;
+}, {} as TokenRecord<ChartData<"bar">["datasets"][number]>);
 
 export interface StackedBarChartProps {
   title: string;
@@ -58,7 +44,7 @@ export default function StackedBarChart({ title, tokens, amounts, timestamps }: 
     <Bar
       data={chartData}
       options={{
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         responsive: true,
         normalized: true,
         scales: {
@@ -67,6 +53,7 @@ export default function StackedBarChart({ title, tokens, amounts, timestamps }: 
         },
         color: "rgb(26, 12, 109)",
       }}
+      style={{ height: "300px" }}
     />
   );
 };

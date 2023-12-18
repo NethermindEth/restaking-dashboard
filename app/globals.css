@@ -12,6 +12,17 @@
   --tertiary-accent-color: 0, 153, 153;
   --alternative-bg: rgb(202, 223, 255);
   --tertiary-bg-rgb: 254, 156, 147;
+  
+  --steth-color: 79, 161, 250;
+  --reth-color: 238, 157, 131;
+  --cbeth-color: 42, 84, 248;
+  --wbeth-color: 236, 201, 70;
+  --oseth-color: 52, 91, 137;
+  --sweth-color: 39, 59, 165;
+  --ankreth-color: 250, 232, 74;
+  --ethx-color: 24, 36, 40;
+  --oeth-color: 56, 116, 234;
+  --beacon-color: 170, 215, 130;
 }
 
 body {
@@ -21,113 +32,76 @@ body {
     var(--alternative-bg);
 }
 
-.data-card-steth {
-  color: rgb(var(--whitish));
-  background-color: rgb(var(--accent-color));
-}
-
-.data-card-reth {
-  color: rgb(var(--accent-color));
-  background-color: rgb(var(--secondary-accent-color));
-}
-
-.data-card-cbeth {
-  color: rgb(var(--whitish));
-  background-color: rgb(var(--tertiary-accent-color));
-}
-
-.data-card-beacon {
-  color: rgb(var(--accent-color));
-  background-color: rgb(var(--tertiary-bg-rgb));
-}
-
 h3 {
   color: rgb(var(--accent-color));
 }
 
-.table-button-totals-active,
-.table-head-total {
+.table-button-inactive {
+  opacity: 0.5;
+}
+
+.table-button-inactive:hover {
+  opacity: 0.9;
+}
+
+.table-button-totals, .table-head-totals {
   color: rgb(var(--whitish));
   background-color: rgba(46, 46, 46, 1);
 }
 
-.table-button-totals-inactive {
-  color: rgb(var(--whitish));
-  background-color: rgba(46, 46, 46, 0.8);
-}
-
-.table-button-totals-inactive:hover {
-  color: rgb(var(--whitish));
-  background-color: rgba(46, 46, 46, 0.9);
-}
-
-.table-button-steth-active,
-.table-head-steth {
-  color: rgb(var(--whitish));
-  background-color: rgb(var(--accent-color));
-}
-
-.table-button-steth-inactive {
-  color: rgb(var(--whitish));
-  background-color: rgba(var(--accent-color), 0.6);
-}
-
-.table-button-steth-inactive:hover {
-  color: rgb(var(--whitish));
-  background-color: rgba(var(--accent-color), 0.8);
-}
-
-.table-button-reth-active,
-.table-head-reth {
+.table-button-steth, .table-head-steth {
   color: rgb(var(--accent-color));
-  background-color: rgb(var(--secondary-accent-color));
+  background-color: rgb(var(--steth-color));
 }
 
-.table-button-reth-inactive {
+.table-button-reth, .table-head-reth {
   color: rgb(var(--accent-color));
-  background-color: rgba(var(--secondary-accent-color), 0.6);
+  background-color: rgb(var(--reth-color));
 }
 
-.table-button-reth-inactive:hover {
-  color: rgb(var(--accent-color));
-  background-color: rgb(var(--secondary-accent-color), 0.8);
-}
-
-.table-button-cbeth-active,
-.table-head-cbeth {
+.table-button-cbeth, .table-head-cbeth {
   color: rgb(var(--whitish));
-  background-color: rgb(var(--tertiary-accent-color));
+  background-color: rgb(var(--cbeth-color));
 }
 
-.table-button-cbeth-inactive {
+.table-button-wbeth, .table-head-wbeth {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--wbeth-color));
+}
+
+.table-button-oseth, .table-head-oseth {
   color: rgb(var(--whitish));
-  background-color: rgba(var(--tertiary-accent-color), 0.6);
+  background-color: rgb(var(--oseth-color));
 }
 
-.table-button-cbeth-inactive:hover {
+.table-button-sweth, .table-head-sweth {
   color: rgb(var(--whitish));
-  background-color: rgb(var(--tertiary-accent-color), 0.8);
+  background-color: rgb(var(--sweth-color));
 }
 
-.table-button-beacon-active,
-.table-head-beacon {
+.table-button-ankreth, .table-head-ankreth {
   color: rgb(var(--accent-color));
-  background-color: rgb(var(--tertiary-bg-rgb));
+  background-color: rgb(var(--ankreth-color));
 }
 
-.table-button-beacon-inactive {
-  color: rgb(var(--accent-color));
-  background-color: rgba(var(--tertiary-bg-rgb), 0.6);
+.table-button-ethx, .table-head-ethx {
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--ethx-color));
 }
 
-.table-button-beacon-inactive:hover {
+.table-button-oeth, .table-head-oeth {
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--oeth-color));
+}
+
+.table-button-beacon, .table-head-beacon {
   color: rgb(var(--accent-color));
-  background-color: rgba(var(--tertiary-bg-rgb), 0.8);
+  background-color: rgb(var(--beacon-color));
 }
 
 .table-head,
 .table-button {
-  transition: background-color 300ms ease, color 300ms ease;
+  transition: opacity 300ms ease;
 }
 
 td {

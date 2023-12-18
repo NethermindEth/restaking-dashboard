@@ -41,6 +41,12 @@ export async function queryTotalStakedTokens(network: SupportedNetwork, _: boole
     stEth: await results.stEth,
     rEth: await results.rEth,
     cbEth: await results.cbEth,
+    wBEth: await results.wBEth,
+    osEth: await results.osEth,
+    swEth: await results.swEth,
+    ankrEth: await results.ankrEth,
+    ethX: await results.ethX,
+    oEth: await results.oEth,
     beacon: await results.beacon,
   };
 }

@@ -1,4 +1,14 @@
-export const supportedStrategyTokens = ["stEth", "rEth", "cbEth"] as const;
+export const supportedStrategyTokens = [
+  "stEth",
+  "rEth",
+  "cbEth",
+  "wBEth",
+  "osEth",
+  "swEth",
+  "ankrEth",
+  "ethX",
+  "oEth",
+] as const;
 export type SupportedStrategyToken = (typeof supportedStrategyTokens)[number];
 
 export const supportedTokens = [...supportedStrategyTokens, "beacon"] as const;
@@ -26,9 +36,11 @@ export interface TokenInfo {
   classId: string;
   label: string;
   image: string;
+  color: string;
 }
 
 export interface TokenNetworkInfo {
   strategyAddress: `0x${string}`;
   address: `0x${string}`;
+  feed?: `0x${string}`;
 }

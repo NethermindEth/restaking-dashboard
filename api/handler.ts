@@ -26,7 +26,17 @@ export const getDeposits = async (
 
   const tokenAddresses = getContractAddresses(chain);
   
-  const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
+  const {
+    stEthAddress,
+    cbEthAddress,
+    rEthAddress,
+    wBEthAddress,
+    osEthAddress,
+    swEthAddress,
+    ankrEthAddress,
+    ethXAddress,
+    oEthAddress,
+  } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
   const days = timelineToDays[timeline];
@@ -148,6 +158,12 @@ export const getDeposits = async (
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
         cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
         rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
+        wBEth: wBEthAddress ? groupedResponse[wBEthAddress] : null,
+        osEth: osEthAddress ? groupedResponse[osEthAddress] : null,
+        swEth: swEthAddress ? groupedResponse[swEthAddress] : null,
+        ankrEth: ankrEthAddress ? groupedResponse[ankrEthAddress] : null,
+        ethX: ethXAddress ? groupedResponse[ethXAddress] : null,
+        oEth: oEthAddress ? groupedResponse[oEthAddress] : null,
         beacon: groupedResponse["null"],
       },
     }),
@@ -169,7 +185,17 @@ export const getLeaderboard = async (
 
   const tokenAddresses = getContractAddresses(chain);
   
-  const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
+  const {
+    stEthAddress,
+    cbEthAddress,
+    rEthAddress,
+    wBEthAddress,
+    osEthAddress,
+    swEthAddress,
+    ankrEthAddress,
+    ethXAddress,
+    oEthAddress,
+  } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
   const response = (
@@ -263,6 +289,12 @@ export const getLeaderboard = async (
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
         cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
         rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
+        wBEth: wBEthAddress ? groupedResponse[wBEthAddress] : null,
+        osEth: osEthAddress ? groupedResponse[osEthAddress] : null,
+        swEth: swEthAddress ? groupedResponse[swEthAddress] : null,
+        ankrEth: ankrEthAddress ? groupedResponse[ankrEthAddress] : null,
+        ethX: ethXAddress ? groupedResponse[ethXAddress] : null,
+        oEth: oEthAddress ? groupedResponse[oEthAddress] : null,
         beacon: groupedResponse["null"],
       },
     }),
@@ -285,7 +317,17 @@ export const getWithdrawals = async (
 
   const tokenAddresses = getContractAddresses(chain);
   
-  const { stEthAddress, cbEthAddress, rEthAddress } = tokenAddresses;
+  const {
+    stEthAddress,
+    cbEthAddress,
+    rEthAddress,
+    wBEthAddress,
+    osEthAddress,
+    swEthAddress,
+    ankrEthAddress,
+    ethXAddress,
+    oEthAddress,
+  } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
   const days = timelineToDays[timeline];
@@ -406,6 +448,12 @@ export const getWithdrawals = async (
         stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
         cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
         rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
+        wBEth: wBEthAddress ? groupedResponse[wBEthAddress] : null,
+        osEth: osEthAddress ? groupedResponse[osEthAddress] : null,
+        swEth: swEthAddress ? groupedResponse[swEthAddress] : null,
+        ankrEth: ankrEthAddress ? groupedResponse[ankrEthAddress] : null,
+        ethX: ethXAddress ? groupedResponse[ethXAddress] : null,
+        oEth: oEthAddress ? groupedResponse[oEthAddress] : null,
         beacon: groupedResponse["null"],
       },
     }),
@@ -427,7 +475,7 @@ export async function getTotalStakedBeacon(
   } = getTotalStakedBeaconSchema.parse(event);
 
   const result = (await spiceClient.query(`
-      SELECT SUM(effective_balance) / POW(10,9) as total_staked
+      SELECT SUM(balance_gwei) / POW(10,9) as total_staked
       FROM ${chain}.beacon.validators
       JOIN ${chain}.eigenlayer.eigenpods
       ON
