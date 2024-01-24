@@ -50,7 +50,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
       <h3 className="text-center text-xl">Restaking Leaderboard</h3>
       <div className="flex flex-col lg:flex-row mt-3 w-full">
         <button
-          className={`table-button table-button-totals-${(activeTab === "total") ? "active" : "inactive"} py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+          className={`table-button table-button-totals table-button-${(activeTab === "total") ? "active" : "inactive"} p-1 md:p-0 grow border rounded focus:outline-none text-sm shadow-lg`}
           onClick={() => setActiveTab("total")}
         >
           Total staked
@@ -58,7 +58,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
         {tokens.map((token, idx) => (
           <button
             key={idx}
-            className={`table-button table-button-${getTokenInfo(token).classId}-${(activeTab === token) ? "active" : "inactive"} py-3 px-4 lg:mr-2 grow border rounded focus:outline-none text-sm shadow-lg`}
+            className={`table-button table-button-${getTokenInfo(token).classId} table-button-${(activeTab === token) ? "active" : "inactive"} p-1 md:p-0 grow border rounded focus:outline-none text-sm shadow-lg`}
             onClick={() => setActiveTab(token)}
           >
             {getTokenInfo(token).label}
@@ -67,7 +67,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
       </div>
       <div className="leaderboard-table w-full mt-3 overflow-x-scroll">
         <table className="table table-fixed w-full border-collapse">
-          <thead className={`text-base table-head table-head-${(activeTab === "total") ? "total" : getTokenInfo(activeTab).classId}`}>
+          <thead className={`text-base table-head table-head-${(activeTab === "total") ? "totals" : getTokenInfo(activeTab).classId}`}>
             <tr>
               <th className="py-3 px-4 text-left w-1/6">Rank</th>
               <th className="py-3 px-4 text-left w-3/6 sm:w-4/6">Address</th>

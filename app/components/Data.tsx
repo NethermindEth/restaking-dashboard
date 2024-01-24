@@ -47,16 +47,16 @@ export default function Data() {
           </select>
         </div>
       </div>
-      <div className="my-8 w-full lg:w-1/2 flex flex-wrap flex-col lg:flex-row lg:flex-nowrap items-stretch justify-center">
+      <div className={`my-8 w-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4`}>
         {tokens.map(token => (
           <div
             key={token}
-            className={`data-card data-card-${getTokenInfo(token).classId} ${(!totalStakedTokensData)? "loading-pulse" : ""} grow mt-8 lg:mt-0 py-8 px-10 md:px-24 mx-4 shadow-lg rounded-md text-center`}
+            className={`data-card ${(!totalStakedTokensData)? "loading-pulse" : ""} grow lg:mt-0 min-w-100 rounded-md text-center`}
           >
             <span className="inline-block">
               <Image src={getTokenInfo(token).image} alt={getTokenInfo(token).label} width={48} height={48} />
             </span>
-            <p className="text-sm md:text-base">Staked {getTokenInfo(token).label}</p>
+            <p className="text-sm md:text-base">{getTokenInfo(token).label}</p>
             <p className="md:text-xl">
               {totalStakedTokensData && totalStakedTokensData[token]?.toFixed(2)}
             </p>
@@ -116,7 +116,7 @@ export default function Data() {
           <TimelineSelector name="beacon" onTimelineChange={handleTimelineChange} />
         </div>
 
-        <div className="charts-homepage pie-chart-deposits w-full md:w-1/3 mx-auto mt-16">
+        <div className="charts-homepage pie-chart-deposits w-full md:w-1/2 mx-auto mt-16">
           <h3 className="text-center text-xl">Staked ETH Distribution</h3>
           <DistributionChart network={network} />
         </div>
