@@ -1,6 +1,7 @@
 import "./globals.css";
 
 import Providers from "@/app/providers";
+import Matomo from "@/app/components/Matomo";
 
 const title = "EigenLayer Restaking Dashboard";
 const description = "Visualise EigenLayer staking and withdrawals in Mainnet";
@@ -50,6 +51,8 @@ export default function RootLayout({
           {children}
         </Providers>
       </body>
+
+      <Matomo />
     </html>
   );
 }

@@ -1,13 +1,11 @@
 import Image from "next/image";
 
 import Data from "./components/Data";
-import Matomo from "./components/Matomo";
 import Disclaimer from "./components/Disclaimer";
 
 export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 font-semibold">
-      <Matomo />
       <div>
         <div className="z-10 max-w-5xl items-center justify-between font-mono text-sm">
           <div className="h-48 flex w-full items-center justify-center lg:static lg:h-auto lg:w-auto lg:bg-none lgmb-12">
