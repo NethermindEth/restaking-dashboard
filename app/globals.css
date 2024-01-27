@@ -22,6 +22,9 @@
   --ankreth-color: 250, 232, 74;
   --ethx-color: 24, 36, 40;
   --oeth-color: 56, 116, 234;
+  --sfrxeth-color: 0, 0, 0;
+  --lseth-color: 221, 228, 127;
+  --meth-color: 115, 25, 22;
   --beacon-color: 170, 215, 130;
 }
 
@@ -92,6 +95,21 @@ h3 {
 .table-button-oeth, .table-head-oeth {
   color: rgb(var(--whitish));
   background-color: rgb(var(--oeth-color));
+}
+
+.table-button-sfrxeth, .table-head-sfrxeth {
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--sfrxeth-color));
+}
+
+.table-button-lseth, .table-head-lseth {
+  color: rgb(var(--accent-color));
+  background-color: rgb(var(--lseth-color));
+}
+
+.table-button-meth, .table-head-meth {
+  color: rgb(var(--whitish));
+  background-color: rgb(var(--meth-color));
 }
 
 .table-button-beacon, .table-head-beacon {

@@ -9,6 +9,9 @@ import {
   SwETH__factory,
   AETH_R21__factory,
   OETH__factory,
+  SfrxETH__factory,
+  MantleStaking__factory,
+  RiverV1__factory,
 } from "@/typechain";
 import { getNetworkProvider, getTokenNetworkInfo } from "@/app/utils/constants";
 
@@ -61,6 +64,21 @@ export async function queryShareRates(network: SupportedNetwork, _: boolean = fa
   : null;
   const oEthRate = oEth ? oEth.rebasingCreditsPerToken().then(val => Number(BigInt(1e36) / val) / 1e18) : 0;
 
+  const sfrxEth = getTokenNetworkInfo(network, "sfrxEth")
+  ? SfrxETH__factory.connect(getTokenNetworkInfo(network, "sfrxEth")!.address, provider)
+  : null;
+  const sfrxEthRate = sfrxEth ? sfrxEth.convertToShares(BigInt(1e18)).then(val => Number(val) / 1e18) : 0;
+
+  const lsEth = getTokenNetworkInfo(network, "lsEth")
+  ? RiverV1__factory.connect(getTokenNetworkInfo(network, "lsEth")!.address, provider)
+  : null;
+  const lsEthRate = lsEth ? lsEth.underlyingBalanceFromShares(BigInt(1e18)).then(val => Number(val) / 1e18) : 0;
+
+  const mEth = getTokenNetworkInfo(network, "mEth")
+  ? MantleStaking__factory.connect(getTokenNetworkInfo(network, "mEth")!.feed!, provider)
+  : null;
+  const mEthRate = mEth ? mEth.mETHToETH(BigInt(1e18)).then(val => Number(val) / 1e18) : 0;
+
   const strategyRates = supportedStrategyTokens.reduce((acc, token) => {
     const strategy = getTokenNetworkInfo(network, token)
       ? StrategyBaseTVLLimits__factory.connect(
@@ -86,6 +104,9 @@ export async function queryShareRates(network: SupportedNetwork, _: boolean = fa
     ankrEth: strategyRates["ankrEth"] ? await strategyRates["ankrEth"] * await ankrEthRate : null,
     ethX: strategyRates["ethX"] ? await strategyRates["ethX"] * await ethXRate : null,
     oEth: strategyRates["oEth"] ? await strategyRates["oEth"] * await oEthRate : null,
+    sfrxEth: strategyRates["sfrxEth"] ? await strategyRates["sfrxEth"] * await sfrxEthRate : null,
+    lsEth: strategyRates["lsEth"] ? await strategyRates["lsEth"] * await lsEthRate : null,
+    mEth: strategyRates["mEth"] ? await strategyRates["mEth"] * await mEthRate : null,
     beacon: 1,
   };
 }

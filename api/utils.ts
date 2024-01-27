@@ -15,6 +15,9 @@ export const supportedTokens = [
   "ankrEth",
   "ethX",
   "oEth",
+  "sfrxEth",
+  "lsEth",
+  "mEth",
 ] as const;
 export type SupportedToken = (typeof supportedTokens)[number];
 
@@ -31,18 +34,24 @@ export function getContractAddresses(chain: Chain): Record<SupportedToken, strin
         ankrEth: "0xe95a203b1a91a908f9b9ce46459d101078c2c3cb",
         ethX: "0xa35b1b31ce002fbf2058d22f30f95d405200a15b",
         oEth: "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+        sfrxEth: "0xac3E018457B222d93114458476f3E3416Abbe38F",
+        lsEth: "0x8c1BEd5b9a0928467c9B1341Da1D7BD5e10b6549",
+        mEth: "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa",
       };
     case "goerli":
       return {
         stEth: "0x1643e812ae58766192cf7d2cf9567df2c37e9b7f",
         cbEth: undefined,
         rEth: "0x178e141a0e3b34152f73ff610437a7bf9b83267a",
-        wBEth: undefined,
+        wBEth: "0xE7bCB9e341D546b66a46298f4893f5650a56e99E",
         osEth: undefined,
         swEth: undefined,
         ankrEth: "0x2bbc91e1990f0dc5e5bad04aae000ca97f56990f",
         ethX: "0x3338ecd3ab3d3503c55c931d759fa6d78d287236",
         oEth: undefined,
+        sfrxEth: undefined,
+        lsEth: "0x3ecCAdA3e11c1Cc3e9B5a53176A67cc3ABDD3E46",
+        mEth: "0x20d7E093B3fa5eBfA7a0fa414FaD547743a2400F",
       };
     default:
       throw new Error(`Unknown network '${chain}'`);

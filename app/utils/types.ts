@@ -8,6 +8,9 @@ export const supportedStrategyTokens = [
   "ankrEth",
   "ethX",
   "oEth",
+  "sfrxEth",
+  "lsEth",
+  "mEth",
 ] as const;
 export type SupportedStrategyToken = (typeof supportedStrategyTokens)[number];
 
