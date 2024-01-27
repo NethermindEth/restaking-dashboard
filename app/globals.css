@@ -39,6 +39,10 @@ h3 {
   color: rgb(var(--accent-color));
 }
 
+.table-button {
+  font-size: 12px;
+}
+
 .table-button-inactive {
   opacity: 0.5;
 }
