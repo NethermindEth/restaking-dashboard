@@ -53,7 +53,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
           className={`table-button table-button-totals table-button-${(activeTab === "total") ? "active" : "inactive"} p-1 md:p-0 grow border rounded focus:outline-none text-sm shadow-lg`}
           onClick={() => setActiveTab("total")}
         >
-          Total staked
+          Total ETH
         </button>
         {tokens.map((token, idx) => (
           <button
@@ -96,7 +96,7 @@ export default function Leaderboard({ network }: LeaderboardProps) {
                     </Link>
                   </td>
                   <td className="py-4 px-4 text-right text-sm">
-                    {userData.totalEth.toFixed(2)}
+                    {userData.totalTokens.toFixed(2)}
                   </td>
                 </tr>
               ))) || null}
