@@ -67,7 +67,7 @@ export async function queryShareRates(network: SupportedNetwork, _: boolean = fa
   const sfrxEth = getTokenNetworkInfo(network, "sfrxEth")
   ? SfrxETH__factory.connect(getTokenNetworkInfo(network, "sfrxEth")!.address, provider)
   : null;
-  const sfrxEthRate = sfrxEth ? sfrxEth.convertToShares(BigInt(1e18)).then(val => Number(val) / 1e18) : 0;
+  const sfrxEthRate = sfrxEth ? sfrxEth.convertToAssets(BigInt(1e18)).then(val => Number(val) / 1e18) : 0;
 
   const lsEth = getTokenNetworkInfo(network, "lsEth")
   ? RiverV1__factory.connect(getTokenNetworkInfo(network, "lsEth")!.address, provider)
