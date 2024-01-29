@@ -1,6 +1,6 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
-import { SupportedNetwork, TokenRecord } from "@/app/utils/types";
+import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
 import { ShareRates, useShareRates } from "./useShareRates";
 import { useTotalStakedTokens } from "./useTotalStakedTokens";
 
@@ -20,18 +20,9 @@ export async function queryTotalStakedEth(
   if (!rates) throw new Error("Rates were not yet fetched");
   if (!totalStakedTokens) throw new Error("Total staked tokens were not yet fetched");
 
-  return {
-    stEth: totalStakedTokens.stEth ? totalStakedTokens.stEth * rates.stEth! : null,
-    rEth: totalStakedTokens.rEth ? totalStakedTokens.rEth * rates.rEth! : null,
-    cbEth: totalStakedTokens.cbEth ? totalStakedTokens.cbEth * rates.cbEth! : null,
-    wBEth: totalStakedTokens.wBEth ? totalStakedTokens.wBEth * rates.wBEth! : null,
-    osEth: totalStakedTokens.osEth ? totalStakedTokens.osEth * rates.osEth! : null,
-    swEth: totalStakedTokens.swEth ? totalStakedTokens.swEth * rates.swEth! : null,
-    ankrEth: totalStakedTokens.ankrEth ? totalStakedTokens.ankrEth * rates.ankrEth! : null,
-    ethX: totalStakedTokens.ethX ? totalStakedTokens.ethX * rates.ethX! : null,
-    oEth: totalStakedTokens.oEth ? totalStakedTokens.oEth * rates.oEth! : null,
-    beacon: totalStakedTokens.beacon,
-  };
+  return Object.fromEntries(
+    supportedTokens.map(token => ([token, (totalStakedTokens[token] == null) ? totalStakedTokens[token]! * rates[token]! : null]))
+  ) as TokenRecord<number | null>;
 }
 
 export function useTotalStakedEth(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {

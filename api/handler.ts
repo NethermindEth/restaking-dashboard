@@ -2,6 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 
 import {
+  extractGroupedResponse,
   getContractAddresses,
   startingEpochTimestamps,
   supportedChains,
@@ -25,18 +26,6 @@ export const getDeposits = async (
   } = getDepositsSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
-  
-  const {
-    stEthAddress,
-    cbEthAddress,
-    rEthAddress,
-    wBEthAddress,
-    osEthAddress,
-    swEthAddress,
-    ankrEthAddress,
-    ethXAddress,
-    oEthAddress,
-  } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
   const days = timelineToDays[timeline];
@@ -154,18 +143,7 @@ export const getDeposits = async (
     } : {},
     body: JSON.stringify({
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
-      deposits: {
-        stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
-        cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
-        rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
-        wBEth: wBEthAddress ? groupedResponse[wBEthAddress] : null,
-        osEth: osEthAddress ? groupedResponse[osEthAddress] : null,
-        swEth: swEthAddress ? groupedResponse[swEthAddress] : null,
-        ankrEth: ankrEthAddress ? groupedResponse[ankrEthAddress] : null,
-        ethX: ethXAddress ? groupedResponse[ethXAddress] : null,
-        oEth: oEthAddress ? groupedResponse[oEthAddress] : null,
-        beacon: groupedResponse["null"],
-      },
+      deposits: extractGroupedResponse(tokenAddresses, groupedResponse),
     }),
   };
 };
@@ -184,18 +162,6 @@ export const getLeaderboard = async (
   } = getLeaderboardSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
-  
-  const {
-    stEthAddress,
-    cbEthAddress,
-    rEthAddress,
-    wBEthAddress,
-    osEthAddress,
-    swEthAddress,
-    ankrEthAddress,
-    ethXAddress,
-    oEthAddress,
-  } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
   const response = (
@@ -285,18 +251,7 @@ export const getLeaderboard = async (
       "Access-Control-Allow-Credentials": false,
     } : {},
     body: JSON.stringify({
-      leaderboard: {
-        stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
-        cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
-        rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
-        wBEth: wBEthAddress ? groupedResponse[wBEthAddress] : null,
-        osEth: osEthAddress ? groupedResponse[osEthAddress] : null,
-        swEth: swEthAddress ? groupedResponse[swEthAddress] : null,
-        ankrEth: ankrEthAddress ? groupedResponse[ankrEthAddress] : null,
-        ethX: ethXAddress ? groupedResponse[ethXAddress] : null,
-        oEth: oEthAddress ? groupedResponse[oEthAddress] : null,
-        beacon: groupedResponse["null"],
-      },
+      leaderboard: extractGroupedResponse(tokenAddresses, groupedResponse),
     }),
   };
 };
@@ -316,18 +271,6 @@ export const getWithdrawals = async (
   } = getWithdrawalsSchema.parse(event);
 
   const tokenAddresses = getContractAddresses(chain);
-  
-  const {
-    stEthAddress,
-    cbEthAddress,
-    rEthAddress,
-    wBEthAddress,
-    osEthAddress,
-    swEthAddress,
-    ankrEthAddress,
-    ethXAddress,
-    oEthAddress,
-  } = tokenAddresses;
   const tokenAddressList = Object.values(tokenAddresses).filter((el) => el);
 
   const days = timelineToDays[timeline];
@@ -444,18 +387,7 @@ export const getWithdrawals = async (
     } : {},
     body: JSON.stringify({
       timestamps: Array.from(new Set(response.map(el => el.date.toLocaleDateString("fr-CA", { timeZone: "UTC" })))),
-      withdrawals: {
-        stEth: stEthAddress ? groupedResponse[stEthAddress] : null,
-        cbEth: cbEthAddress ? groupedResponse[cbEthAddress] : null,
-        rEth: rEthAddress ? groupedResponse[rEthAddress] : null,
-        wBEth: wBEthAddress ? groupedResponse[wBEthAddress] : null,
-        osEth: osEthAddress ? groupedResponse[osEthAddress] : null,
-        swEth: swEthAddress ? groupedResponse[swEthAddress] : null,
-        ankrEth: ankrEthAddress ? groupedResponse[ankrEthAddress] : null,
-        ethX: ethXAddress ? groupedResponse[ethXAddress] : null,
-        oEth: oEthAddress ? groupedResponse[oEthAddress] : null,
-        beacon: groupedResponse["null"],
-      },
+      withdrawals: extractGroupedResponse(tokenAddresses, groupedResponse),
     }),
   };
 };
