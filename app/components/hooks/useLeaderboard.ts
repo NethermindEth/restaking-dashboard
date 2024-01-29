@@ -1,12 +1,14 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { SupportedNetwork, TokenRecord, supportedTokens } from "@/app/utils/types";
-import { ShareRates, useShareRates } from "./useShareRates";
+import { ExchangeRates, useExchangeRates } from "./useExchangeRates";
 import { getLeaderboard } from "@/app/utils/api/leaderboard";
 import { MAX_LEADERBOARD_SIZE } from "@/app/utils/constants";
+import { StrategyShareRates, useStrategyShareRates } from "./useStrategyShareRates";
 
 export interface LeaderboardStaker {
   depositor: `0x${string}`;
+  totalTokens: number;
   totalEth: number;
 }
 
@@ -15,12 +17,13 @@ export interface LeaderboardData {
   total: LeaderboardStaker[];
 }
 
-export function getLeaderboardQueryKey(network: SupportedNetwork, rates?: ShareRates): any[] {
-  return ["leaderboard", network, rates];
+export function getLeaderboardQueryKey(network: SupportedNetwork, exchangeRates?: ExchangeRates, strategyShareRates?: StrategyShareRates): any[] {
+  return ["leaderboard", network, exchangeRates, strategyShareRates];
 }
 
-export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRates, _: boolean = false): Promise<LeaderboardData> {
-  if (!rates) throw new Error("Rates were not yet fetched");
+export async function queryLeaderboard(network: SupportedNetwork, exchangeRates: ExchangeRates, strategyShareRates: StrategyShareRates, _: boolean = false): Promise<LeaderboardData> {
+  if (!exchangeRates) throw new Error("Exchange rates were not yet fetched");
+  if (!strategyShareRates) throw new Error("Strategy share rates were not yet fetched");
 
   const result = await getLeaderboard(network);
   const partial = {} as TokenRecord<LeaderboardStaker[] | null>;
@@ -31,7 +34,8 @@ export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRa
     partial[token] = leaderboard
       ? leaderboard.map(el => ({
         depositor: el.depositor,
-        totalEth: el.totalShares * rates[token]!,
+        totalTokens: el.totalShares * strategyShareRates[token]!,
+        totalEth: el.totalShares * strategyShareRates[token]! * exchangeRates[token]!,
       }))
       : null;
   });
@@ -40,8 +44,9 @@ export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRa
     Object.values(partial).flat().reduce((acc, el) => {
       if (!el) return acc;
 
-      if (!acc[el.depositor]) acc[el.depositor] = { depositor: el.depositor, totalEth: 0 };
+      if (!acc[el.depositor]) acc[el.depositor] = { depositor: el.depositor, totalTokens: 0, totalEth: 0 };
       acc[el.depositor].totalEth += el.totalEth;
+      acc[el.depositor].totalTokens = acc[el.depositor].totalEth;
 
       return acc;
     }, {} as Record<string, LeaderboardStaker>)
@@ -54,12 +59,13 @@ export async function queryLeaderboard(network: SupportedNetwork, rates: ShareRa
 }
 
 export function useLeaderboard(network: SupportedNetwork): UseQueryResult<LeaderboardData> {
-  const { data: rates } = useShareRates(network);
+  const { data: exchangeRates } = useExchangeRates(network);
+  const { data: strategyShareRates } = useStrategyShareRates(network);
 
   const result = useQuery({
-    queryKey: getLeaderboardQueryKey(network, rates),
-    queryFn: () => queryLeaderboard(network, rates!),
-    enabled: !!rates,
+    queryKey: getLeaderboardQueryKey(network, exchangeRates, strategyShareRates),
+    queryFn: () => queryLeaderboard(network, exchangeRates!, strategyShareRates!),
+    enabled: !!exchangeRates && !!strategyShareRates,
     retry: false,
   });
 
