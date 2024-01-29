@@ -21,7 +21,7 @@ export async function queryTotalStakedEth(
   if (!totalStakedTokens) throw new Error("Total staked tokens were not yet fetched");
 
   return Object.fromEntries(
-    supportedTokens.map(token => ([token, (totalStakedTokens[token] == null) ? totalStakedTokens[token]! * rates[token]! : null]))
+    supportedTokens.map(token => ([token, totalStakedTokens[token] != null ? totalStakedTokens[token]! * rates[token]! : null]))
   ) as TokenRecord<number | null>;
 }
 
