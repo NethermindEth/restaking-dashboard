@@ -19,36 +19,28 @@ export function getTotalStakedTokensQueryKey(network: SupportedNetwork): any[] {
 export async function queryTotalStakedTokens(network: SupportedNetwork, _: boolean = false): Promise<TokenRecord<number | null>> {
   const provider = getNetworkProvider(network);
   
-  const results = supportedTokens.reduce((acc, token) => {
-    if (token == "beacon") {
-      acc[token] = getTotalStakedBeacon(network).then((data) => data.totalStakedBeacon);
-      return acc;
-    }
+  const results: Partial<TokenRecord<number | null>> = {};
+  await Promise.all(
+    supportedTokens.map(async token => {
+      if (token == "beacon") {
+        results[token] = await getTotalStakedBeacon(network).then((data) => data.totalStakedBeacon);
+        return results;
+      }
 
-    const networkInfo = getTokenNetworkInfo(network, token);
+      const networkInfo = getTokenNetworkInfo(network, token);
 
-    if (!networkInfo) {
-      acc[token] = null;
-      return acc;
-    }
-    
-    acc[token] = getStrategyTvl(networkInfo.address, networkInfo.strategyAddress, provider);
+      if (!networkInfo) {
+        results[token] = null;
+        return results;
+      }
+      
+      results[token] = await getStrategyTvl(networkInfo.address, networkInfo.strategyAddress, provider);
 
-    return acc;
-  }, {} as TokenRecord<Promise<number> | null>);
+      return results;
+    })
+  );
 
-  return {
-    stEth: await results.stEth,
-    rEth: await results.rEth,
-    cbEth: await results.cbEth,
-    wBEth: await results.wBEth,
-    osEth: await results.osEth,
-    swEth: await results.swEth,
-    ankrEth: await results.ankrEth,
-    ethX: await results.ethX,
-    oEth: await results.oEth,
-    beacon: await results.beacon,
-  };
+  return results as TokenRecord<number | null>;
 }
 
 export function useTotalStakedTokens(network: SupportedNetwork): UseQueryResult<TokenRecord<number | null>> {
