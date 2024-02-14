@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "ethers": "https://esm.sh/ethers@6",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
-  }
-}
