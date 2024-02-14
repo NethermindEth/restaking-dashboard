@@ -21,7 +21,7 @@ export function getLeaderboardQueryKey(network: SupportedNetwork, exchangeRates?
   return ["leaderboard", network, exchangeRates, strategyShareRates];
 }
 
-export async function queryLeaderboard(network: SupportedNetwork, exchangeRates: ExchangeRates, strategyShareRates: StrategyShareRates, _: boolean = false): Promise<LeaderboardData> {
+export async function queryLeaderboard(network: SupportedNetwork, exchangeRates: ExchangeRates, strategyShareRates: StrategyShareRates): Promise<LeaderboardData> {
   if (!exchangeRates) throw new Error("Exchange rates were not yet fetched");
   if (!strategyShareRates) throw new Error("Strategy share rates were not yet fetched");
 

@@ -12,7 +12,7 @@ export function getStrategyShareRatesQueryKey(network: SupportedNetwork): any[] 
   return ["strategyShareRates", network];
 }
 
-export async function queryStrategyShareRates(network: SupportedNetwork, _: boolean = false): Promise<StrategyShareRates> {
+export async function queryStrategyShareRates(network: SupportedNetwork): Promise<StrategyShareRates> {
   const provider = getNetworkProvider(network);
 
   const strategyShareRates: Partial<StrategyShareRates> = {

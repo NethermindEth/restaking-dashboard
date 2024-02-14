@@ -20,7 +20,7 @@ export function getExchangeRatesQueryKey(network: SupportedNetwork): any[] {
   return ["exchangeRates", network];
 }
 
-export async function queryExchangeRates(network: SupportedNetwork, _: boolean = false): Promise<ExchangeRates> {
+export async function queryExchangeRates(network: SupportedNetwork): Promise<ExchangeRates> {
   const provider = getNetworkProvider(network);
 
   const rEth = getTokenNetworkInfo(network, "rEth")

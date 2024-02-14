@@ -15,7 +15,6 @@ export function getTotalStakedEthQueryKey(
 export async function queryTotalStakedEth(
   rates: ExchangeRates,
   totalStakedTokens: TokenRecord<number | null>,
-  _: boolean = false,
 ): Promise<TokenRecord<number | null>> {
   if (!rates) throw new Error("Rates were not yet fetched");
   if (!totalStakedTokens) throw new Error("Total staked tokens were not yet fetched");

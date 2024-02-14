@@ -16,7 +16,7 @@ export function getTotalStakedTokensQueryKey(network: SupportedNetwork): any[] {
   return ["totalStakedTokens", network];
 }
 
-export async function queryTotalStakedTokens(network: SupportedNetwork, _: boolean = false): Promise<TokenRecord<number | null>> {
+export async function queryTotalStakedTokens(network: SupportedNetwork): Promise<TokenRecord<number | null>> {
   const provider = getNetworkProvider(network);
   
   const results: Partial<TokenRecord<number | null>> = {};
