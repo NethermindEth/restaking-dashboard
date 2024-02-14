@@ -1,4 +1,4 @@
-name: "Deploy Serverless DEV"
+name: "Deploy NextJS PROD"
 on:
   workflow_dispatch:
     inputs:
@@ -40,12 +40,14 @@ jobs:
         run: npm install --global yarn
 
       - name: "Install dependencies"
-        working-directory: ./api
         run: yarn install
 
-      - name: "Deploy serverless"
-        working-directory: "./api"
-        run: npx serverless deploy --conceal --region ${{ env.AWS_REGION }} --stage dev
+      - name: "Build NextJS app"
+        run: yarn build
         env:
-          SPICE_AI_API_KEY: ${{ secrets.SPICE_AI_API_KEY }}
-          CORS_ORIGIN_WHITELIST: ${{ secrets.CORS_ORIGIN_WHITELIST_DEV }}
+          NEXT_PUBLIC_SPICE_PROXY_API_URL: ${{ secrets.NEXT_PUBLIC_SPICE_PROXY_API_URL_PROD }}
+          NEXT_PUBLIC_MAINNET_RPC_URL: ${{ secrets.NEXT_PUBLIC_MAINNET_RPC_URL }} 
+          NEXT_PUBLIC_GOERLI_RPC_URL: ${{ secrets.NEXT_PUBLIC_GOERLI_RPC_URL }}
+            
+      - name: "Update S3 Bucket"
+        run: aws s3 sync out ${{ secrets.AWS_S3_BUCKET_PROD }} --delete
