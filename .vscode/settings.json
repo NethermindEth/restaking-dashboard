@@ -1,6 +1,0 @@
-{
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "deno.enablePaths": ["./supabase"],
-  "deno.importMap": "./supabase/functions/import_map.json"
-}
