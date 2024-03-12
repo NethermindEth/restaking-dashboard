@@ -1,5 +1,5 @@
 import { Contract, formatEther } from 'ethers';
-import { assetMap } from './constants.js';
+import { tryGetTokenSymbol, tokenAddressMap } from './helpers.js';
 import configABI from './abi/kelp/ILRTConfig.json' with { type: 'json' };
 import depositABI from './abi/kelp/ILRTDepositPool.json' with { type: 'json' };
 
@@ -30,8 +30,11 @@ export default async function (fastify) {
 
   for (let r of results) {
     if (r.status === 'fulfilled') {
-      // TODO ensure token address is mapped to symbol
-      data[assetMap[r.value.asset]] = r.value.value;
+      const symbol =
+        tokenAddressMap[r.value.asset] ||
+        (await tryGetTokenSymbol(r.value.asset, fastify.ethProvider));
+
+      data[symbol] = r.value.value;
     } else {
       fastify.log.error(r.reason);
     }

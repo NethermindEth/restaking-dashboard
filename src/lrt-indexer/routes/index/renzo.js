@@ -1,6 +1,6 @@
 import { Contract, formatEther } from 'ethers';
+import { tryGetTokenSymbol, tokenAddressMap } from './helpers.js';
 import abi from './abi/renzo/RestakeManager.json' with { type: 'json' };
-import { assetMap } from './constants.js';
 
 export default async function (fastify) {
   if (!fastify) {
@@ -26,8 +26,11 @@ export default async function (fastify) {
   let tokenSum = 0n;
 
   for (let i = 0, count = odTVLs.length; i < count; i++) {
-    // TODO ensure token address is mapped to symbol
-    data[assetMap[tokens[i]]] = formatEther(odTVLs[i]);
+    const symbol =
+      tokenAddressMap[tokens[i]] ||
+      (await tryGetTokenSymbol(tokens[i], fastify.ethProvider));
+
+    data[symbol] = formatEther(odTVLs[i]);
     tokenSum += odTVLs[i];
   }
 
