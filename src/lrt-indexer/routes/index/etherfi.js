@@ -1,17 +1,18 @@
-import { ethers } from 'ethers';
+import { Contract, formatEther } from 'ethers';
 import abi from './abi/etherfi/ILiquidityPool.json' with { type: 'json' };
 
-export default async function (provider) {
-  if (!provider) {
-    throw new Error('JSON-RPC Provider is required');
+export default async function (fastify) {
+  if (!fastify) {
+    throw new Error('`fastify` parameter not provided');
   }
 
-  const liquidityPool = new ethers.Contract(
+  const liquidityPool = new Contract(
     '0x308861A430be4cce5502d0A12724771Fc6DaF216',
     abi,
-    provider
+    fastify.ethProvider
   );
   const eth = await liquidityPool.getTotalPooledEther();
+  const store = fastify.lrtStore();
 
-  return { ETH: ethers.formatEther(eth) };
+  await store.put('etherfi', Date.now(), { ETH: formatEther(eth) });
 }

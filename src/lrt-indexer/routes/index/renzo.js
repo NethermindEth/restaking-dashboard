@@ -1,15 +1,16 @@
-import { ethers } from 'ethers';
+import { Contract, formatEther } from 'ethers';
 import abi from './abi/renzo/RestakeManager.json' with { type: 'json' };
+import { assetMap } from './constants.js';
 
-export default async function (provider) {
-  if (!provider) {
-    throw new Error('JSON-RPC Provider is required');
+export default async function (fastify) {
+  if (!fastify) {
+    throw new Error('`fastify` parameter not provided');
   }
 
-  const restakeManager = new ethers.Contract(
+  const restakeManager = new Contract(
     '0x74a09653A083691711cF8215a6ab074BB4e99ef5',
     abi,
-    provider
+    fastify.ethProvider
   );
   const tokensLength = await restakeManager.getCollateralTokensLength();
   const [tokens, tvls] = await Promise.all([
@@ -26,16 +27,13 @@ export default async function (provider) {
 
   for (let i = 0, count = odTVLs.length; i < count; i++) {
     // TODO ensure token address is mapped to symbol
-    data[assetSymbols[tokens[i]]] = ethers.formatEther(odTVLs[i]);
+    data[assetMap[tokens[i]]] = formatEther(odTVLs[i]);
     tokenSum += odTVLs[i];
   }
 
-  data.ETH = ethers.formatEther(tvls[2] - tokenSum);
+  data.ETH = formatEther(tvls[2] - tokenSum);
 
-  return data;
+  const store = fastify.lrtStore();
+
+  await store.put('renzo', Date.now(), data);
 }
-
-const assetSymbols = Object.freeze({
-  '0xa2E3356610840701BDf5611a53974510Ae27E2e1': 'wBETH',
-  '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84': 'stETH'
-});
