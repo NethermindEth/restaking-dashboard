@@ -1,16 +1,16 @@
 import { Contract, formatEther } from 'ethers';
-import { tryGetTokenSymbol, tokenAddressMap } from './helpers.js';
-import abi from './abi/renzo/RestakeManager.json' with { type: 'json' };
+import { tryGetTokenSymbol, tokenAddressMap } from '../helpers.js';
+import abi from '../abi/renzo/RestakeManager.json' with { type: 'json' };
 
-export default async function (fastify) {
-  if (!fastify) {
-    throw new Error('`fastify` parameter not provided');
+export default async function (context) {
+  if (!context) {
+    throw new Error('`context` parameter not provided');
   }
 
   const restakeManager = new Contract(
     '0x74a09653A083691711cF8215a6ab074BB4e99ef5',
     abi,
-    fastify.ethProvider
+    context.ethProvider
   );
   const tokensLength = await restakeManager.getCollateralTokensLength();
   const [tokens, tvls] = await Promise.all([
@@ -28,7 +28,7 @@ export default async function (fastify) {
   for (let i = 0, count = odTVLs.length; i < count; i++) {
     const symbol =
       tokenAddressMap[tokens[i]] ||
-      (await tryGetTokenSymbol(tokens[i], fastify.ethProvider));
+      (await tryGetTokenSymbol(tokens[i], context.ethProvider));
 
     data[symbol] = formatEther(odTVLs[i]);
     tokenSum += odTVLs[i];
@@ -36,7 +36,5 @@ export default async function (fastify) {
 
   data.ETH = formatEther(tvls[2] - tokenSum);
 
-  const store = fastify.lrtStore();
-
-  await store.put('renzo', Date.now(), data);
+  return data;
 }

@@ -1,22 +1,22 @@
 import { Contract, formatEther } from 'ethers';
-import { tryGetTokenSymbol, tokenAddressMap } from './helpers.js';
-import configABI from './abi/kelp/ILRTConfig.json' with { type: 'json' };
-import depositABI from './abi/kelp/ILRTDepositPool.json' with { type: 'json' };
+import { tryGetTokenSymbol, tokenAddressMap } from '../helpers.js';
+import configABI from '../abi/kelp/ILRTConfig.json' with { type: 'json' };
+import depositABI from '../abi/kelp/ILRTDepositPool.json' with { type: 'json' };
 
-export default async function (fastify) {
-  if (!fastify) {
-    throw new Error('`fastify` parameter not provided');
+export default async function (context) {
+  if (!context) {
+    throw new Error('`context` parameter not provided');
   }
 
   const config = new Contract(
     '0x947Cb49334e6571ccBFEF1f1f1178d8469D65ec7',
     configABI,
-    fastify.ethProvider
+    context.ethProvider
   );
   const depositPool = new Contract(
     '0x036676389e48133B63a802f8635AD39E752D375D',
     depositABI,
-    fastify.ethProvider
+    context.ethProvider
   );
 
   const addresses = await config.getSupportedAssetList();
@@ -32,17 +32,15 @@ export default async function (fastify) {
     if (r.status === 'fulfilled') {
       const symbol =
         tokenAddressMap[r.value.asset] ||
-        (await tryGetTokenSymbol(r.value.asset, fastify.ethProvider));
+        (await tryGetTokenSymbol(r.value.asset, context.ethProvider));
 
       data[symbol] = r.value.value;
     } else {
-      fastify.log.error(r.reason);
+      context.log.error(r.reason);
     }
   }
 
-  const store = fastify.lrtStore();
-
-  await store.put('kelp', Date.now(), data);
+  return data;
 }
 
 async function getDistributionData(asset, depositPool) {
