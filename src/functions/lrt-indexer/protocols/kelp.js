@@ -31,7 +31,7 @@ export default async function (context) {
   for (let r of results) {
     if (r.status === 'fulfilled') {
       const symbol =
-        tokenAddressMap[r.value.asset] ||
+        tokenAddressMap[r.value.asset] ??
         (await tryGetTokenSymbol(r.value.asset, context.ethProvider));
 
       data[symbol] = r.value.value;

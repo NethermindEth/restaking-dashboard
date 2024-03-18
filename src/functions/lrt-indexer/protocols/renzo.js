@@ -27,7 +27,7 @@ export default async function (context) {
 
   for (let i = 0, count = odTVLs.length; i < count; i++) {
     const symbol =
-      tokenAddressMap[tokens[i]] ||
+      tokenAddressMap[tokens[i]] ??
       (await tryGetTokenSymbol(tokens[i], context.ethProvider));
 
     data[symbol] = formatEther(odTVLs[i]);
