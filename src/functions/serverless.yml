@@ -1,5 +1,6 @@
 service: nmrd-functions
 frameworkVersion: '3'
+useDotenv: true
 
 provider:
   name: aws

@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import fetchLRTDistribution from './lrt-indexer/index.js';
 
 export const handler = async (event, context) => {

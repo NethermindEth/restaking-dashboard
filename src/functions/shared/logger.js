@@ -7,5 +7,5 @@ export default pino(
           target: 'pino-pretty'
         }
       }
-    : null
+    : {}
 );
