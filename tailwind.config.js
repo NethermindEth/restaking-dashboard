@@ -26,6 +26,7 @@ export default {
           colors: {
             background: '#ffffff',
             default: '#e0e7ff',
+            content1: '#eef2ff',
             focus: '#34d399',
             foreground: '#000000'
           }

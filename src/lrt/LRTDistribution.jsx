@@ -2,17 +2,24 @@ import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
-import data from '../response_1710877586918';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import HBrush from '../shared/HBrush';
 import { localPoint } from '@visx/event';
+import { reduceState } from '../shared/helpers';
+import { useMutativeReducer } from 'use-mutative';
 
-export default function LRTDistribution({ height }) {
+export default function LRTDistribution({ data, height }) {
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    filteredData: [],
+    keys: [],
+    maxX: 0,
+    maxY: 0
+  });
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
     scroll: true
@@ -27,9 +34,6 @@ export default function LRTDistribution({ height }) {
   } = useTooltip();
   const dateAxisRef = useRef(null);
 
-  const [filteredData, setFilteredData] = useState(data.slice(-90));
-  const [maxX, setMaxX] = useState(1);
-  const [maxY, setMaxY] = useState(1);
   const rootRef = useRef(null);
   const scaleBrushDate = useMemo(
     () =>
@@ -38,9 +42,9 @@ export default function LRTDistribution({ height }) {
           Math.min(...data.map(getDate)),
           Math.max(...data.map(getDate))
         ],
-        range: [0, maxX - 2] // 2 for brush borders
+        range: [0, state.maxX - 2] // 2 for brush borders
       }),
-    [maxX]
+    [data, state.maxX]
   );
   const scaleBrushValue = useMemo(
     () =>
@@ -62,18 +66,18 @@ export default function LRTDistribution({ height }) {
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    []
+    [data]
   );
   const scaleDate = useMemo(
     () =>
       scaleUtc({
         domain: [
-          Math.min(...filteredData.map(getDate)),
-          Math.max(...filteredData.map(getDate))
+          Math.min(...state.filteredData.map(getDate)),
+          Math.max(...state.filteredData.map(getDate))
         ],
-        range: [0, maxX]
+        range: [0, state.maxX]
       }),
-    [filteredData, maxX]
+    [state.filteredData, state.maxX]
   );
   const scaleValue = useMemo(
     () =>
@@ -81,7 +85,7 @@ export default function LRTDistribution({ height }) {
         domain: [
           0,
           Math.max(
-            ...filteredData.map(d => {
+            ...state.filteredData.map(d => {
               let value = 0;
 
               for (let k in d.protocols) {
@@ -93,18 +97,19 @@ export default function LRTDistribution({ height }) {
           ) * 1.2 // 20% padding
         ],
         nice: true,
-        range: [maxY, 0]
+        range: [state.maxY, 0]
       }),
-    [filteredData, maxY]
+    [state.filteredData, state.maxY]
   );
-  const [brushPosition, setBrushPosition] = useState();
-  const handleBrushChange = useCallback(domain => {
-    const { x0, x1 } = domain;
-    const filtered = data.filter(s => s.timestamp >= x0 && s.timestamp <= x1);
+  const handleBrushChange = useCallback(
+    domain => {
+      const { x0, x1 } = domain;
+      const filtered = data.filter(s => s.timestamp >= x0 && s.timestamp <= x1);
 
-    setBrushPosition(null);
-    setFilteredData(filtered);
-  }, []);
+      dispatch({ brushPosition: null, filteredData: filtered });
+    },
+    [data, dispatch]
+  );
   const handleAreaPointerMove = useCallback(
     (event, stack) => {
       const point = localPoint(event.target.ownerSVGElement, event);
@@ -126,30 +131,34 @@ export default function LRTDistribution({ height }) {
     key => {
       const start = Math.max(0, data.length - 1 - tabMap[key]);
 
-      setFilteredData(data.slice(start));
-
-      setBrushPosition({
-        start: scaleBrushDate(data[start].timestamp),
-        end: scaleBrushDate(data[data.length - 1].timestamp)
+      dispatch({
+        brushPosition: {
+          start: scaleBrushDate(data[start].timestamp),
+          end: scaleBrushDate(data[data.length - 1].timestamp)
+        },
+        filteredData: data.slice(start)
       });
     },
-    [scaleBrushDate]
+    [data, dispatch, scaleBrushDate]
   );
 
   useEffect(() => {
     const ro = new ResizeObserver(entries => {
       for (let entry of entries) {
         if (entry.target === rootRef.current) {
-          setMaxX(entry.contentRect.width - margin.left - margin.right);
+          dispatch({
+            maxX: entry.contentRect.width - margin.left - margin.right
+          });
         } else if (entry.target === dateAxisRef.current) {
-          setMaxY(
-            height -
+          dispatch({
+            maxY:
+              height -
               margin.top -
               margin.bottom -
               Math.ceil(entry.contentRect.height) -
               brushSize.height -
               brushSize.marginTop
-          );
+          });
         }
       }
     });
@@ -163,14 +172,27 @@ export default function LRTDistribution({ height }) {
     }
 
     return () => ro.disconnect();
-  }, [height]);
+  }, [dispatch, height]);
 
   useEffect(() => {
-    setBrushPosition({
-      start: scaleBrushDate(data[data.length - 1 - 90].timestamp),
-      end: scaleBrushDate(data[data.length - 1].timestamp)
+    dispatch({
+      brushData: data?.map(d => {
+        let value = 0;
+
+        for (let k in d.protocols) {
+          value += d.protocols[k];
+        }
+
+        return { timestamp: d.timestamp, value };
+      }),
+      brushPosition: {
+        start: scaleBrushDate(data[data.length - 1 - 90].timestamp),
+        end: scaleBrushDate(data[data.length - 1].timestamp)
+      },
+      filteredData: data.slice(-90),
+      keys: Object.keys(data?.[data.length - 1].protocols)
     });
-  }, [scaleBrushDate]);
+  }, [data, dispatch, scaleBrushDate]);
 
   return (
     <div ref={rootRef}>
@@ -191,18 +213,18 @@ export default function LRTDistribution({ height }) {
           <Group top={margin.top} left={margin.left}>
             <GridRows
               className="[&_line]:stroke-primary-50 dark:[&_line]:stroke-primary-900 dark:[&_line]:opacity-10"
-              height={maxY ?? 0}
+              height={state.maxY}
               numTicks={4}
               scale={scaleValue}
-              width={maxX}
+              width={state.maxX}
               x="0"
               y="0"
             />
             <AreaStack
               curve={curveMonotoneX}
-              data={filteredData}
+              data={state.filteredData}
               defined={isDefined}
-              keys={keys}
+              keys={state.keys}
               value={getValue}
               x={d => scaleDate(getDate(d.data)) ?? 0}
               y0={d => scaleValue(getY0(d)) ?? 0}
@@ -233,14 +255,14 @@ export default function LRTDistribution({ height }) {
                 x1={tooltipLeft - margin.left}
                 x2={tooltipLeft - margin.left}
                 y1="0"
-                y2={maxY}
+                y2={state.maxY}
               />
             )}
             <AxisRight
               axisLineClassName="stroke-primary-100 dark:stroke-primary-900 dark:opacity-25"
               hideTicks={true}
               hideZero={true}
-              left={maxX}
+              left={state.maxX}
               numTicks={4}
               scale={scaleValue}
               tickFormat={formatValue}
@@ -254,7 +276,7 @@ export default function LRTDistribution({ height }) {
             <AxisBottom
               axisLineClassName="stroke-primary-100 dark:stroke-primary-900 dark:opacity-25"
               innerRef={dateAxisRef}
-              numTicks={Math.round(maxX / 120)}
+              numTicks={Math.round(state.maxX / 120)}
               // rangePadding={margin.right}
               scale={scaleDate}
               tickClassName="[&_line]:stroke-primary-100 dark:[&_line]:stroke-primary-900 dark:[&_line]:opacity-25"
@@ -265,7 +287,7 @@ export default function LRTDistribution({ height }) {
                 fontFamily: null,
                 fontSize: null
               }}
-              top={maxY}
+              top={state.maxY}
             />
           </Group>
           <Group
@@ -275,7 +297,7 @@ export default function LRTDistribution({ height }) {
             <AreaClosed
               className="fill-primary-50 dark:fill-primary-700 dark:opacity-25"
               curve={curveMonotoneX}
-              data={brushData}
+              data={state.brushData}
               key="value"
               x={d => scaleBrushDate(getDate(d)) ?? 0}
               y={d => scaleBrushValue(d.value) ?? 0}
@@ -287,12 +309,12 @@ export default function LRTDistribution({ height }) {
           className="absolute border border-primary-50 dark:border-primary-700/25 bottom-px"
           style={{
             height: brushSize.height,
-            width: maxX ?? 0
+            width: state.maxX ?? 0
           }}
         >
           <HBrush
             brushClassName="bg-secondary-100/35 h-full"
-            brushPosition={brushPosition}
+            brushPosition={state.brushPosition}
             onChange={handleBrushChange}
             scale={scaleBrushDate}
             trackClassName="absolute h-full w-full"
@@ -300,8 +322,8 @@ export default function LRTDistribution({ height }) {
         </div>
       </div>
       <ul className="mt-4 pe-8 w-full">
-        {keys
-          .slice()
+        {state.keys
+          ?.slice()
           .sort()
           .map(key => (
             <li key={key} className="inline-block me-4">
@@ -359,21 +381,12 @@ export default function LRTDistribution({ height }) {
   );
 }
 
-const keys = Object.keys(data[data.length - 1].protocols);
 const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'short'
 });
 const bisectDate = bisector(i => i.data.timestamp).left;
-const brushData = data.map(d => {
-  let value = 0;
 
-  for (let k in d.protocols) {
-    value += d.protocols[k];
-  }
-
-  return { timestamp: d.timestamp, value };
-});
 const brushSize = { height: 50, marginTop: 20 };
 const colors = {
   kelp: '#6b63a8',

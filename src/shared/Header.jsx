@@ -1,14 +1,4 @@
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  RadioGroup,
-  Radio
-} from '@nextui-org/react';
+import { Button, Modal, ModalContent, useDisclosure } from '@nextui-org/react';
 import Sidebar from './Sidebar';
 import { useTheme } from './ThemeContext';
 
@@ -19,7 +9,7 @@ export default function Header() {
   return (
     <div className="bg-background">
       <header
-        className={`sidebar-${theme} flex font-bold font-display items-center gap-x-3 px-5 py-6 uppercase`}
+        className={`sidebar-${theme} flex items-center gap-x-3 px-5 py-6`}
         data-theme
       >
         <Button
@@ -31,7 +21,9 @@ export default function Header() {
         >
           <span className="material-symbols-outlined">menu</span>
         </Button>
-        <div>Restaking Dashboard</div>
+        <div className="font-bold font-display uppercase">
+          Restaking Dashboard
+        </div>
         <Modal
           classNames={{
             base: 'h-full m-0 sm:m-0 p-0 rounded-none w-full',

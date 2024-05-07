@@ -13,10 +13,12 @@ export default function Layout() {
           <Sidebar />
         </div>
       )}
-      <main className="basis-0 flex-1">
+      <div className="basis-0 flex-1">
         {!showSidebar && <Header />}
-        <Outlet />
-      </main>
+        <main className="p-4 lg:p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

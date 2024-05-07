@@ -28,7 +28,7 @@ export default function Sidebar() {
         {navItems.map((item, i) => {
           const selected =
             item.href === location.pathname
-              ? 'border-emerald-400'
+              ? 'border-focus bg-default/20'
               : 'border-transparent';
           return (
             <Link
