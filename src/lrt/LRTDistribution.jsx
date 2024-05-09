@@ -190,7 +190,7 @@ export default function LRTDistribution({ data, height }) {
         end: scaleBrushDate(data[data.length - 1].timestamp)
       },
       filteredData: data.slice(-90),
-      keys: Object.keys(data?.[data.length - 1].protocols)
+      keys: Object.keys(data?.[data.length - 1].protocols).sort(sortProtocols)
     });
   }, [data, dispatch, scaleBrushDate]);
 
@@ -332,7 +332,7 @@ export default function LRTDistribution({ data, height }) {
                   className="inline-block h-3 rounded-full w-3"
                   style={{ backgroundColor: colors[key] }}
                 ></span>
-                {lrtNames[key]}
+                {protocols[key]?.name ?? key}
               </div>
             </li>
           ))}
@@ -362,7 +362,7 @@ export default function LRTDistribution({ data, height }) {
                     <span
                       className={key === tooltipData.key ? 'font-bold' : ''}
                     >
-                      {lrtNames[key]}
+                      {protocols[key]?.name ?? key}
                     </span>
                     <span
                       className={`${key === tooltipData.key ? 'font-bold' : ''} grow ps-2 text-end`}
@@ -419,13 +419,27 @@ const getValue = (d, k) => d.protocols[k];
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
-const lrtNames = {
-  etherfi: 'ether.fi',
-  kelp: 'Kelp',
-  puffer: 'Puffer',
-  renzo: 'Renzo'
-};
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
+const protocols = {
+  etherfi: { index: 0, name: 'ether.fi' },
+  renzo: { index: 1, name: 'Renzo' },
+  kelp: { index: 2, name: 'Kelp' },
+  puffer: { index: 3, name: 'Puffer' }
+};
+const sortProtocols = (p1, p2) => {
+  const i1 = protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
+  const i2 = protocols[p2]?.index ?? Number.MAX_SAFE_INTEGER;
+
+  if (i1 < i2) {
+    return -1;
+  }
+
+  if (i1 > i2) {
+    return 1;
+  }
+
+  return 0;
+};
 const tabMap = {
   '1w': 7,
   '1m': 30,
