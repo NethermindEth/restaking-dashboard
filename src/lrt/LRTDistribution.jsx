@@ -209,7 +209,7 @@ export default function LRTDistribution({ data, height }) {
         <Tab key="all" title="All" />
       </Tabs>
       <div className="relative">
-        <svg ref={containerRef} height={height} className="touch-pan-y w-full">
+        <svg ref={containerRef} height={height} className="w-full touch-pan-y">
           <Group top={margin.top} left={margin.left}>
             <GridRows
               className="[&_line]:stroke-primary-50 dark:[&_line]:stroke-primary-900 dark:[&_line]:opacity-10"
@@ -321,15 +321,15 @@ export default function LRTDistribution({ data, height }) {
           />
         </div>
       </div>
-      <ul className="mt-4 pe-8 w-full">
+      <ul className="w-full mt-4 pe-8">
         {state.keys
           ?.slice()
           .sort()
           .map(key => (
             <li key={key} className="inline-block me-4">
-              <div className="flex flex-row gap-1 items-center text-sm">
+              <div className="flex flex-row items-center gap-1 text-sm">
                 <span
-                  className="inline-block h-3 rounded-full w-3"
+                  className="inline-block w-3 h-3 rounded-full"
                   style={{ backgroundColor: colors[key] }}
                 ></span>
                 {protocols[key]?.name ?? key}
@@ -341,12 +341,12 @@ export default function LRTDistribution({ data, height }) {
         <TooltipInPortal
           key={Math.random()}
           applyPositionStyle={true}
-          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
+          className="p-2 rounded shadow-md backdrop-blur bg-white/75 dark:bg-black/75 min-w-40 text-foreground"
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="font-bold text-xs mb-2">
+          <div className="mb-2 text-xs font-bold">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
@@ -354,9 +354,9 @@ export default function LRTDistribution({ data, height }) {
               .sort()
               .map(key => (
                 <li key={`tt-${key}`}>
-                  <div className="flex flex-row gap-1 items-center">
+                  <div className="flex flex-row items-center gap-1">
                     <span
-                      className="h-3 inline-block rounded-full w-3"
+                      className="inline-block w-3 h-3 rounded-full"
                       style={{ backgroundColor: colors[key] }}
                     ></span>
                     <span
@@ -392,6 +392,7 @@ const colors = {
   kelp: '#6b63a8',
   renzo: '#f6a550',
   etherfi: '#faca51',
+  swell: '#e7c6ff',
   puffer: '#9597f1'
 };
 // const colors = {
@@ -424,7 +425,8 @@ const protocols = {
   etherfi: { index: 0, name: 'ether.fi' },
   renzo: { index: 1, name: 'Renzo' },
   kelp: { index: 2, name: 'Kelp' },
-  puffer: { index: 3, name: 'Puffer' }
+  swell: { index: 3, name: 'Swell' },
+  puffer: { index: 4, name: 'Puffer' }
 };
 const sortProtocols = (p1, p2) => {
   const i1 = protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
