@@ -356,7 +356,7 @@ export default function LRTDistribution({ data, height }) {
                 <li key={`tt-${key}`}>
                   <div className="flex flex-row items-center gap-1">
                     <span
-                      className="inline-block w-3 h-3 rounded-full"
+                      className="h-3 inline-block rounded-full w-3"
                       style={{ backgroundColor: colors[key] }}
                     ></span>
                     <span
