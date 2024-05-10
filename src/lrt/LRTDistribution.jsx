@@ -209,7 +209,7 @@ export default function LRTDistribution({ data, height }) {
         <Tab key="all" title="All" />
       </Tabs>
       <div className="relative">
-        <svg ref={containerRef} height={height} className="w-full touch-pan-y">
+        <svg ref={containerRef} height={height} className="touch-pan-y w-full">
           <Group top={margin.top} left={margin.left}>
             <GridRows
               className="[&_line]:stroke-primary-50 dark:[&_line]:stroke-primary-900 dark:[&_line]:opacity-10"
@@ -321,15 +321,15 @@ export default function LRTDistribution({ data, height }) {
           />
         </div>
       </div>
-      <ul className="w-full mt-4 pe-8">
+      <ul className="mt-4 pe-8 w-full">
         {state.keys
           ?.slice()
           .sort()
           .map(key => (
             <li key={key} className="inline-block me-4">
-              <div className="flex flex-row items-center gap-1 text-sm">
+              <div className="flex flex-row gap-1 items-center text-sm">
                 <span
-                  className="inline-block w-3 h-3 rounded-full"
+                  className="inline-block h-3 rounded-full w-3"
                   style={{ backgroundColor: colors[key] }}
                 ></span>
                 {protocols[key]?.name ?? key}
@@ -341,12 +341,12 @@ export default function LRTDistribution({ data, height }) {
         <TooltipInPortal
           key={Math.random()}
           applyPositionStyle={true}
-          className="p-2 rounded shadow-md backdrop-blur bg-white/75 dark:bg-black/75 min-w-40 text-foreground"
+          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 text-xs font-bold">
+          <div className="font-bold text-xs mb-2">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
@@ -354,7 +354,7 @@ export default function LRTDistribution({ data, height }) {
               .sort()
               .map(key => (
                 <li key={`tt-${key}`}>
-                  <div className="flex flex-row items-center gap-1">
+                  <div className="flex flex-row gap-1 items-center">
                     <span
                       className="h-3 inline-block rounded-full w-3"
                       style={{ backgroundColor: colors[key] }}
