@@ -392,6 +392,7 @@ const colors = {
   kelp: '#6b63a8',
   renzo: '#f6a550',
   etherfi: '#faca51',
+  swell: '#e7c6ff',
   puffer: '#9597f1'
 };
 // const colors = {
@@ -424,7 +425,8 @@ const protocols = {
   etherfi: { index: 0, name: 'ether.fi' },
   renzo: { index: 1, name: 'Renzo' },
   kelp: { index: 2, name: 'Kelp' },
-  puffer: { index: 3, name: 'Puffer' }
+  swell: { index: 3, name: 'Swell' },
+  puffer: { index: 4, name: 'Puffer' }
 };
 const sortProtocols = (p1, p2) => {
   const i1 = protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
