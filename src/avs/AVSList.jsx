@@ -73,7 +73,7 @@ export default function AVSList({ onSelectionChange }) {
             style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
           ></div>
           <span className="basis-full font-bold truncate">
-            {avs?.metadata?.name || ''}
+            {avs?.metadata?.name}
           </span>
           <span className="basis-1/4">
             {formatNumber(formatEther(avs.tvl))}
