@@ -48,7 +48,11 @@ export default function AVSList({ onSelectionChange }) {
     // TODO: loading indicators
 
     fetchAVS();
-  }, [avsService, dispatch]);
+  }, [avsService, dispatch, onSelectionChange]);
+
+  const handleAVSItemClick = avs => {
+    onSelectionChange(avs);
+  };
 
   return (
     <div className="basis-1/2 px-2">
@@ -61,14 +65,15 @@ export default function AVSList({ onSelectionChange }) {
       {state.avs?.map((avs, i) => (
         <div
           key={`avs-item-${i}`}
-          className="border-b flex flex-row gap-x-2 justify-between items-center py-4"
+          onClick={() => handleAVSItemClick(avs)}
+          className="border-b flex flex-row gap-x-2 justify-between items-center py-4 cursor-pointer"
         >
           <div
             className="bg-contain bg-no-repeat h-5 rounded-full min-w-5"
             style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
           ></div>
           <span className="basis-full font-bold truncate">
-            {avs.metadata?.name}
+            {avs?.metadata?.name || ''}
           </span>
           <span className="basis-1/4">
             {formatNumber(formatEther(avs.tvl))}
