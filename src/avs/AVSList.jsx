@@ -1,5 +1,5 @@
 import { reduceState } from '../shared/helpers';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { formatEther } from 'ethers';
@@ -7,6 +7,7 @@ import { formatEther } from 'ethers';
 export default function AVSList({ onSelectionChange }) {
   const { avsService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {});
+  const [selectedAVS, setSelectedAVS] = useState(null);
 
   useEffect(() => {
     async function fetchAVS() {
@@ -38,6 +39,7 @@ export default function AVSList({ onSelectionChange }) {
         });
 
         onSelectionChange(data[0]);
+        setSelectedAVS(data[0]);
 
         dispatch({ avs: data });
       } catch {
@@ -52,6 +54,7 @@ export default function AVSList({ onSelectionChange }) {
 
   const handleAVSItemClick = avs => {
     onSelectionChange(avs);
+    setSelectedAVS(avs);
   };
 
   return (
@@ -66,7 +69,9 @@ export default function AVSList({ onSelectionChange }) {
         <div
           key={`avs-item-${i}`}
           onClick={() => handleAVSItemClick(avs)}
-          className="border-b flex flex-row gap-x-2 justify-between items-center py-4 cursor-pointer"
+          className={`border-b flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-content1 ${
+            selectedAVS === avs ? 'bg-content1' : ''
+          }`}
         >
           <div
             className="bg-contain bg-no-repeat h-5 rounded-full min-w-5"
