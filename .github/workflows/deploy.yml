@@ -1,25 +1,26 @@
-name: "Deploy to S3 PROD"
+name: Deploy
+
 on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "The branch, tag or SHA to checkout"
         type: string
         required: true
-        default: "new"
+        description: Git ref
+        default: new
 
 env:
-  AWS_REGION: "us-east-1"
+  AWS_REGION: us-east-1
 
 jobs:
   deploy:
-    name: "Development deployment"
-    runs-on: ubuntu-22.04
-    permissions: 
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
       id-token: write
       contents: read
     steps:
-      - name: "Checkout to deployment ref"
+      - name: Check out repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
@@ -32,9 +33,10 @@ jobs:
           role-duration-seconds: 1200 # Set the session duration as needed
           role-session-name: RestakingDashboardGithubAction
 
-      - name: "Update S3 Bucket"
-        run: aws s3 sync . ${{ secrets.AWS_S3_BUCKET_PROD }} --delete --exclude 'terraform/*' --exclude '.github/*' --exclude '.gitignore' --exclude '*/*.md'
+      - name: Build
+        run: |
+          npm i
+          npm run build
 
-    
-
-    
+      - name: Update AWS S3 Bucket
+        run: aws s3 sync ./dist ${{ secrets.AWS_S3_BUCKET_PROD }} --delete
