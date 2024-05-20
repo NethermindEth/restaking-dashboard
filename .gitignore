@@ -16,11 +16,11 @@ node_modules/
 # dotenv environment variable files
 .env*
 
-# DynamoDB Local files
-.dynamodb/
-
 # Serverless files
 .serverless/
+
+# Vite build
+dist/
 
 # VSCode settings
 .vscode/
