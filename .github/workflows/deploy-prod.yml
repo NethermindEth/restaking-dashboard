@@ -1,0 +1,41 @@
+name: "Deploy to S3 PROD"
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "The branch, tag or SHA to checkout"
+        type: string
+        required: true
+        default: "new"
+
+env:
+  AWS_REGION: "us-east-1"
+  AWS_S3_BUCKET_PROD: "restaking.info"
+
+jobs:
+  deploy:
+    name: "Development deployment"
+    runs-on: ubuntu-22.04
+    permissions: 
+      id-token: write
+      contents: read
+    steps:
+      - name: "Checkout to deployment ref"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-duration-seconds: 1200 # Set the session duration as needed
+          role-session-name: RestakingDashboardGithubAction
+
+      - name: "Update S3 Bucket"
+        run: aws s3 sync . s3://${{ env.AWS_S3_BUCKET_PROD }} --delete --exclude 'terraform/*' --exclude '.github/*' --exclude '.gitignore' --exclude '*/*.md'
+
+    
+
+    
