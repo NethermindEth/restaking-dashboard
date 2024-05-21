@@ -13,6 +13,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
+  AWS_S3_BUCKET_PROD: "restaking.info"
 
 jobs:
   deploy:
@@ -41,4 +42,4 @@ jobs:
           npm run build
 
       - name: Update AWS S3 Bucket
-        run: aws s3 sync ./dist ${{ secrets.AWS_S3_BUCKET_PROD }} --delete
+        run: aws s3 sync ./dist s3://${{ env.AWS_S3_BUCKET_PROD }} --delete
