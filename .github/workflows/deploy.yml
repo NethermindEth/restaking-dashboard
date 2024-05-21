@@ -8,8 +8,6 @@ on:
         required: true
         description: Git ref
         default: new
-  push: # temp
-    branches: [ci/deploy-to-s3]
 
 env:
   AWS_REGION: us-east-1
