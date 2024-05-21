@@ -13,6 +13,7 @@ on:
 env:
   NODE_VERSION: "18.X"
   AWS_REGION: "us-east-1"
+  AWS_S3_BUCKET_PROD: restaking.info
 jobs:
   deploy:
     name: "Development deployment"
@@ -53,4 +54,4 @@ jobs:
           NEXT_PUBLIC_GOERLI_RPC_URL: ${{ secrets.NEXT_PUBLIC_GOERLI_RPC_URL }}
             
       - name: "Update S3 Bucket"
-        run: aws s3 sync out ${{ secrets.AWS_S3_BUCKET_PROD }} --delete
+        run: aws s3 sync out s3://${{ env.AWS_S3_BUCKET_PROD }} --delete
