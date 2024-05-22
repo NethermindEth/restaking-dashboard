@@ -24,6 +24,6 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
     );
   };
 };
-log.setLevel(Number(import.meta.env.VITE_LOG_LEVEL), false);
+log.setLevel(import.meta.env.VITE_LOG_LEVEL, false);
 
 export default log;
