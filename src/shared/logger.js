@@ -17,7 +17,7 @@ const timeFormatter = Intl.DateTimeFormat('en', {
 log.methodFactory = (methodName, logLevel, loggerName) => {
   const method = methodFactory(methodName, logLevel, loggerName);
 
-  return function (...args) {
+  return function(...args) {
     method(
       `[NRD ${timeFormatter.format(Date.now())} ${levels[methodName]}]`,
       ...args

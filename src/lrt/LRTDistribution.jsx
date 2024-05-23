@@ -240,7 +240,7 @@ export default function LRTDistribution({ data, height }) {
                     onPointerLeave={hideTooltip}
                     onPointerMove={e => handleAreaPointerMove(e, stack)}
                     stroke={colors[stack.key]}
-                    // opacity={0.75}
+                  // opacity={0.75}
                   />
                 ))
               }
