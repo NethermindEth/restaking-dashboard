@@ -19,7 +19,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: deploy
+    - name: deploy
       run: |
           URL="${{ secrets.AMPLIFY_WEBHOOK_NEW }}"
           curl -X POST -d {} "$URL" -H "Content-Type: application/json"
