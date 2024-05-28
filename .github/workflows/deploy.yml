@@ -1,8 +1,8 @@
-name: Deploy
+name: Deploy to amplify
 
 on:
   push:
-    branches: [new]
+    branches: [ci/amplify-deploy]
   workflow_dispatch:
     inputs:
       ref:
@@ -17,29 +17,9 @@ env:
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.ref }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-duration-seconds: 1200 # Set the session duration as needed
-          role-session-name: RestakingDashboardGithubAction
-
-      - name: Build
-        run: |
-          npm i
-          npm run build
-
-      - name: Update AWS S3 Bucket
-        run: aws s3 sync ./dist s3://${{ env.AWS_S3_BUCKET_PROD }} --delete
+      - name: deploy
+      run: |
+          URL="${{ secrets.AMPLIFY_WEBHOOK_NEW }}"
+          curl -X POST -d {} "$URL" -H "Content-Type: application/json"
