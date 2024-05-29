@@ -1,5 +1,5 @@
 import { reduceState } from '../shared/helpers';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { formatEther } from 'ethers';
@@ -38,6 +38,7 @@ export default function AVSList({ onSelectionChange }) {
         });
 
         onSelectionChange(data[0]);
+        dispatch({ selectedAVS: data[0] });
 
         dispatch({ avs: data });
       } catch {
@@ -48,7 +49,12 @@ export default function AVSList({ onSelectionChange }) {
     // TODO: loading indicators
 
     fetchAVS();
-  }, [avsService, dispatch]);
+  }, [avsService, dispatch, onSelectionChange]);
+
+  const handleAVSItemClick = avs => {
+    onSelectionChange(avs);
+    dispatch({ selectedAVS: avs });
+  };
 
   return (
     <div className="basis-1/2 px-2">
@@ -61,14 +67,17 @@ export default function AVSList({ onSelectionChange }) {
       {state.avs?.map((avs, i) => (
         <div
           key={`avs-item-${i}`}
-          className="border-b flex flex-row gap-x-2 justify-between items-center py-4"
+          onClick={() => handleAVSItemClick(avs)}
+          className={`border-b flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-content1 ${
+            state.selectedAVS === avs ? 'bg-content1' : ''
+          }`}
         >
           <div
             className="bg-contain bg-no-repeat h-5 rounded-full min-w-5"
             style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
           ></div>
           <span className="basis-full font-bold truncate">
-            {avs.metadata?.name}
+            {avs?.metadata?.name}
           </span>
           <span className="basis-1/4">
             {formatNumber(formatEther(avs.tvl))}

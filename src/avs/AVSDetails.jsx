@@ -11,7 +11,7 @@ export default function AVSDetails({ avs }) {
           style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
         ></div>
         <span className="basis-full font-bold text-lg truncate">
-          {avs.metadata.name}
+          {avs?.metadata?.name}
         </span>
       </div>
       <div className="flex flex-row gap-x-1 mt-4">
@@ -75,9 +75,9 @@ export default function AVSDetails({ avs }) {
                   key={`strategy-item-${i}`}
                   className="border-b flex flex-row gap-x-1 items-center py-1.5 text-sm"
                 >
-                  <div>{assets[strategy].name}</div>
+                  <div>{assets[strategy]?.name}</div>
                   <div className="bg-default px-1 py-0.5 rounded text-xs">
-                    {assets[strategy].symbol}
+                    {assets[strategy]?.symbol}
                   </div>
                   <div className="grow text-end">
                     {assetFormatter.format(formatEther(value))}
