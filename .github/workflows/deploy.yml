@@ -1,8 +1,8 @@
-name: Deploy to amplify
+name: Deploy to Amplify
 
 on:
   push:
-    branches: [ci/amplify-deploy]
+    branches: [new]
   workflow_dispatch:
     inputs:
       ref:
@@ -10,10 +10,6 @@ on:
         required: true
         description: Git ref
         default: new
-
-env:
-  AWS_REGION: us-east-1
-  AWS_S3_BUCKET_PROD: staging.restaking.info
 
 jobs:
   deploy:
