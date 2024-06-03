@@ -80,7 +80,9 @@ export default function Header() {
           placement="top"
           onOpenChange={onOpenChange}
         >
-          <ModalContent>{() => <Sidebar />}</ModalContent>
+          <ModalContent>
+            {() => <Sidebar onOpenChange={onOpenChange} />}
+          </ModalContent>
         </Modal>
       </header>
     </div>

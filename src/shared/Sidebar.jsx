@@ -4,7 +4,7 @@ import { Link } from '@nextui-org/react';
 import { useCallback } from 'react';
 import { useTheme } from './ThemeContext';
 
-export default function Sidebar() {
+export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { resolvedTheme: theme } = useTheme();
@@ -13,12 +13,13 @@ export default function Sidebar() {
       event.preventDefault();
 
       navigate(event.target.getAttribute('href'));
+      onOpenChange(false);
     },
-    [navigate]
+    [navigate, onOpenChange]
   );
   return (
     <div
-      className={`sidebar-${theme} h-full flex flex-col overflow-y-scroll lg:overflow-hidden w-full`}
+      className={`sidebar-${theme} h-full md:max-h-screen md:sticky top-0 flex flex-col overflow-y-scroll lg:overflow-hidden w-full`}
       data-theme
     >
       <header className="flex-none font-display font-bold pb-8 pt-3 px-5 text-sm uppercase">

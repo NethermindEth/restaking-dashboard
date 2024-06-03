@@ -15,7 +15,7 @@ export default function Layout() {
       )}
       <div className="basis-0 flex-1">
         {!showSidebar && <Header />}
-        <main className="p-4 lg:p-6">
+        <main className="p-4 lg:p-6 max-w-[100vw]">
           <Outlet />
         </main>
       </div>
