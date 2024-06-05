@@ -1,4 +1,8 @@
 export default Object.freeze({
+  '0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7': {
+    name: 'Backing EIGEN',
+    symbol: 'bEIGEN'
+  },
   '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0': {
     name: 'Beacon Ether',
     symbol: 'ETH'
