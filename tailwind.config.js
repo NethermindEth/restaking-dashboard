@@ -10,11 +10,8 @@ export default {
   theme: {
     extend: {},
     fontFamily: {
-      sans: ['Outfit, system-ui, sans-serif', { fontOpticalSizing: 'auto' }],
-      display: [
-        'Syncopate, system-ui, sans-serif',
-        { fontOpticalSizing: 'auto' }
-      ]
+      sans: ['"DM Sans", system-ui, sans-serif', { fontOpticalSizing: 'auto' }],
+      display: ['Exo, system-ui, sans-serif', { fontOpticalSizing: 'auto' }]
     }
   },
   darkMode: 'class',
@@ -31,31 +28,24 @@ export default {
             foreground: '#000000'
           }
         },
-        'sidebar-light': {
-          colors: {
-            background: '#1e1b4b',
-            default: '#ffffff',
-            focus: '#34d399',
-            foreground: '#ffffff',
-            primary: '#ffffff'
-          }
-        },
-        'sidebar-dark': {
-          colors: {
-            background: '#0c0b1e',
-            default: '#ffffff',
-            focus: '#34d399',
-            foreground: '#ffffff',
-            primary: '#ffffff'
-          }
-        },
         dark: {
           colors: {
-            background: '#12102d',
-            content1: '#18163c',
-            default: 'rgb(255 255 255 / 20%)',
+            background: '#080a0f',
+            content1: '#0f111a',
+            content2: 'red',
+            content3: 'yellow',
+            content4: 'green',
+            default: {
+              DEFAULT: '#191c2c',
+            },
             focus: '#34d399',
-            foreground: '#ffffff'
+            foreground: {
+              DEFAULT: '#ffffff',
+              1: '#c4cce3',
+              2: '#7a86a5'
+            },
+            outline: '#293041',
+            secondary: 'orange',
           }
         }
       }

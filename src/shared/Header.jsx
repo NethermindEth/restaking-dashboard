@@ -9,7 +9,7 @@ export default function Header() {
   return (
     <div className="bg-background">
       <header
-        className={`sidebar-${theme} flex items-center gap-x-3 px-5 py-6`}
+        className={`flex items-center gap-x-3 px-5 py-6`}
         data-theme
       >
         <Button
@@ -29,7 +29,6 @@ export default function Header() {
             base: 'h-full m-0 sm:m-0 p-0 rounded-none w-full',
             closeButton: 'hover:bg-default/20 text-foreground',
             wrapper: [
-              `sidebar-${theme}`,
               'bottom-0',
               'fixed',
               'items-start',

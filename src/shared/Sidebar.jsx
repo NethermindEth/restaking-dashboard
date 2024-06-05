@@ -2,12 +2,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import { Link } from '@nextui-org/react';
 import { useCallback } from 'react';
-import { useTheme } from './ThemeContext';
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { resolvedTheme: theme } = useTheme();
   const handleNavLinkClick = useCallback(
     event => {
       event.preventDefault();
@@ -18,7 +16,7 @@ export default function Sidebar() {
   );
   return (
     <div
-      className={`sidebar-${theme} h-full flex flex-col overflow-y-scroll lg:overflow-hidden w-full`}
+      className={`bg-content1 border-b border-e border-outline h-full flex flex-col overflow-y-scroll lg:overflow-hidden rounded-br-lg w-full`}
       data-theme
     >
       <header className="flex-none font-display font-bold pb-8 pt-3 px-5 text-sm uppercase">
@@ -28,12 +26,12 @@ export default function Sidebar() {
         {navItems.map((item, i) => {
           const selected =
             item.href === location.pathname
-              ? 'border-focus bg-default/20'
+              ? 'border-foreground-1 bg-default text-foreground-1'
               : 'border-transparent';
           return (
             <Link
               key={`nav-item-${i}`}
-              className={`border-l-4 hover:bg-default/20 flex gap-x-2 px-4 py-4 transition-all ${selected}`}
+              className={`border-l-4 hover:bg-default/80 hover:border-foreground-2 flex gap-x-2 px-5 py-5 text-foreground-2 transition-all ${selected}`}
               href={item.href}
               onClick={handleNavLinkClick}
             >
@@ -55,11 +53,6 @@ const navItems = [
     icon: 'home'
   },
   {
-    title: 'LRT',
-    href: '/lrt',
-    icon: 'cycle'
-  },
-  {
     title: 'AVS',
     href: '/avs',
     icon: 'stacks'
@@ -67,11 +60,16 @@ const navItems = [
   {
     title: 'Operators',
     href: '/operators',
-    icon: 'network_node'
+    icon: 'linked_services'
+  },
+  {
+    title: 'LRT',
+    href: '/lrt',
+    icon: 'token'
   },
   {
     title: 'LST',
     href: '/lst',
-    icon: 'cached'
+    icon: 'bar_chart_4_bars'
   }
 ];

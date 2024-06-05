@@ -12,7 +12,7 @@ export default function Footer() {
 
   return (
     <footer className="content-end grow ps-2 pb-1">
-      <Dropdown>
+      <Dropdown className="border border-outline shadow-none">
         <DropdownTrigger>
           <Button color="default" isIconOnly={true} size="sm" variant="light">
             <span className="material-symbols-outlined">contrast</span>
