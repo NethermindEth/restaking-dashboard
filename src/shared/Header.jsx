@@ -1,17 +1,12 @@
 import { Button, Modal, ModalContent, useDisclosure } from '@nextui-org/react';
 import Sidebar from './Sidebar';
-import { useTheme } from './ThemeContext';
 
 export default function Header() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { resolvedTheme: theme } = useTheme();
 
   return (
     <div className="bg-background">
-      <header
-        className={`flex items-center gap-x-3 px-5 py-6`}
-        data-theme
-      >
+      <header className={`flex items-center gap-x-3 px-5 py-6`} data-theme>
         <Button
           color="default"
           isIconOnly={true}
@@ -21,7 +16,7 @@ export default function Header() {
         >
           <span className="material-symbols-outlined">menu</span>
         </Button>
-        <div className="font-bold font-display uppercase">
+        <div className="font-bold font-display text-[#ffa726] uppercase">
           Restaking Dashboard
         </div>
         <Modal

@@ -36,7 +36,7 @@ export default {
             content3: 'yellow',
             content4: 'green',
             default: {
-              DEFAULT: '#191c2c',
+              DEFAULT: '#191c2c'
             },
             focus: '#34d399',
             foreground: {
@@ -45,7 +45,7 @@ export default {
               2: '#7a86a5'
             },
             outline: '#293041',
-            secondary: 'orange',
+            secondary: 'orange'
           }
         }
       }

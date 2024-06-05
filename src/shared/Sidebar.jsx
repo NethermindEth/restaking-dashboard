@@ -19,7 +19,7 @@ export default function Sidebar() {
       className={`bg-content1 border-b border-e border-outline h-full flex flex-col overflow-y-scroll lg:overflow-hidden rounded-br-lg w-full`}
       data-theme
     >
-      <header className="flex-none font-display font-bold pb-8 pt-3 px-5 text-sm uppercase">
+      <header className="border-l-4 border-transparent flex-none font-display font-bold pb-8 pt-6 px-5 text-[#ffa726] text-sm uppercase">
         Restaking Dashboard
       </header>
       <nav className="flex-none">
@@ -31,7 +31,7 @@ export default function Sidebar() {
           return (
             <Link
               key={`nav-item-${i}`}
-              className={`border-l-4 hover:bg-default/80 hover:border-foreground-2 flex gap-x-2 px-5 py-5 text-foreground-2 transition-all ${selected}`}
+              className={`border-l-4 hover:bg-default hover:border-foreground-2 flex gap-x-2 px-5 py-5 text-foreground-2 transition-all ${selected}`}
               href={item.href}
               onClick={handleNavLinkClick}
             >
