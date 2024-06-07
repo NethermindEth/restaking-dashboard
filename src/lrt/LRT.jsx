@@ -12,7 +12,7 @@ export default function LRT() {
     async function fetchData() {
       try {
         const data = await lrtService.getAll();
-        dispatch({ lrtData: data });
+        dispatch({ lrtData: data.results, ethRate: data.price });
       } catch {
         // TODO: handle error
       }
@@ -28,7 +28,13 @@ export default function LRT() {
       <div className="font-bold font-display pb-12 uppercase">
         LRT Distribution
       </div>
-      {state.lrtData && <LRTDistribution data={state.lrtData} height={512} />}
+      {state.lrtData && (
+        <LRTDistribution
+          data={state.lrtData}
+          rate={state.ethRate}
+          height={512}
+        />
+      )}
     </>
   );
 }
