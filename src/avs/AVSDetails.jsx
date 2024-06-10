@@ -1,9 +1,19 @@
-import { Button, Card, CardBody, Link, Tab, Tabs } from '@nextui-org/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Link,
+  Tab,
+  Tabs
+} from '@nextui-org/react';
 import assets from '../shared/assets';
 import { formatEther } from 'ethers';
 import { reduceState } from '../shared/helpers';
 import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
+import OperatorsOverTime from './OperatorsOverTime';
+import Operators from './Operators';
 
 export default function AVSDetails({ avs }) {
   const location = useLocation();
@@ -20,7 +30,7 @@ export default function AVSDetails({ avs }) {
               className="bg-contain bg-no-repeat h-8 rounded-full min-w-8"
               style={{ backgroundImage: `url('${state.avs.metadata.logo}')` }}
             ></div>
-            <span className="basis-full font-bold text-lg truncate">
+            <span className="basis-full font-bold text-xl truncate text-foreground-1">
               {state.avs?.metadata?.name}
             </span>
           </div>
@@ -85,7 +95,7 @@ export default function AVSDetails({ avs }) {
               .map(([strategy, value], i) => (
                 <div
                   key={`strategy-item-${i}`}
-                  className="border-b flex flex-row gap-x-1 items-center py-1.5 text-sm"
+                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
                 >
                   <div>{assets[strategy]?.name ?? ''}</div>
                   <div className="bg-default px-1 py-0.5 rounded text-xs">
@@ -106,7 +116,24 @@ export default function AVSDetails({ avs }) {
               <div className="font-bold">{state.avs.operators}</div>
             </div>
           }
-        />
+        >
+          <div className="space-y-4">
+            <Card radius="md" className="bg-content1 border border-outline p-4">
+              <CardHeader className="space-y-1 block">
+                <div className=" font-light text-lg text-foreground-1">
+                  Operators over time
+                </div>
+                <div className=" font-light text-base">
+                  364 <span className="text-success">+2.3%</span>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <OperatorsOverTime />
+              </CardBody>
+            </Card>
+            <Operators />
+          </div>
+        </Tab>
         <Tab
           key="stakers"
           disabled
