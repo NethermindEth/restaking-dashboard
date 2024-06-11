@@ -106,7 +106,7 @@ const mockOperators = [
 export default function Operators() {
   const compact = !useTailwindBreakpoint('md');
   return (
-    <div className="w-full flex items-start justify-between gap-4">
+    <div className="w-full flex md:flex-row flex-col items-start justify-between gap-4">
       <Card
         radius="md"
         className="bg-content1 border border-outline w-full space-y-4"

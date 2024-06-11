@@ -14,6 +14,8 @@ import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import OperatorsOverTime from './OperatorsOverTime';
 import Operators from './Operators';
+import RestakersOverTime from './RestakersOverTime';
+import RestakingLeaderboard from './RestakingLeaderboard';
 
 export default function AVSDetails({ avs }) {
   const location = useLocation();
@@ -71,12 +73,11 @@ export default function AVSDetails({ avs }) {
         </CardBody>
       </Card>
       <Tabs
-        className="w-full border border-outline p-2 rounded-lg"
+        className="w-full border border-outline p-2 rounded-lg "
         classNames={{
           tab: 'px-6 py-8',
           tabList: 'bg-content1 w-full'
         }}
-        disabledKeys={['stakers']}
       >
         <Tab
           key="assets"
@@ -89,23 +90,40 @@ export default function AVSDetails({ avs }) {
             </div>
           }
         >
-          <div>
-            {Object.entries(state.avs.strategies)
-              .sort(compareStrategies)
-              .map(([strategy, value], i) => (
-                <div
-                  key={`strategy-item-${i}`}
-                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-                >
-                  <div>{assets[strategy]?.name ?? ''}</div>
-                  <div className="bg-default px-1 py-0.5 rounded text-xs">
-                    {assets[strategy]?.symbol ?? ''}
-                  </div>
-                  <div className="grow text-end">
-                    {assetFormatter.format(formatEther(value))}
-                  </div>
+          <div className="space-y-4 -mt-2">
+            <Card radius="md" className="bg-content1 border border-outline p-4">
+              <CardHeader className="space-y-1 block">
+                <div className="font-light text-lg text-foreground-1">
+                  TVL overtime
                 </div>
-              ))}
+                <div className="font-light">
+                  <div className="text-base flex items-center gap-2">
+                    <span>4,554,567 ETH</span>{' '}
+                    <span className="text-success">+1.5%</span>
+                  </div>
+                  <div className="text-sm text-foreground-1">$ 34,554,567</div>
+                </div>
+              </CardHeader>
+              <CardBody>TVL GRAPH HERE</CardBody>
+            </Card>
+            <div>
+              {Object.entries(state.avs.strategies)
+                .sort(compareStrategies)
+                .map(([strategy, value], i) => (
+                  <div
+                    key={`strategy-item-${i}`}
+                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
+                  >
+                    <div>{assets[strategy]?.name ?? ''}</div>
+                    <div className="bg-default px-1 py-0.5 rounded text-xs">
+                      {assets[strategy]?.symbol ?? ''}
+                    </div>
+                    <div className="grow text-end">
+                      {assetFormatter.format(formatEther(value))}
+                    </div>
+                  </div>
+                ))}
+            </div>
           </div>
         </Tab>
         <Tab
@@ -117,7 +135,7 @@ export default function AVSDetails({ avs }) {
             </div>
           }
         >
-          <div className="space-y-4">
+          <div className="space-y-4 -mt-2">
             <Card radius="md" className="bg-content1 border border-outline p-4">
               <CardHeader className="space-y-1 block">
                 <div className=" font-light text-lg text-foreground-1">
@@ -135,15 +153,32 @@ export default function AVSDetails({ avs }) {
           </div>
         </Tab>
         <Tab
-          key="stakers"
+          key="restakers"
           disabled
           title={
             <div className="text-center">
-              <div>Stakers</div>
+              <div>Restakers</div>
               <div className="font-bold">{state.avs.stakers}</div>
             </div>
           }
-        />
+        >
+          <div className="space-y-4 -mt-2">
+            <Card radius="md" className="bg-content1 border border-outline p-4">
+              <CardHeader className="space-y-1 block">
+                <div className=" font-light text-lg text-foreground-1">
+                  Restakers overtime
+                </div>
+                <div className=" font-light text-base">
+                  12,234 <span className="text-success">+1.5%</span>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <RestakersOverTime />
+              </CardBody>
+            </Card>
+            <RestakingLeaderboard />
+          </div>
+        </Tab>
       </Tabs>
     </div>
   );

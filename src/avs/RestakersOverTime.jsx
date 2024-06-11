@@ -22,7 +22,7 @@ const width = 1100;
 const height = 220;
 const margin = { top: 20, right: 20, bottom: 20, left: 40 };
 
-const OperatorsOverTime = () => {
+const RestakersOverTime = () => {
   const xScale = scaleLinear({
     domain: [0, Math.max(...data.map(d => d.x))],
     range: [margin.left, width - margin.right]
@@ -35,7 +35,7 @@ const OperatorsOverTime = () => {
 
   return (
     <div className="flex items-center justify-center">
-      <svg className="w-full" height={height}>
+      <svg className=" w-full" height={height}>
         <GridRows
           scale={yScale}
           width={width}
@@ -85,4 +85,4 @@ const OperatorsOverTime = () => {
   );
 };
 
-export default OperatorsOverTime;
+export default RestakersOverTime;
