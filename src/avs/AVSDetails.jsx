@@ -16,6 +16,8 @@ import OperatorsOverTime from './OperatorsOverTime';
 import Operators from './Operators';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
+import TVLOverTime from './TVLOverTime';
+import LSTDistribution from './LSTDistribution';
 
 export default function AVSDetails({ avs }) {
   const location = useLocation();
@@ -83,7 +85,7 @@ export default function AVSDetails({ avs }) {
           key="assets"
           title={
             <div className="text-center">
-              <div>Assets</div>
+              <div>Total ETH value</div>
               <div className="font-bold">
                 {assetFormatter.format(formatEther(state.avs.tvl))}
               </div>
@@ -104,26 +106,11 @@ export default function AVSDetails({ avs }) {
                   <div className="text-sm text-foreground-1">$ 34,554,567</div>
                 </div>
               </CardHeader>
-              <CardBody>TVL GRAPH HERE</CardBody>
+              <CardBody>
+                <TVLOverTime />
+              </CardBody>
             </Card>
-            <div>
-              {Object.entries(state.avs.strategies)
-                .sort(compareStrategies)
-                .map(([strategy, value], i) => (
-                  <div
-                    key={`strategy-item-${i}`}
-                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-                  >
-                    <div>{assets[strategy]?.name ?? ''}</div>
-                    <div className="bg-default px-1 py-0.5 rounded text-xs">
-                      {assets[strategy]?.symbol ?? ''}
-                    </div>
-                    <div className="grow text-end">
-                      {assetFormatter.format(formatEther(value))}
-                    </div>
-                  </div>
-                ))}
-            </div>
+            <LSTDistribution />
           </div>
         </Tab>
         <Tab

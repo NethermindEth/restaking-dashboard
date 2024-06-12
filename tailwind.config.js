@@ -41,6 +41,7 @@ export default {
             focus: '#34d399',
             foreground: {
               DEFAULT: '#ffffff',
+              active: '#CAD7F9',
               1: '#c4cce3',
               2: '#7a86a5'
             },
