@@ -118,10 +118,11 @@ export default function Operators() {
           <div>
             <Input
               type="text"
-              placeholder="Search..."
+              placeholder="Search by operator"
               radius="sm"
+              className="lg:w-64"
               variant="bordered"
-              startContent={<SearchIcon className="size-4" />}
+              endContent={<SearchIcon className="size-4" />}
             />
           </div>
         </div>

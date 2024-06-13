@@ -2,7 +2,17 @@ import React from 'react';
 import { Group } from '@visx/group';
 import { Treemap, hierarchy, stratify, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
-import { Card } from '@nextui-org/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Link,
+  Tab,
+  Tabs
+} from '@nextui-org/react';
+import { reduceState } from '../shared/helpers';
+import { useMutativeReducer } from 'use-mutative';
 
 const mockData = [
   {
@@ -84,12 +94,13 @@ const data = stratify()
 const defaultMargin = { top: 0, left: 0, right: 0, bottom: 0 };
 
 export default function LSTDistributionGraph({
-  width,
   height,
   margin = defaultMargin
 }) {
-  //   const aspectRatio = 1.0;
-  const xMax = width - margin.left - margin.right;
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    selectedTab: 'all-assets'
+  });
+
   const yMax = height - margin.top - margin.bottom;
 
   const root = hierarchy(data).sort((a, b) => (a.value || 0) - (b.value || 0));
@@ -101,21 +112,53 @@ export default function LSTDistributionGraph({
     range: [minOpacity, maxOpacity]
   });
 
+  const handleTabChange = tab => {
+    dispatch({ selectedTab: tab });
+  };
+
   return (
     <Card
       radius="md"
       className="bg-content1 border border-outline space-y-4 p-4 w-full flex items-start flex-col justify-center"
     >
-      <div className="font-light text-base text-foreground-1 self-start px-2">
-        LST distribution
+      <div className="flex items-center justify-between w-full flex-wrap gap-3">
+        <div className="font-light text-base text-foreground-1 px-2">
+          LST distribution
+        </div>
+
+        <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+          <div
+            className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-32 cursor-pointer ${
+              state.selectedTab === 'all-assets' &&
+              'bg-default border border-outline text-foreground-active'
+            }`}
+            onClick={() => handleTabChange('all-assets')}
+          >
+            All Assets
+          </div>
+
+          <div
+            className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-32 cursor-pointer ${
+              state.selectedTab === 'lst' &&
+              'bg-default border border-outline text-foreground-active'
+            }`}
+            onClick={() => handleTabChange('lst')}
+          >
+            LST
+          </div>
+        </div>
       </div>
-      <svg width={width} height={height}>
+      <svg
+        height={height}
+        className="w-full overflow-x-scroll pr-2"
+        style={{ marginRight: 'auto' }}
+      >
         <Treemap
           top={margin.top}
           root={root}
-          size={[xMax, yMax]}
+          size={[550, yMax]}
           tile={treemapBinary}
-          padding={6}
+          padding={8}
           paddingInner={8}
           round
         >

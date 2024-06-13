@@ -46,7 +46,7 @@ export default {
               2: '#7a86a5'
             },
             outline: '#293041',
-            secondary: 'orange'
+            secondary: '#FFCC80'
           }
         }
       }

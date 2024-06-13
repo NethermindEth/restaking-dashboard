@@ -35,7 +35,7 @@ const TVLOverTime = () => {
 
   return (
     <div className="flex items-center justify-center">
-      <svg className=" w-full" height={height}>
+      <svg className="w-full" height={height}>
         <GridRows
           scale={yScale}
           width={width}

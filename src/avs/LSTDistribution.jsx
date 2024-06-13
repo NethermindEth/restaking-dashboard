@@ -149,7 +149,7 @@ export default function LSTDistribution() {
         </Card>
       </div>
       <div className="flex flex-col gap-4 justify-between items-end w-full">
-        <LSTDistributionGraph width={500} height={500} />
+        <LSTDistributionGraph height={500} />
       </div>
     </div>
   );
