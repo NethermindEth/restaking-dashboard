@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import AVSService from './AVSService';
 import LRTService from './LRTService';
+import LSTService from './LSTService';
 
 export const ServiceContext = createContext();
 
@@ -16,5 +17,6 @@ export function ServiceProvider({ children }) {
 
 const services = {
   avsService: new AVSService(),
-  lrtService: new LRTService()
+  lrtService: new LRTService(),
+  lstService: new LSTService()
 };
