@@ -409,8 +409,12 @@ const formatDate = date => {
   return axisDateFormatter.format(date);
 };
 const formatValue = value => {
-  if (value >= 1_000_000) {
-    return `${value / 1_000_000}m`;
+  if (value >= 1e9) {
+    return `${value / 1e9}b`;
+  }
+
+  if (value >= 1e6) {
+    return `${value / 1e6}m`;
   }
 
   return `${value / 1_000}k`;

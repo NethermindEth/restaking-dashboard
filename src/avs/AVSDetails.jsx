@@ -1,44 +1,52 @@
 import { Button, Link, Tab, Tabs } from '@nextui-org/react';
 import assets from '../shared/assets';
 import { formatEther } from 'ethers';
+import { reduceState } from '../shared/helpers';
+import { useLocation } from 'react-router-dom';
+import { useMutativeReducer } from 'use-mutative';
 
 export default function AVSDetails({ avs }) {
+  const location = useLocation();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    avs: location.state.avs
+  });
+
   return (
     <div className="basis-1/2 border-s px-4 w-full">
       <div className="flex flex-row gap-x-2 items-center">
         <div
           className="bg-contain bg-no-repeat h-8 rounded-full min-w-8"
-          style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
+          style={{ backgroundImage: `url('${state.avs.metadata.logo}')` }}
         ></div>
         <span className="basis-full font-bold text-lg truncate">
-          {avs?.metadata?.name}
+          {state.avs?.metadata?.name}
         </span>
       </div>
       <div className="flex flex-row gap-x-1 mt-4">
         <Button
           as={Link}
-          href={`https://etherscan.io/address/${avs.address}`}
+          href={`https://etherscan.io/address/${state.avs.address}`}
           target="_blank"
           showAnchorIcon
           size="sm"
           variant="flat"
-        >{`${avs.address.slice(0, 6)}...${avs.address.slice(-4)}`}</Button>
+        >{`${state.avs.address.slice(0, 6)}...${state.avs.address.slice(-4)}`}</Button>
         <Button
           as={Link}
-          href={avs.metadata.twitter}
+          href={state.avs.metadata.twitter}
           target="_blank"
           showAnchorIcon
           size="sm"
           variant="flat"
         >
           @
-          {avs.metadata.twitter.substring(
-            avs.metadata.twitter.lastIndexOf('/') + 1
+          {state.avs.metadata.twitter.substring(
+            state.avs.metadata.twitter.lastIndexOf('/') + 1
           )}
         </Button>
         <Button
           as={Link}
-          href={avs.metadata.website}
+          href={state.avs.metadata.website}
           target="_blank"
           showAnchorIcon
           size="sm"
@@ -47,7 +55,7 @@ export default function AVSDetails({ avs }) {
           Website
         </Button>
       </div>
-      <div className="py-4 text-sm">{avs.metadata.description}</div>
+      <div className="py-4 text-sm">{state.avs.metadata.description}</div>
       <Tabs
         className="w-full"
         classNames={{
@@ -62,22 +70,22 @@ export default function AVSDetails({ avs }) {
             <div className="text-center">
               <div>Assets</div>
               <div className="font-bold">
-                {assetFormatter.format(formatEther(avs.tvl))}
+                {assetFormatter.format(formatEther(state.avs.tvl))}
               </div>
             </div>
           }
         >
           <div>
-            {Object.entries(avs.strategies)
+            {Object.entries(state.avs.strategies)
               .sort(compareStrategies)
               .map(([strategy, value], i) => (
                 <div
                   key={`strategy-item-${i}`}
                   className="border-b flex flex-row gap-x-1 items-center py-1.5 text-sm"
                 >
-                  <div>{assets[strategy]?.name}</div>
+                  <div>{assets[strategy]?.name ?? ''}</div>
                   <div className="bg-default px-1 py-0.5 rounded text-xs">
-                    {assets[strategy]?.symbol}
+                    {assets[strategy]?.symbol ?? ''}
                   </div>
                   <div className="grow text-end">
                     {assetFormatter.format(formatEther(value))}
@@ -91,7 +99,7 @@ export default function AVSDetails({ avs }) {
           title={
             <div className="text-center">
               <div>Operators</div>
-              <div className="font-bold">{avs.operators}</div>
+              <div className="font-bold">{state.avs.operators}</div>
             </div>
           }
         />
@@ -101,7 +109,7 @@ export default function AVSDetails({ avs }) {
           title={
             <div className="text-center">
               <div>Stakers</div>
-              <div className="font-bold">{avs.stakers}</div>
+              <div className="font-bold">{state.avs.stakers}</div>
             </div>
           }
         />

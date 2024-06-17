@@ -15,7 +15,7 @@ export default function AVS() {
 
   return (
     <>
-      <div className="border-b font-bold font-display pb-4 mb-12 text-2xl uppercase">
+      <div className="border-b font-display font-medium pb-4 mb-12 text-foreground-1 text-3xl uppercase">
         AVS
       </div>
       <div className="flex flex-col lg:flex-row gap-6 md:gap-4">

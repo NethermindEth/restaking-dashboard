@@ -1,4 +1,4 @@
-import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import js from '@eslint/js';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -10,7 +10,7 @@ export default [
   js.configs.recommended,
   reactRecommended,
   reactJSXRutime,
-  eslintConfigPrettier,
+  eslintPluginPrettierRecommended,
   {
     files: ['**/*.{js,jsx}'],
     ignores: ['dist'],

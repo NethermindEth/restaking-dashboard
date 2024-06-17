@@ -85,7 +85,7 @@ export function ThemeProvider({ children }) {
       // TODO: log
     }
 
-    applyTheme(theme || themes[0]);
+    applyTheme(theme || themes[2]);
 
     return () => window.removeEventListener('storage', handler);
   }, [applyTheme, systemTheme]);

@@ -1,11 +1,14 @@
 import { reduceState } from '../shared/helpers';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
+import { useNavigate } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
-import { formatEther } from 'ethers';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function AVSList({ onSelectionChange }) {
   const { avsService } = useServices();
+  const compact = !useTailwindBreakpoint('md');
+  const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {});
 
   useEffect(() => {
@@ -22,6 +25,8 @@ export default function AVSList({ onSelectionChange }) {
 
             item.tvl += item.strategies[s];
           }
+
+          item.tvl = Number(item.tvl / BigInt(1e18));
         }
 
         // Sort descending by TVL
@@ -37,7 +42,7 @@ export default function AVSList({ onSelectionChange }) {
           return 0;
         });
 
-        onSelectionChange(data[0]);
+        // onSelectionChange(data[0]);
         dispatch({ selectedAVS: data[0] });
 
         dispatch({ avs: data });
@@ -52,55 +57,70 @@ export default function AVSList({ onSelectionChange }) {
   }, [avsService, dispatch, onSelectionChange]);
 
   const handleAVSItemClick = avs => {
-    onSelectionChange(avs);
-    dispatch({ selectedAVS: avs });
+    navigate(`/avs/${avs.address}`, { state: { avs } });
   };
 
   return (
-    <div className="basis-1/2 px-2">
-      <div className="border-b flex flex-row gap-x-2 justify-between items-center py-4 text-sm">
-        <div className="h-5 min-w-5"></div>
-        <span className="basis-full">Name</span>
-        <span className="basis-1/4">TVL</span>
-        <span className="basis-1/4 text-end">Stakers</span>
+    <div>
+      <div className="font-display font-medium pb-4 mb-4 text-foreground-1 text-3xl uppercase">
+        AVS
       </div>
-      {state.avs?.map((avs, i) => (
-        <div
-          key={`avs-item-${i}`}
-          onClick={() => handleAVSItemClick(avs)}
-          className={`border-b flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-content1 ${
-            state.selectedAVS === avs ? 'bg-content1' : ''
-          }`}
-        >
-          <div
-            className="bg-contain bg-no-repeat h-5 rounded-full min-w-5"
-            style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
-          ></div>
-          <span className="basis-full font-bold truncate">
-            {avs?.metadata?.name}
-          </span>
-          <span className="basis-1/4">
-            {formatNumber(formatEther(avs.tvl))}
-          </span>
-          <span className="basis-1/4 text-end text-sm">
-            {formatNumber(avs.stakers)}
-          </span>
+      <div className="bg-content1 border border-outline rounded-lg text-sm">
+        <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+          <div className="min-w-5"></div>
+          <div className="min-w-5"></div>
+          <span className="basis-full">Name</span>
+          <span className="basis-1/3">Stakers</span>
+          <span className="basis-1/4">Operators</span>
+          <span className="basis-1/3 text-end">TVL</span>
         </div>
-      ))}
+        {state.avs?.map((avs, i) => (
+          <div
+            key={`avs-item-${i}`}
+            onClick={() => handleAVSItemClick(avs)}
+            className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default ${
+              state.selectedAVS === avs ? 'bg-content1' : ''
+            }`}
+          >
+            <div className="min-w-5">{i + 1}</div>
+            <div
+              className="bg-center bg-contain bg-no-repeat h-5 rounded-full min-w-5"
+              style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
+            ></div>
+            <span className="basis-full truncate">{avs?.metadata?.name}</span>
+            <span className="basis-1/3">
+              {formatNumber(avs.stakers, compact)}
+            </span>
+            <span className="basis-1/4">
+              {formatNumber(avs.operators, compact)}
+            </span>
+            <span className="basis-1/3 text-end">
+              <div>ETH {formatNumber(avs.tvl, compact)}</div>
+              <div className="text-foreground-1 text-xs">
+                USD {formatNumber(avs.tvl, compact)}
+              </div>
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-function formatNumber(value) {
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(1)}m`;
+const numberFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 0
+});
+
+function formatNumber(value, compact) {
+  if (compact) {
+    if (value >= 1_000_000) {
+      return `${(value / 1_000_000).toFixed(1)}m`;
+    }
+
+    if (value >= 1_000) {
+      return `${(value / 1_000).toFixed(1)}k`;
+    }
   }
 
-  if (value >= 1_000) {
-    return `${(value / 1_000).toFixed(1)}k`;
-  }
-
-  if (value < 1_000) {
-    return value.toString();
-  }
+  return numberFormatter.format(value);
 }
