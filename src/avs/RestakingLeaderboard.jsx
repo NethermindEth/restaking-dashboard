@@ -126,10 +126,7 @@ export default function RestakingLeaderboard() {
             className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
           >
             <div className="min-w-5">{i + 1}</div>
-            <div
-              className="bg-center bg-contain bg-no-repeat h-5 rounded-full min-w-5"
-              style={{ backgroundImage: `url('${operator.operator.logo}')` }}
-            ></div>
+            <img src={operator.operator.logo} className="size-5 rounded-full" />
             <span className="basis-full truncate">
               {operator.operator.name}
             </span>

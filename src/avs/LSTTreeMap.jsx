@@ -27,9 +27,7 @@ export default function LSTTreeMap({
   const getTreemapData = () => {
     if (state.selectedTab === 'all-assets') {
       const allData = [
-        ...totalEthDistributionData.filter(
-          d => d.name !== 'Liquidity Staked Tokens'
-        ),
+        ...totalEthDistributionData.filter(d => d.token === 'ETH'),
         ...lstDistributionData
       ];
       return allData;

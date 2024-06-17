@@ -21,69 +21,86 @@ import GraphTimelineSelector from './GraphTimelineSelector';
 
 const strategiesData = [
   {
+    name: 'Coinbase Staked Ether',
+    logo: '/public/cbEth.svg',
     token: 'cbETH',
     proxy: '0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc'
   },
   {
+    name: 'Lido Staked Ether',
+    logo: '/public/stEth.svg',
     token: 'stETH',
     proxy: '0x93c4b944D05dfe6df7645A86cd2206016c51564D'
   },
   {
-    name: 'Liquid Staked Ether',
+    name: 'Rocket Pool Ether',
+    logo: '/public/rEth.svg',
     token: 'rETH',
     proxy: '0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2'
   },
   {
     name: 'Stader Staked Ether',
+    logo: '/public/ethX.png',
     token: 'ETHx',
     proxy: '0x9d7eD45EE2E8FC5482fa2428f15C971e6369011d'
   },
   {
     name: 'Ankr Staked Ether',
+    logo: '/public/ankrEth.svg',
     token: 'ankrETH',
     proxy: '0x13760F50a9d7377e4F20CB8CF9e4c26586c658ff'
   },
   {
+    name: 'Origin Staked Ether',
+    logo: '/public/oEth.svg',
     token: 'OETH',
     proxy: '0xa4C637e0F704745D182e4D38cAb7E7485321d059'
   },
   {
     name: 'StakeWise Staked Ether',
+    logo: '/public/osEth.svg',
     token: 'osETH',
     proxy: '0x57ba429517c3473B6d34CA9aCd56c0e735b94c02'
   },
   {
     name: 'Swell Staked Ether',
+    logo: '/public/swEth.svg',
     token: 'swETH',
     proxy: '0x0Fe4F44beE93503346A3Ac9EE5A26b130a5796d6'
   },
   {
+    name: 'Binance Staked Ether',
+    logo: '/public/wBETH.png',
     token: 'wBETH',
     proxy: '0x7CA911E83dabf90C90dD3De5411a10F1A6112184'
   },
   {
     name: 'Staked Frax Ether',
+    logo: '/public/sfrxEth.svg',
     token: 'sfrxETH',
     proxy: '0x8CA7A5d6f3acd3A7A8bC468a8CD0FB14B6BD28b6'
   },
   {
-    name: 'Lido Staked Ether',
+    name: 'Liquid Staked Ether',
+    logo: '/public/lsEth.png',
     token: 'lsETH',
     proxy: '0xAe60d8180437b5C34bB956822ac2710972584473'
   },
   {
-    name: 'Rocket Pool Ether',
+    name: 'Mantle Staked Ether',
+    logo: '/public/mEth.svg',
     token: 'mETH',
     proxy: '0x298aFB19A105D59E74658C4C334Ff360BadE6dd2'
   },
-
   {
     name: 'Beacon',
+    logo: '/public/eth.png',
     token: 'ETH',
     proxy: '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'
   },
   {
     name: 'Eigen',
+    logo: '/public/eigen.webp',
     token: 'EIGEN',
     proxy: '0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7'
   }
@@ -126,7 +143,9 @@ export default function AVSDetails({ avs }) {
   );
 
   const eigenTVL = eigenEntry
-    ? BigInt(state.avs.strategies[eigenEntry.proxy])
+    ? state.avs.address === '0x870679E138bCdf293b7Ff14dD44b70FC97e12fc0'
+      ? BigInt(state.avs.strategies[eigenEntry.proxy])
+      : BigInt(0)
     : BigInt(0);
 
   const beaconTVL = beaconEntry
@@ -145,6 +164,7 @@ export default function AVSDetails({ avs }) {
 
   const totalEthDistributionData = [
     beaconEntry && {
+      ...beaconEntry,
       token: beaconEntry.token,
       tvl: Number(beaconTVL / BigInt(1e18)),
       tvlPercentage: (
@@ -153,6 +173,7 @@ export default function AVSDetails({ avs }) {
       ).toFixed(2)
     },
     eigenEntry && {
+      ...eigenEntry,
       token: eigenEntry.token,
       tvl: Number(eigenTVL / BigInt(1e18)),
       tvlPercentage: (
@@ -162,6 +183,7 @@ export default function AVSDetails({ avs }) {
     },
     {
       name: 'Liquidity Staked Tokens',
+      logo: 'https://w7.pngwing.com/pngs/268/1013/png-transparent-ethereum-eth-hd-logo-thumbnail.png',
       tvl: liquidityStakedTVL,
       tvlPercentage: ((liquidityStakedTVL / totalTVL) * 100).toFixed(2)
     }
@@ -172,10 +194,10 @@ export default function AVSDetails({ avs }) {
       <Card radius="md" className="bg-content1 border border-outline p-4">
         <CardBody>
           <div className="flex flex-row gap-x-2 items-center">
-            <div
-              className="bg-contain bg-no-repeat h-8 rounded-full min-w-8"
-              style={{ backgroundImage: `url('${state.avs.metadata.logo}')` }}
-            ></div>
+            <img
+              src={state.avs.metadata.logo}
+              className="size-5 rounded-full"
+            />
             <div className="flex items-center gap-3">
               <span className="basis-full font-bold text-xl truncate text-foreground-1">
                 {state.avs?.metadata?.name}
@@ -238,6 +260,7 @@ export default function AVSDetails({ avs }) {
           tab: 'px-6 py-8',
           tabList: 'bg-content1 w-full'
         }}
+        disabledKeys={['restakers']}
       >
         <Tab
           key="assets"

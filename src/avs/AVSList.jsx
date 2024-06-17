@@ -84,10 +84,7 @@ export default function AVSList({ onSelectionChange }) {
             }`}
           >
             <div className="min-w-5">{i + 1}</div>
-            <div
-              className="bg-center bg-contain bg-no-repeat h-5 rounded-full min-w-5"
-              style={{ backgroundImage: `url('${avs.metadata.logo}')` }}
-            ></div>
+            <img src={avs.metadata.logo} className="size-5 rounded-full" />
             <span className="basis-full truncate">{avs?.metadata?.name}</span>
             <span className="basis-1/3">
               {formatNumber(avs.stakers, compact)}

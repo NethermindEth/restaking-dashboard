@@ -32,12 +32,8 @@ export default function LSTDistribution({
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2">
-                      <div
-                        className="bg-center bg-contain bg-no-repeat h-5 rounded-full min-w-5"
-                        style={{
-                          backgroundImage: `url('https://w7.pngwing.com/pngs/268/1013/png-transparent-ethereum-eth-hd-logo-thumbnail.png')`
-                        }}
-                      />
+                      <img src={lst.logo} className="size-5 rounded-full" />
+
                       {lst.name && (
                         <span className="text-foreground-2">{lst.name}</span>
                       )}
@@ -86,12 +82,7 @@ export default function LSTDistribution({
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
-                    <div
-                      className="bg-center bg-contain bg-no-repeat h-5 rounded-full min-w-5"
-                      style={{
-                        backgroundImage: `url('https://w7.pngwing.com/pngs/268/1013/png-transparent-ethereum-eth-hd-logo-thumbnail.png')`
-                      }}
-                    />
+                    <img src={lst.logo} className="size-5 rounded-full" />
                     <span className="text-foreground-2">{lst.name}</span>
                   </div>
                   <span className="text-foreground-active">{lst.token}</span>
