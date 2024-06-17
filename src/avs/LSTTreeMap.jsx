@@ -1,101 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Group } from '@visx/group';
 import { Treemap, hierarchy, stratify, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Link,
-  Tab,
-  Tabs
-} from '@nextui-org/react';
+import { Card } from '@nextui-org/react';
 import { reduceState } from '../shared/helpers';
 import { useMutativeReducer } from 'use-mutative';
-
-const mockData = [
-  {
-    id: 'Category',
-    parent: null,
-    size: 0
-  },
-  {
-    id: 'Subcategory 1',
-    parent: 'Category',
-    size: 20
-  },
-  {
-    id: 'Subcategory 2',
-    parent: 'Category',
-    size: 30
-  },
-  {
-    id: 'Subcategory 3',
-    parent: 'Category',
-    size: 15
-  },
-  {
-    id: 'Subcategory 4',
-    parent: 'Category',
-    size: 25
-  },
-  {
-    id: 'Subcategory 5',
-    parent: 'Category',
-    size: 10
-  },
-  {
-    id: 'Subcategory 6',
-    parent: 'Category',
-    size: 40
-  },
-  {
-    id: 'Subcategory 7',
-    parent: 'Category',
-    size: 35
-  },
-  {
-    id: 'Subcategory 8',
-    parent: 'Category',
-    size: 5
-  },
-  {
-    id: 'Subcategory 9',
-    parent: 'Category',
-    size: 50
-  },
-  {
-    id: 'Subcategory 10',
-    parent: 'Category',
-    size: 45
-  },
-  {
-    id: 'Subcategory 11',
-    parent: 'Category',
-    size: 60
-  },
-  {
-    id: 'Subcategory 12',
-    parent: 'Category',
-    size: 55
-  }
-];
 
 const baseColor = '#465e92';
 const minOpacity = 0.2;
 const maxOpacity = 1;
 
-const data = stratify()
-  .id(d => d.id)
-  .parentId(d => d.parent)(mockData)
-  .sum(d => d.size ?? 0);
-
 const defaultMargin = { top: 0, left: 0, right: 0, bottom: 0 };
 
-export default function LSTDistributionGraph({
+export default function LSTTreeMap({
   height,
-  margin = defaultMargin
+  margin = defaultMargin,
+  totalEthDistributionData,
+  lstDistributionData
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     selectedTab: 'all-assets'
@@ -103,14 +24,37 @@ export default function LSTDistributionGraph({
 
   const yMax = height - margin.top - margin.bottom;
 
-  const root = hierarchy(data).sort((a, b) => (a.value || 0) - (b.value || 0));
+  const getTreemapData = () => {
+    if (state.selectedTab === 'all-assets') {
+      const allData = [
+        ...totalEthDistributionData.filter(
+          d => d.name !== 'Liquidity Staked Tokens'
+        ),
+        ...lstDistributionData
+      ];
+      return allData;
+    } else if (state.selectedTab === 'lst') {
+      return lstDistributionData;
+    }
+    return [];
+  };
+
+  const data = getTreemapData();
+
+  const root = useMemo(() => {
+    return hierarchy({ name: 'root', children: data })
+      .sum(d => d.tvl)
+      .sort((a, b) => a.value - b.value);
+  }, [data]);
 
   const numberOfMapBoxes = root.descendants().length - 1;
 
-  const opacityScale = scaleLinear({
-    domain: [0, numberOfMapBoxes],
-    range: [minOpacity, maxOpacity]
-  });
+  const opacityScale = useMemo(() => {
+    return scaleLinear({
+      domain: [0, numberOfMapBoxes],
+      range: [minOpacity, maxOpacity]
+    });
+  }, [numberOfMapBoxes]);
 
   const handleTabChange = tab => {
     dispatch({ selectedTab: tab });
@@ -159,7 +103,7 @@ export default function LSTDistributionGraph({
           size={[550, yMax]}
           tile={treemapBinary}
           padding={8}
-          paddingInner={8}
+          paddingInner={1}
           round
         >
           {treemap => (
