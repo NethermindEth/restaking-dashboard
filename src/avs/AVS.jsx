@@ -1,9 +1,8 @@
 import AVSDetails from './AVSDetails';
 import AVSList from './AVSList';
 import { reduceState } from '../shared/helpers';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useMutativeReducer } from 'use-mutative';
-import { useServices } from '../@services/ServiceContext';
 
 export default function AVS() {
   const [state, dispatch] = useMutativeReducer(reduceState, {});

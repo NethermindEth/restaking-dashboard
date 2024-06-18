@@ -41,3 +41,8 @@ export function formatDate(dateString) {
     }
   }
 }
+
+export const assetFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2
+});

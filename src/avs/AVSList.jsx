@@ -19,15 +19,23 @@ export default function AVSList({ onSelectionChange }) {
 
         for (let i = 0, count = data.length; i < count; i++) {
           let item = data[i];
-          item.tvl = 0n;
+          item.tvl = 0;
+          item.address = item.address.toLowerCase();
 
+          const lowercaseStrategies = {};
           for (let s in item.strategies) {
-            item.strategies[s] = BigInt(item.strategies[s]);
+            const strategy = item.strategies[s];
+            const shares = BigInt(strategy.shares);
+            const tokens = BigInt(strategy.tokens);
+            const totalValue = shares + tokens;
 
-            item.tvl += item.strategies[s];
+            item.tvl += Number(totalValue);
+            lowercaseStrategies[s.toLowerCase()] = strategy;
           }
+          item.strategies = lowercaseStrategies;
 
-          item.tvl = Number(item.tvl / BigInt(1e18));
+          // Convert from wei to ether
+          item.tvl = item.tvl / 1e18;
         }
 
         // Sort descending by TVL
@@ -43,9 +51,7 @@ export default function AVSList({ onSelectionChange }) {
           return 0;
         });
 
-        // onSelectionChange(data[0]);
         dispatch({ selectedAVS: data[0] });
-
         dispatch({ avs: data });
       } catch {
         // TODO: handle error

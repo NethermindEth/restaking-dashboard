@@ -7,106 +7,20 @@ import {
   Tab,
   Tabs
 } from '@nextui-org/react';
-import { formatEther } from 'ethers';
-import { reduceState } from '../shared/helpers';
 import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
-import OperatorsOverTime from './OperatorsOverTime';
+import GraphTimelineSelector from '../shared/GraphTimelineSelector';
+import { reduceState } from '../shared/helpers';
+import { assetFormatter } from '../utils';
+import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
+import OperatorsOverTime from './OperatorsOverTime';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
+import { strategiesData } from './strategies.mapping';
 import TVLOverTime from './TVLOverTime';
-import LSTDistribution from './LSTDistribution';
-import GraphTimelineSelector from './GraphTimelineSelector';
 
-const strategiesData = [
-  {
-    name: 'Coinbase Staked Ether',
-    logo: '/public/cbEth.svg',
-    token: 'cbETH',
-    proxy: '0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc'
-  },
-  {
-    name: 'Lido Staked Ether',
-    logo: '/public/stEth.svg',
-    token: 'stETH',
-    proxy: '0x93c4b944D05dfe6df7645A86cd2206016c51564D'
-  },
-  {
-    name: 'Rocket Pool Ether',
-    logo: '/public/rEth.svg',
-    token: 'rETH',
-    proxy: '0x1BeE69b7dFFfA4E2d53C2a2Df135C388AD25dCD2'
-  },
-  {
-    name: 'Stader Staked Ether',
-    logo: '/public/ethX.png',
-    token: 'ETHx',
-    proxy: '0x9d7eD45EE2E8FC5482fa2428f15C971e6369011d'
-  },
-  {
-    name: 'Ankr Staked Ether',
-    logo: '/public/ankrEth.svg',
-    token: 'ankrETH',
-    proxy: '0x13760F50a9d7377e4F20CB8CF9e4c26586c658ff'
-  },
-  {
-    name: 'Origin Staked Ether',
-    logo: '/public/oEth.svg',
-    token: 'OETH',
-    proxy: '0xa4C637e0F704745D182e4D38cAb7E7485321d059'
-  },
-  {
-    name: 'StakeWise Staked Ether',
-    logo: '/public/osEth.svg',
-    token: 'osETH',
-    proxy: '0x57ba429517c3473B6d34CA9aCd56c0e735b94c02'
-  },
-  {
-    name: 'Swell Staked Ether',
-    logo: '/public/swEth.svg',
-    token: 'swETH',
-    proxy: '0x0Fe4F44beE93503346A3Ac9EE5A26b130a5796d6'
-  },
-  {
-    name: 'Binance Staked Ether',
-    logo: '/public/wBETH.png',
-    token: 'wBETH',
-    proxy: '0x7CA911E83dabf90C90dD3De5411a10F1A6112184'
-  },
-  {
-    name: 'Staked Frax Ether',
-    logo: '/public/sfrxEth.svg',
-    token: 'sfrxETH',
-    proxy: '0x8CA7A5d6f3acd3A7A8bC468a8CD0FB14B6BD28b6'
-  },
-  {
-    name: 'Liquid Staked Ether',
-    logo: '/public/lsEth.png',
-    token: 'lsETH',
-    proxy: '0xAe60d8180437b5C34bB956822ac2710972584473'
-  },
-  {
-    name: 'Mantle Staked Ether',
-    logo: '/public/mEth.svg',
-    token: 'mETH',
-    proxy: '0x298aFB19A105D59E74658C4C334Ff360BadE6dd2'
-  },
-  {
-    name: 'Beacon',
-    logo: '/public/eth.png',
-    token: 'ETH',
-    proxy: '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'
-  },
-  {
-    name: 'Eigen',
-    logo: '/public/eigen.webp',
-    token: 'EIGEN',
-    proxy: '0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7'
-  }
-];
-
-export default function AVSDetails({ avs }) {
+export default function AVSDetails() {
   const location = useLocation();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avs: location.state.avs,
@@ -119,37 +33,58 @@ export default function AVSDetails({ avs }) {
 
   const lstDistributionData = strategiesData
     .map(strategy => {
-      let tvl = BigInt(state.avs.strategies[strategy.proxy]);
+      const proxyAddress = strategy.proxy.toLowerCase();
+      const strategyData = state.avs.strategies[proxyAddress];
 
-      return {
-        ...strategy,
-        tvl: Number(tvl / BigInt(1e18))
-      };
+      if (strategyData) {
+        const shares = BigInt(strategyData.shares || '0');
+        const tokens = BigInt(strategyData.tokens || '0');
+        const tvl = shares + tokens;
+
+        return {
+          ...strategy,
+          tvl: Number(tvl / BigInt(1e18))
+        };
+      } else {
+        return {
+          ...strategy,
+          tvl: 0
+        };
+      }
     })
     .filter(
       strategy =>
         strategy.proxy.toLowerCase() !==
           '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'.toLowerCase() &&
         strategy.proxy.toLowerCase() !==
-          '0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7'.toLowerCase()
+          '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'.toLowerCase()
     );
 
   const beaconEntry = strategiesData.find(
-    strategy => strategy.proxy === '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'
+    strategy =>
+      strategy.proxy.toLowerCase() ===
+      '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'.toLowerCase()
   );
 
   const eigenEntry = strategiesData.find(
-    strategy => strategy.proxy === '0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7'
+    strategy =>
+      strategy.proxy.toLowerCase() ===
+      '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'.toLowerCase()
   );
 
   const eigenTVL = eigenEntry
-    ? state.avs.address === '0x870679E138bCdf293b7Ff14dD44b70FC97e12fc0'
-      ? BigInt(state.avs.strategies[eigenEntry.proxy])
+    ? state.avs.address.toLowerCase() ===
+      '0x870679e138bcdf293b7ff14dd44b70fc97e12fc0'.toLowerCase()
+      ? BigInt(
+          state.avs.strategies[eigenEntry.proxy.toLowerCase()]?.tokens || '0'
+        )
       : BigInt(0)
     : BigInt(0);
 
   const beaconTVL = beaconEntry
-    ? BigInt(state.avs.strategies[beaconEntry.proxy])
+    ? BigInt(
+        state.avs.strategies[beaconEntry.proxy.toLowerCase()]?.tokens || '0'
+      )
     : BigInt(0);
 
   const liquidityStakedTVL = lstDistributionData.reduce(
@@ -162,24 +97,29 @@ export default function AVSDetails({ avs }) {
     Number(beaconTVL / BigInt(1e18)) +
     liquidityStakedTVL;
 
+  const formatTVL = tvl => {
+    if (tvl < 1e-18) {
+      return '0';
+    } else {
+      return assetFormatter.format(tvl);
+    }
+  };
+
+  const beaconTVLInEther = Number(beaconTVL / BigInt(1e18));
+  const eigenTVLInEther = Number(eigenTVL / BigInt(1e18));
+
   const totalEthDistributionData = [
     beaconEntry && {
       ...beaconEntry,
       token: beaconEntry.token,
-      tvl: Number(beaconTVL / BigInt(1e18)),
-      tvlPercentage: (
-        (Number(beaconTVL / BigInt(1e18)) / totalTVL) *
-        100
-      ).toFixed(2)
+      tvl: beaconTVLInEther,
+      tvlPercentage: ((beaconTVLInEther / totalTVL) * 100).toFixed(2)
     },
     eigenEntry && {
       ...eigenEntry,
       token: eigenEntry.token,
-      tvl: Number(eigenTVL / BigInt(1e18)),
-      tvlPercentage: (
-        (Number(eigenTVL / BigInt(1e18)) / totalTVL) *
-        100
-      ).toFixed(2)
+      tvl: eigenTVLInEther,
+      tvlPercentage: ((eigenTVLInEther / totalTVL) * 100).toFixed(2)
     },
     {
       name: 'Liquidity Staked Tokens',
@@ -267,9 +207,7 @@ export default function AVSDetails({ avs }) {
           title={
             <div className="text-center">
               <div>Total ETH value</div>
-              <div className="font-bold">
-                {assetFormatter.format(formatEther(state.avs.tvl))}
-              </div>
+              <div className="font-bold">{formatTVL(state.avs.tvl)}</div>
             </div>
           }
         >
@@ -377,10 +315,6 @@ export default function AVSDetails({ avs }) {
   );
 }
 
-const assetFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2
-});
 const compareStrategies = ([, i1], [, i2]) => {
   if (i1 < i2) {
     return 1;
