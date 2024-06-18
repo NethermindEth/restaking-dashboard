@@ -1,10 +1,12 @@
-import React, { useMemo } from 'react';
-import { Group } from '@visx/group';
-import { Treemap, hierarchy, stratify, treemapBinary } from '@visx/hierarchy';
-import { scaleLinear } from '@visx/scale';
 import { Card } from '@nextui-org/react';
-import { reduceState } from '../shared/helpers';
+import { Group } from '@visx/group';
+import { Treemap, hierarchy, treemapBinary } from '@visx/hierarchy';
+import { scaleLinear } from '@visx/scale';
+import { defaultStyles, useTooltipInPortal } from '@visx/tooltip';
+import React, { useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
+import { reduceState } from '../shared/helpers';
+import { assetFormatter } from '../utils';
 
 const baseColor = '#465e92';
 const minOpacity = 0.2;
@@ -19,7 +21,8 @@ export default function LSTTreeMap({
   lstDistributionData
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    selectedTab: 'all-assets'
+    selectedTab: 'all-assets',
+    hoveredNode: null
   });
 
   const yMax = height - margin.top - margin.bottom;
@@ -27,7 +30,9 @@ export default function LSTTreeMap({
   const getTreemapData = () => {
     if (state.selectedTab === 'all-assets') {
       const allData = [
-        ...totalEthDistributionData.filter(d => d.token === 'ETH'),
+        ...totalEthDistributionData.filter(
+          d => d.name !== 'Liquidity Staked Tokens'
+        ),
         ...lstDistributionData
       ];
       return allData;
@@ -56,6 +61,16 @@ export default function LSTTreeMap({
 
   const handleTabChange = tab => {
     dispatch({ selectedTab: tab });
+  };
+
+  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+    scroll: true
+  });
+
+  const tooltipStyles = {
+    ...defaultStyles,
+    minWidth: 100,
+    color: 'black'
   };
 
   return (
@@ -91,6 +106,7 @@ export default function LSTTreeMap({
         </div>
       </div>
       <svg
+        ref={containerRef}
         height={height}
         className="w-full overflow-x-scroll pr-2"
         style={{ marginRight: 'auto' }}
@@ -116,6 +132,7 @@ export default function LSTTreeMap({
                     key={`node-${i}`}
                     top={node.y0 + margin.top}
                     left={node.x0 + margin.left}
+                    className="cursor-pointer"
                   >
                     {node.depth > 0 && (
                       <rect
@@ -123,6 +140,8 @@ export default function LSTTreeMap({
                         height={nodeHeight}
                         fill={baseColor}
                         fillOpacity={opacity}
+                        onMouseEnter={() => dispatch({ hoveredNode: node })}
+                        onMouseLeave={() => dispatch({ hoveredNode: null })}
                       />
                     )}
                   </Group>
@@ -132,6 +151,30 @@ export default function LSTTreeMap({
           )}
         </Treemap>
       </svg>
+      {state.hoveredNode && (
+        <TooltipInPortal
+          key={Math.random()}
+          top={
+            state.hoveredNode.y0 +
+            (state.hoveredNode.y1 - state.hoveredNode.y0) / 2 -
+            20
+          }
+          left={
+            state.hoveredNode.x0 +
+            (state.hoveredNode.x1 - state.hoveredNode.x0) / 2
+          }
+          style={tooltipStyles}
+          className="space-y-1"
+        >
+          <div className="text-sm">
+            {state.hoveredNode.data.name}{' '}
+            <span className="text-xs">{`(${state.hoveredNode.data.token})`}</span>
+          </div>
+          <div className="text-base">
+            TVL: {assetFormatter.format(state.hoveredNode.data.tvl)}
+          </div>
+        </TooltipInPortal>
+      )}
     </Card>
   );
 }
