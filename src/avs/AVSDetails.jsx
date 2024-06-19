@@ -7,8 +7,10 @@ import {
   Tab,
   Tabs
 } from '@nextui-org/react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
+import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
 import { assetFormatter } from '../utils';
@@ -22,8 +24,10 @@ import TVLOverTime from './TVLOverTime';
 
 export default function AVSDetails() {
   const location = useLocation();
+  const avsAddress = location.pathname.split('/')[2];
+  const { avsService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    avs: location.state.avs,
+    avsDetails: null,
     timelineTab: '7days'
   });
 
@@ -31,61 +35,63 @@ export default function AVSDetails() {
     dispatch({ timelineTab: tab });
   };
 
+  const getStrategyData = (state, proxyAddress) => {
+    return state?.avsDetails?.strategies?.find(s => s.address === proxyAddress);
+  };
+
+  const calculateTVL = strategyData => {
+    const shares = BigInt(strategyData?.shares || '0');
+    const tokens = BigInt(strategyData?.tokens || '0');
+    return Number((shares + tokens) / BigInt(1e18));
+  };
+
+  const formatTVL = tvl => {
+    return tvl < 1e-18 ? '0' : assetFormatter.format(tvl);
+  };
+
   const lstDistributionData = strategiesData
     .map(strategy => {
-      const proxyAddress = strategy.proxy.toLowerCase();
-      const strategyData = state.avs.strategies[proxyAddress];
+      const proxyAddress = strategy.proxy;
+      const strategyData = getStrategyData(state, proxyAddress);
 
-      if (strategyData) {
-        const shares = BigInt(strategyData.shares || '0');
-        const tokens = BigInt(strategyData.tokens || '0');
-        const tvl = shares + tokens;
-
-        return {
-          ...strategy,
-          tvl: Number(tvl / BigInt(1e18))
-        };
-      } else {
-        return {
-          ...strategy,
-          tvl: 0
-        };
-      }
+      return strategyData
+        ? { ...strategy, tvl: calculateTVL(strategyData) }
+        : { ...strategy, tvl: 0 };
     })
     .filter(
       strategy =>
-        strategy.proxy.toLowerCase() !==
-          '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'.toLowerCase() &&
-        strategy.proxy.toLowerCase() !==
-          '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'.toLowerCase()
+        ![
+          '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0',
+          '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
+        ].includes(strategy.proxy)
     );
 
-  const beaconEntry = strategiesData.find(
-    strategy =>
-      strategy.proxy.toLowerCase() ===
-      '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'.toLowerCase()
+  const findStrategyByProxy = proxy =>
+    strategiesData.find(strategy => strategy.proxy === proxy);
+
+  const calculateSpecialTVL = (entry, condition) => {
+    if (!entry || !state?.avsDetails) return BigInt(0);
+
+    if (condition) {
+      const strategy = getStrategyData(state, entry.proxy);
+      return strategy ? BigInt(strategy.tokens) : BigInt(0);
+    }
+
+    return BigInt(0);
+  };
+
+  const eigenEntry = findStrategyByProxy(
+    '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
+  );
+  const beaconEntry = findStrategyByProxy(
+    '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'
   );
 
-  const eigenEntry = strategiesData.find(
-    strategy =>
-      strategy.proxy.toLowerCase() ===
-      '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'.toLowerCase()
+  const eigenTVL = calculateSpecialTVL(
+    eigenEntry,
+    state?.avsDetails?.address === '0x870679e138bcdf293b7ff14dd44b70fc97e12fc0'
   );
-
-  const eigenTVL = eigenEntry
-    ? state.avs.address.toLowerCase() ===
-      '0x870679e138bcdf293b7ff14dd44b70fc97e12fc0'.toLowerCase()
-      ? BigInt(
-          state.avs.strategies[eigenEntry.proxy.toLowerCase()]?.tokens || '0'
-        )
-      : BigInt(0)
-    : BigInt(0);
-
-  const beaconTVL = beaconEntry
-    ? BigInt(
-        state.avs.strategies[beaconEntry.proxy.toLowerCase()]?.tokens || '0'
-      )
-    : BigInt(0);
+  const beaconTVL = calculateSpecialTVL(beaconEntry, true);
 
   const liquidityStakedTVL = lstDistributionData.reduce(
     (sum, strategy) => sum + strategy.tvl,
@@ -97,29 +103,20 @@ export default function AVSDetails() {
     Number(beaconTVL / BigInt(1e18)) +
     liquidityStakedTVL;
 
-  const formatTVL = tvl => {
-    if (tvl < 1e-18) {
-      return '0';
-    } else {
-      return assetFormatter.format(tvl);
-    }
-  };
-
-  const beaconTVLInEther = Number(beaconTVL / BigInt(1e18));
-  const eigenTVLInEther = Number(eigenTVL / BigInt(1e18));
+  const convertToEther = bigIntValue => Number(bigIntValue / BigInt(1e18));
 
   const totalEthDistributionData = [
     beaconEntry && {
       ...beaconEntry,
       token: beaconEntry.token,
-      tvl: beaconTVLInEther,
-      tvlPercentage: ((beaconTVLInEther / totalTVL) * 100).toFixed(2)
+      tvl: convertToEther(beaconTVL),
+      tvlPercentage: ((convertToEther(beaconTVL) / totalTVL) * 100).toFixed(2)
     },
     eigenEntry && {
       ...eigenEntry,
       token: eigenEntry.token,
-      tvl: eigenTVLInEther,
-      tvlPercentage: ((eigenTVLInEther / totalTVL) * 100).toFixed(2)
+      tvl: convertToEther(eigenTVL),
+      tvlPercentage: ((convertToEther(eigenTVL) / totalTVL) * 100).toFixed(2)
     },
     {
       name: 'Liquidity Staked Tokens',
@@ -129,13 +126,30 @@ export default function AVSDetails() {
     }
   ].filter(Boolean);
 
+  useEffect(() => {
+    async function fetchAvsDetails() {
+      try {
+        const data = await avsService.getAvsDetails(avsAddress);
+        dispatch({ avsDetails: data });
+      } catch {
+        // TODO: handle error
+      }
+    }
+    // TODO: loading indicators
+    fetchAvsDetails();
+  }, [avsService, dispatch]);
+
+  if (state.avsDetails === null) {
+    return null;
+  }
+
   return (
     <div className="basis-1/2 w-full space-y-4">
       <Card radius="md" className="bg-content1 border border-outline p-4">
         <CardBody>
           <div className="flex flex-row gap-x-2 items-center">
             <img
-              src={state.avs.metadata.logo}
+              src={state.avsDetails.metadata.logo}
               className="size-5 rounded-full"
             />
             <div className="flex items-center gap-3">
@@ -148,7 +162,7 @@ export default function AVSDetails() {
             </div>
           </div>
           <div className="py-4 text-sm text-foreground-active">
-            {state.avs.metadata.description}
+            {state.avsDetails.metadata.description}
           </div>
 
           <div className="space-y-2">
@@ -158,16 +172,16 @@ export default function AVSDetails() {
             <div className="flex flex-row gap-x-1 mt-4">
               <Button
                 as={Link}
-                href={`https://etherscan.io/address/${state.avs.address}`}
+                href={`https://etherscan.io/address/${state.avsDetails.address}`}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
                 variant="flat"
                 className="text-secondary"
-              >{`${state.avs.address.slice(0, 6)}...${state.avs.address.slice(-4)}`}</Button>
+              >{`${state.avsDetails.address.slice(0, 6)}...${state.avsDetails.address.slice(-4)}`}</Button>
               <Button
                 as={Link}
-                href={state.avs.metadata.twitter}
+                href={state.avsDetails.metadata.twitter}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
@@ -175,13 +189,13 @@ export default function AVSDetails() {
                 className="text-secondary"
               >
                 @
-                {state.avs.metadata.twitter.substring(
-                  state.avs.metadata.twitter.lastIndexOf('/') + 1
+                {state.avsDetails.metadata.twitter.substring(
+                  state.avsDetails.metadata.twitter.lastIndexOf('/') + 1
                 )}
               </Button>
               <Button
                 as={Link}
-                href={state.avs.metadata.website}
+                href={state.avsDetails.metadata.website}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
@@ -207,7 +221,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Total ETH value</div>
-              <div className="font-bold">{formatTVL(state.avs.tvl)}</div>
+              <div className="font-bold">{formatTVL(totalTVL)}</div>
             </div>
           }
         >
@@ -248,7 +262,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Operators</div>
-              <div className="font-bold">{state.avs.operators}</div>
+              <div className="font-bold">{state.avsDetails.operators}</div>
             </div>
           }
         >
@@ -282,7 +296,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Restakers</div>
-              <div className="font-bold">{state.avs.stakers}</div>
+              <div className="font-bold">{state.avsDetails.stakers}</div>
             </div>
           }
         >

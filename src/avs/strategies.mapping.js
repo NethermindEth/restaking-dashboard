@@ -75,7 +75,7 @@ export const strategiesData = [
     name: 'Beacon',
     logo: '/public/eth.png',
     token: 'ETH',
-    proxy: '0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0'
+    proxy: '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'
   },
   {
     name: 'Eigen',
