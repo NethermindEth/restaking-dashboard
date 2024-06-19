@@ -17,5 +17,5 @@ jobs:
     steps:
     - name: deploy
       run: |
-          URL="${{ secrets.AMPLIFY_WEBHOOK_NEW_PROD }}"
+          URL="${{ secrets.AMPLIFY_WEBHOOK_PROD }}"
           curl -X POST -d {} "$URL" -H "Content-Type: application/json"
