@@ -1,0 +1,21 @@
+name: Deploy to Amplify Prod
+
+on:
+  push:
+    branches: [feature/add-prod-env]
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: Git ref
+        default: new
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: deploy
+      run: |
+          URL="${{ secrets.AMPLIFY_WEBHOOK_NEW_PROD }}"
+          curl -X POST -d {} "$URL" -H "Content-Type: application/json"
