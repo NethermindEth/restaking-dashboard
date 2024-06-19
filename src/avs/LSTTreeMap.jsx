@@ -2,15 +2,16 @@ import { Card } from '@nextui-org/react';
 import { Group } from '@visx/group';
 import { Treemap, hierarchy, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
+import { Text } from '@visx/text';
 import { defaultStyles, useTooltipInPortal } from '@visx/tooltip';
 import React, { useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { assetFormatter } from '../utils';
 
-const baseColor = '#465e92';
-const minOpacity = 0.2;
-const maxOpacity = 1;
+const baseColor = '#465e99';
+const minOpacity = 0.1;
+const maxOpacity = 0.9;
 
 const defaultMargin = { top: 0, left: 0, right: 0, bottom: 0 };
 
@@ -139,10 +140,26 @@ export default function LSTTreeMap({
                         width={nodeWidth}
                         height={nodeHeight}
                         fill={baseColor}
-                        fillOpacity={opacity}
+                        fillOpacity={
+                          state.hoveredNode?.data?.name === node.data.name
+                            ? opacity + 0.2
+                            : opacity
+                        }
                         onMouseEnter={() => dispatch({ hoveredNode: node })}
                         onMouseLeave={() => dispatch({ hoveredNode: null })}
                       />
+                    )}
+
+                    {nodeWidth > 100 && node.depth > 0 && (
+                      <Text
+                        dy={'40px'}
+                        dx={'10px'}
+                        width={nodeWidth + 10}
+                        fontSize={12}
+                        fill={'#ffffff'}
+                      >
+                        {node.data.name}
+                      </Text>
                     )}
                   </Group>
                 );
@@ -159,10 +176,7 @@ export default function LSTTreeMap({
             (state.hoveredNode.y1 - state.hoveredNode.y0) / 2 -
             20
           }
-          left={
-            state.hoveredNode.x0 +
-            (state.hoveredNode.x1 - state.hoveredNode.x0) / 2
-          }
+          left={state.hoveredNode.x0 + state.hoveredNode.x0}
           style={tooltipStyles}
           className="space-y-1"
         >
