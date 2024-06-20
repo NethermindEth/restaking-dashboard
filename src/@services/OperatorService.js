@@ -2,9 +2,11 @@ import { apiGet } from './apiCall';
 
 export default class OperatorService {
   async getAll(pageIndex) {
-    const response = await apiGet(
-      `operators?page-index=${pageIndex}&page-size=10`
-    );
+    const response = await apiGet(`operators`, {
+      query: {
+        'page-index': pageIndex
+      }
+    });
 
     if (response.ok) {
       return await response.json();
