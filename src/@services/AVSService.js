@@ -22,4 +22,19 @@ export default class AVSService {
     // TODO: Handle error
     return await response.json();
   }
+
+  async getAvsOperators(address, pageIndex) {
+    const response = await apiGet(`/avs/${address}/operators`, {
+      query: {
+        'page-index': pageIndex
+      }
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
 }

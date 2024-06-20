@@ -129,8 +129,8 @@ export default function AVSDetails() {
   useEffect(() => {
     async function fetchAvsDetails() {
       try {
-        const data = await avsService.getAvsDetails(avsAddress);
-        dispatch({ avsDetails: data });
+        const avsDetailsData = await avsService.getAvsDetails(avsAddress);
+        dispatch({ avsDetails: avsDetailsData });
       } catch {
         // TODO: handle error
       }
@@ -287,7 +287,7 @@ export default function AVSDetails() {
                 <OperatorsOverTime />
               </CardBody>
             </Card>
-            <Operators />
+            <Operators avsAddress={avsAddress} totalTVL={totalTVL} />
           </div>
         </Tab>
         <Tab
