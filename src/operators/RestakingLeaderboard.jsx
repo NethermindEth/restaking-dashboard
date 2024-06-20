@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomPagination from '../shared/CustomPagination';
+import Pagination from '../shared/Pagination';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 
@@ -91,7 +91,7 @@ const RestakingLeaderboard = () => {
           </span>
         </div>
       ))}
-      <CustomPagination
+      <Pagination
         totalPages={state.totalPages}
         currentPage={state.currentPage}
         onNext={onNext}

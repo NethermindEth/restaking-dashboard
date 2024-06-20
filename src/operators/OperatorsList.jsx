@@ -3,7 +3,7 @@ import { useServices } from '../@services/ServiceContext';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { Link, useSearchParams } from 'react-router-dom';
-import CustomPagination from '../shared/CustomPagination';
+import Pagination from '../shared/Pagination';
 
 const OperatorsList = () => {
   const { operatorService } = useServices();
@@ -91,7 +91,7 @@ const OperatorsList = () => {
           </Link>
         ))}
 
-        <CustomPagination
+        <Pagination
           totalPages={state.totalPages}
           currentPage={parseInt(searchParams.get('page'))}
           onNext={onNext}

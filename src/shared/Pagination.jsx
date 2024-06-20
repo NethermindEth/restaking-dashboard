@@ -2,7 +2,7 @@ import React from 'react';
 
 import { PaginationItemType, usePagination } from '@nextui-org/react';
 
-const CustomPagination = ({
+const Pagination = ({
   totalPages,
   currentPage,
   onNext,
@@ -55,4 +55,4 @@ const CustomPagination = ({
   );
 };
 
-export default CustomPagination;
+export default Pagination;
