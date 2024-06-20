@@ -2,7 +2,7 @@ name: Deploy to Amplify Prod
 
 on:
   push:
-    branches: [feature/add-prod-env]
+    branches: [new]
   workflow_dispatch:
     inputs:
       ref:
