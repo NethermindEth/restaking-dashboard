@@ -45,7 +45,13 @@ export default {
               2: '#cad7F9'
             },
             outline: '#293041',
-            secondary: 'orange'
+            secondary: 'orange',
+            success: '#7CCB69',
+            disabled: '#52525B',
+            'cinder-blue': {
+              100: '#7889B8',
+              200: '#2D344D'
+            }
           }
         }
       }
