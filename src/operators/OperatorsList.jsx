@@ -14,7 +14,7 @@ const OperatorsList = () => {
     try {
       const data = await operatorService.getAll(pageIndex - 1);
       dispatch({
-        operators: data.operators,
+        operators: data.results,
         totalPages: Math.ceil(data.totalCount / 10)
       });
     } catch {

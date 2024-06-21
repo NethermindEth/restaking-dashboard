@@ -7,14 +7,14 @@ import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { formatEther } from 'ethers';
 
-const coins = [
-  { symbol: 'ADA', amount: 160, color: '#9C4FD9', inUSD: 122.48 },
-  { symbol: 'SOL', amount: 100, color: '#7BD94F', inUSD: 327.6 },
-  { symbol: 'BTA', amount: 80, color: '#AE7EDE', inUSD: 27363 },
-  { symbol: 'BTB', amount: 60, color: '#D94FB2', inUSD: 4363 },
-  { symbol: 'BTD', amount: 50, color: '#4FC0D9', inUSD: 1363 },
-  { symbol: 'BTE', amount: 40, color: '#D9B24F', inUSD: 363 },
-  { symbol: 'BTF', amount: 30, color: '#D9D34F', inUSD: 563 }
+const pieChartColors = [
+  '#9C4FD9',
+  '#7BD94F',
+  '#AE7EDE',
+  '#D94FB2',
+  '#4FC0D9',
+  '#D9B24F',
+  '#D9D34F'
 ];
 
 const lstTokenMapping = {
@@ -36,39 +36,30 @@ const lstTokenMapping = {
 
 const LSTDistribution = ({ strategies, operatorTVL }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    opStrategies: []
+    lstDistribution: []
   });
   const [active, setActive] = useState(null);
   const width = 200;
   const half = width / 2;
 
-  const total = useMemo(
-    () =>
-      Math.floor(
-        coins.reduce((acc, coin) => acc + coin.amount * coin.inUSD, 0)
-      ),
-    []
-  );
+  const assetFormatter = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
 
-  const sortStrategies = strategies => {
+  const calculateLSTDistribution = () => {
     if (strategies) {
       const filteredStrategies = strategies.filter(
-        s => s.address !== '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
+        s => s.address !== '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7' // Remove EIGEN Strategy value
       );
 
       if (filteredStrategies.length > 0) {
         filteredStrategies.sort((a, b) => {
           const tokensDiff = BigInt(b.tokens) - BigInt(a.tokens);
-          if (tokensDiff > 0) {
-            return 1;
-          } else if (tokensDiff < 0) {
-            return -1;
-          } else {
-            return 0;
-          }
+          return Number(tokensDiff);
         });
 
-        const sortedStrategies = filteredStrategies.slice(0, 6);
+        const lstDistribution = filteredStrategies.slice(0, 6);
 
         if (filteredStrategies.length > 7) {
           const others = filteredStrategies.slice(6).reduce(
@@ -81,37 +72,40 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
             { tokens: BigInt(0), shares: BigInt(0) }
           );
 
-          sortedStrategies.push(others);
+          lstDistribution.push(others);
         }
 
-        for (let i = 0; i < sortedStrategies.length; i++) {
-          if (sortedStrategies[i].address) {
-            sortedStrategies[i].token =
-              lstTokenMapping[sortedStrategies[i].address];
+        for (let i = 0; i < lstDistribution.length; i++) {
+          if (lstDistribution[i].address) {
+            lstDistribution[i].symbol =
+              lstTokenMapping[lstDistribution[i].address];
           } else {
-            sortedStrategies[i].token = 'Others';
+            lstDistribution[i].symbol = 'Others';
           }
+          lstDistribution[i].color = pieChartColors[i];
+          lstDistribution[i].tokensInETH = parseFloat(
+            formatEther(lstDistribution[i].tokens)
+          );
         }
 
-        dispatch({ opStrategies: sortedStrategies });
+        dispatch({ lstDistribution });
       }
     }
   };
 
   useEffect(() => {
-    sortStrategies(strategies);
+    calculateLSTDistribution();
   }, [strategies]);
 
   return (
     <div className="flex">
       <div className="w-1/2 flex flex-col gap-y-3">
-        {state.opStrategies.map((strategy, i) => (
+        {state.lstDistribution.map((strategy, i) => (
           <LSTShare
             key={`lst-distribution-item-${i}`}
-            label={strategy.token}
+            label={strategy.symbol}
             value={
-              (parseFloat(formatEther(strategy.tokens)) /
-                parseFloat(formatEther(operatorTVL))) *
+              (strategy.tokensInETH / parseFloat(formatEther(operatorTVL))) *
               100
             }
           />
@@ -121,8 +115,8 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
         <svg width={width} height={width}>
           <Group top={half} left={half} className="relative">
             <Pie
-              data={coins}
-              pieValue={data => data.amount * data.inUSD}
+              data={state.lstDistribution}
+              pieValue={data => data.tokensInETH}
               outerRadius={half}
               innerRadius={({ data }) => {
                 const size = 30;
@@ -150,7 +144,7 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
             {active ? (
               <>
                 <Text textAnchor="middle" fill="#fff" fontSize={18} dy={0}>
-                  {`$${Math.floor(active.amount * active.inUSD)}`}
+                  {`$${Math.floor(active.tokensInETH)}`}
                 </Text>
 
                 <Text
@@ -164,17 +158,17 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
               </>
             ) : (
               <>
-                <Text textAnchor="middle" fill="#fff" fontSize={18} dy={0}>
-                  {`$${total}`}
+                <Text textAnchor="middle" fill="#fff" fontSize={16} dy={0}>
+                  {assetFormatter.format(formatEther(operatorTVL))} ETH
                 </Text>
 
                 <Text
                   className="fill-success"
                   textAnchor="middle"
-                  fontSize={14}
+                  fontSize={12}
                   dy={20}
                 >
-                  $ 3,120,070,554
+                  $ 728,8392,3783
                 </Text>
               </>
             )}
