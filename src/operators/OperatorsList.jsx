@@ -4,6 +4,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { Link, useSearchParams } from 'react-router-dom';
 import Pagination from '../shared/Pagination';
+import { Input } from '@nextui-org/react';
 
 const OperatorsList = () => {
   const { operatorService } = useServices();
@@ -58,8 +59,21 @@ const OperatorsList = () => {
 
   return (
     <div>
-      <div className="font-display font-medium pb-4 mb-4 text-foreground-1 text-3xl">
+      <div className="font-display font-medium mb-1 text-foreground-1 text-3xl">
         Operators
+      </div>
+      <div className="flex w-full justify-between items-center mb-6">
+        <span className="text-foreground-2">
+          Short Operators description and provided services
+        </span>
+        <Input
+          type="text"
+          placeholder="Search by operator"
+          radius="sm"
+          className="lg:w-64"
+          variant="bordered"
+          endContent={<span className="material-symbols-outlined">search</span>}
+        />
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
