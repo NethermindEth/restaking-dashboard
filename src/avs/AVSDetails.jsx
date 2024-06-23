@@ -28,118 +28,169 @@ export default function AVSDetails() {
   const { avsService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avsDetails: null,
-    timelineTab: '7days'
+    timelineTab: '7days',
+    lstDistributionData: [],
+    eigenTVL: BigInt(0),
+    beaconTVL: BigInt(0),
+    liquidityStakedTVL: 0,
+    totalTVL: 0,
+    totalEthDistributionData: [],
+    strategiesMap: {}
   });
+  const {
+    avsDetails,
+    timelineTab,
+    lstDistributionData,
+    totalTVL,
+    totalEthDistributionData
+  } = state;
 
   const handleTimelineChange = tab => {
     dispatch({ timelineTab: tab });
   };
 
-  const getStrategyData = (state, proxyAddress) => {
-    return state?.avsDetails?.strategies?.find(s => s.address === proxyAddress);
+  const createStrategiesMap = strategies => {
+    return strategies.reduce((acc, strategy) => {
+      acc[strategy.address] = strategy;
+      return acc;
+    }, {});
   };
 
   const calculateTVL = strategyData => {
-    const shares = BigInt(strategyData?.shares || '0');
     const tokens = BigInt(strategyData?.tokens || '0');
-    return Number((shares + tokens) / BigInt(1e18));
+    return Number(tokens / BigInt(1e18));
   };
 
   const formatTVL = tvl => {
     return tvl < 1e-18 ? '0' : assetFormatter.format(tvl);
   };
 
-  const lstDistributionData = strategiesData
-    .map(strategy => {
-      const proxyAddress = strategy.proxy;
-      const strategyData = getStrategyData(state, proxyAddress);
+  const calculateLstDistributionData = strategiesMap => {
+    const excludedProxies = new Set([
+      '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0',
+      '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
+    ]);
 
-      return strategyData
-        ? { ...strategy, tvl: calculateTVL(strategyData) }
-        : { ...strategy, tvl: 0 };
-    })
-    .filter(
-      strategy =>
-        ![
-          '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0',
-          '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
-        ].includes(strategy.proxy)
-    );
+    return Object.values(strategiesData)
+      .map(strategy => {
+        const proxyAddress = strategy.proxy;
+        const strategyData = strategiesMap[proxyAddress];
 
-  const findStrategyByProxy = proxy =>
-    strategiesData.find(strategy => strategy.proxy === proxy);
+        return strategyData
+          ? { ...strategy, tvl: calculateTVL(strategyData) }
+          : { ...strategy, tvl: 0 };
+      })
+      .filter(strategy => !excludedProxies.has(strategy.proxy));
+  };
 
-  const calculateSpecialTVL = (entry, condition) => {
-    if (!entry || !state?.avsDetails) return BigInt(0);
+  const findStrategyByProxy = proxy => strategiesData[proxy];
 
-    if (condition) {
-      const strategy = getStrategyData(state, entry.proxy);
+  // calculate eigen specific tvl
+  const calculateEigenTVL = (strategiesMap, avsAddress) => {
+    const eigenEntry =
+      strategiesData['0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'];
+    if (!eigenEntry || !strategiesMap) return BigInt(0);
+
+    if (avsAddress === '0x870679e138bcdf293b7ff14dd44b70fc97e12fc0') {
+      const strategy = strategiesMap[eigenEntry.proxy];
       return strategy ? BigInt(strategy.tokens) : BigInt(0);
     }
 
     return BigInt(0);
   };
 
-  const eigenEntry = findStrategyByProxy(
-    '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
-  );
-  const beaconEntry = findStrategyByProxy(
-    '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'
-  );
+  const calculateBeaconTVL = strategiesMap => {
+    const beaconEntry =
+      strategiesData['0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'];
+    if (!beaconEntry || !strategiesMap) return BigInt(0);
 
-  const eigenTVL = calculateSpecialTVL(
-    eigenEntry,
-    state?.avsDetails?.address === '0x870679e138bcdf293b7ff14dd44b70fc97e12fc0'
-  );
-  const beaconTVL = calculateSpecialTVL(beaconEntry, true);
+    const strategy = strategiesMap[beaconEntry.proxy];
+    return strategy ? BigInt(strategy.tokens) : BigInt(0);
+  };
 
-  const liquidityStakedTVL = lstDistributionData.reduce(
-    (sum, strategy) => sum + strategy.tvl,
-    0
-  );
+  function calculateDerivedValues(avsDetailsData) {
+    const strategiesMap = createStrategiesMap(avsDetailsData.strategies || []);
 
-  const totalTVL =
-    Number(eigenTVL / BigInt(1e18)) +
-    Number(beaconTVL / BigInt(1e18)) +
-    liquidityStakedTVL;
+    const lstDistributionData = calculateLstDistributionData(strategiesMap);
+
+    const eigenEntry = findStrategyByProxy(
+      '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
+    );
+    const beaconEntry = findStrategyByProxy(
+      '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'
+    );
+
+    const eigenTVL = calculateEigenTVL(strategiesMap, avsDetailsData.address);
+    const beaconTVL = calculateBeaconTVL(strategiesMap);
+
+    const liquidityStakedTVL = lstDistributionData.reduce(
+      (sum, strategy) => sum + strategy.tvl,
+      0
+    );
+
+    const totalTVL =
+      Number(eigenTVL / BigInt(1e18)) +
+      Number(beaconTVL / BigInt(1e18)) +
+      liquidityStakedTVL;
+
+    const totalEthDistributionData = [
+      beaconEntry && {
+        ...beaconEntry,
+        token: beaconEntry.token,
+        tvl: convertToEther(beaconTVL),
+        tvlPercentage: ((convertToEther(beaconTVL) / totalTVL) * 100).toFixed(2)
+      },
+      eigenEntry && {
+        ...eigenEntry,
+        token: eigenEntry.token,
+        tvl: convertToEther(eigenTVL),
+        tvlPercentage: ((convertToEther(eigenTVL) / totalTVL) * 100).toFixed(2)
+      },
+      {
+        name: 'Liquidity Staked Tokens',
+        logo: 'https://w7.pngwing.com/pngs/268/1013/png-transparent-ethereum-eth-hd-logo-thumbnail.png',
+        tvl: liquidityStakedTVL,
+        tvlPercentage: ((liquidityStakedTVL / totalTVL) * 100).toFixed(2)
+      }
+    ].filter(Boolean);
+
+    return {
+      lstDistributionData,
+      eigenTVL,
+      beaconTVL,
+      liquidityStakedTVL,
+      totalTVL,
+      totalEthDistributionData
+    };
+  }
 
   const convertToEther = bigIntValue => Number(bigIntValue / BigInt(1e18));
-
-  const totalEthDistributionData = [
-    beaconEntry && {
-      ...beaconEntry,
-      token: beaconEntry.token,
-      tvl: convertToEther(beaconTVL),
-      tvlPercentage: ((convertToEther(beaconTVL) / totalTVL) * 100).toFixed(2)
-    },
-    eigenEntry && {
-      ...eigenEntry,
-      token: eigenEntry.token,
-      tvl: convertToEther(eigenTVL),
-      tvlPercentage: ((convertToEther(eigenTVL) / totalTVL) * 100).toFixed(2)
-    },
-    {
-      name: 'Liquidity Staked Tokens',
-      logo: 'https://w7.pngwing.com/pngs/268/1013/png-transparent-ethereum-eth-hd-logo-thumbnail.png',
-      tvl: liquidityStakedTVL,
-      tvlPercentage: ((liquidityStakedTVL / totalTVL) * 100).toFixed(2)
-    }
-  ].filter(Boolean);
 
   useEffect(() => {
     async function fetchAvsDetails() {
       try {
         const avsDetailsData = await avsService.getAvsDetails(avsAddress);
-        dispatch({ avsDetails: avsDetailsData });
-      } catch {
+        const strategiesMap = createStrategiesMap(
+          avsDetailsData.strategies || []
+        );
+        const derivedValues = calculateDerivedValues(
+          avsDetailsData,
+          strategiesMap
+        );
+
+        dispatch({
+          avsDetails: avsDetailsData,
+          strategiesMap,
+          ...derivedValues
+        });
+      } catch (error) {
         // TODO: handle error
       }
     }
-    // TODO: loading indicators
     fetchAvsDetails();
-  }, [avsService, dispatch]);
+  }, [avsService, dispatch, avsAddress]);
 
-  if (state.avsDetails === null) {
+  if (avsDetails === null) {
     return null;
   }
 
@@ -149,7 +200,7 @@ export default function AVSDetails() {
         <CardBody>
           <div className="flex flex-row gap-x-2 items-center">
             <img
-              src={state.avsDetails.metadata.logo}
+              src={avsDetails.metadata.logo}
               className="size-5 rounded-full"
             />
             <div className="flex items-center gap-3">
@@ -162,7 +213,7 @@ export default function AVSDetails() {
             </div>
           </div>
           <div className="py-4 text-sm text-foreground-active">
-            {state.avsDetails.metadata.description}
+            {avsDetails.metadata.description}
           </div>
 
           <div className="space-y-2">
@@ -172,16 +223,16 @@ export default function AVSDetails() {
             <div className="flex flex-row gap-x-1 mt-4">
               <Button
                 as={Link}
-                href={`https://etherscan.io/address/${state.avsDetails.address}`}
+                href={`https://etherscan.io/address/${avsDetails.address}`}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
                 variant="flat"
                 className="text-secondary"
-              >{`${state.avsDetails.address.slice(0, 6)}...${state.avsDetails.address.slice(-4)}`}</Button>
+              >{`${avsDetails.address.slice(0, 6)}...${avsDetails.address.slice(-4)}`}</Button>
               <Button
                 as={Link}
-                href={state.avsDetails.metadata.twitter}
+                href={avsDetails.metadata.twitter}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
@@ -189,13 +240,13 @@ export default function AVSDetails() {
                 className="text-secondary"
               >
                 @
-                {state.avsDetails.metadata.twitter.substring(
-                  state.avsDetails.metadata.twitter.lastIndexOf('/') + 1
+                {avsDetails.metadata.twitter.substring(
+                  avsDetails.metadata.twitter.lastIndexOf('/') + 1
                 )}
               </Button>
               <Button
                 as={Link}
-                href={state.avsDetails.metadata.website}
+                href={avsDetails.metadata.website}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
@@ -243,7 +294,7 @@ export default function AVSDetails() {
                   </div>
                 </div>
                 <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
+                  timelineTab={timelineTab}
                   onTimelineChange={handleTimelineChange}
                 />
               </CardHeader>
@@ -262,7 +313,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Operators</div>
-              <div className="font-bold">{state.avsDetails.operators}</div>
+              <div className="font-bold">{avsDetails.operators}</div>
             </div>
           }
         >
@@ -278,7 +329,7 @@ export default function AVSDetails() {
                   </div>
                 </div>
                 <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
+                  timelineTab={timelineTab}
                   onTimelineChange={handleTimelineChange}
                 />
               </CardHeader>
@@ -296,7 +347,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Restakers</div>
-              <div className="font-bold">{state.avsDetails.stakers}</div>
+              <div className="font-bold">{avsDetails.stakers}</div>
             </div>
           }
         >
@@ -312,7 +363,7 @@ export default function AVSDetails() {
                   </div>
                 </div>
                 <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
+                  timelineTab={timelineTab}
                   onTimelineChange={handleTimelineChange}
                 />
               </CardHeader>

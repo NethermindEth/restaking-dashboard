@@ -12,13 +12,14 @@ export default function AVSList({ onSelectionChange }) {
   const compact = !useTailwindBreakpoint('md');
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    isFetchingAvsData: false
+    isFetchingAvsData: false,
+    error: null
   });
 
   useEffect(() => {
     async function fetchAVS() {
       try {
-        dispatch({ isFetchingAvsData: true });
+        dispatch({ isFetchingAvsData: true, error: null });
         const response = await avsService.getAll();
         const data = response.avs;
 
@@ -41,20 +42,17 @@ export default function AVSList({ onSelectionChange }) {
           return 0;
         });
 
-        dispatch({ selectedAVS: data[0] });
-        dispatch({ avs: data });
-      } catch {
-        // TODO: handle error
-      } finally {
-        dispatch({ isFetchingAvsData: false });
+        dispatch({ selectedAVS: data[0], avs: data, isFetchingAvsData: false });
+      } catch (error) {
+        dispatch({
+          error: 'Failed to fetch AVS data',
+          isFetchingAvsData: false
+        });
       }
     }
 
-    // TODO: loading indicators
-
     fetchAVS();
   }, [avsService, dispatch, onSelectionChange]);
-
   const handleAVSItemClick = avs => {
     navigate(`/avs/${avs.address}`, { state: { avs } });
   };

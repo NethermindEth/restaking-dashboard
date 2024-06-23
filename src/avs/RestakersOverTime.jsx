@@ -1,9 +1,9 @@
-import React from 'react';
+import { AxisBottom, AxisLeft } from '@visx/axis';
+import { GridColumns, GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
-import { LinePath } from '@visx/shape';
 import { scaleLinear } from '@visx/scale';
-import { AxisLeft, AxisBottom } from '@visx/axis';
-import { GridRows, GridColumns } from '@visx/grid';
+import { LinePath } from '@visx/shape';
+import React from 'react';
 
 const data = [
   { x: 0, y: 200 },
@@ -23,15 +23,19 @@ const height = 220;
 const margin = { top: 20, right: 20, bottom: 20, left: 40 };
 
 const RestakersOverTime = () => {
-  const xScale = scaleLinear({
-    domain: [0, Math.max(...data.map(d => d.x))],
-    range: [margin.left, width - margin.right]
-  });
+  const xScale = useMemo(() => {
+    return scaleLinear({
+      domain: [0, Math.max(...data.map(d => d.x))],
+      range: [margin.left, width - margin.right]
+    });
+  }, [data, margin.left, margin.right, width]);
 
-  const yScale = scaleLinear({
-    domain: [0, 300],
-    range: [height - margin.bottom, margin.top]
-  });
+  const yScale = useMemo(() => {
+    return scaleLinear({
+      domain: [0, 300],
+      range: [height - margin.bottom, margin.top]
+    });
+  }, [height, margin.bottom, margin.top]);
 
   return (
     <div className="flex items-center justify-center">

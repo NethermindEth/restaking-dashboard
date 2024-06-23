@@ -109,7 +109,7 @@ export default function Operators({ avsAddress, totalTVL }) {
     if (!page) {
       setSearchParams({ page: 1 }, { replace: true });
       fetchOperators(1);
-    } else fetchOperators(searchParams.get('page'));
+    } else fetchOperators(searchParams.get(page));
   }, [searchParams]);
 
   const latestAggregatedOperators =
@@ -185,9 +185,9 @@ export default function Operators({ avsAddress, totalTVL }) {
         <Pagination
           totalPages={state.totalPages}
           currentPage={parseInt(searchParams.get('page'))}
-          onNext={onNext}
-          onPrevious={onPrevious}
-          onPageClick={onPageClick}
+          handleNext={onNext}
+          handlePrevious={onPrevious}
+          handlePageClick={onPageClick}
         />
       </Card>
       <div className="flex flex-col gap-4 justify-between items-end w-full">

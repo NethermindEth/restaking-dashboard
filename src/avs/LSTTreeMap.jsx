@@ -23,7 +23,9 @@ export default function LSTTreeMap({
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     selectedTab: 'all-assets',
-    hoveredNode: null
+    hoveredNode: null,
+    mouseX: 0,
+    mouseY: 0
   });
 
   const yMax = height - margin.top - margin.bottom;
@@ -81,7 +83,11 @@ export default function LSTTreeMap({
     >
       <div className="flex items-center justify-between w-full flex-wrap gap-3">
         <div className="font-light text-base text-foreground-1 px-2">
-          LST distribution
+          {state.selectedTab === 'all-assets'
+            ? 'All assets distribution'
+            : state.selectedTab === 'lst'
+              ? 'LST distribution'
+              : 'All Assets'}
         </div>
 
         <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
@@ -111,6 +117,14 @@ export default function LSTTreeMap({
         height={height}
         className="w-full overflow-x-scroll pr-2"
         style={{ marginRight: 'auto' }}
+        onMouseMove={event => {
+          const { clientX, clientY } = event;
+          const { left, top } = event.currentTarget.getBoundingClientRect();
+          dispatch({
+            mouseX: clientX - left,
+            mouseY: clientY - top
+          });
+        }}
       >
         <Treemap
           top={margin.top}
@@ -155,7 +169,7 @@ export default function LSTTreeMap({
                         dy={'40px'}
                         dx={'10px'}
                         width={nodeWidth + 10}
-                        fontSize={12}
+                        className="text-xs"
                         fill={'#ffffff'}
                       >
                         {node.data.name}
@@ -171,12 +185,8 @@ export default function LSTTreeMap({
       {state.hoveredNode && (
         <TooltipInPortal
           key={Math.random()}
-          top={
-            state.hoveredNode.y0 +
-            (state.hoveredNode.y1 - state.hoveredNode.y0) / 2 -
-            20
-          }
-          left={state.hoveredNode.x0 + state.hoveredNode.x0}
+          top={state.mouseY + 10}
+          left={state.mouseX + 10}
           style={tooltipStyles}
           className="space-y-1"
         >
