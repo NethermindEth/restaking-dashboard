@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
-import { Pie } from '@visx/shape';
+import { Card, Progress } from '@nextui-org/react';
 import { Group } from '@visx/group';
+import { Pie } from '@visx/shape';
 import { Text } from '@visx/text';
-import { Card } from '@nextui-org/react';
+import { useMemo, useState } from 'react';
+import { formatNumber } from '../utils';
 
 const coins = [
   { symbol: 'ADA', amount: 160, color: '#9C4FD9', inUSD: 122.48 },
@@ -13,6 +14,37 @@ const coins = [
   { symbol: 'BTE', amount: 40, color: '#D9B24F', inUSD: 363 },
   { symbol: 'BTF', amount: 30, color: '#D9D34F', inUSD: 563 }
 ];
+
+export const lrtData = {
+  wBETH: {
+    share: 2508659,
+    logo: '/wBETH.svg'
+  },
+  osETH: {
+    share: 8375748,
+    logo: '/osETH.svg'
+  },
+  lsETH: {
+    share: 5141121,
+    logo: '/lsETH.svg'
+  },
+  ankrETH: {
+    share: 6210246,
+    logo: '/ankrETH.svg'
+  },
+  rETH: {
+    share: 6808644,
+    logo: '/rETH.svg'
+  },
+  ETHx: {
+    share: 5373195,
+    logo: '/ETHx.svg'
+  },
+  others: {
+    share: 9909455,
+    logo: '/image-group.svg'
+  }
+};
 
 export default function OverviewLRTDistribution() {
   const [active, setActive] = useState(null);
@@ -27,6 +59,11 @@ export default function OverviewLRTDistribution() {
     []
   );
 
+  const totalShare = Object.values(lrtData).reduce(
+    (sum, item) => sum + item.share,
+    0
+  );
+
   return (
     <Card
       radius="md"
@@ -36,7 +73,18 @@ export default function OverviewLRTDistribution() {
         LRT Distribution
       </div>
 
-      <div className="w-full flex flex-row items-center justify-end px-4">
+      <div className="w-full flex flex-col gap-10 md:flex-row items-center justify-between px-4">
+        <div className="w-full md:max-w-xl space-y-3">
+          {Object.entries(lrtData).map(([key, data], i) => (
+            <LRTShare
+              key={`lrt-distribution-item-${i + 1}-`}
+              image={data.logo}
+              label={key}
+              share={data.share}
+              value={(data.share / totalShare) * 100}
+            />
+          ))}
+        </div>
         <svg width={width} height={width}>
           <Group top={half} left={half} className="relative">
             <Pie
@@ -57,7 +105,7 @@ export default function OverviewLRTDistribution() {
                       key={arc.data.symbol}
                       onMouseEnter={() => setActive(arc.data)}
                       onMouseLeave={() => setActive(null)}
-                      style={{ cursor: 'pointer' }}
+                      className=" cursor-pointer"
                     >
                       <path d={pie.path(arc)} fill={arc.data.color}></path>
                     </g>
@@ -68,14 +116,19 @@ export default function OverviewLRTDistribution() {
 
             {active ? (
               <>
-                <Text textAnchor="middle" fill="#fff" fontSize={24} dy={0}>
-                  {`$${Math.floor(active.amount * active.inUSD)}`}
+                <Text
+                  textAnchor="middle"
+                  fill="#fff"
+                  className="text-lg"
+                  dy={0}
+                >
+                  {`$${formatNumber(Math.floor(active.amount * active.inUSD))}`}
                 </Text>
 
                 <Text
                   textAnchor="middle"
-                  fill={active.color}
-                  fontSize={20}
+                  fill="#888"
+                  className="text-sm"
                   dy={40}
                 >
                   {`${active.amount} ${active.symbol}`}
@@ -83,11 +136,21 @@ export default function OverviewLRTDistribution() {
               </>
             ) : (
               <>
-                <Text textAnchor="middle" fill="#fff" fontSize={24} dy={0}>
-                  {`$${total}`}
+                <Text
+                  textAnchor="middle"
+                  fill="#fff"
+                  className="text-lg"
+                  dy={0}
+                >
+                  {`$${formatNumber(total)}`}
                 </Text>
 
-                <Text textAnchor="middle" fill="#888" fontSize={20} dy={40}>
+                <Text
+                  textAnchor="middle"
+                  fill="#888"
+                  className="text-sm"
+                  dy={40}
+                >
                   {`${coins.length} Assets`}
                 </Text>
               </>
@@ -98,3 +161,30 @@ export default function OverviewLRTDistribution() {
     </Card>
   );
 }
+
+const LRTShare = ({ label, value, image, share }) => {
+  return (
+    <div className="flex items-end md:flex-row flex-col gap-2">
+      <Progress
+        radius="sm"
+        classNames={{
+          base: 'max-w-lg',
+          track: 'drop-shadow-md border bg-cinder-1 border-default',
+          indicator: 'bg-cinder-default',
+          label: 'text-foreground-active text-sm font-normal',
+          value: 'text-white text-xs font-normal'
+        }}
+        label={
+          <div className="flex items-center gap-2">
+            {image && <img src={image} className="size-3" />} <div>{label}</div>
+          </div>
+        }
+        value={value}
+        showValueLabel={true}
+      />
+      <div className="text-sm text-foreground-2 min-w-fit">
+        {formatNumber(share)} ETH
+      </div>
+    </div>
+  );
+};

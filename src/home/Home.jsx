@@ -1,8 +1,9 @@
 import { Card, Divider } from '@nextui-org/react';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { ChevronRightIcon } from '@nextui-org/shared-icons';
-import OverviewTVLOverTime from './OverviewTVLOverTime';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { formatNumber } from '../utils';
 import OverviewLRTDistribution from './OverviewLRTDistribution';
+import OverviewTVLOverTime from './OverviewTVLOverTime';
 
 const topAVS = [
   {
@@ -81,10 +82,10 @@ export default function Home() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-stretch gap-4 justify-between">
+      <div className="flex items-stretch md:flex-row flex-col gap-4 justify-between">
         <Card
           radius="md"
-          className="bg-content1 border border-outline space-y-4 p-4 flex flex-row items-center justify-around w-full"
+          className="bg-content1 border border-outline space-y-4 p-4 flex md:flex-row items-center justify-around w-full"
         >
           <div className="space-y-2 text-center">
             <div className="font-light text-sm text-foreground-1">
@@ -99,14 +100,16 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <Divider orientation="vertical" className="h-12" />
+          <Divider orientation="vertical" className="h-12 hidden md:block" />
+          <Divider orientation="horizontal" className="w-8/12 md:hidden" />
           <div className="space-y-1 text-center">
             <div className="font-light text-sm text-foreground-1">
               Active AVS
             </div>
             <div className="text-2xl font-normal text-white">13</div>
           </div>
-          <Divider orientation="vertical" className="h-12" />
+          <Divider orientation="vertical" className="h-12 hidden md:block" />
+          <Divider orientation="horizontal" className="w-8/12 md:hidden" />
           <div className="space-y-1 text-center">
             <div className="font-light text-sm text-foreground-1">
               Active Operators
@@ -114,11 +117,11 @@ export default function Home() {
             <div className="text-2xl font-normal text-white">240</div>
           </div>
         </Card>
-        <div className="w-2/5">
-          <CTAs />
+        <div className="md:w-2/5">
+          <CallToActions />
         </div>
       </div>
-      <div className="flex items-stretch justify-between gap-4">
+      <div className="flex items-stretch md:flex-row flex-col justify-between gap-4">
         <Card
           radius="md"
           className="bg-content1 border border-outline space-y-4 p-4 w-full"
@@ -196,21 +199,21 @@ export default function Home() {
   );
 }
 
-const CTAs = () => {
+const CallToActions = () => {
   return (
     <div className="space-y-2">
       <Card
         radius="md"
-        className="bg-cinder-1 hover:bg-cinder-1/80 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5"
+        className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group"
       >
         <div>
-          <img src="/public/nethermind.png" />
+          <img src="/nethermind.png" />
         </div>
         <div className="space-y-1">
-          <div className="text-cinder-2 font-semibold text-base">
+          <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
             Start Restaking
           </div>
-          <div className="text-cinder-3 text-sm font-light">
+          <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
             Nethermind operator
           </div>
         </div>
@@ -218,16 +221,16 @@ const CTAs = () => {
       </Card>
       <Card
         radius="md"
-        className="bg-cinder-1 hover:bg-cinder-1/80 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5"
+        className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group"
       >
         <div>
           <img src="/public/nethermind.png" />
         </div>
         <div className="space-y-1">
-          <div className="text-cinder-2 font-semibold text-base">
+          <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
             Audit smart contract
           </div>
-          <div className="text-cinder-3 text-sm font-light">
+          <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
             audit AVS with Nethermind
           </div>
         </div>
@@ -236,21 +239,3 @@ const CTAs = () => {
     </div>
   );
 };
-
-const numberFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 0
-});
-
-function formatNumber(value, compact) {
-  if (compact) {
-    if (value >= 1_000_000) {
-      return `${(value / 1_000_000).toFixed(1)}m`;
-    }
-
-    if (value >= 1_000) {
-      return `${(value / 1_000).toFixed(1)}k`;
-    }
-  }
-
-  return numberFormatter.format(value);
-}
