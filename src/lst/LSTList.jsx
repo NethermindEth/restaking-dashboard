@@ -3,6 +3,9 @@ import { useServices } from '../@services/ServiceContext';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { formatNumber } from '../utils';
+import LSTDistribution from './LSTDistribution';
+import LSTTreeMap from './LSTTreeMap';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 const PROTOCOL_TOKEN_NAME_MAPPING = {
   stEth: 'Lido Staked Ether',
@@ -108,6 +111,18 @@ export default function LSTList({}) {
             </div>
           ))}
         </div>
+      </div>
+      <div className="flex mt-4 gap-4 lg:justify-between flex-col">
+        {state.lst && (
+          <div>
+            <LSTDistribution height={512} data={state.lst} />
+          </div>
+        )}
+        {state.lst && (
+          <div>
+            <LSTTreeMap height={720} width={720} data={state.lst} />
+          </div>
+        )}
       </div>
     </div>
   );
