@@ -21,7 +21,7 @@ export default function AVSList({ onSelectionChange }) {
       try {
         dispatch({ isFetchingAvsData: true, error: null });
         const response = await avsService.getAll();
-        const data = response.avs;
+        const data = response.results;
 
         for (let i = 0, count = data.length; i < count; i++) {
           let item = data[i];

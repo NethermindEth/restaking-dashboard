@@ -3,7 +3,7 @@ import { Group } from '@visx/group';
 import { Treemap, hierarchy, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
 import { Text } from '@visx/text';
-import { defaultStyles, useTooltipInPortal } from '@visx/tooltip';
+import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import React, { useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
@@ -23,9 +23,15 @@ export default function LSTTreeMap({
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     selectedTab: 'all-assets',
-    hoveredNode: null,
     mouseX: 0,
     mouseY: 0
+  });
+
+  const { hideTooltip, showTooltip, tooltipData, tooltipOpen } = useTooltip();
+
+  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+    detectBounds: true,
+    scroll: true
   });
 
   const yMax = height - margin.top - margin.bottom;
@@ -65,10 +71,6 @@ export default function LSTTreeMap({
   const handleTabChange = tab => {
     dispatch({ selectedTab: tab });
   };
-
-  const { containerRef, TooltipInPortal } = useTooltipInPortal({
-    scroll: true
-  });
 
   const tooltipStyles = {
     ...defaultStyles,
@@ -155,12 +157,25 @@ export default function LSTTreeMap({
                         height={nodeHeight}
                         fill={baseColor}
                         fillOpacity={
-                          state.hoveredNode?.data?.name === node.data.name
+                          tooltipData?.name === node.data.name
                             ? opacity + 0.2
                             : opacity
                         }
-                        onMouseEnter={() => dispatch({ hoveredNode: node })}
-                        onMouseLeave={() => dispatch({ hoveredNode: null })}
+                        onMouseEnter={() => {
+                          showTooltip({
+                            tooltipData: node.data,
+                            tooltipLeft: state.mouseX,
+                            tooltipTop: state.mouseY
+                          });
+                        }}
+                        onMouseMove={() => {
+                          showTooltip({
+                            tooltipData: node.data,
+                            tooltipLeft: state.mouseX,
+                            tooltipTop: state.mouseY
+                          });
+                        }}
+                        onMouseLeave={hideTooltip}
                       />
                     )}
 
@@ -182,20 +197,19 @@ export default function LSTTreeMap({
           )}
         </Treemap>
       </svg>
-      {state.hoveredNode && (
+      {tooltipOpen && tooltipData && (
         <TooltipInPortal
           key={Math.random()}
-          top={state.mouseY + 10}
-          left={state.mouseX + 10}
-          style={tooltipStyles}
-          className="space-y-1"
+          top={state.mouseY}
+          left={state.mouseX}
+          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
         >
           <div className="text-sm">
-            {state.hoveredNode.data.name}{' '}
-            <span className="text-xs">{`(${state.hoveredNode.data.token})`}</span>
+            {tooltipData.name}{' '}
+            <span className="text-xs">{`(${tooltipData.token})`}</span>
           </div>
           <div className="text-base">
-            TVL: {assetFormatter.format(state.hoveredNode.data.tvl)}
+            TVL: {assetFormatter.format(tooltipData.tvl)}
           </div>
         </TooltipInPortal>
       )}
