@@ -1,9 +1,11 @@
+import { cn } from '@nextui-org/react';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { GridColumns, GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
+import { useScreenSize } from '@visx/responsive';
 import { scaleLinear } from '@visx/scale';
 import { LinePath } from '@visx/shape';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 const data = [
   { x: 0, y: 200 },
@@ -18,48 +20,54 @@ const data = [
   { x: 9, y: 150 }
 ];
 
-const width = 1100;
-const height = 220;
 const margin = { top: 20, right: 20, bottom: 20, left: 40 };
 
 const RestakersOverTime = () => {
+  const { width } = useScreenSize();
+  const height = Math.min(250, width * 0.4);
+
   const xScale = useMemo(() => {
     return scaleLinear({
       domain: [0, Math.max(...data.map(d => d.x))],
       range: [margin.left, width - margin.right]
     });
-  }, [data, margin.left, margin.right, width]);
+  }, [width]);
 
   const yScale = useMemo(() => {
     return scaleLinear({
       domain: [0, 300],
       range: [height - margin.bottom, margin.top]
     });
-  }, [height, margin.bottom, margin.top]);
+  }, [height]);
 
   return (
-    <div className="flex items-center justify-center">
-      <svg className=" w-full" height={height}>
+    <div className={cn('w-full', `h-[${height}px] max-h-[250px]`)}>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`}>
         <GridRows
           scale={yScale}
-          width={width}
-          height={height}
+          width={width - margin.left - margin.right}
+          height={height - margin.top - margin.bottom}
+          left={margin.left}
+          top={margin.top}
           stroke="#7A86A5"
           strokeOpacity={0.2}
           numTicks={4}
         />
         <GridColumns
           scale={xScale}
-          width={width}
-          height={height}
+          width={width - margin.left - margin.right}
+          height={height - margin.top - margin.bottom}
+          left={margin.left}
+          top={margin.top}
           stroke="#7A86A5"
           strokeOpacity={0.2}
           numTicks={10}
         />
         <AxisLeft
           scale={yScale}
+          top={margin.top - 16}
           left={margin.left}
-          tickValues={[0, 50, 100, 200, 300]}
+          tickValues={[100, 200, 300]}
           tickLabelProps={() => ({
             fill: '#7A86A5',
             fontSize: 12,
