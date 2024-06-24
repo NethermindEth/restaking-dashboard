@@ -14,13 +14,13 @@ import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
 import { assetFormatter } from '../utils';
+import AVSTVLOverTime from './AVSTVLOverTime';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
 import OperatorsOverTime from './OperatorsOverTime';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
 import { strategiesData } from './strategies.mapping';
-import TVLOverTime from './TVLOverTime';
 
 export default function AVSDetails() {
   const location = useLocation();
@@ -277,31 +277,7 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className="space-y-1 block">
-                  <div className="font-light text-lg text-foreground-1">
-                    TVL overtime
-                  </div>
-                  <div className="font-light">
-                    <div className="text-base flex items-center gap-2">
-                      <span>4,554,567 ETH</span>{' '}
-                      <span className="text-success">+1.5%</span>
-                    </div>
-                    <div className="text-sm text-foreground-1">
-                      $ 34,554,567
-                    </div>
-                  </div>
-                </div>
-                <GraphTimelineSelector
-                  timelineTab={timelineTab}
-                  onTimelineChange={handleTimelineChange}
-                />
-              </CardHeader>
-              <CardBody>
-                <TVLOverTime />
-              </CardBody>
-            </Card>
+            <AVSTVLOverTime avsAddress={avsAddress} />
             <LSTDistribution
               lstDistributionData={lstDistributionData}
               totalEthDistributionData={totalEthDistributionData}

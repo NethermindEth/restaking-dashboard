@@ -37,4 +37,15 @@ export default class AVSService {
     // TODO: Handle error
     return await response.json();
   }
+
+  async getAvsTvlOvertime(address) {
+    const response = await apiGet(`/avs/${address}/tvlOvertime`);
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
 }
