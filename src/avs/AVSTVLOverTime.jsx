@@ -22,7 +22,7 @@ const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
     if (width < 500) return 3;
     if (width < 800) return 5;
-    return 10;
+    return 7;
   } else if (axis === 'y') {
     if (width < 500) return 3;
     if (width < 800) return 4;
@@ -60,18 +60,14 @@ const AVSTVLOverTime = ({ avsAddress }) => {
     scroll: true
   });
 
-  const bisectDate = bisector(d => d.date).left;
+  const bisectDate = bisector(d => new Date(d.timestamp)).left;
 
   useEffect(() => {
     async function fetchTvlOvertime() {
       try {
         const tvlOvertimeData = await avsService.getAvsTvlOvertime(avsAddress);
-        const parsedData = tvlOvertimeData.map(d => ({
-          date: new Date(d.date),
-          value: d.value
-        }));
         dispatch({
-          tvlOvertimeData: parsedData
+          tvlOvertimeData
         });
       } catch (error) {
         // TODO: handle error
@@ -102,8 +98,8 @@ const AVSTVLOverTime = ({ avsAddress }) => {
     if (!sortedData) return null;
     return scaleTime({
       domain: [
-        Math.min(...sortedData.map(d => d.date)),
-        Math.max(...sortedData.map(d => d.date))
+        Math.min(...sortedData.map(d => new Date(d.timestamp))),
+        Math.max(...sortedData.map(d => new Date(d.timestamp)))
       ],
       range: [margin.left, width - margin.right]
     });
@@ -111,8 +107,8 @@ const AVSTVLOverTime = ({ avsAddress }) => {
 
   const yScale = useMemo(() => {
     if (!sortedData) return null;
-    const maxValue = Math.max(...sortedData.map(d => d.value));
-    const minValue = Math.min(...sortedData.map(d => d.value));
+    const maxValue = Math.max(...sortedData.map(d => d.tvl));
+    const minValue = Math.min(...sortedData.map(d => d.tvl));
     const yDomain = [minValue, maxValue + (maxValue - minValue) * 0.1];
 
     return scaleLinear({
@@ -136,9 +132,10 @@ const AVSTVLOverTime = ({ avsAddress }) => {
       const d0 = sortedData[index - 1];
       const d1 = sortedData[index];
       let d = d0;
-      if (d1 && d1.date) {
+      if (d1 && d1.timestamp) {
         d =
-          x0.valueOf() - d0.date.valueOf() > d1.date.valueOf() - x0.valueOf()
+          x0.valueOf() - new Date(d0.timestamp).valueOf() >
+          new Date(d1.timestamp).valueOf() - x0.valueOf()
             ? d1
             : d0;
       }
@@ -228,20 +225,33 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                 <AxisBottom
                   scale={xScale}
                   top={height - margin.bottom + 30}
-                  tickFormat={date => formatDateToVerboseString(date)}
+                  left={margin.left - 80}
+                  tickFormat={date => formatDateToVerboseString(new Date(date))}
                   tickLabelProps={() => ({
                     fill: '#7A86A5',
                     fontSize: width < 500 ? 12 : 14,
                     textAnchor: 'middle'
                   })}
-                  numTicks={getNumberOfTicks(width, 'x')}
+                  tickValues={sortedData
+                    .filter(
+                      (_, i) =>
+                        i %
+                          Math.max(
+                            1,
+                            Math.floor(
+                              sortedData.length / getNumberOfTicks(width, 'x')
+                            )
+                          ) ===
+                        0
+                    )
+                    .map(d => new Date(d.timestamp))}
                 />
                 <Group>
                   <LinePath
                     className="cursor-pointer"
                     data={sortedData}
-                    x={d => xScale(d.date)}
-                    y={d => yScale(d.value)}
+                    x={d => xScale(new Date(d.timestamp))}
+                    y={d => yScale(d.tvl)}
                     stroke="#009CDD"
                     strokeWidth={2}
                   />
@@ -249,8 +259,8 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                 {tooltipData && (
                   <g>
                     <Circle
-                      cx={xScale(tooltipData.date).toString()}
-                      cy={yScale(tooltipData.value).toString()}
+                      cx={xScale(new Date(tooltipData.timestamp)).toString()}
+                      cy={yScale(tooltipData.tvl).toString()}
                       r={4}
                       className="cursor-pointer"
                       fill="#009CDD"
@@ -270,10 +280,11 @@ const AVSTVLOverTime = ({ avsAddress }) => {
               className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
             >
               <div className="text-sm">
-                Date: {formatDateToVerboseString(tooltipData.date)}
+                Date:{' '}
+                {formatDateToVerboseString(new Date(tooltipData.timestamp))}
               </div>
               <div className="text-base">
-                Value: {formatNumberToCompactString(tooltipData.value)}
+                TVL: {formatNumberToCompactString(tooltipData.tvl)}
               </div>
             </TooltipInPortal>
           )}
