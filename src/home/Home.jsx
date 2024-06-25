@@ -1,4 +1,4 @@
-import { Card, Divider } from '@nextui-org/react';
+import { Card, Divider, Link } from '@nextui-org/react';
 import { ChevronRightIcon } from '@nextui-org/shared-icons';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
@@ -202,40 +202,54 @@ export default function Home() {
 const CallToActions = () => {
   return (
     <div className="space-y-2">
-      <Card
-        radius="md"
-        className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group"
+      <Link
+        href="https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e"
+        target="_blank"
+        rel="noreferrer"
+        className="w-full"
       >
-        <div>
-          <img src="/nethermind.png" />
-        </div>
-        <div className="space-y-1">
-          <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
-            Start Restaking
+        <Card
+          radius="md"
+          className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group w-full"
+        >
+          <div>
+            <img src="/nethermind.png" />
           </div>
-          <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
-            Nethermind operator
+          <div className="space-y-1">
+            <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
+              Start Restaking
+            </div>
+            <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
+              Nethermind Operator
+            </div>
           </div>
-        </div>
-        <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
-      </Card>
-      <Card
-        radius="md"
-        className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group"
+          <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
+        </Card>
+      </Link>
+      <Link
+        href="https://www.nethermind.io/nethermind-security"
+        target="_blank"
+        rel="noreferrer"
+        className="w-full"
       >
-        <div>
-          <img src="/public/nethermind.png" />
-        </div>
-        <div className="space-y-1">
-          <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
-            Audit smart contract
+        <Card
+          radius="md"
+          className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group w-full"
+        >
+          <div>
+            <img src="/public/nethermind.png" />
           </div>
-          <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
-            audit AVS with Nethermind
+          <div className="space-y-1">
+            <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
+              Audit Smart Contract
+            </div>
+            <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
+              Audit AVS with Nethermind
+            </div>
           </div>
-        </div>
-        <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
-      </Card>
+          <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
+        </Card>
+      </Link>
     </div>
   );
 };
