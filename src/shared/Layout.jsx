@@ -1,5 +1,5 @@
-import Header from './Header';
 import { Outlet } from 'react-router-dom';
+import Header from './Header';
 import Sidebar from './Sidebar';
 import { useTailwindBreakpoint } from './useTailwindBreakpoint';
 
@@ -10,7 +10,7 @@ export default function Layout() {
     <div className="bg-background min-h-screen flex flex-col text-foreground relative">
       <div className="basis-0 flex flex-1 ">
         {showSidebar && (
-          <div className="flex w-64 h-screen fixed z-50 lg:w-64">
+          <div className="flex w-64 h-screen fixed lg:w-64">
             <Sidebar />
           </div>
         )}
