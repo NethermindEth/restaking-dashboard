@@ -95,26 +95,12 @@ const OperatorDetails = () => {
         </CardBody>
       </Card>
 
-      <Card radius="md" className="bg-content1 border border-outline p-4">
-        <CardHeader className="flex flex-wrap justify-between gap-3">
-          <div className="space-y-2 block">
-            <div className="font-light text-lg text-foreground-1">TVL</div>
-            <div className="font-light">
-              <div className="text-base ">
-                <span>4,554,567 ETH</span>
-              </div>
-              <div className="text-xs text-success">13,444,543.123 USD</div>
-            </div>
-          </div>
-          <GraphTimelineSelector
-            timelineTab={'7days'}
-            onTimelineChange={handleTimelineChange}
-          />
-        </CardHeader>
-        <CardBody className="w-full">
-          <TVLOverTime />
-        </CardBody>
-      </Card>
+      <TVLOverTime
+        opAddress={address}
+        currentTVL={assetFormatter.format(
+          formatEther(state.operatorTVL.toString())
+        )}
+      />
 
       <div className="flex gap-x-4 w-full">
         <Card

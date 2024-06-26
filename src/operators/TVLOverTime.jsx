@@ -1,87 +1,294 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Group } from '@visx/group';
-import { LinePath } from '@visx/shape';
-import { scaleLinear } from '@visx/scale';
+import { Circle, LinePath } from '@visx/shape';
+import { scaleLinear, scaleTime } from '@visx/scale';
+import { localPoint } from '@visx/event';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 import { GridRows, GridColumns } from '@visx/grid';
+import { Card, CardBody, CardHeader, cn } from '@nextui-org/react';
+import GraphTimelineSelector from '../shared/GraphTimelineSelector';
+import { useMutativeReducer } from 'use-mutative';
+import { reduceState } from '../shared/helpers';
+import { useScreenSize } from '@visx/responsive';
+import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import { bisector } from 'd3-array';
+import { useServices } from '../@services/ServiceContext';
+import {
+  formatDateToVerboseString,
+  formatNumberToCompactString
+} from '../utils';
 
-const data = [
-  { x: 0, y: 200 },
-  { x: 1, y: 200 },
-  { x: 2, y: 80 },
-  { x: 3, y: 150 },
-  { x: 4, y: 200 },
-  { x: 5, y: 80 },
-  { x: 6, y: 100 },
-  { x: 7, y: 100 },
-  { x: 8, y: 75 },
-  { x: 9, y: 150 }
-];
+const getNumberOfTicks = (width, axis) => {
+  if (axis === 'x') {
+    if (width < 500) return 3;
+    if (width < 800) return 5;
+    return 7;
+  } else if (axis === 'y') {
+    if (width < 500) return 3;
+    if (width < 800) return 4;
+    return 5;
+  }
+};
 
-const width = 2000;
-const height = 220;
-const margin = { top: 20, right: 20, bottom: 20, left: 40 };
+const getMargin = width => {
+  if (width < 500) {
+    return { top: 20, right: 20, bottom: 50, left: 40 };
+  }
+  return { top: 20, right: 20, bottom: 20, left: 60 };
+};
 
-const TVLOverTime = () => {
-  const xScale = scaleLinear({
-    domain: [0, Math.max(...data.map(d => d.x))],
-    range: [margin.left, width - margin.right]
+const TVLOverTime = ({ opAddress, currentTVL }) => {
+  const { operatorService } = useServices();
+  const [{ timelineTab, tvlOvertimeData }, dispatch] = useMutativeReducer(
+    reduceState,
+    {
+      timelineTab: '7days',
+      tvlOvertimeData: null
+    }
+  );
+
+  const { width } = useScreenSize();
+  const height = Math.min(400, width * 0.4);
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipOpen,
+    tooltipData,
+    tooltipTop = 0,
+    tooltipLeft = 0
+  } = useTooltip();
+
+  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+    detectBounds: true,
+    scroll: true
   });
 
-  const yScale = scaleLinear({
-    domain: [0, 300],
-    range: [height - margin.bottom, margin.top]
-  });
+  const bisectDate = bisector(d => new Date(d.timestamp)).left;
+
+  const sortData = (data, tab) => {
+    switch (tab) {
+      case '7days':
+        return data.slice(-7);
+      case '30days':
+        return data.slice(-30);
+      default:
+        return data;
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    if (!tvlOvertimeData) return null;
+    return sortData(tvlOvertimeData, timelineTab);
+  }, [tvlOvertimeData, timelineTab]);
+
+  const margin = getMargin(width);
+
+  const xScale = useMemo(() => {
+    if (!sortedData) return null;
+    return scaleTime({
+      domain: [
+        Math.min(...sortedData.map(d => new Date(d.timestamp))),
+        Math.max(...sortedData.map(d => new Date(d.timestamp)))
+      ],
+      range: [margin.left, width - margin.right]
+    });
+  }, [sortedData, width, margin]);
+
+  const yScale = useMemo(() => {
+    if (!sortedData) return null;
+    const maxValue = Math.max(...sortedData.map(d => d.tvl));
+    const minValue = Math.min(...sortedData.map(d => d.tvl));
+    const yDomain = [minValue, maxValue + (maxValue - minValue) * 0.1];
+
+    return scaleLinear({
+      domain: yDomain,
+      range: [height - margin.bottom, margin.top],
+      nice: true
+    });
+  }, [sortedData, height, margin]);
+
+  const handleTimelineChange = tab => {
+    dispatch({ timelineTab: tab });
+  };
+
+  const handleMouseMove = React.useCallback(
+    event => {
+      if (!sortedData || !xScale || !yScale) return;
+
+      const { x, y } = localPoint(event) || { x: 0, y: 0 };
+      const x0 = xScale.invert(x);
+      const index = bisectDate(sortedData, x0, 1);
+      const d0 = sortedData[index - 1];
+      const d1 = sortedData[index];
+      let d = d0;
+      if (d1 && d1.timestamp) {
+        d =
+          x0.valueOf() - new Date(d0.timestamp).valueOf() >
+          new Date(d1.timestamp).valueOf() - x0.valueOf()
+            ? d1
+            : d0;
+      }
+
+      showTooltip({
+        tooltipData: d,
+        tooltipLeft: x,
+        tooltipTop: y
+      });
+    },
+    [showTooltip, sortedData, xScale, yScale]
+  );
+
+  const fetchTVLOverTime = async () => {
+    try {
+      const tvlOvertimeData = await operatorService.getOperatorTVL(opAddress);
+      dispatch({
+        tvlOvertimeData
+      });
+    } catch (error) {
+      // TODO: handle error
+    }
+  };
+
+  useEffect(() => {
+    fetchTVLOverTime();
+  }, [operatorService, dispatch, opAddress]);
 
   return (
-    <div className="flex items-center justify-center">
-      <svg className="w-full" height={height}>
-        <GridRows
-          scale={yScale}
-          width={width}
-          height={height}
-          stroke="#7A86A5"
-          strokeOpacity={0.2}
-          numTicks={4}
+    <Card radius="md" className="bg-content1 border border-outline p-4">
+      <CardHeader className="flex flex-wrap justify-between gap-3">
+        <div className="space-y-2 block">
+          <div className="font-light text-lg text-foreground-1">TVL</div>
+          <div className="font-light">
+            <div className="text-base ">
+              <span>{currentTVL} ETH</span>
+            </div>
+            <div className="text-xs text-success">TODO USD</div>
+          </div>
+        </div>
+        <GraphTimelineSelector
+          timelineTab={timelineTab}
+          onTimelineChange={handleTimelineChange}
         />
-        <GridColumns
-          scale={xScale}
-          width={width}
-          height={height}
-          stroke="#7A86A5"
-          strokeOpacity={0.2}
-          numTicks={10}
-        />
-        <AxisLeft
-          scale={yScale}
-          left={margin.left}
-          tickValues={[0, 50, 100, 200, 300]}
-          tickLabelProps={() => ({
-            fill: '#7A86A5',
-            fontSize: 12,
-            textAnchor: 'end'
-          })}
-        />
-        <AxisBottom
-          scale={xScale}
-          top={height - margin.bottom}
-          tickLabelProps={() => ({
-            fill: '#7A86A5',
-            fontSize: 12,
-            textAnchor: 'middle'
-          })}
-        />
-        <Group>
-          <LinePath
-            data={data}
-            x={d => xScale(d.x)}
-            y={d => yScale(d.y)}
-            stroke="#009CDD"
-            strokeWidth={2}
-          />
-        </Group>
-      </svg>
-    </div>
+      </CardHeader>
+      <CardBody className="w-full">
+        <div
+          ref={containerRef}
+          className={cn('w-full', `h-[${height}px] max-h-[400px] relative`)}
+        >
+          <svg
+            width="100%"
+            height={height}
+            viewBox={`0 0 ${width} ${height}`}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => hideTooltip()}
+          >
+            {xScale && yScale && (
+              <>
+                <GridRows
+                  scale={yScale}
+                  width={width - margin.left - margin.right}
+                  height={height - margin.top - margin.bottom}
+                  left={margin.left}
+                  top={margin.top}
+                  stroke="#7A86A5"
+                  strokeOpacity={0.2}
+                  numTicks={getNumberOfTicks(width, 'y')}
+                  tickValues={yScale.ticks(getNumberOfTicks(width, 'y'))}
+                />
+                <GridColumns
+                  scale={xScale}
+                  width={width - margin.left - margin.right}
+                  height={height - margin.top - margin.bottom}
+                  left={margin.left}
+                  top={margin.top}
+                  stroke="#7A86A5"
+                  strokeOpacity={0.2}
+                  numTicks={getNumberOfTicks(width, 'x')}
+                />
+                <AxisLeft
+                  scale={yScale}
+                  top={margin.top}
+                  left={margin.left}
+                  tickFormat={formatNumberToCompactString}
+                  tickLabelProps={() => ({
+                    fill: '#7A86A5',
+                    fontSize: width < 500 ? 12 : 14,
+                    textAnchor: 'end',
+                    dy: '0.33em',
+                    dx: '-0.33em'
+                  })}
+                  numTicks={getNumberOfTicks(width, 'y')}
+                  tickValues={yScale.ticks(getNumberOfTicks(width, 'y'))}
+                />
+                <AxisBottom
+                  scale={xScale}
+                  top={height - margin.bottom + 30}
+                  left={margin.left - 80}
+                  tickFormat={date => formatDateToVerboseString(new Date(date))}
+                  tickLabelProps={() => ({
+                    fill: '#7A86A5',
+                    fontSize: width < 500 ? 12 : 14,
+                    textAnchor: 'middle'
+                  })}
+                  tickValues={sortedData
+                    .filter(
+                      (_, i) =>
+                        i %
+                          Math.max(
+                            1,
+                            Math.floor(
+                              sortedData.length / getNumberOfTicks(width, 'x')
+                            )
+                          ) ===
+                        0
+                    )
+                    .map(d => new Date(d.timestamp))}
+                />
+                <Group>
+                  <LinePath
+                    className="cursor-pointer"
+                    data={sortedData}
+                    x={d => xScale(new Date(d.timestamp))}
+                    y={d => yScale(d.tvl)}
+                    stroke="#009CDD"
+                    strokeWidth={2}
+                  />
+                </Group>
+                {tooltipData && (
+                  <g>
+                    <Circle
+                      cx={xScale(new Date(tooltipData.timestamp)).toString()}
+                      cy={yScale(tooltipData.tvl).toString()}
+                      r={4}
+                      className="cursor-pointer"
+                      fill="#009CDD"
+                      stroke="white"
+                      strokeWidth={2}
+                    />
+                  </g>
+                )}
+              </>
+            )}
+          </svg>
+          {tooltipOpen && tooltipData && (
+            <TooltipInPortal
+              key={Math.random()}
+              top={tooltipTop + 10}
+              left={tooltipLeft - 200}
+              className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
+            >
+              <div className="text-sm">
+                Date:{' '}
+                {formatDateToVerboseString(new Date(tooltipData.timestamp))}
+              </div>
+              <div className="text-base">
+                TVL: {formatNumberToCompactString(tooltipData.tvl)}
+              </div>
+            </TooltipInPortal>
+          )}
+        </div>
+      </CardBody>
+    </Card>
   );
 };
 
