@@ -3,7 +3,7 @@ import Footer from './Footer';
 import { Link } from '@nextui-org/react';
 import { useCallback } from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
   const navigate = useNavigate();
   const handleNavLinkClick = useCallback(
@@ -11,8 +11,9 @@ export default function Sidebar() {
       event.preventDefault();
 
       navigate(event.target.getAttribute('href'));
+      onOpenChange(false);
     },
-    [navigate]
+    [navigate, onOpenChange]
   );
   return (
     <div
