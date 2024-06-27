@@ -7,7 +7,7 @@ import {
   Tab,
   Tabs
 } from '@nextui-org/react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -37,17 +37,13 @@ export default function AVSDetails() {
     totalEthDistributionData: [],
     strategiesMap: {}
   });
-  const {
-    avsDetails,
-    timelineTab,
-    lstDistributionData,
-    totalTVL,
-    totalEthDistributionData
-  } = state;
 
-  const handleTimelineChange = tab => {
-    dispatch({ timelineTab: tab });
-  };
+  const handleTimelineChange = useCallback(
+    tab => {
+      dispatch({ timelineTab: tab });
+    },
+    [dispatch]
+  );
 
   const createStrategiesMap = strategies => {
     return strategies.reduce((acc, strategy) => {
@@ -164,12 +160,15 @@ export default function AVSDetails() {
     };
   }
 
-  const convertToEther = bigIntValue => Number(bigIntValue / BigInt(1e18));
+  const convertToEther = useMemo(
+    () => bigIntValue => Number(bigIntValue / BigInt(1e18)),
+    []
+  );
 
   useEffect(() => {
     async function fetchAvsDetails() {
       try {
-        const avsDetailsData = await avsService.getAvsDetails(avsAddress);
+        const avsDetailsData = await avsService.getAVSDetails(avsAddress);
         const strategiesMap = createStrategiesMap(
           avsDetailsData.strategies || []
         );
@@ -190,7 +189,7 @@ export default function AVSDetails() {
     fetchAvsDetails();
   }, [avsService, dispatch, avsAddress]);
 
-  if (avsDetails === null) {
+  if (state.avsDetails === null) {
     return null;
   }
 
@@ -200,7 +199,7 @@ export default function AVSDetails() {
         <CardBody>
           <div className="flex flex-row gap-x-2 items-center">
             <img
-              src={avsDetails.metadata.logo}
+              src={state.avsDetails.metadata.logo}
               className="size-5 rounded-full"
             />
             <div className="flex items-center gap-3">
@@ -213,47 +212,44 @@ export default function AVSDetails() {
             </div>
           </div>
           <div className="py-4 text-sm text-foreground-active">
-            {avsDetails.metadata.description}
+            {state.avsDetails.metadata.description}
           </div>
 
           <div className="space-y-2">
-            <div className="py-4 text-sm text-secondary">
-              https://docs.eigenlayer.xyz/eigenda/overview/
-            </div>
-            <div className="flex flex-row gap-x-1 mt-4">
+            {state.avsDetails.metadata.website && (
+              <Link
+                href={state.avsDetails.metadata.website}
+                target="_blank"
+                rel="noreferrer"
+                className="py-4 text-sm text-secondary"
+              >
+                {state.avsDetails.metadata.website}
+              </Link>
+            )}
+
+            <div className="flex flex-row gap-4 mt-4">
               <Button
                 as={Link}
-                href={`https://etherscan.io/address/${avsDetails.address}`}
+                href={`https://etherscan.io/address/${state.avsDetails.address}`}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
                 variant="flat"
-                className="text-secondary"
-              >{`${avsDetails.address.slice(0, 6)}...${avsDetails.address.slice(-4)}`}</Button>
+                className="text-secondary p-0"
+              >{`${state.avsDetails.address.slice(0, 6)}...${state.avsDetails.address.slice(-4)}`}</Button>
               <Button
                 as={Link}
-                href={avsDetails.metadata.twitter}
+                href={state.avsDetails.metadata.twitter}
                 target="_blank"
                 showAnchorIcon
                 size="sm"
                 variant="flat"
-                className="text-secondary"
+                className="text-secondary p-0"
               >
                 @
-                {avsDetails.metadata.twitter.substring(
-                  avsDetails.metadata.twitter.lastIndexOf('/') + 1
+                {state.avsDetails.metadata.twitter.substring(
+                  state.avsDetails.metadata.twitter.lastIndexOf('/') + 1
                 )}
-              </Button>
-              <Button
-                as={Link}
-                href={avsDetails.metadata.website}
-                target="_blank"
-                showAnchorIcon
-                size="sm"
-                variant="flat"
-                className="text-secondary"
-              >
-                Website
               </Button>
             </div>
           </div>
@@ -272,15 +268,16 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Total ETH value</div>
-              <div className="font-bold">{formatTVL(totalTVL)}</div>
+              <div className="font-bold">{formatTVL(state.totalTVL)}</div>
             </div>
           }
         >
           <div className="space-y-4 -mt-2">
             <AVSTVLOverTime avsAddress={avsAddress} />
+
             <LSTDistribution
-              lstDistributionData={lstDistributionData}
-              totalEthDistributionData={totalEthDistributionData}
+              lstDistributionData={state.lstDistributionData}
+              totalEthDistributionData={state.totalEthDistributionData}
             />
           </div>
         </Tab>
@@ -289,7 +286,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Operators</div>
-              <div className="font-bold">{avsDetails.operators}</div>
+              <div className="font-bold">{state.avsDetails.operators}</div>
             </div>
           }
         >
@@ -300,7 +297,7 @@ export default function AVSDetails() {
                   Operators over time
                 </div>
                 <GraphTimelineSelector
-                  timelineTab={timelineTab}
+                  timelineTab={state.timelineTab}
                   onTimelineChange={handleTimelineChange}
                 />
               </CardHeader>
@@ -309,7 +306,7 @@ export default function AVSDetails() {
                 <OperatorsOverTime />
               </CardBody>
             </Card>
-            <Operators avsAddress={avsAddress} totalTVL={totalTVL} />
+            <Operators avsAddress={avsAddress} totalTVL={state.totalTVL} />
           </div>
         </Tab>
         <Tab
@@ -318,7 +315,7 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Restakers</div>
-              <div className="font-bold">{avsDetails.stakers}</div>
+              <div className="font-bold">{state.avsDetails.stakers}</div>
             </div>
           }
         >
@@ -334,7 +331,7 @@ export default function AVSDetails() {
                   </div>
                 </div>
                 <GraphTimelineSelector
-                  timelineTab={timelineTab}
+                  timelineTab={state.timelineTab}
                   onTimelineChange={handleTimelineChange}
                 />
               </CardHeader>

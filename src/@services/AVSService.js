@@ -12,7 +12,7 @@ export default class AVSService {
     return await response.json();
   }
 
-  async getAvsDetails(address) {
+  async getAVSDetails(address) {
     const response = await apiGet(`/avs/${address}`);
 
     if (response.ok) {
