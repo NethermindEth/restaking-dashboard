@@ -157,14 +157,7 @@ const AVSTVLOverTime = ({ avsAddress }) => {
       <CardHeader className="flex items-end flex-wrap justify-between gap-3">
         <div className="space-y-1 block">
           <div className="font-light text-lg text-foreground-1">
-            TVL overtime
-          </div>
-          <div className="font-light">
-            <div className="text-base flex items-center gap-2">
-              <span>4,554,567 ETH</span>{' '}
-              <span className="text-success">+1.5%</span>
-            </div>
-            <div className="text-sm text-foreground-1">$ 34,554,567</div>
+            TVL over time
           </div>
         </div>
         <GraphTimelineSelector
