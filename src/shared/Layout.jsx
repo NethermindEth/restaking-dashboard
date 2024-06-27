@@ -7,14 +7,14 @@ export default function Layout() {
   const showSidebar = useTailwindBreakpoint('lg');
 
   return (
-    <div className="bg-background min-h-screen flex flex-col text-foreground">
-      <div className="basis-0 flex flex-1">
+    <div className="bg-background min-h-screen flex flex-col text-foreground relative">
+      <div className="basis-0 flex flex-1 ">
         {showSidebar && (
-          <div className="flex">
+          <div className="flex w-64 h-screen fixed lg:w-64">
             <Sidebar />
           </div>
         )}
-        <div className="basis-0 flex-1">
+        <div className="basis-0 flex-1 lg:pl-64">
           {!showSidebar && <Header />}
           <main className="px-4 pt-6">
             <Outlet />

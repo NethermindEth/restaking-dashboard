@@ -1,4 +1,4 @@
-name: Deploy to Amplify
+name: Deploy to Amplify Stage
 
 on:
   push:
@@ -17,5 +17,5 @@ jobs:
     steps:
     - name: deploy
       run: |
-          URL="${{ secrets.AMPLIFY_WEBHOOK_NEW }}"
+          URL="${{ secrets.AMPLIFY_WEBHOOK_STAGE }}"
           curl -X POST -d {} "$URL" -H "Content-Type: application/json"
