@@ -109,8 +109,8 @@ const OperatorsOverTime = ({ avsAddress }) => {
 
   const yScale = useMemo(() => {
     if (!sortedData) return null;
-    const maxValue = Math.max(...sortedData.map(d => d.count));
-    const minValue = Math.min(...sortedData.map(d => d.count));
+    const maxValue = Math.max(...sortedData.map(d => d.operators));
+    const minValue = Math.min(...sortedData.map(d => d.operators));
 
     // create artificial range if all values same
     const yDomain =
@@ -149,7 +149,7 @@ const OperatorsOverTime = ({ avsAddress }) => {
       showTooltip({
         tooltipData: d,
         tooltipLeft: x,
-        tooltipTop: yScale(d.count)
+        tooltipTop: yScale(d.operators)
       });
     },
     [showTooltip, sortedData, xScale, yScale, bisectDate]
@@ -236,7 +236,7 @@ const OperatorsOverTime = ({ avsAddress }) => {
                   <LinePath
                     data={sortedData}
                     x={d => xScale(new Date(d.date))}
-                    y={d => yScale(d.count)}
+                    y={d => yScale(d.operators)}
                     stroke="#009CDD"
                     strokeWidth={2}
                   />
@@ -245,7 +245,7 @@ const OperatorsOverTime = ({ avsAddress }) => {
                   <g>
                     <Circle
                       cx={xScale(new Date(tooltipData.date)).toString()}
-                      cy={yScale(tooltipData.count).toString()}
+                      cy={yScale(tooltipData.operators).toString()}
                       r={4}
                       className="cursor-pointer"
                       fill="#009CDD"
@@ -267,7 +267,7 @@ const OperatorsOverTime = ({ avsAddress }) => {
               <div className="text-sm">
                 Date: {formatDateToVerboseString(new Date(tooltipData.date))}
               </div>
-              <div className="text-base">Count: {tooltipData.count}</div>
+              <div className="text-base">Count: {tooltipData.operators}</div>
             </TooltipInPortal>
           )}
         </div>
