@@ -294,26 +294,7 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className="space-y-1 block">
-                  <div className=" font-light text-lg text-foreground-1">
-                    Operators over time
-                  </div>
-                  <div className=" font-light text-base">
-                    364 <span className="text-success">+2.3%</span>
-                  </div>
-                </div>
-                <GraphTimelineSelector
-                  timelineTab={timelineTab}
-                  onTimelineChange={handleTimelineChange}
-                />
-              </CardHeader>
-
-              <CardBody>
-                <OperatorsOverTime />
-              </CardBody>
-            </Card>
+            <OperatorsOverTime avsAddress={avsAddress} />
             <Operators avsAddress={avsAddress} totalTVL={totalTVL} />
           </div>
         </Tab>
