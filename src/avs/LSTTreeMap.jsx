@@ -3,7 +3,7 @@ import { Group } from '@visx/group';
 import { Treemap, hierarchy, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
 import { Text } from '@visx/text';
-import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import React, { useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
@@ -22,12 +22,17 @@ export default function LSTTreeMap({
   lstDistributionData
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    selectedTab: 'all-assets',
-    mouseX: 0,
-    mouseY: 0
+    selectedTab: 'all-assets'
   });
 
-  const { hideTooltip, showTooltip, tooltipData, tooltipOpen } = useTooltip();
+  const {
+    hideTooltip,
+    showTooltip,
+    tooltipData,
+    tooltipOpen,
+    tooltipLeft,
+    tooltipTop
+  } = useTooltip();
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -72,12 +77,6 @@ export default function LSTTreeMap({
     dispatch({ selectedTab: tab });
   };
 
-  const tooltipStyles = {
-    ...defaultStyles,
-    minWidth: 100,
-    color: 'black'
-  };
-
   return (
     <Card
       radius="md"
@@ -119,14 +118,6 @@ export default function LSTTreeMap({
         height={height}
         className="w-full overflow-x-scroll pr-2"
         style={{ marginRight: 'auto' }}
-        onMouseMove={event => {
-          const { clientX, clientY } = event;
-          const { left, top } = event.currentTarget.getBoundingClientRect();
-          dispatch({
-            mouseX: clientX - left,
-            mouseY: clientY - top
-          });
-        }}
       >
         <Treemap
           top={margin.top}
@@ -161,21 +152,27 @@ export default function LSTTreeMap({
                             ? opacity + 0.2
                             : opacity
                         }
-                        onMouseEnter={() => {
+                        onPointerEnter={event => {
+                          const { clientX, clientY } = event;
+                          const { left, top } =
+                            event.currentTarget.getBoundingClientRect();
                           showTooltip({
                             tooltipData: node.data,
-                            tooltipLeft: state.mouseX,
-                            tooltipTop: state.mouseY
+                            tooltipLeft: clientX - left,
+                            tooltipTop: clientY - top
                           });
                         }}
-                        onMouseMove={() => {
+                        onPointerMove={event => {
+                          const { clientX, clientY } = event;
+                          const { left, top } =
+                            event.currentTarget.getBoundingClientRect();
                           showTooltip({
                             tooltipData: node.data,
-                            tooltipLeft: state.mouseX,
-                            tooltipTop: state.mouseY
+                            tooltipLeft: clientX - left,
+                            tooltipTop: clientY - top
                           });
                         }}
-                        onMouseLeave={hideTooltip}
+                        onPointerLeave={hideTooltip}
                       />
                     )}
 
@@ -200,8 +197,8 @@ export default function LSTTreeMap({
       {tooltipOpen && tooltipData && (
         <TooltipInPortal
           key={Math.random()}
-          top={state.mouseY}
-          left={state.mouseX}
+          top={tooltipTop}
+          left={tooltipLeft}
           className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
         >
           <div className="text-sm">

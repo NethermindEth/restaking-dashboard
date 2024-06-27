@@ -114,29 +114,17 @@ const AVSListSkeleton = () => {
           className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
         >
           <div className="md:w-10/12 w-6/12">
-            <Skeleton
-              style={{ background: '#191C2C' }}
-              className="h-8 rounded-md w-4/5 md:w-2/3"
-            />
+            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
           </div>
           <div className="pl-5 flex justify-between gap-5 w-10/12">
             <div className="w-3/12">
-              <Skeleton
-                style={{ background: '#191C2C' }}
-                className="h-8 rounded-md w-full "
-              />
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton
-                style={{ background: '#191C2C' }}
-                className="h-8 rounded-md w-full "
-              />
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton
-                style={{ background: '#191C2C' }}
-                className="h-8 rounded-md w-full "
-              />
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
             </div>
           </div>
         </div>

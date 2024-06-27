@@ -1,6 +1,6 @@
 import { Card, Input } from '@nextui-org/react';
 import { SearchIcon } from '@nextui-org/shared-icons';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -69,7 +69,7 @@ export default function Operators({ avsAddress, totalTVL }) {
     }
   };
 
-  const onNext = () => {
+  const handleNext = () => {
     const currentPage = parseInt(searchParams.get('page'));
     if (currentPage + 1 <= state.totalPages) {
       setSearchParams({ page: currentPage + 1 });
@@ -77,7 +77,7 @@ export default function Operators({ avsAddress, totalTVL }) {
     }
   };
 
-  const onPrevious = () => {
+  const handlePrevious = () => {
     const currentPage = parseInt(searchParams.get('page'));
     if (currentPage - 1 >= 1) {
       setSearchParams({ page: currentPage - 1 });
@@ -85,7 +85,7 @@ export default function Operators({ avsAddress, totalTVL }) {
     }
   };
 
-  const onPageClick = page => {
+  const handlePageClick = page => {
     setSearchParams({ page });
     fetchOperators(page);
   };
@@ -185,9 +185,9 @@ export default function Operators({ avsAddress, totalTVL }) {
         <Pagination
           totalPages={state.totalPages}
           currentPage={parseInt(searchParams.get('page'))}
-          handleNext={onNext}
-          handlePrevious={onPrevious}
-          handlePageClick={onPageClick}
+          handleNext={handleNext}
+          handlePrevious={handlePrevious}
+          handlePageClick={handlePageClick}
         />
       </Card>
       <div className="flex flex-col gap-4 justify-between items-end w-full">
