@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import TVLOverTime from './TVLOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
@@ -15,12 +15,16 @@ const OperatorDetails = () => {
   const { address } = useParams();
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    operatorTVL: 0
+    operatorTVL: 0,
+    timelineTab: '7days'
   });
-  const handleTimelineChange = tab => {
-    // dispatch({ timelineTab: tab });
-    console.log(tab);
-  };
+
+  const handleTimelineChange = useCallback(
+    tab => {
+      dispatch({ timelineTab: tab });
+    },
+    [dispatch]
+  );
 
   const calculateTVL = strategies => {
     const tvl = strategies.reduce((acc, s) => {
@@ -32,7 +36,7 @@ const OperatorDetails = () => {
     return tvl;
   };
 
-  const fetchOperator = async () => {
+  const getOperator = async () => {
     try {
       const data = await operatorService.getOperator(address);
       const operatorTVL = calculateTVL(data.strategies);
@@ -48,7 +52,7 @@ const OperatorDetails = () => {
   });
 
   useEffect(() => {
-    fetchOperator();
+    getOperator();
   }, []);
 
   return (
@@ -107,7 +111,7 @@ const OperatorDetails = () => {
             </div>
           </div>
           <GraphTimelineSelector
-            timelineTab={'7days'}
+            timelineTab={state.timelineTab}
             onTimelineChange={handleTimelineChange}
           />
         </CardHeader>
@@ -143,7 +147,7 @@ const OperatorDetails = () => {
                 </div>
               </div>
               <GraphTimelineSelector
-                timelineTab={'7days'}
+                timelineTab={state.timelineTab}
                 onTimelineChange={handleTimelineChange}
               />
             </CardHeader>

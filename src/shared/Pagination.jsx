@@ -5,11 +5,11 @@ import { PaginationItemType, usePagination } from '@nextui-org/react';
 const Pagination = ({
   totalPages,
   currentPage,
-  onNext,
-  onPrevious,
-  onPageClick
+  handleNext,
+  handlePrevious,
+  handlePageClick
 }) => {
-  const { activePage, range, setPage } = usePagination({
+  const { activePage, range } = usePagination({
     total: totalPages,
     showControls: true,
     page: currentPage
@@ -19,7 +19,7 @@ const Pagination = ({
     <div className="flex border-t border-outline gap-x-2 justify-between items-center p-4 text-foreground-1 mt-austo">
       <span
         className={`cursor-pointer material-symbols-outlined ${activePage === 1 && 'text-disabled'}`}
-        onClick={onPrevious}
+        onClick={handlePrevious}
       >
         arrow_back_ios
       </span>
@@ -35,7 +35,7 @@ const Pagination = ({
 
             return (
               <span
-                onClick={() => onPageClick(page)}
+                onClick={() => handlePageClick(page)}
                 key={`page-${page}`}
                 aria-label={`page ${page}`}
                 className={`${activePage == page ? 'text-foreground-2' : 'text-slate-500'} cursor-pointer`}
@@ -47,7 +47,7 @@ const Pagination = ({
       </div>
       <div
         className={`cursor-pointer material-symbols-outlined ${activePage === totalPages && 'text-disabled'}`}
-        onClick={onNext}
+        onClick={handleNext}
       >
         arrow_forward_ios
       </div>
