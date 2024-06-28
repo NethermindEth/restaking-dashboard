@@ -11,7 +11,7 @@ const OperatorsList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {});
 
-  const fetchOperators = async pageIndex => {
+  const getOperators = async pageIndex => {
     try {
       const data = await operatorService.getAll(pageIndex - 1);
       dispatch({
@@ -28,33 +28,33 @@ const OperatorsList = () => {
     minimumFractionDigits: 2
   });
 
-  const onNext = () => {
+  const handleNext = () => {
     const currentPage = parseInt(searchParams.get('page'));
     if (currentPage + 1 <= state.totalPages) {
       setSearchParams({ page: currentPage + 1 });
-      fetchOperators(currentPage + 1);
+      getOperators(currentPage + 1);
     }
   };
 
-  const onPrevious = () => {
+  const handlePrevious = () => {
     const currentPage = parseInt(searchParams.get('page'));
     if (currentPage - 1 >= 1) {
       setSearchParams({ page: currentPage - 1 });
-      fetchOperators(currentPage - 1);
+      getOperators(currentPage - 1);
     }
   };
 
-  const onPageClick = page => {
+  const handlePageClick = page => {
     setSearchParams({ page });
-    fetchOperators(page);
+    getOperators(page);
   };
 
   useEffect(() => {
     const page = searchParams.get('page');
     if (!page) {
       setSearchParams({ page: 1 }, { replace: true });
-      fetchOperators(1);
-    } else fetchOperators(searchParams.get('page'));
+      getOperators(1);
+    } else getOperators(searchParams.get('page'));
   }, [searchParams]);
 
   return (
@@ -108,9 +108,9 @@ const OperatorsList = () => {
         <Pagination
           totalPages={state.totalPages}
           currentPage={parseInt(searchParams.get('page'))}
-          onNext={onNext}
-          onPrevious={onPrevious}
-          onPageClick={onPageClick}
+          handleNext={handleNext}
+          handlePrevious={handlePrevious}
+          handlePageClick={handlePageClick}
         />
       </div>
     </div>

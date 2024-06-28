@@ -14,12 +14,9 @@ const OperatorDetails = () => {
   const { address } = useParams();
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    operatorTVL: 0
+    operatorTVL: 0,
+    timelineTab: '7days'
   });
-  const handleTimelineChange = tab => {
-    // dispatch({ timelineTab: tab });
-    console.log(tab);
-  };
 
   const calculateTVL = strategies => {
     const tvl = strategies.reduce((acc, s) => {
@@ -31,7 +28,7 @@ const OperatorDetails = () => {
     return tvl;
   };
 
-  const fetchOperator = async () => {
+  const getOperator = async () => {
     try {
       const data = await operatorService.getOperator(address);
       const operatorTVL = calculateTVL(data.strategies);
@@ -47,7 +44,7 @@ const OperatorDetails = () => {
   });
 
   useEffect(() => {
-    fetchOperator();
+    getOperator();
   }, []);
 
   return (
