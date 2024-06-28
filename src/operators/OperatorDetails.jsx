@@ -1,14 +1,14 @@
 import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
 import React, { useEffect } from 'react';
-import TVLOverTime from './TVLOverTime';
+import OperatorTVLOverTime from './OperatorTVLOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
-import RestakerTrend from './RestakerTrend';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { formatEther } from 'ethers';
 import LSTDistribution from './LSTDistribution';
+import RestakersTrend from './RestakersTrend';
 
 const OperatorDetails = () => {
   const { address } = useParams();
@@ -91,7 +91,7 @@ const OperatorDetails = () => {
         </CardBody>
       </Card>
 
-      <TVLOverTime
+      <OperatorTVLOverTime
         opAddress={address}
         currentTVL={assetFormatter.format(
           formatEther(state.operatorTVL.toString())
@@ -111,7 +111,7 @@ const OperatorDetails = () => {
           </CardBody>
         </Card>
         <div className="w-full flex flex-col gap-y-4">
-          <RestakerTrend width={670} height={400} opAddress={address} />
+          <RestakersTrend opAddress={address} />
           <Card
             radius="md"
             className="bg-content1 w-full border border-outline p-4"
@@ -128,7 +128,6 @@ const OperatorDetails = () => {
           </Card>
         </div>
       </div>
-      <RestakerTrend width={1100} height={400} opAddress={address} />
     </div>
   );
 };

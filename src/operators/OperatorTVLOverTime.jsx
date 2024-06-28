@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Group } from '@visx/group';
 import { Circle, LinePath } from '@visx/shape';
 import { scaleLinear, scaleTime } from '@visx/scale';
@@ -37,15 +37,12 @@ const getMargin = width => {
   return { top: 20, right: 20, bottom: 20, left: 60 };
 };
 
-const TVLOverTime = ({ opAddress, currentTVL }) => {
+const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
   const { operatorService } = useServices();
-  const [{ timelineTab, tvlOvertimeData }, dispatch] = useMutativeReducer(
-    reduceState,
-    {
-      timelineTab: '7days',
-      tvlOvertimeData: null
-    }
-  );
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    timelineTab: '7days',
+    tvlOvertimeData: null
+  });
 
   const { width } = useScreenSize();
   const height = Math.min(400, width * 0.4);
@@ -65,39 +62,39 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
 
   const bisectDate = bisector(d => new Date(d.timestamp)).left;
 
-  const sortData = (data, tab) => {
-    switch (tab) {
+  const getDataByRange = useCallback(() => {
+    switch (state.timelineTab) {
       case '7days':
-        return data.slice(-7);
+        return state.tvlOvertimeData.slice(-7);
       case '30days':
-        return data.slice(-30);
+        return state.tvlOvertimeData.slice(-30);
       default:
-        return data;
+        return state.tvlOvertimeData;
     }
-  };
+  }, [state.tvlOvertimeData, state.timelineTab]);
 
-  const sortedData = useMemo(() => {
-    if (!tvlOvertimeData) return null;
-    return sortData(tvlOvertimeData, timelineTab);
-  }, [tvlOvertimeData, timelineTab]);
+  const filteredData = useMemo(() => {
+    if (!state.tvlOvertimeData) return null;
+    return getDataByRange();
+  }, [state.tvlOvertimeData, state.timelineTab]);
 
   const margin = getMargin(width);
 
   const xScale = useMemo(() => {
-    if (!sortedData) return null;
+    if (!filteredData) return null;
     return scaleTime({
       domain: [
-        Math.min(...sortedData.map(d => new Date(d.timestamp))),
-        Math.max(...sortedData.map(d => new Date(d.timestamp)))
+        Math.min(...filteredData.map(d => new Date(d.timestamp))),
+        Math.max(...filteredData.map(d => new Date(d.timestamp)))
       ],
       range: [margin.left, width - margin.right]
     });
-  }, [sortedData, width, margin]);
+  }, [filteredData, width, margin]);
 
   const yScale = useMemo(() => {
-    if (!sortedData) return null;
-    const maxValue = Math.max(...sortedData.map(d => d.tvl));
-    const minValue = Math.min(...sortedData.map(d => d.tvl));
+    if (!filteredData) return null;
+    const maxValue = Math.max(...filteredData.map(d => d.tvl));
+    const minValue = Math.min(...filteredData.map(d => d.tvl));
     const yDomain = [minValue, maxValue + (maxValue - minValue) * 0.1];
 
     return scaleLinear({
@@ -105,21 +102,24 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
       range: [height - margin.bottom, margin.top],
       nice: true
     });
-  }, [sortedData, height, margin]);
+  }, [filteredData, height, margin]);
 
-  const handleTimelineChange = tab => {
-    dispatch({ timelineTab: tab });
-  };
+  const handleTimelineChange = useCallback(
+    tab => {
+      dispatch({ timelineTab: tab });
+    },
+    [dispatch]
+  );
 
   const handleMouseMove = React.useCallback(
     event => {
-      if (!sortedData || !xScale || !yScale) return;
+      if (!filteredData || !xScale || !yScale) return;
 
       const { x, y } = localPoint(event) || { x: 0, y: 0 };
       const x0 = xScale.invert(x);
-      const index = bisectDate(sortedData, x0, 1);
-      const d0 = sortedData[index - 1];
-      const d1 = sortedData[index];
+      const index = bisectDate(filteredData, x0, 1);
+      const d0 = filteredData[index - 1];
+      const d1 = filteredData[index];
       let d = d0;
       if (d1 && d1.timestamp) {
         d =
@@ -135,7 +135,7 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
         tooltipTop: y
       });
     },
-    [showTooltip, sortedData, xScale, yScale]
+    [showTooltip, filteredData, xScale, yScale]
   );
 
   const fetchTVLOverTime = async () => {
@@ -166,7 +166,7 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
           </div>
         </div>
         <GraphTimelineSelector
-          timelineTab={timelineTab}
+          timelineTab={state.timelineTab}
           onTimelineChange={handleTimelineChange}
         />
       </CardHeader>
@@ -230,14 +230,14 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
                     fontSize: width < 500 ? 12 : 14,
                     textAnchor: 'middle'
                   })}
-                  tickValues={sortedData
+                  tickValues={filteredData
                     .filter(
                       (_, i) =>
                         i %
                           Math.max(
                             1,
                             Math.floor(
-                              sortedData.length / getNumberOfTicks(width, 'x')
+                              filteredData.length / getNumberOfTicks(width, 'x')
                             )
                           ) ===
                         0
@@ -247,7 +247,7 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
                 <Group>
                   <LinePath
                     className="cursor-pointer"
-                    data={sortedData}
+                    data={filteredData}
                     x={d => xScale(new Date(d.timestamp))}
                     y={d => yScale(d.tvl)}
                     stroke="#009CDD"
@@ -292,4 +292,4 @@ const TVLOverTime = ({ opAddress, currentTVL }) => {
   );
 };
 
-export default TVLOverTime;
+export default OperatorTVLOverTime;
