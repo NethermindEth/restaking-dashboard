@@ -1,6 +1,5 @@
 import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
 import React, { useEffect } from 'react';
-import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import TVLOverTime from './TVLOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
 import RestakerTrend from './RestakerTrend';
@@ -115,28 +114,7 @@ const OperatorDetails = () => {
           </CardBody>
         </Card>
         <div className="w-full flex flex-col gap-y-4">
-          <Card
-            radius="md"
-            className="bg-content1 w-full border border-outline p-4"
-          >
-            <CardHeader className="flex flex-wrap justify-between gap-3">
-              <div className="space-y-2 block">
-                <span className="text-foreground-2">Restaker Trend</span>
-                <div className="font-light">
-                  <div className="text-base text-foreground-1">
-                    <span>4,554,567 ETH</span>
-                  </div>
-                </div>
-              </div>
-              <GraphTimelineSelector
-                timelineTab={'7days'}
-                onTimelineChange={handleTimelineChange}
-              />
-            </CardHeader>
-            <CardBody>
-              <RestakerTrend width={670} height={400} />
-            </CardBody>
-          </Card>
+          <RestakerTrend width={670} height={400} opAddress={address} />
           <Card
             radius="md"
             className="bg-content1 w-full border border-outline p-4"
@@ -153,6 +131,7 @@ const OperatorDetails = () => {
           </Card>
         </div>
       </div>
+      <RestakerTrend width={1100} height={400} opAddress={address} />
     </div>
   );
 };
