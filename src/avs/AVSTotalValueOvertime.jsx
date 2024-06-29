@@ -8,7 +8,7 @@ import { scaleLinear, scaleTime } from '@visx/scale';
 import { Circle, LinePath } from '@visx/shape';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from 'd3-array';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
@@ -37,7 +37,7 @@ const getMargin = width => {
   return { top: 20, right: 20, bottom: 20, left: 60 };
 };
 
-const AVSTVLOverTime = ({ avsAddress }) => {
+const AVSTotalValueOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: '7days',
     tvlOvertimeData: null
@@ -65,7 +65,7 @@ const AVSTVLOverTime = ({ avsAddress }) => {
   useEffect(() => {
     async function fetchTvlOvertime() {
       try {
-        const tvlOvertimeData = await avsService.getAvsTvlOvertime(avsAddress);
+        const tvlOvertimeData = await avsService.getAVSTotalValue(avsAddress);
         dispatch({
           tvlOvertimeData
         });
@@ -76,25 +76,25 @@ const AVSTVLOverTime = ({ avsAddress }) => {
     fetchTvlOvertime();
   }, [avsService, dispatch, avsAddress]);
 
-  const sortData = (data, tab) => {
-    switch (tab) {
+  const getDataByRange = useCallback(() => {
+    switch (state.timelineTab) {
       case '7days':
-        return data.slice(-7);
+        return state.tvlOvertimeData.slice(-7);
       case '30days':
-        return data.slice(-30);
+        return state.tvlOvertimeData.slice(-30);
       default:
-        return data;
+        return state.tvlOvertimeData;
     }
-  };
+  }, [state.tvlOvertimeData, state.timelineTab]);
 
   const sortedData = useMemo(() => {
     if (!tvlOvertimeData) return null;
-    return sortData(tvlOvertimeData, timelineTab);
-  }, [tvlOvertimeData, timelineTab]);
+    return getDataByRange(tvlOvertimeData, timelineTab);
+  }, [tvlOvertimeData, timelineTab, getDataByRange]);
 
   const margin = getMargin(width);
 
-  const xScale = useMemo(() => {
+  const dateScale = useMemo(() => {
     if (!sortedData) return null;
     return scaleTime({
       domain: [
@@ -105,7 +105,7 @@ const AVSTVLOverTime = ({ avsAddress }) => {
     });
   }, [sortedData, width, margin]);
 
-  const yScale = useMemo(() => {
+  const tvlScale = useMemo(() => {
     if (!sortedData) return null;
     const maxValue = Math.max(...sortedData.map(d => d.tvl));
     const minValue = Math.min(...sortedData.map(d => d.tvl));
@@ -122,12 +122,12 @@ const AVSTVLOverTime = ({ avsAddress }) => {
     dispatch({ timelineTab: tab });
   };
 
-  const handleMouseMove = React.useCallback(
+  const handleMouseMove = useCallback(
     event => {
-      if (!sortedData || !xScale || !yScale) return;
+      if (!sortedData || !dateScale || !tvlScale) return;
 
       const { x, y } = localPoint(event) || { x: 0, y: 0 };
-      const x0 = xScale.invert(x);
+      const x0 = dateScale.invert(x);
       const index = bisectDate(sortedData, x0, 1);
       const d0 = sortedData[index - 1];
       const d1 = sortedData[index];
@@ -146,7 +146,7 @@ const AVSTVLOverTime = ({ avsAddress }) => {
         tooltipTop: y
       });
     },
-    [showTooltip, sortedData, xScale, yScale]
+    [showTooltip, sortedData, dateScale, tvlScale]
   );
 
   return (
@@ -177,10 +177,10 @@ const AVSTVLOverTime = ({ avsAddress }) => {
             onMouseMove={handleMouseMove}
             onMouseLeave={() => hideTooltip()}
           >
-            {xScale && yScale && (
+            {dateScale && tvlScale && (
               <>
                 <GridRows
-                  scale={yScale}
+                  scale={tvlScale}
                   width={width - margin.left - margin.right}
                   height={height - margin.top - margin.bottom}
                   left={margin.left}
@@ -188,10 +188,10 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                   stroke="#7A86A5"
                   strokeOpacity={0.2}
                   numTicks={getNumberOfTicks(width, 'y')}
-                  tickValues={yScale.ticks(getNumberOfTicks(width, 'y'))}
+                  tickValues={tvlScale.ticks(getNumberOfTicks(width, 'y'))}
                 />
                 <GridColumns
-                  scale={xScale}
+                  scale={dateScale}
                   width={width - margin.left - margin.right}
                   height={height - margin.top - margin.bottom}
                   left={margin.left}
@@ -201,9 +201,9 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                   numTicks={getNumberOfTicks(width, 'x')}
                 />
                 <AxisLeft
-                  scale={yScale}
-                  top={margin.top}
-                  left={margin.left}
+                  scale={tvlScale}
+                  top={margin.top + 15}
+                  left={margin.left - 15}
                   tickFormat={formatNumberToCompactString}
                   tickLabelProps={() => ({
                     fill: '#7A86A5',
@@ -213,12 +213,12 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                     dx: '-0.33em'
                   })}
                   numTicks={getNumberOfTicks(width, 'y')}
-                  tickValues={yScale.ticks(getNumberOfTicks(width, 'y'))}
+                  tickValues={tvlScale.ticks(getNumberOfTicks(width, 'y'))}
                 />
                 <AxisBottom
-                  scale={xScale}
-                  top={height - margin.bottom + 30}
-                  left={margin.left - 80}
+                  scale={dateScale}
+                  top={height - margin.bottom + 50}
+                  left={width > 500 ? margin.left - 70 : margin.left - 50}
                   tickFormat={date => formatDateToVerboseString(new Date(date))}
                   tickLabelProps={() => ({
                     fill: '#7A86A5',
@@ -243,8 +243,8 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                   <LinePath
                     className="cursor-pointer"
                     data={sortedData}
-                    x={d => xScale(new Date(d.timestamp))}
-                    y={d => yScale(d.tvl)}
+                    x={d => dateScale(new Date(d.timestamp))}
+                    y={d => tvlScale(d.tvl)}
                     stroke="#009CDD"
                     strokeWidth={2}
                   />
@@ -252,8 +252,8 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                 {tooltipData && (
                   <g>
                     <Circle
-                      cx={xScale(new Date(tooltipData.timestamp)).toString()}
-                      cy={yScale(tooltipData.tvl).toString()}
+                      cx={dateScale(new Date(tooltipData.timestamp)).toString()}
+                      cy={tvlScale(tooltipData.tvl).toString()}
                       r={4}
                       className="cursor-pointer"
                       fill="#009CDD"
@@ -287,4 +287,4 @@ const AVSTVLOverTime = ({ avsAddress }) => {
   );
 };
 
-export default AVSTVLOverTime;
+export default AVSTotalValueOvertime;

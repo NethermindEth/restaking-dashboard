@@ -14,7 +14,7 @@ import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
 import { assetFormatter } from '../utils';
-import AVSTVLOverTime from './AVSTVLOverTime';
+import AVSTotalValueOvertime from './AVSTotalValueOvertime';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
 import OperatorsOverTime from './OperatorsOverTime';
@@ -273,7 +273,7 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <AVSTVLOverTime avsAddress={avsAddress} />
+            <AVSTotalValueOvertime avsAddress={avsAddress} />
 
             <LSTDistribution
               lstDistributionData={state.lstDistributionData}
