@@ -8,7 +8,7 @@ import { scaleLinear, scaleTime } from '@visx/scale';
 import { Circle, LinePath } from '@visx/shape';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from 'd3-array';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
@@ -37,7 +37,7 @@ const getMargin = width => {
   return { top: 20, right: 20, bottom: 20, left: 60 };
 };
 
-const OperatorsOverTime = ({ avsAddress }) => {
+const OperatorsOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: '7days',
     graphData: null
@@ -78,25 +78,25 @@ const OperatorsOverTime = ({ avsAddress }) => {
     fetchTvlOvertime();
   }, [avsService, dispatch, avsAddress]);
 
-  const sortData = (data, tab) => {
-    switch (tab) {
+  const getDataByRange = useCallback(() => {
+    switch (state.timelineTab) {
       case '7days':
-        return data.slice(-7);
+        return state.graphData.slice(-7);
       case '30days':
-        return data.slice(-30);
+        return state.graphData.slice(-30);
       default:
-        return data;
+        return state.graphData;
     }
-  };
+  }, [state.graphData, state.timelineTab]);
 
   const sortedData = useMemo(() => {
     if (!graphData) return null;
-    return sortData(graphData, timelineTab);
-  }, [graphData, timelineTab]);
+    return getDataByRange(graphData, timelineTab);
+  }, [graphData, timelineTab, getDataByRange]);
 
   const margin = getMargin(width);
 
-  const xScale = useMemo(() => {
+  const dateScale = useMemo(() => {
     if (!sortedData) return null;
     return scaleTime({
       domain: [
@@ -107,12 +107,12 @@ const OperatorsOverTime = ({ avsAddress }) => {
     });
   }, [sortedData, width, margin]);
 
-  const yScale = useMemo(() => {
+  const operatorsScale = useMemo(() => {
     if (!sortedData) return null;
     const maxValue = Math.max(...sortedData.map(d => d.operators));
     const minValue = Math.min(...sortedData.map(d => d.operators));
 
-    // create artificial range if all values same
+    // create artificial range of tick values for operators count axis if operators count is contant to avoid rendering single tick value
     const yDomain =
       maxValue === minValue
         ? [maxValue * 0.9, maxValue * 1.1]
@@ -134,10 +134,10 @@ const OperatorsOverTime = ({ avsAddress }) => {
 
   const handleMouseMove = useCallback(
     event => {
-      if (!sortedData || !xScale || !yScale) return;
+      if (!sortedData || !dateScale || !operatorsScale) return;
 
       const { x } = localPoint(event) || { x: 0 };
-      const x0 = xScale.invert(x);
+      const x0 = dateScale.invert(x);
       const index = bisectDate(sortedData, x0, 1);
       const d0 = sortedData[index - 1];
       const d1 = sortedData[index];
@@ -149,10 +149,10 @@ const OperatorsOverTime = ({ avsAddress }) => {
       showTooltip({
         tooltipData: d,
         tooltipLeft: x,
-        tooltipTop: yScale(d.operators)
+        tooltipTop: operatorsScale(d.operators)
       });
     },
-    [showTooltip, sortedData, xScale, yScale, bisectDate]
+    [showTooltip, sortedData, dateScale, operatorsScale, bisectDate]
   );
 
   return (
@@ -161,9 +161,8 @@ const OperatorsOverTime = ({ avsAddress }) => {
       className="bg-content1 border border-outline p-4 relative"
     >
       <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-        {' '}
         <div className="font-light text-lg text-foreground-1">
-          Operators over time
+          Total operators over time
         </div>
         <GraphTimelineSelector
           timelineTab={timelineTab}
@@ -182,10 +181,10 @@ const OperatorsOverTime = ({ avsAddress }) => {
             onMouseMove={handleMouseMove}
             onMouseLeave={hideTooltip}
           >
-            {xScale && yScale && (
+            {dateScale && operatorsScale && (
               <>
                 <GridRows
-                  scale={yScale}
+                  scale={operatorsScale}
                   width={width - margin.left - margin.right}
                   height={height - margin.top - margin.bottom}
                   left={margin.left}
@@ -193,10 +192,12 @@ const OperatorsOverTime = ({ avsAddress }) => {
                   stroke="#7A86A5"
                   strokeOpacity={0.2}
                   numTicks={getNumberOfTicks(width, 'y')}
-                  tickValues={yScale.ticks(getNumberOfTicks(width, 'y'))}
+                  tickValues={operatorsScale.ticks(
+                    getNumberOfTicks(width, 'y')
+                  )}
                 />
                 <GridColumns
-                  scale={xScale}
+                  scale={dateScale}
                   width={width - margin.left - margin.right}
                   height={height - margin.top - margin.bottom}
                   left={margin.left}
@@ -206,8 +207,8 @@ const OperatorsOverTime = ({ avsAddress }) => {
                   numTicks={getNumberOfTicks(width, 'x')}
                 />
                 <AxisLeft
-                  scale={yScale}
-                  top={margin.top}
+                  scale={operatorsScale}
+                  top={margin.top - 20}
                   left={margin.left}
                   tickFormat={formatNumberToCompactString}
                   tickLabelProps={() => ({
@@ -218,10 +219,12 @@ const OperatorsOverTime = ({ avsAddress }) => {
                     dx: '-0.33em'
                   })}
                   numTicks={getNumberOfTicks(width, 'y')}
-                  tickValues={yScale.ticks(getNumberOfTicks(width, 'y'))}
+                  tickValues={operatorsScale.ticks(
+                    getNumberOfTicks(width, 'y')
+                  )}
                 />
                 <AxisBottom
-                  scale={xScale}
+                  scale={dateScale}
                   top={height - margin.bottom + 30}
                   left={margin.left - 30}
                   tickFormat={date => formatDateToVerboseString(new Date(date))}
@@ -230,13 +233,13 @@ const OperatorsOverTime = ({ avsAddress }) => {
                     fontSize: width < 500 ? 12 : 14,
                     textAnchor: 'middle'
                   })}
-                  tickValues={xScale.ticks(getNumberOfTicks(width, 'x'))}
+                  tickValues={dateScale.ticks(getNumberOfTicks(width, 'x'))}
                 />
                 <Group>
                   <LinePath
                     data={sortedData}
-                    x={d => xScale(new Date(d.date))}
-                    y={d => yScale(d.operators)}
+                    x={d => dateScale(new Date(d.date))}
+                    y={d => operatorsScale(d.operators)}
                     stroke="#009CDD"
                     strokeWidth={2}
                   />
@@ -244,8 +247,8 @@ const OperatorsOverTime = ({ avsAddress }) => {
                 {tooltipData && (
                   <g>
                     <Circle
-                      cx={xScale(new Date(tooltipData.date)).toString()}
-                      cy={yScale(tooltipData.operators).toString()}
+                      cx={dateScale(new Date(tooltipData.date)).toString()}
+                      cy={operatorsScale(tooltipData.operators).toString()}
                       r={4}
                       className="cursor-pointer"
                       fill="#009CDD"
@@ -260,14 +263,16 @@ const OperatorsOverTime = ({ avsAddress }) => {
           {tooltipOpen && tooltipData && (
             <TooltipInPortal
               key={Math.random()}
-              top={tooltipTop}
-              left={tooltipLeft}
+              top={tooltipTop + 60}
+              left={tooltipLeft - 250}
               className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
             >
               <div className="text-sm">
                 Date: {formatDateToVerboseString(new Date(tooltipData.date))}
               </div>
-              <div className="text-base">Count: {tooltipData.operators}</div>
+              <div className="text-base">
+                Operators: {tooltipData.operators}
+              </div>
             </TooltipInPortal>
           )}
         </div>
@@ -276,4 +281,4 @@ const OperatorsOverTime = ({ avsAddress }) => {
   );
 };
 
-export default OperatorsOverTime;
+export default OperatorsOvertime;

@@ -17,7 +17,7 @@ import { assetFormatter } from '../utils';
 import AVSTVLOverTime from './AVSTVLOverTime';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
-import OperatorsOverTime from './OperatorsOverTime';
+import OperatorsOvertime from './OperatorsOvertime';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
 import { strategiesData } from './strategies.mapping';
@@ -291,7 +291,7 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <OperatorsOverTime avsAddress={avsAddress} />
+            <OperatorsOvertime avsAddress={avsAddress} />
             <Operators avsAddress={avsAddress} totalTVL={state.totalTVL} />
           </div>
         </Tab>
