@@ -1,84 +1,54 @@
-import { Card, Divider, Link } from '@nextui-org/react';
+import { Card, Divider, Link, Skeleton } from '@nextui-org/react';
 import { ChevronRightIcon } from '@nextui-org/shared-icons';
+import { useEffect } from 'react';
+import { useMutativeReducer } from 'use-mutative';
+import { useServices } from '../@services/ServiceContext';
+import { reduceState } from '../shared/helpers';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
+import EigenTvlOvertime from './EigenTvlOvertime';
 import OverviewLRTDistribution from './OverviewLRTDistribution';
-import OverviewTVLOverTime from './OverviewTVLOverTime';
-
-const topAVS = [
-  {
-    avs: {
-      name: 'EigenDa',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    operators: 123,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    }
-  },
-  {
-    avs: {
-      name: 'EigenDa',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    operators: 123,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    }
-  },
-  {
-    avs: {
-      name: 'EigenDa',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    operators: 123,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    }
-  }
-];
-
-const topOperators = [
-  {
-    operator: {
-      name: 'EigenDa',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    restakers: 123,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    }
-  },
-  {
-    operator: {
-      name: 'EigenDa',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    restakers: 123,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    }
-  },
-  {
-    operator: {
-      name: 'EigenDa',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    restakers: 123,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    }
-  }
-];
 
 export default function Home() {
   const compact = !useTailwindBreakpoint('md');
+  const { avsService, operatorService } = useServices();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isFetchingTopAVS: false,
+    isFetchingTopOperators: false,
+    topAVS: [],
+    topOperators: []
+  });
+
+  const fetchTopAVS = async () => {
+    try {
+      dispatch({ isFetchingTopAVS: true });
+      const data = await avsService.getTopAVS();
+      dispatch({ topAVS: data.results, isFetchingTopAVS: false });
+    } catch {
+      // TODO: Handle error
+      dispatch({
+        isFetchingTopAVS: false
+      });
+    }
+  };
+
+  const fetchTopOperators = async () => {
+    try {
+      dispatch({ isFetchingTopOperators: true });
+      const data = await operatorService.getTopOperators();
+      dispatch({ topOperators: data.results, isFetchingTopOperators: false });
+    } catch {
+      // TODO: Handle error
+      dispatch({
+        isFetchingTopOperators: false
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchTopAVS();
+    fetchTopOperators();
+  }, [avsService, operatorService, dispatch]);
 
   return (
     <div className="space-y-4">
@@ -129,28 +99,36 @@ export default function Home() {
           <div className="font-light text-base text-foreground-1">Top AVS</div>
           <div className="text-sm">
             <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-              <span className="basis-full">AVS</span>
-              <span className="basis-2/3">Operators</span>
-              <span className="basis-1/2 text-end">TVL</span>
+              <span className="basis-full truncate">AVS</span>
+              <span className="basis-1/2">Operators</span>
+              <span className="basis-1/3 text-end">TVL</span>
             </div>
-            {topAVS.map((entry, i) => (
-              <div
-                key={`top-avs-item-${i}`}
-                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-              >
-                <img src={entry.avs.logo} className="size-5 rounded-full" />
-                <span className="basis-full truncate">{entry.avs.name}</span>
-                <span className="basis-2/3">
-                  {formatNumber(entry.operators, compact)}%
-                </span>
-                <span className="basis-1/2 text-end">
-                  <div>{formatNumber(entry.tvl.eth, compact)} ETH</div>
-                  <div className="text-foreground-1 text-xs">
-                    $ {formatNumber(entry.tvl.usd, compact)}
-                  </div>
-                </span>
-              </div>
-            ))}
+            {state.isFetchingTopAVS ? (
+              <ListSkeleton />
+            ) : (
+              state.topAVS &&
+              state.topAVS.map((avs, i) => (
+                <Link
+                  href={`/avs/${avs.address}`}
+                  key={`avs-item-${i}`}
+                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default text-white text-sm`}
+                >
+                  <img
+                    className="h-5 rounded-full min-w-5"
+                    src={avs.metadata.logo}
+                  />
+                  <span className="basis-full truncate">
+                    {avs?.metadata?.name}
+                  </span>
+                  <span className="basis-1/2">
+                    {formatNumber(avs.operators, compact)}
+                  </span>
+                  <span className="basis-1/3 text-end">
+                    <div>ETH {formatNumber(avs.strategiesTotal, compact)}</div>
+                  </span>
+                </Link>
+              ))
+            )}
           </div>
         </Card>
         <Card
@@ -162,38 +140,41 @@ export default function Home() {
           </div>
           <div className="text-sm">
             <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-              <span className="basis-full">Operators</span>
-              <span className="basis-2/3">Restakers</span>
-              <span className="basis-1/2 text-end">TVL</span>
+              <span className="basis-full truncate">Operators</span>
+              <span className="basis-1/2">Restakers</span>
+              <span className="basis-1/3 text-end">TVL</span>
             </div>
-            {topOperators.map((entry, i) => (
-              <div
-                key={`top-avs-item-${i}`}
-                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-              >
-                <img
-                  src={entry.operator.logo}
-                  className="size-5 rounded-full"
-                />
-                <span className="basis-full truncate">
-                  {entry.operator.name}
-                </span>
-                <span className="basis-2/3">
-                  {formatNumber(entry.restakers, compact)}%
-                </span>
-                <span className="basis-1/2 text-end">
-                  <div>{formatNumber(entry.tvl.eth, compact)} ETH</div>
-                  <div className="text-foreground-1 text-xs">
-                    $ {formatNumber(entry.tvl.usd, compact)}
-                  </div>
-                </span>
-              </div>
-            ))}
+            {state.isFetchingTopOperators ? (
+              <ListSkeleton />
+            ) : (
+              state.topOperators &&
+              state.topOperators.map((op, i) => (
+                <Link
+                  href={`/operators/${op.address}`}
+                  key={`avs-item-${i}`}
+                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default text-white text-sm`}
+                >
+                  <img
+                    className="h-5 rounded-full min-w-5"
+                    src={op.metadata.logo}
+                  />
+                  <span className="basis-full truncate">
+                    {op?.metadata?.name}
+                  </span>
+                  <span className="basis-1/2">
+                    {formatNumber(op.stakerCount, compact)}
+                  </span>
+                  <span className="basis-1/3 text-end">
+                    <div>ETH {formatNumber(op.strategiesTotal, compact)}</div>
+                  </span>
+                </Link>
+              ))
+            )}
           </div>
         </Card>
       </div>
 
-      <OverviewTVLOverTime width={1100} height={400} />
+      <EigenTvlOvertime />
       <OverviewLRTDistribution />
     </div>
   );
@@ -250,6 +231,34 @@ const CallToActions = () => {
           <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
         </Card>
       </Link>
+    </div>
+  );
+};
+
+const ListSkeleton = () => {
+  return (
+    <div>
+      {[...Array(3)].map((item, i) => (
+        <div
+          key={i}
+          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+        >
+          <div className="md:w-10/12 w-6/12">
+            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          </div>
+          <div className="pl-5 flex justify-between gap-5 w-10/12">
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
