@@ -7,7 +7,10 @@ import { extent } from 'd3-array';
 import { GridRows, GridColumns } from '@visx/grid';
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
-import { formatDateToVerboseString } from '../utils';
+import {
+  formatDateToVerboseString,
+  formatNumberToCompactString
+} from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
@@ -21,7 +24,7 @@ const getNumberOfTicks = (width, axis) => {
   }
 };
 
-const RestakersTrendChart = ({ data, width, height }) => {
+const OperatorTVLOverTimeChart = ({ data, width, height }) => {
   const {
     tooltipData,
     tooltipLeft = 0,
@@ -35,15 +38,15 @@ const RestakersTrendChart = ({ data, width, height }) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const getRestakers = d => d.restakers;
+  const getTVL = d => d.tvl;
 
-  const getRestakersByDate = date => {
+  const getTVLByDate = date => {
     const selectedDate = formatDateToVerboseString(new Date(date));
-    const restakers = data.filter(
+    const tvl = data.filter(
       item =>
         selectedDate === formatDateToVerboseString(new Date(item.timestamp))
     );
-    return restakers[0];
+    return tvl[0];
   };
 
   const dateScale = useMemo(
@@ -59,15 +62,17 @@ const RestakersTrendChart = ({ data, width, height }) => {
     [data]
   );
 
-  const restakersScale = useMemo(
-    () =>
-      scaleLinear({
-        range: [innerHeight, 0],
-        domain: extent(data, getRestakers),
-        nice: true
-      }),
-    [data]
-  );
+  const tvlScale = useMemo(() => {
+    const maxValue = Math.max(...data.map(d => d.tvl));
+    const minValue = Math.min(...data.map(d => d.tvl));
+    const yDomain = [minValue, maxValue + (maxValue - minValue) * 0.1];
+
+    return scaleLinear({
+      domain: yDomain,
+      range: [innerHeight, 0],
+      nice: true
+    });
+  }, [data, height, margin]);
 
   const handleTooltip = useCallback(
     ev => {
@@ -75,12 +80,12 @@ const RestakersTrendChart = ({ data, width, height }) => {
       const date = dateScale.invert(x - margin.left);
 
       showTooltip({
-        tooltipData: getRestakersByDate(date),
+        tooltipData: getTVLByDate(date),
         tooltipLeft: x,
         tooltipTop: y
       });
     },
-    [localPoint, dateScale, margin, showTooltip, getRestakersByDate]
+    [localPoint, dateScale, margin, showTooltip, getTVLByDate]
   );
 
   return (
@@ -96,13 +101,13 @@ const RestakersTrendChart = ({ data, width, height }) => {
         />
         <Group left={margin.left} top={margin.top}>
           <GridRows
-            scale={restakersScale}
+            scale={tvlScale}
             width={innerWidth}
             height={innerHeight - margin.top}
             stroke="#7A86A5"
             strokeOpacity={0.2}
             numTicks={getNumberOfTicks(width, 'y')}
-            tickValues={restakersScale.ticks(getNumberOfTicks(width, 'y'))}
+            tickValues={tvlScale.ticks(getNumberOfTicks(width, 'y'))}
           />
           <GridColumns
             scale={dateScale}
@@ -114,11 +119,13 @@ const RestakersTrendChart = ({ data, width, height }) => {
           />
 
           <AxisLeft
-            scale={restakersScale}
+            tickFormat={formatNumberToCompactString}
+            scale={tvlScale}
             tickLabelProps={() => ({
               className: 'fill-default-2 text-xs',
-              fontSize: 11,
-              textAnchor: 'end'
+              textAnchor: 'end',
+              dy: '0.33em',
+              dx: '-0.33em'
             })}
           />
 
@@ -148,14 +155,14 @@ const RestakersTrendChart = ({ data, width, height }) => {
             strokeWidth={2}
             data={data}
             x={d => dateScale(new Date(d.timestamp))}
-            y={d => restakersScale(getRestakers(d)) ?? 0}
+            y={d => tvlScale(getTVL(d)) ?? 0}
           />
 
           {tooltipData && (
             <g>
               <Circle
                 cx={dateScale(new Date(tooltipData.timestamp)).toString()}
-                cy={restakersScale(tooltipData.restakers).toString()}
+                cy={tvlScale(tooltipData.tvl).toString()}
                 r={4}
                 className="cursor-pointer fill-dark-blue"
                 stroke="white"
@@ -186,11 +193,13 @@ const RestakersTrendChart = ({ data, width, height }) => {
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
-          <div className="text-base">Restakers: {tooltipData.restakers}</div>
+          <div className="text-base">
+            TVL: {formatNumberToCompactString(tooltipData.tvl)}
+          </div>
         </TooltipWithBounds>
       )}
     </div>
   );
 };
 
-export default RestakersTrendChart;
+export default OperatorTVLOverTimeChart;
