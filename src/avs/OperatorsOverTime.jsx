@@ -265,10 +265,10 @@ const OperatorsOvertime = ({ avsAddress }) => {
               key={Math.random()}
               top={tooltipTop + 60}
               left={tooltipLeft - 250}
-              className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
+              className="bg-white p-2 rounded min-w-20 shadow-md text-foreground z-10"
             >
               <div className="text-sm">
-                Timestamp:{' '}
+                Date:{' '}
                 {formatDateToVerboseString(new Date(tooltipData.timestamp))}
               </div>
               <div className="text-base">
