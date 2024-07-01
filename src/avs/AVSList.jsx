@@ -93,7 +93,7 @@ export default function AVSList() {
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <span className="basis-full md:pl-10">Name</span>
+          <span className="basis-full md:pl-8 md:pr-20">Name</span>
           <span className="basis-1/3">Stakers</span>
           <span className="basis-1/4">Operators</span>
           <span className="basis-1/3 text-end">TVL</span>
@@ -125,10 +125,7 @@ export default function AVSList() {
                       {formatNumber(avs.operators, compact)}
                     </span>
                     <span className="basis-1/3 text-end">
-                      <div>ETH {formatNumber(avs.tvl, compact)}</div>
-                      <div className="text-foreground-1 text-xs">
-                        USD {formatNumber(avs.tvl, compact)}
-                      </div>
+                      <div>{formatNumber(avs.tvl, compact)} ETH</div>
                     </span>
                   </div>
                 )
