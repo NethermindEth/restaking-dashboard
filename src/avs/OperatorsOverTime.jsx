@@ -60,7 +60,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
     scroll: true
   });
 
-  const bisectDate = bisector(d => new Date(d.date)).left;
+  const bisectTimestamp = bisector(d => new Date(d.timestamp)).left;
 
   useEffect(() => {
     async function fetchTvlOvertime() {
@@ -100,8 +100,8 @@ const OperatorsOvertime = ({ avsAddress }) => {
     if (!sortedData) return null;
     return scaleTime({
       domain: [
-        Math.min(...sortedData.map(d => new Date(d.date))),
-        Math.max(...sortedData.map(d => new Date(d.date)))
+        Math.min(...sortedData.map(d => new Date(d.timestamp))),
+        Math.max(...sortedData.map(d => new Date(d.timestamp)))
       ],
       range: [margin.left, width - margin.right]
     });
@@ -112,7 +112,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
     const maxValue = Math.max(...sortedData.map(d => d.operators));
     const minValue = Math.min(...sortedData.map(d => d.operators));
 
-    // create artificial range of tick values for operators count axis if operators count is contant to avoid rendering single tick value
+    // create artificial range of tick values for operators count axis if operators count is constant to avoid rendering single tick value
     const yDomain =
       maxValue === minValue
         ? [maxValue * 0.9, maxValue * 1.1]
@@ -138,12 +138,12 @@ const OperatorsOvertime = ({ avsAddress }) => {
 
       const { x } = localPoint(event) || { x: 0 };
       const x0 = dateScale.invert(x);
-      const index = bisectDate(sortedData, x0, 1);
+      const index = bisectTimestamp(sortedData, x0, 1);
       const d0 = sortedData[index - 1];
       const d1 = sortedData[index];
       let d = d0;
-      if (d1 && d1.date) {
-        d = x0 - new Date(d0.date) > new Date(d1.date) - x0 ? d1 : d0;
+      if (d1 && d1.timestamp) {
+        d = x0 - new Date(d0.timestamp) > new Date(d1.timestamp) - x0 ? d1 : d0;
       }
 
       showTooltip({
@@ -152,7 +152,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
         tooltipTop: operatorsScale(d.operators)
       });
     },
-    [showTooltip, sortedData, dateScale, operatorsScale, bisectDate]
+    [showTooltip, sortedData, dateScale, operatorsScale, bisectTimestamp]
   );
 
   return (
@@ -238,7 +238,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
                 <Group>
                   <LinePath
                     data={sortedData}
-                    x={d => dateScale(new Date(d.date))}
+                    x={d => dateScale(new Date(d.timestamp))}
                     y={d => operatorsScale(d.operators)}
                     stroke="#009CDD"
                     strokeWidth={2}
@@ -247,7 +247,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
                 {tooltipData && (
                   <g>
                     <Circle
-                      cx={dateScale(new Date(tooltipData.date)).toString()}
+                      cx={dateScale(new Date(tooltipData.timestamp)).toString()}
                       cy={operatorsScale(tooltipData.operators).toString()}
                       r={4}
                       className="cursor-pointer"
@@ -268,7 +268,8 @@ const OperatorsOvertime = ({ avsAddress }) => {
               className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
             >
               <div className="text-sm">
-                Date: {formatDateToVerboseString(new Date(tooltipData.date))}
+                Timestamp:{' '}
+                {formatDateToVerboseString(new Date(tooltipData.timestamp))}
               </div>
               <div className="text-base">
                 Operators: {tooltipData.operators}
