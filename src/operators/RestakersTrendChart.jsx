@@ -70,16 +70,19 @@ const RestakersTrendChart = ({ data, width, height }) => {
     [data]
   );
 
-  const handleTooltip = useCallback(event => {
-    const { x, y } = localPoint(event) || { x: 0, y: 0 };
-    const date = dateScale.invert(x - margin.left);
+  const handleTooltip = useCallback(
+    ev => {
+      const { x, y } = localPoint(ev) || { x: 0, y: 0 };
+      const date = dateScale.invert(x - margin.left);
 
-    showTooltip({
-      tooltipData: getRestakersByDate(date),
-      tooltipLeft: x,
-      tooltipTop: y
-    });
-  });
+      showTooltip({
+        tooltipData: getRestakersByDate(date),
+        tooltipLeft: x,
+        tooltipTop: y
+      });
+    },
+    [localPoint, dateScale, margin, showTooltip, getRestakersByDate]
+  );
 
   return (
     <div>
@@ -89,7 +92,7 @@ const RestakersTrendChart = ({ data, width, height }) => {
           y={0}
           width={width}
           height={height}
-          fill={'#0f111a'}
+          className="fill-content1"
           rx={14}
         />
         <Group left={margin.left} top={margin.top}>
@@ -110,18 +113,11 @@ const RestakersTrendChart = ({ data, width, height }) => {
             strokeOpacity={0.2}
             numTicks={getNumberOfTicks(width, 'x')}
           />
-          <LinearGradient
-            id="area-gradient"
-            from={'#43b284'}
-            to={'#43b284'}
-            toOpacity={0.1}
-          />
 
           <AxisLeft
-            tickTextFill={'#7A86A5'}
             scale={restakersScale}
             tickLabelProps={() => ({
-              fill: '#7A86A5',
+              className: 'fill-default-2 text-xs',
               fontSize: 11,
               textAnchor: 'end'
             })}
@@ -130,11 +126,9 @@ const RestakersTrendChart = ({ data, width, height }) => {
           <AxisBottom
             scale={dateScale}
             tickFormat={date => formatDateToVerboseString(new Date(date))}
-            tickTextFill={'#7A86A5'}
             top={innerHeight}
             tickLabelProps={() => ({
-              fill: '#7A86A5',
-              fontSize: width < 500 ? 12 : 14,
+              className: 'fill-default-2 text-xs',
               textAnchor: 'middle'
             })}
             tickValues={data
@@ -151,7 +145,7 @@ const RestakersTrendChart = ({ data, width, height }) => {
           />
 
           <LinePath
-            stroke="#009CDD"
+            className="stroke-dark-blue"
             strokeWidth={2}
             data={data}
             x={d => dateScale(new Date(d.timestamp))}
@@ -164,8 +158,7 @@ const RestakersTrendChart = ({ data, width, height }) => {
                 cx={dateScale(new Date(tooltipData.timestamp)).toString()}
                 cy={restakersScale(tooltipData.restakers).toString()}
                 r={4}
-                className="cursor-pointer"
-                fill="#009CDD"
+                className="cursor-pointer fill-dark-blue"
                 stroke="white"
                 strokeWidth={2}
               />
@@ -184,11 +177,11 @@ const RestakersTrendChart = ({ data, width, height }) => {
           />
         </Group>
       </svg>
-      {tooltipData ? (
+      {tooltipData && (
         <TooltipWithBounds
           key={Math.random()}
           top={tooltipTop + 10}
-          left={tooltipLeft - 200}
+          left={tooltipLeft}
           className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
         >
           <div className="text-sm">
@@ -196,7 +189,7 @@ const RestakersTrendChart = ({ data, width, height }) => {
           </div>
           <div className="text-base">Restakers: {tooltipData.restakers}</div>
         </TooltipWithBounds>
-      ) : null}
+      )}
     </div>
   );
 };

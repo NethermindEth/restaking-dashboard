@@ -34,13 +34,11 @@ const RestakersTrend = ({ opAddress }) => {
     dispatch({ timelineTab: tab });
   };
 
-  const getRestakerTrend = async () => {
-    const restakerData = await operatorService.getRestakerTrend(opAddress);
-    dispatch({ restakerTrend: restakerData });
-  };
-
   useEffect(() => {
-    getRestakerTrend();
+    (async () => {
+      const restakerData = await operatorService.getRestakerTrend(opAddress);
+      dispatch({ restakerTrend: restakerData });
+    })();
   }, []);
 
   return (
@@ -52,8 +50,8 @@ const RestakersTrend = ({ opAddress }) => {
             <div className="text-base text-foreground-1">
               <span>
                 Total Restakers:{' '}
-                {state.restakerTrend.length != 0 &&
-                  state.restakerTrend[state.restakerTrend.length - 1].restakers}
+                {state.restakerTrend[state.restakerTrend.length - 1]
+                  ?.restakers ?? 'N/A'}
               </span>
             </div>
           </div>

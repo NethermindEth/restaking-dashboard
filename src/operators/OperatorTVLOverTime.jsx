@@ -111,7 +111,7 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
     [dispatch]
   );
 
-  const handleMouseMove = React.useCallback(
+  const handleMouseMove = useCallback(
     event => {
       if (!filteredData || !xScale || !yScale) return;
 
@@ -138,19 +138,17 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
     [showTooltip, filteredData, xScale, yScale]
   );
 
-  const fetchTVLOverTime = async () => {
-    try {
-      const tvlOvertimeData = await operatorService.getOperatorTVL(opAddress);
-      dispatch({
-        tvlOvertimeData
-      });
-    } catch (error) {
-      // TODO: handle error
-    }
-  };
-
   useEffect(() => {
-    fetchTVLOverTime();
+    (async () => {
+      try {
+        const tvlOvertimeData = await operatorService.getOperatorTVL(opAddress);
+        dispatch({
+          tvlOvertimeData
+        });
+      } catch (error) {
+        // TODO: handle error
+      }
+    })();
   }, [operatorService, dispatch, opAddress]);
 
   return (
@@ -180,7 +178,7 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
             height={height}
             viewBox={`0 0 ${width} ${height}`}
             onMouseMove={handleMouseMove}
-            onMouseLeave={() => hideTooltip()}
+            onMouseLeave={hideTooltip}
           >
             {xScale && yScale && (
               <>

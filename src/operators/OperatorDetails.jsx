@@ -98,7 +98,7 @@ const OperatorDetails = () => {
         )}
       />
 
-      <div className="flex gap-x-4 w-full">
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
         <Card
           radius="md"
           className="bg-content1 w-full border border-outline p-0"
