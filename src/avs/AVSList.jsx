@@ -1,14 +1,16 @@
 import { Skeleton } from '@nextui-org/react';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
+import Pagination from '../shared/Pagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
 
-export default function AVSList({ onSelectionChange }) {
+export default function AVSList() {
   const { avsService } = useServices();
+  const [searchParams, setSearchParams] = useSearchParams();
   const compact = !useTailwindBreakpoint('md');
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
@@ -16,46 +18,73 @@ export default function AVSList({ onSelectionChange }) {
     error: null
   });
 
-  useEffect(() => {
-    async function fetchAVS() {
-      try {
-        dispatch({ isFetchingAvsData: true, error: null });
-        const response = await avsService.getAll();
-        const data = response.results;
+  const fetchAVS = async pageNumber => {
+    try {
+      dispatch({ isFetchingAvsData: true, error: null });
+      const response = await avsService.getAll(pageNumber);
+      const data = response.results;
 
-        for (let i = 0, count = data.length; i < count; i++) {
-          let item = data[i];
-          item.tvl = item.strategiesTotal;
-          item.address = item.address.toLowerCase();
+      for (let i = 0, count = data.length; i < count; i++) {
+        let item = data[i];
+        item.tvl = item.strategiesTotal;
+        item.address = item.address.toLowerCase();
+      }
+
+      // Sort descending by TVL
+      data.sort((i1, i2) => {
+        if (i1.tvl < i2.tvl) {
+          return 1;
         }
 
-        // Sort descending by TVL
-        data.sort((i1, i2) => {
-          if (i1.tvl < i2.tvl) {
-            return 1;
-          }
+        if (i1.tvl > i2.tvl) {
+          return -1;
+        }
 
-          if (i1.tvl > i2.tvl) {
-            return -1;
-          }
+        return 0;
+      });
 
-          return 0;
-        });
-
-        dispatch({ selectedAVS: data[0], avs: data, isFetchingAvsData: false });
-      } catch (error) {
-        dispatch({
-          error: 'Failed to fetch AVS data',
-          isFetchingAvsData: false
-        });
-      }
+      dispatch({
+        avs: data,
+        isFetchingAvsData: false,
+        totalPages: Math.ceil(response.totalCount / 10)
+      });
+    } catch (error) {
+      dispatch({
+        error: 'Failed to fetch AVS data',
+        isFetchingAvsData: false
+      });
     }
+  };
 
-    fetchAVS();
-  }, [avsService, dispatch, onSelectionChange]);
   const handleAVSItemClick = avs => {
     navigate(`/avs/${avs.address}`, { state: { avs } });
   };
+
+  const handleNext = () => {
+    const currentPage = parseInt(searchParams.get('page') || '1');
+    if (currentPage + 1 <= state.totalPages) {
+      setSearchParams({ page: (currentPage + 1).toString() });
+      fetchAVS(currentPage + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    const currentPage = parseInt(searchParams.get('page') || '1');
+    if (currentPage - 1 >= 1) {
+      setSearchParams({ page: (currentPage - 1).toString() });
+      fetchAVS(currentPage - 1);
+    }
+  };
+
+  const handlePageClick = page => {
+    setSearchParams({ page: page.toString() });
+    fetchAVS(page);
+  };
+
+  useEffect(() => {
+    const page = parseInt(searchParams.get('page') || '1');
+    fetchAVS(page);
+  }, [searchParams]);
 
   return (
     <div>
@@ -72,33 +101,47 @@ export default function AVSList({ onSelectionChange }) {
         {state.isFetchingAvsData ? (
           <AVSListSkeleton />
         ) : (
-          state.avs?.map((avs, i) => (
-            <div
-              key={`avs-item-${i}`}
-              onClick={() => handleAVSItemClick(avs)}
-              className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default ${
-                state.selectedAVS === avs ? 'bg-content1' : ''
-              }`}
-            >
-              <div className="min-w-5">{i + 1}</div>
-              <img src={avs.metadata.logo} className="size-5 rounded-full" />
-              <span className="md:basis-full md:w-full w-[180px] truncate">
-                {avs?.metadata?.name}
-              </span>
-              <span className="basis-1/3">
-                {formatNumber(avs.stakers, compact)}
-              </span>
-              <span className="basis-1/4">
-                {formatNumber(avs.operators, compact)}
-              </span>
-              <span className="basis-1/3 text-end">
-                <div>ETH {formatNumber(avs.tvl, compact)}</div>
-                <div className="text-foreground-1 text-xs">
-                  USD {formatNumber(avs.tvl, compact)}
-                </div>
-              </span>
-            </div>
-          ))
+          <div>
+            {state.avs?.map(
+              (avs, i) =>
+                avs.metadata && (
+                  <div
+                    key={`avs-item-${i}`}
+                    onClick={() => handleAVSItemClick(avs)}
+                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
+                  >
+                    <div className="min-w-5">{i + 1}</div>
+                    <img
+                      src={avs.metadata.logo}
+                      className="size-5 rounded-full"
+                    />
+                    <span className="md:basis-full md:w-full w-[180px] truncate">
+                      {avs?.metadata?.name}
+                    </span>
+                    <span className="basis-1/3">
+                      {formatNumber(avs.stakers, compact)}
+                    </span>
+                    <span className="basis-1/4">
+                      {formatNumber(avs.operators, compact)}
+                    </span>
+                    <span className="basis-1/3 text-end">
+                      <div>ETH {formatNumber(avs.tvl, compact)}</div>
+                      <div className="text-foreground-1 text-xs">
+                        USD {formatNumber(avs.tvl, compact)}
+                      </div>
+                    </span>
+                  </div>
+                )
+            )}
+
+            <Pagination
+              totalPages={state.totalPages}
+              currentPage={parseInt(searchParams.get('page') || '1')}
+              handleNext={handleNext}
+              handlePrevious={handlePrevious}
+              handlePageClick={handlePageClick}
+            />
+          </div>
         )}
       </div>
     </div>
