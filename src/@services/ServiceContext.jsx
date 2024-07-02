@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import AVSService from './AVSService';
-import EigenService from './EigenService';
+import EigenlayerService from './EigenlayerService';
 import LRTService from './LRTService';
 import OperatorService from './OperatorService';
 
@@ -20,5 +20,5 @@ const services = {
   avsService: new AVSService(),
   lrtService: new LRTService(),
   operatorService: new OperatorService(),
-  eigenService: new EigenService()
+  eigenService: new EigenlayerService()
 };

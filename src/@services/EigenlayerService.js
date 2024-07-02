@@ -1,7 +1,7 @@
 import { apiGet } from './apiCall';
 
-export default class EigenService {
-  async getEigenTvlOvertime() {
+export default class EigenlayerService {
+  async getEigenlayerTVLOvertime() {
     const response = await apiGet(`/eigenlayer/tvl`);
 
     if (response.ok) {
