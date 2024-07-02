@@ -18,43 +18,46 @@ export default function AVSList() {
     error: null
   });
 
-  const fetchAVS = async pageNumber => {
-    try {
-      dispatch({ isFetchingAvsData: true, error: null });
-      const response = await avsService.getAll(pageNumber);
-      const data = response.results;
+  const fetchAVS = useCallback(
+    async pageNumber => {
+      try {
+        dispatch({ isFetchingAvsData: true, error: null });
+        const response = await avsService.getAll(pageNumber);
+        const data = response.results;
 
-      for (let i = 0, count = data.length; i < count; i++) {
-        let item = data[i];
-        item.tvl = item.strategiesTotal;
-        item.address = item.address.toLowerCase();
+        for (let i = 0, count = data.length; i < count; i++) {
+          let item = data[i];
+          item.tvl = item.strategiesTotal;
+          item.address = item.address.toLowerCase();
+        }
+
+        // Sort descending by TVL
+        data.sort((i1, i2) => {
+          if (i1.tvl < i2.tvl) {
+            return 1;
+          }
+
+          if (i1.tvl > i2.tvl) {
+            return -1;
+          }
+
+          return 0;
+        });
+
+        dispatch({
+          avs: data,
+          isFetchingAvsData: false,
+          totalPages: Math.ceil(response.totalCount / 10)
+        });
+      } catch (error) {
+        dispatch({
+          error: 'Failed to fetch AVS data',
+          isFetchingAvsData: false
+        });
       }
-
-      // Sort descending by TVL
-      data.sort((i1, i2) => {
-        if (i1.tvl < i2.tvl) {
-          return 1;
-        }
-
-        if (i1.tvl > i2.tvl) {
-          return -1;
-        }
-
-        return 0;
-      });
-
-      dispatch({
-        avs: data,
-        isFetchingAvsData: false,
-        totalPages: Math.ceil(response.totalCount / 10)
-      });
-    } catch (error) {
-      dispatch({
-        error: 'Failed to fetch AVS data',
-        isFetchingAvsData: false
-      });
-    }
-  };
+    },
+    [avsService, dispatch]
+  );
 
   const handleAVSItemClick = avs => {
     navigate(`/avs/${avs.address}`, { state: { avs } });
