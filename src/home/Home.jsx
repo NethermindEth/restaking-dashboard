@@ -6,24 +6,33 @@ import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
-import EigenTvlOvertime from './EigenTvlOvertime';
+import EigenTVLOvertime from './EigenTVLOvertime';
 import OverviewLRTDistribution from './OverviewLRTDistribution';
 
 export default function Home() {
   const compact = !useTailwindBreakpoint('md');
-  const { avsService, operatorService } = useServices();
+  const { avsService, operatorService, eigenService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    isFetchingTopAVS: false,
-    isFetchingTopOperators: false,
+    totalAVSCount: null,
+    totalOperatorsCount: null,
     topAVS: [],
-    topOperators: []
+    topOperators: [],
+    eigenTVLData: [],
+    latestEigenTVL: null,
+    isFetchingEigenTVL: false,
+    isFetchingTopAVS: false,
+    isFetchingTopOperators: false
   });
 
   const fetchTopAVS = async () => {
     try {
       dispatch({ isFetchingTopAVS: true });
       const data = await avsService.getTopAVS();
-      dispatch({ topAVS: data.results, isFetchingTopAVS: false });
+      dispatch({
+        topAVS: data.results,
+        totalAVSCount: data.totalCount,
+        isFetchingTopAVS: false
+      });
     } catch {
       // TODO: Handle error
       dispatch({
@@ -36,7 +45,11 @@ export default function Home() {
     try {
       dispatch({ isFetchingTopOperators: true });
       const data = await operatorService.getTopOperators();
-      dispatch({ topOperators: data.results, isFetchingTopOperators: false });
+      dispatch({
+        topOperators: data.results,
+        totalOperatorsCount: data.totalCount,
+        isFetchingTopOperators: false
+      });
     } catch {
       // TODO: Handle error
       dispatch({
@@ -45,46 +58,80 @@ export default function Home() {
     }
   };
 
+  const fetchEigenTVL = async () => {
+    try {
+      dispatch({ isFetchingEigenTVL: true });
+      const eigenTVLData = await eigenService.getEigenTvlOvertime();
+      const latestEigenTVL =
+        eigenTVLData && eigenTVLData[eigenTVLData.length - 1].ethTVL;
+      dispatch({
+        eigenTVLData,
+        latestEigenTVL,
+        isFetchingEigenTVL: false
+      });
+    } catch {
+      // TODO: Handle error
+      dispatch({
+        isFetchingEigenTVL: false
+      });
+    }
+  };
+
   useEffect(() => {
+    fetchEigenTVL();
     fetchTopAVS();
     fetchTopOperators();
-  }, [avsService, operatorService, dispatch]);
+  }, [avsService, operatorService, eigenService, dispatch]);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-stretch md:flex-row flex-col gap-4 justify-between">
+      <div className="flex items-stretch md:flex-row flex-col gap-4 justify-between w-full">
         <Card
           radius="md"
-          className="bg-content1 border border-outline space-y-4 p-4 flex md:flex-row items-center justify-around w-full"
+          className="bg-content1 border border-outline flex md:flex-row items-center justify-around w-full p-4 md:space-y-0 space-y-4"
         >
-          <div className="space-y-2 text-center">
+          <div className="space-y-1 text-center">
             <div className="font-light text-sm text-foreground-1">
               EigenLayer TVL
             </div>
-            <div className="space-y-1">
+            {state.isFetchingEigenTVL ? (
+              <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
+            ) : (
               <div className="text-2xl font-normal text-white">
-                1,479,349 ETH
+                {formatNumber(parseFloat(state.latestEigenTVL) / 1e18, compact)}{' '}
+                ETH
               </div>
-              <div className="font-light text-sm text-success">
-                $ 3,120,070,554
-              </div>
+            )}
+          </div>
+
+          <Divider orientation="vertical" className="h-12 hidden md:block" />
+          <Divider orientation="horizontal" className="w-8/12 md:hidden" />
+
+          <div className="space-y-1 text-center">
+            <div className="font-light text-sm text-foreground-1">
+              Total AVS
             </div>
+            {state.isFetchingTopAVS ? (
+              <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
+            ) : (
+              <div className="text-2xl font-normal text-white">
+                {state.totalAVSCount}
+              </div>
+            )}
           </div>
           <Divider orientation="vertical" className="h-12 hidden md:block" />
           <Divider orientation="horizontal" className="w-8/12 md:hidden" />
           <div className="space-y-1 text-center">
             <div className="font-light text-sm text-foreground-1">
-              Active AVS
+              Total Operators
             </div>
-            <div className="text-2xl font-normal text-white">13</div>
-          </div>
-          <Divider orientation="vertical" className="h-12 hidden md:block" />
-          <Divider orientation="horizontal" className="w-8/12 md:hidden" />
-          <div className="space-y-1 text-center">
-            <div className="font-light text-sm text-foreground-1">
-              Active Operators
-            </div>
-            <div className="text-2xl font-normal text-white">240</div>
+            {state.isFetchingTopOperators ? (
+              <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
+            ) : (
+              <div className="text-2xl font-normal text-white">
+                {state.totalOperatorsCount}
+              </div>
+            )}
           </div>
         </Card>
         <div className="md:w-2/5">
@@ -174,7 +221,7 @@ export default function Home() {
         </Card>
       </div>
 
-      <EigenTvlOvertime />
+      <EigenTVLOvertime eigenTVLData={state.eigenTVLData} />
       <OverviewLRTDistribution />
     </div>
   );

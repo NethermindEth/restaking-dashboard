@@ -1,77 +1,75 @@
 import { Card, CardBody, CardHeader } from '@nextui-org/react';
 import { ParentSize } from '@visx/responsive';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
-import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
+import EigenTVLOvertimeChart from './EigenTVLOvertimeChart';
 
-const EigenTvlOvertime = () => {
-  const { eigenService } = useServices();
+const EigenTVLOvertime = ({ eigenTVLData }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    eigenTvlData: [],
     timelineTab: '7days'
   });
 
-  //   eigenTvlData
   const getDataByRange = useCallback(() => {
     switch (state.timelineTab) {
       case '7days':
-        return state.restakerTrend.slice(-7);
+        return eigenTVLData.slice(-7);
       case '30days':
-        return state.restakerTrend.slice(-30);
+        return eigenTVLData.slice(-30);
       default:
-        return state.restakerTrend;
+        return eigenTVLData;
     }
-  }, [state.restakerTrend, state.timelineTab]);
+  }, [eigenTVLData, state.timelineTab]);
 
   const filteredData = useMemo(() => {
-    if (!state.restakerTrend) return null;
+    if (!eigenTVLData) return null;
     return getDataByRange();
-  }, [state.eigenTvlData, state.timelineTab]);
+  }, [eigenTVLData, getDataByRange]);
 
   const handleTimelineChange = tab => {
     dispatch({ timelineTab: tab });
   };
 
-  useEffect(() => {
-    (async () => {
-      const eigenTvlData = await eigenService.getEigenTvlOvertime();
-      dispatch({ eigenTvlData });
-    })();
-  }, [dispatch]);
-
   return (
-    <Card radius="md" className="bg-content1 w-full border border-outline p-4">
-      <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="space-y-2 block">
-          <div className="font-light">
-            <div className="text-base text-foreground-1">
-              <span>Eigen TVL over time</span>
+    <>
+      <Card radius="md" className="bg-content1 border border-outline p-4 ">
+        <CardHeader className="flex flex-wrap justify-between gap-3">
+          <div className="space-y-2 block">
+            <div className="font-light">
+              <div className="text-base text-foreground-1">
+                <span>Eigen TVL over time</span>
+              </div>
             </div>
           </div>
-        </div>
-        <GraphTimelineSelector
-          timelineTab={state.timelineTab}
-          onTimelineChange={handleTimelineChange}
-        />
-      </CardHeader>
-      <CardBody className="w-full h-[400px]">
-        <ParentSize>
-          {({ width, height }) => (
-            <>
-              {width}
-              {/*  <EigenTvlOvertimeChart
-               data={filteredData}
-               width={width}
-               height={height}
-            /> */}
-            </>
-          )}
-        </ParentSize>
-      </CardBody>
-    </Card>
+          <GraphTimelineSelector
+            timelineTab={state.timelineTab}
+            onTimelineChange={handleTimelineChange}
+          />
+        </CardHeader>
+        <CardBody className="w-full space-y-4">
+          <div className="w-full h-[400px]">
+            <ParentSize>
+              {({ width, height }) => (
+                <EigenTVLOvertimeChart
+                  data={filteredData}
+                  width={width}
+                  height={height}
+                />
+              )}
+            </ParentSize>
+          </div>
+          <div className="text-xs text-foreground-2 pt-10">
+            Due to the expanding pool of Liquid Staking Tokens {`(LST)`} and
+            Liquid Restaking Tokens {`(LRT)`}, the TVL value on this dashboard
+            may not always match the actual TVL of the entire token pool. Refer
+            to the dashboard token list for the current LST and LRT data
+            included in the TVL calculation.
+          </div>
+        </CardBody>
+      </Card>
+    </>
   );
 };
 
-export default EigenTvlOvertime;
+export default EigenTVLOvertime;

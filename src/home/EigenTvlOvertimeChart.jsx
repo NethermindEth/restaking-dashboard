@@ -2,16 +2,17 @@ import { AxisBottom, AxisLeft } from '@visx/axis';
 import { localPoint } from '@visx/event';
 import { GridColumns, GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
-import { scaleLinear, scaleTime } from '@visx/scale';
+import { LegendOrdinal } from '@visx/legend';
+import { scaleLinear, scaleOrdinal, scaleTime } from '@visx/scale';
 import { Circle, LinePath } from '@visx/shape';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { extent, max } from 'd3-array';
 import { useCallback, useMemo } from 'react';
-import { formatDateToVerboseString } from '../utils';
+import { formatDateToVerboseString, formatNumber } from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
-    if (width < 500) return 3;
+    if (width < 500) return 2;
     if (width < 800) return 5;
     return 7;
   } else if (axis === 'y') {
@@ -21,7 +22,7 @@ const getNumberOfTicks = (width, axis) => {
   }
 };
 
-const EigenTvlOvertimeChart = ({ data, width, height }) => {
+const EigenTVLOvertimeChart = ({ data, width, height }) => {
   const {
     tooltipData,
     tooltipLeft = 0,
@@ -30,21 +31,22 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
     hideTooltip
   } = useTooltip();
 
-  const margin = { top: 40, right: 60, bottom: 40, left: 60 };
+  const margin = { top: 40, right: 0, bottom: 40, left: 45 };
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const getEthTVL = d => parseFloat(d.ethTVL);
-  const getLstTVL = d => parseFloat(d.lstTVL);
+  const getEthTVL = d => parseFloat(d.ethTVL) / 1e18;
+  const getLstTVL = d => parseFloat(d.lstTVL) / 1e18;
 
   const getTvlByDate = date => {
-    const selectedDate = formatDateToVerboseString(new Date(date));
-    const tvl = data.filter(
+    const selectedDate = formatDateToVerboseString(date, 'yyyy-MM-dd');
+    const tvl = data.find(
       item =>
-        selectedDate === formatDateToVerboseString(new Date(item.timestamp))
+        formatDateToVerboseString(new Date(item.timestamp), 'yyyy-MM-dd') ===
+        selectedDate
     );
-    return tvl[0];
+    return tvl;
   };
 
   const dateScale = useMemo(
@@ -81,9 +83,14 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
     [dateScale, margin.left, showTooltip, getTvlByDate]
   );
 
+  const legendColorScale = scaleOrdinal({
+    domain: ['ETH TVL', 'LST TVL'],
+    range: ['#7828C8', '#C9A9E9']
+  });
+
   return (
     <div>
-      <svg width={width} height={height}>
+      <svg width={width} height={height} className="overflow-visible">
         <rect
           x={0}
           y={0}
@@ -112,8 +119,10 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
 
           <AxisLeft
             scale={tvlScale}
+            left={0}
+            tickFormat={formatNumber}
             tickLabelProps={() => ({
-              className: 'fill-default-2 text-xs',
+              className: 'fill-foreground-active text-xs',
               fontSize: 11,
               textAnchor: 'end'
             })}
@@ -121,10 +130,10 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
 
           <AxisBottom
             scale={dateScale}
-            tickFormat={date => formatDateToVerboseString(new Date(date))}
+            tickFormat={date => formatDateToVerboseString(date)}
             top={innerHeight}
             tickLabelProps={() => ({
-              className: 'fill-default-2 text-xs',
+              className: 'fill-foreground-active text-xs',
               textAnchor: 'middle'
             })}
             tickValues={data
@@ -141,7 +150,7 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
           />
 
           <LinePath
-            className="stroke-blue-500"
+            className="stroke-purple-500"
             strokeWidth={2}
             data={data}
             x={d => dateScale(new Date(d.timestamp))}
@@ -149,7 +158,7 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
           />
 
           <LinePath
-            className="stroke-green-500"
+            className="stroke-purple-300"
             strokeWidth={2}
             data={data}
             x={d => dateScale(new Date(d.timestamp))}
@@ -162,7 +171,7 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
                 cx={dateScale(new Date(tooltipData.timestamp))}
                 cy={tvlScale(getEthTVL(tooltipData))}
                 r={4}
-                className="fill-blue-500"
+                className="fill-purple-500"
                 stroke="white"
                 strokeWidth={2}
               />
@@ -170,7 +179,7 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
                 cx={dateScale(new Date(tooltipData.timestamp))}
                 cy={tvlScale(getLstTVL(tooltipData))}
                 r={4}
-                className="fill-green-500"
+                className="fill-purple-300"
                 stroke="white"
                 strokeWidth={2}
               />
@@ -189,6 +198,15 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
           />
         </Group>
       </svg>
+
+      <div className="mt-4">
+        <LegendOrdinal
+          scale={legendColorScale}
+          shape="circle"
+          direction="row"
+          className="flex items-center justify-between w-full text-foreground-active text-sm uppercase"
+        />
+      </div>
       {tooltipData && (
         <TooltipWithBounds
           key={Math.random()}
@@ -199,11 +217,11 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
-          <div className="text-base text-blue-500">
-            ETH TVL: {tooltipData.ethTVL}
+          <div className="text-base text-purple-500">
+            ETH TVL: {getEthTVL(tooltipData).toFixed(2)}
           </div>
-          <div className="text-base text-green-500">
-            LST TVL: {tooltipData.lstTVL}
+          <div className="text-base text-purple-300">
+            LST TVL: {getLstTVL(tooltipData).toFixed(2)}
           </div>
         </TooltipWithBounds>
       )}
@@ -211,4 +229,4 @@ const EigenTvlOvertimeChart = ({ data, width, height }) => {
   );
 };
 
-export default EigenTvlOvertimeChart;
+export default EigenTVLOvertimeChart;

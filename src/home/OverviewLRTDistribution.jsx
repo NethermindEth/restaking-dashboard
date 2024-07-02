@@ -196,7 +196,7 @@ export default function OverviewLRTDistribution() {
                       onMouseEnter={() =>
                         dispatch({ activePieEntry: arc.data })
                       }
-                      onMouseLeave={() => dispatch({ acactivePieEntry: null })}
+                      onMouseLeave={() => dispatch({ activePieEntry: null })}
                       className="cursor-pointer"
                     >
                       <path d={pie.path(arc)} fill={arc.data.color}></path>
