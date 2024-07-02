@@ -17,7 +17,7 @@ import { assetFormatter } from '../utils';
 import AVSTVLOverTime from './AVSTVLOverTime';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
-import OperatorsOvertime from './OperatorsOverTime';
+import OperatorsOvertime from './OperatorsOvertime';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
 import { strategiesData } from './strategies.mapping';
