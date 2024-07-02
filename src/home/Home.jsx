@@ -6,7 +6,7 @@ import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
-import EigenTVLOvertime from './EigenTVLOvertime';
+import EigenTVLOvertime from './EigenTvlOvertime';
 import OverviewLRTDistribution from './OverviewLRTDistribution';
 
 export default function Home() {
