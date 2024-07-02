@@ -1,4 +1,4 @@
-import { Card, Input } from '@nextui-org/react';
+import { Card, Input, Skeleton } from '@nextui-org/react';
 import { SearchIcon } from '@nextui-org/shared-icons';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -15,18 +15,22 @@ export default function Operators({ avsAddress, totalTVL }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avsOperators: null,
-    searchInput: ''
+    searchInput: '',
+    isFetchingOperators: false
   });
 
   const fetchOperators = async pageIndex => {
     try {
+      dispatch({ isFetchingOperators: true });
       const data = await avsService.getAvsOperators(avsAddress, pageIndex - 1);
       dispatch({
         avsOperators: data.results,
-        totalPages: Math.ceil(data.totalCount / 10)
+        totalPages: Math.ceil(data.totalCount / 10),
+        isFetchingOperators: false
       });
     } catch {
       // TODO: handle error
+      dispatch({ isFetchingOperators: false });
     }
   };
 
@@ -104,7 +108,9 @@ export default function Operators({ avsAddress, totalTVL }) {
             <span className="basis-2/3 pl-8">Share</span>
             <span className="basis-1/3 text-end">TVL</span>
           </div>
-          {filteredOperators.length ? (
+          {state.isFetchingOperators ? (
+            <OperatorsListSkeleton />
+          ) : filteredOperators.length ? (
             filteredOperators.map(
               (operator, i) =>
                 operator.metadata && (
@@ -113,10 +119,15 @@ export default function Operators({ avsAddress, totalTVL }) {
                     className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
                   >
                     <div className="min-w-5">{i + 1}</div>
-                    <img
-                      src={operator.metadata.logo}
-                      className="size-5 rounded-full"
-                    />
+                    {state.isFetchingOperators ? (
+                      <Skeleton className="bg-default dark:bg-default min-w-5 size-5 rounded-full" />
+                    ) : (
+                      <img
+                        src={operator.metadata.logo}
+                        className="size-5 rounded-full"
+                        alt={`${operator.metadata.name} logo`}
+                      />
+                    )}
                     <span className="basis-full truncate">
                       {operator.metadata.name}
                     </span>
@@ -152,3 +163,29 @@ export default function Operators({ avsAddress, totalTVL }) {
     </div>
   );
 }
+
+const OperatorsListSkeleton = () => {
+  return (
+    <div>
+      {[...Array(10)].map((item, i) => (
+        <div
+          key={i}
+          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+        >
+          <div className="md:w-10/12 w-6/12">
+            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          </div>
+          <div className="pl-5 flex justify-between gap-5 w-10/12">
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};

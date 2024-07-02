@@ -14,19 +14,6 @@ const OperatorsOvertime = ({ avsAddress }) => {
   });
   const { avsService } = useServices();
 
-  async function fetchOperatorsOvertime() {
-    try {
-      const operatorsOvertimeData =
-        await avsService.getAVSOperatorsOvertime(avsAddress);
-
-      dispatch({
-        operatorsOvertimeData: operatorsOvertimeData
-      });
-    } catch (error) {
-      // TODO: handle error
-    }
-  }
-
   const getDataByRange = useCallback(() => {
     switch (state.timelineTab) {
       case '7days':
@@ -51,6 +38,19 @@ const OperatorsOvertime = ({ avsAddress }) => {
   );
 
   useEffect(() => {
+    async function fetchOperatorsOvertime() {
+      try {
+        const operatorsOvertimeData =
+          await avsService.getAVSOperatorsOvertime(avsAddress);
+
+        dispatch({
+          operatorsOvertimeData: operatorsOvertimeData
+        });
+      } catch (error) {
+        // TODO: handle error
+      }
+    }
+
     fetchOperatorsOvertime();
   }, [avsService, dispatch, avsAddress]);
 

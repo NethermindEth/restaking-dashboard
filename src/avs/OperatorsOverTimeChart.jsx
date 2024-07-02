@@ -90,7 +90,7 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
         tooltipTop: y
       });
     },
-    [localPoint, dateScale, margin, showTooltip, getOperatorsByDate]
+    [localPoint, dateScale, margin, showTooltip]
   );
 
   return (
