@@ -26,4 +26,26 @@ export default class OperatorService {
     // TODO: Handle error
     return await response.json();
   }
+
+  async getOperatorTVL(address) {
+    const response = await apiGet(`operators/${address}/tvl`);
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
+
+  async getRestakerTrend(address) {
+    const response = await apiGet(`operators/${address}/restakers`);
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
 }

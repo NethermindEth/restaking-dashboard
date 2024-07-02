@@ -1,15 +1,14 @@
 import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
-import React, { useCallback, useEffect } from 'react';
-import GraphTimelineSelector from '../shared/GraphTimelineSelector';
-import TVLOverTime from './TVLOverTime';
+import React, { useEffect } from 'react';
+import OperatorTVLOverTime from './OperatorTVLOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
-import RestakerTrend from './RestakerTrend';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { formatEther } from 'ethers';
 import LSTDistribution from './LSTDistribution';
+import RestakersTrend from './RestakersTrend';
 
 const OperatorDetails = () => {
   const { address } = useParams();
@@ -18,13 +17,6 @@ const OperatorDetails = () => {
     operatorTVL: 0,
     timelineTab: '7days'
   });
-
-  const handleTimelineChange = useCallback(
-    tab => {
-      dispatch({ timelineTab: tab });
-    },
-    [dispatch]
-  );
 
   const calculateTVL = strategies => {
     const tvl = strategies.reduce((acc, s) => {
@@ -99,28 +91,14 @@ const OperatorDetails = () => {
         </CardBody>
       </Card>
 
-      <Card radius="md" className="bg-content1 border border-outline p-4">
-        <CardHeader className="flex flex-wrap justify-between gap-3">
-          <div className="space-y-2 block">
-            <div className="font-light text-lg text-foreground-1">TVL</div>
-            <div className="font-light">
-              <div className="text-base ">
-                <span>4,554,567 ETH</span>
-              </div>
-              <div className="text-xs text-success">13,444,543.123 USD</div>
-            </div>
-          </div>
-          <GraphTimelineSelector
-            timelineTab={state.timelineTab}
-            onTimelineChange={handleTimelineChange}
-          />
-        </CardHeader>
-        <CardBody className="w-full">
-          <TVLOverTime />
-        </CardBody>
-      </Card>
+      <OperatorTVLOverTime
+        opAddress={address}
+        currentTVL={assetFormatter.format(
+          formatEther(state.operatorTVL.toString())
+        )}
+      />
 
-      <div className="flex gap-x-4 w-full">
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
         <Card
           radius="md"
           className="bg-content1 w-full border border-outline p-0"
@@ -133,28 +111,7 @@ const OperatorDetails = () => {
           </CardBody>
         </Card>
         <div className="w-full flex flex-col gap-y-4">
-          <Card
-            radius="md"
-            className="bg-content1 w-full border border-outline p-4"
-          >
-            <CardHeader className="flex flex-wrap justify-between gap-3">
-              <div className="space-y-2 block">
-                <span className="text-foreground-2">Restaker Trend</span>
-                <div className="font-light">
-                  <div className="text-base text-foreground-1">
-                    <span>4,554,567 ETH</span>
-                  </div>
-                </div>
-              </div>
-              <GraphTimelineSelector
-                timelineTab={state.timelineTab}
-                onTimelineChange={handleTimelineChange}
-              />
-            </CardHeader>
-            <CardBody>
-              <RestakerTrend width={670} height={400} />
-            </CardBody>
-          </Card>
+          <RestakersTrend opAddress={address} />
           <Card
             radius="md"
             className="bg-content1 w-full border border-outline p-4"

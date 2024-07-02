@@ -25,7 +25,8 @@ export default {
             default: '#e0e7ff',
             content1: '#eef2ff',
             focus: '#34d399',
-            foreground: '#000000'
+            foreground: '#000000',
+            'dark-blue': '#009CDD'
           }
         },
         dark: {
@@ -36,7 +37,8 @@ export default {
             content3: 'yellow',
             content4: 'green',
             default: {
-              DEFAULT: '#191c2c'
+              DEFAULT: '#191c2c',
+              2: '#7A86A5'
             },
             focus: '#34d399',
             foreground: {
@@ -51,7 +53,8 @@ export default {
             'cinder-blue': {
               100: '#7889B8',
               200: '#2D344D'
-            }
+            },
+            'dark-blue': '#009CDD'
           }
         }
       }
