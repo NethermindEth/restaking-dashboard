@@ -5,7 +5,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
-import OperatorsOvertimeChart from './OperatorsOverTimeChart';
+import OperatorsOvertimeChart from './OperatorsOvertimeChart';
 
 const OperatorsOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {

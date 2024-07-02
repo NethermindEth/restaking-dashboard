@@ -5,12 +5,9 @@ import { Group } from '@visx/group';
 import { scaleLinear, scaleTime } from '@visx/scale';
 import { Circle, LinePath } from '@visx/shape';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
+import { bisector } from 'd3-array';
 import { useCallback, useMemo } from 'react';
-import {
-  formatDateToVerboseString,
-  formatNumber,
-  formatNumberToCompactString
-} from '../utils';
+import { formatDateToVerboseString, formatNumber } from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
@@ -73,24 +70,27 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
   const handleTooltip = useCallback(
     ev => {
       const { x, y } = localPoint(ev) || { x: 0, y: 0 };
-      const date = dateScale.invert(x - margin.left);
+      const x0 = dateScale.invert(x - margin.left);
 
-      const getOperatorsByDate = date => {
-        const selectedDate = formatDateToVerboseString(new Date(date));
-        const operators = data.filter(
-          item =>
-            selectedDate === formatDateToVerboseString(new Date(item.timestamp))
-        );
-        return operators[0];
-      };
+      // find the nearest data point
+      const bisectDate = bisector(d => new Date(d.timestamp)).left;
+      const index = bisectDate(data, x0, 1);
+      const d0 = data[index - 1];
+      const d1 = data[index];
+      const d =
+        d0 && d1 && x0 - new Date(d0.timestamp) > new Date(d1.timestamp) - x0
+          ? d1
+          : d0;
 
-      showTooltip({
-        tooltipData: getOperatorsByDate(date),
-        tooltipLeft: x,
-        tooltipTop: y
-      });
+      if (d) {
+        showTooltip({
+          tooltipData: d,
+          tooltipLeft: dateScale(new Date(d.timestamp)) + margin.left,
+          tooltipTop: operatorsScale(d.operators)
+        });
+      }
     },
-    [localPoint, dateScale, margin, showTooltip]
+    [data, dateScale, operatorsScale, margin, showTooltip]
   );
 
   return (
@@ -169,8 +169,8 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
             {tooltipData && (
               <g>
                 <Circle
-                  cx={dateScale(new Date(tooltipData.timestamp))}
-                  cy={operatorsScale(tooltipData.operators)}
+                  cx={tooltipLeft - margin.left}
+                  cy={tooltipTop}
                   r={4}
                   className="cursor-pointer fill-dark-blue"
                   stroke="white"
@@ -179,15 +179,15 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
               </g>
             )}
             <rect
-              x={0}
-              y={0}
+              x={margin.left}
+              y={margin.top}
               width={innerWidth}
               height={innerHeight}
               onTouchStart={handleTooltip}
-              fill={'transparent'}
               onTouchMove={handleTooltip}
               onMouseMove={handleTooltip}
               onMouseLeave={hideTooltip}
+              fill="transparent"
             />
           </Group>
         )}
@@ -203,7 +203,7 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
           <div className="text-base">
-            TVL: {formatNumberToCompactString(tooltipData.operators)}
+            TVL: {formatNumber(tooltipData.operators)}
           </div>
         </TooltipWithBounds>
       )}
