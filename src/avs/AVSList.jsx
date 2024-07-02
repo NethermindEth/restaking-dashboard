@@ -1,5 +1,5 @@
 import { Skeleton } from '@nextui-org/react';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -60,26 +60,29 @@ export default function AVSList() {
     navigate(`/avs/${avs.address}`, { state: { avs } });
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage + 1 <= state.totalPages) {
       setSearchParams({ page: (currentPage + 1).toString() });
       fetchAVS(currentPage + 1);
     }
-  };
+  }, [searchParams, state.totalPages, setSearchParams, fetchAVS]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage - 1 >= 1) {
       setSearchParams({ page: (currentPage - 1).toString() });
       fetchAVS(currentPage - 1);
     }
-  };
+  }, [searchParams, fetchAVS]);
 
-  const handlePageClick = page => {
-    setSearchParams({ page: page.toString() });
-    fetchAVS(page);
-  };
+  const handlePageClick = useCallback(
+    page => {
+      setSearchParams({ page: page.toString() });
+      fetchAVS(page);
+    },
+    [setSearchParams, fetchAVS]
+  );
 
   useEffect(() => {
     const page = parseInt(searchParams.get('page') || '1');
