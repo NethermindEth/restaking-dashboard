@@ -6,6 +6,7 @@ import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
+import { EigenTVLOvertime } from './EigenTVLOvertime';
 import OverviewLRTDistribution from './OverviewLRTDistribution';
 
 export default function Home() {
@@ -220,7 +221,7 @@ export default function Home() {
         </Card>
       </div>
 
-      {/* <EigenTVLOvertime eigenTVLData={state.eigenTVLData} /> */}
+      <EigenTVLOvertime eigenTVLData={state.eigenTVLData} />
       <OverviewLRTDistribution />
     </div>
   );
