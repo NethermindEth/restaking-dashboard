@@ -40,15 +40,6 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
 
   const getOperators = d => d.operators;
 
-  const getOperatorsByDate = date => {
-    const selectedDate = formatDateToVerboseString(new Date(date));
-    const operators = data.filter(
-      item =>
-        selectedDate === formatDateToVerboseString(new Date(item.timestamp))
-    );
-    return operators[0];
-  };
-
   const dateScale = useMemo(() => {
     if (!data || data.length === 0) return null;
     const dates = data.map(d => new Date(d.timestamp)).filter(d => !isNaN(d));
@@ -83,6 +74,15 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
     ev => {
       const { x, y } = localPoint(ev) || { x: 0, y: 0 };
       const date = dateScale.invert(x - margin.left);
+
+      const getOperatorsByDate = date => {
+        const selectedDate = formatDateToVerboseString(new Date(date));
+        const operators = data.filter(
+          item =>
+            selectedDate === formatDateToVerboseString(new Date(item.timestamp))
+        );
+        return operators[0];
+      };
 
       showTooltip({
         tooltipData: getOperatorsByDate(date),
