@@ -65,15 +65,18 @@ const OperatorsList = () => {
       <div className="font-display font-medium mb-1 text-foreground-1 text-3xl">
         Operators
       </div>
-      <div className="flex w-full justify-between items-center mb-6">
+      <div className="flex flex-col lg:flex-row gap-4 w-full justify-between items-center mb-6">
         <span className="text-foreground-2">
-          Short Operators description and provided services
+          Operators run AVS software built on top of EigenLayer. Operators
+          register in EigenLayer and allow restakers to delegate to them, then
+          opt in to secure various services (AVSs) built on top of EigenLayer.
+          Operators may also be Stakers; these are not mutually exclusive.
         </span>
         <Input
           type="text"
           placeholder="Search by operator"
           radius="sm"
-          className="lg:w-64"
+          className="lg:w-96"
           variant="bordered"
           endContent={<span className="material-symbols-outlined">search</span>}
         />
