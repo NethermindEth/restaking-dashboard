@@ -13,7 +13,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
-import { assetFormatter } from '../utils';
+import { assetFormatter, formatNumber } from '../utils';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
 import OperatorsOverTime from './OperatorsOverTime';
@@ -87,12 +87,8 @@ export default function AVSDetails() {
       strategiesData['0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'];
     if (!eigenEntry || !strategiesMap) return BigInt(0);
 
-    if (avsAddress === '0x870679e138bcdf293b7ff14dd44b70fc97e12fc0') {
-      const strategy = strategiesMap[eigenEntry.proxy];
-      return strategy ? BigInt(strategy.tokens) : BigInt(0);
-    }
-
-    return BigInt(0);
+    const strategy = strategiesMap[eigenEntry.proxy];
+    return strategy ? BigInt(strategy.tokens) : BigInt(0);
   };
 
   const calculateBeaconTVL = strategiesMap => {
@@ -268,7 +264,9 @@ export default function AVSDetails() {
           title={
             <div className="text-center">
               <div>Total ETH value</div>
-              <div className="font-bold">{formatTVL(state.totalTVL)}</div>
+              <div className="font-bold">
+                {formatNumber(state.totalTVL, true)}
+              </div>
             </div>
           }
         >

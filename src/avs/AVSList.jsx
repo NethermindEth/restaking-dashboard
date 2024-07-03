@@ -93,9 +93,14 @@ export default function AVSList() {
   }, [searchParams]);
 
   return (
-    <div>
-      <div className="font-display font-medium pb-4 mb-4 text-foreground-1 text-3xl uppercase">
-        AVS
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <div className="font-display font-medium text-foreground-1 text-3xl">
+          AVS
+        </div>
+        <div className="font-display font-medium text-foreground-1 text-base">
+          Actively Validated Services
+        </div>
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
@@ -160,17 +165,17 @@ const AVSListSkeleton = () => {
           className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
         >
           <div className="md:w-10/12 w-6/12">
-            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
           </div>
           <div className="pl-5 flex justify-between gap-5 w-10/12">
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
             </div>
           </div>
         </div>
