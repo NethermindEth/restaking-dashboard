@@ -44,7 +44,7 @@ export default {
               DEFAULT: '#ffffff',
               active: '#CAD7F9',
               1: '#c4cce3',
-              2: '#cad7F9'
+              2: '#7a86a5'
             },
             outline: '#293041',
             secondary: '#FFCC80',

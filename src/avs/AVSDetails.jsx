@@ -17,7 +17,7 @@ import { assetFormatter } from '../utils';
 import AVSTotalValueOvertime from './AVSTotalValueOvertime';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
-import OperatorsOverTime from './OperatorsOverTime';
+import OperatorsOvertime from './OperatorsOvertime';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
 import { strategiesData } from './strategies.mapping';
@@ -291,21 +291,7 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className=" font-light text-lg text-foreground-1">
-                  Operators over time
-                </div>
-                <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
-                  onTimelineChange={handleTimelineChange}
-                />
-              </CardHeader>
-
-              <CardBody>
-                <OperatorsOverTime />
-              </CardBody>
-            </Card>
+            <OperatorsOvertime avsAddress={avsAddress} />
             <Operators avsAddress={avsAddress} totalTVL={state.totalTVL} />
           </div>
         </Tab>

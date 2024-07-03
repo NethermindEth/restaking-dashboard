@@ -23,7 +23,8 @@ export default class AVSService {
     return await response.json();
   }
 
-  async getAvsOperators(address, pageIndex) {
+  async getAvsOperators(address, pageNumber) {
+    const pageIndex = Math.max(0, pageNumber - 1);
     const response = await apiGet(`/avs/${address}/operators`, {
       query: {
         'page-index': pageIndex
@@ -40,6 +41,17 @@ export default class AVSService {
 
   async getAVSTotalValue(address) {
     const response = await apiGet(`/avs/${address}/tvl`);
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
+
+  async getAVSOperatorsOvertime(address) {
+    const response = await apiGet(`/avs/${address}/operators/over-time`);
 
     if (response.ok) {
       return await response.json();

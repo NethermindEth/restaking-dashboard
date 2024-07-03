@@ -1,4 +1,4 @@
-import { Card, Input } from '@nextui-org/react';
+import { Card, Input, Skeleton } from '@nextui-org/react';
 import { SearchIcon } from '@nextui-org/shared-icons';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -7,46 +7,7 @@ import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
 import Pagination from '../shared/Pagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
-import { formatDate, formatNumber } from '../utils';
-
-const mockOperators = [
-  {
-    operator: {
-      name: 'AltLayer',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    share: 46,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    },
-    joined: '2024-6-1 11:34:57.000000'
-  },
-  {
-    operator: {
-      name: 'AltLayer',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    share: 46,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    },
-    joined: '2024-6-10 11:34:57.000000'
-  },
-  {
-    operator: {
-      name: 'AltLayer',
-      logo: 'https://mainnet-ethereum-avs-metadata.s3.amazonaws.com/markEigenDA.png'
-    },
-    share: 46,
-    tvl: {
-      eth: 34554567,
-      usd: 34554567
-    },
-    joined: '2024-6-10 11:34:57.000000'
-  }
-];
+import { formatNumber } from '../utils';
 
 export default function Operators({ avsAddress, totalTVL }) {
   const compact = !useTailwindBreakpoint('md');
@@ -54,39 +15,43 @@ export default function Operators({ avsAddress, totalTVL }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avsOperators: null,
-    searchInput: ''
+    searchInput: '',
+    isFetchingOperators: false
   });
 
   const fetchOperators = async pageIndex => {
     try {
+      dispatch({ isFetchingOperators: true });
       const data = await avsService.getAvsOperators(avsAddress, pageIndex - 1);
       dispatch({
-        avsOperators: data.operators,
-        totalPages: Math.ceil(data.totalCount / 10)
+        avsOperators: data.results,
+        totalPages: Math.ceil(data.totalCount / 10),
+        isFetchingOperators: false
       });
     } catch {
       // TODO: handle error
+      dispatch({ isFetchingOperators: false });
     }
   };
 
   const handleNext = () => {
-    const currentPage = parseInt(searchParams.get('page'));
+    const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage + 1 <= state.totalPages) {
-      setSearchParams({ page: currentPage + 1 });
+      setSearchParams({ page: (currentPage + 1).toString() });
       fetchOperators(currentPage + 1);
     }
   };
 
   const handlePrevious = () => {
-    const currentPage = parseInt(searchParams.get('page'));
+    const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage - 1 >= 1) {
-      setSearchParams({ page: currentPage - 1 });
+      setSearchParams({ page: (currentPage - 1).toString() });
       fetchOperators(currentPage - 1);
     }
   };
 
   const handlePageClick = page => {
-    setSearchParams({ page });
+    setSearchParams({ page: page.toString() });
     fetchOperators(page);
   };
 
@@ -94,7 +59,7 @@ export default function Operators({ avsAddress, totalTVL }) {
     (state.avsOperators &&
       state.avsOperators
         .filter(operator =>
-          operator.metadata.name
+          operator?.metadata?.name
             .toLowerCase()
             .includes(state.searchInput.toLowerCase())
         )
@@ -105,19 +70,9 @@ export default function Operators({ avsAddress, totalTVL }) {
     [];
 
   useEffect(() => {
-    const page = searchParams.get('page');
-    if (!page) {
-      setSearchParams({ page: 1 }, { replace: true });
-      fetchOperators(1);
-    } else fetchOperators(searchParams.get(page));
+    const page = parseInt(searchParams.get('page') || '1');
+    fetchOperators(page);
   }, [searchParams]);
-
-  const latestAggregatedOperators =
-    (state.avsOperators &&
-      [...state.avsOperators].sort(
-        (a, b) => new Date(b.registeredAt) - new Date(a.registeredAt)
-      )) ||
-    [];
 
   if (state.avsOperators === null) {
     return null;
@@ -150,37 +105,52 @@ export default function Operators({ avsAddress, totalTVL }) {
         <div className="text-sm">
           <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
             <span className="basis-full">Operators</span>
-            <span className="basis-1/4">Share</span>
+            <span className="basis-2/3 pl-8">Share</span>
             <span className="basis-1/3 text-end">TVL</span>
           </div>
-          {filteredOperators &&
-            filteredOperators.map((operator, i) => (
-              <div
-                key={`operator-item-${i}`}
-                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-              >
-                <div className="min-w-5">{i + 1}</div>
-                <img
-                  src={operator.metadata.logo}
-                  className="size-5 rounded-full"
-                />
-                <span className="basis-full truncate">
-                  {operator.metadata.name}
-                </span>
-                <span className="basis-1/3">
-                  {(
-                    (parseFloat(operator.strategiesTotal) / totalTVL) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </span>
-                <span className="basis-1/3 text-end">
-                  <div>
-                    {formatNumber(operator.strategiesTotal, compact)} ETH
+          {state.isFetchingOperators ? (
+            <OperatorsListSkeleton />
+          ) : filteredOperators.length ? (
+            filteredOperators.map(
+              (operator, i) =>
+                operator.metadata && (
+                  <div
+                    key={`operator-item-${i}`}
+                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
+                  >
+                    <div className="min-w-5">{i + 1}</div>
+                    {state.isFetchingOperators ? (
+                      <Skeleton className="bg-default dark:bg-default min-w-5 size-5 rounded-full" />
+                    ) : (
+                      <img
+                        src={operator.metadata.logo}
+                        className="size-5 rounded-full"
+                        alt={`${operator.metadata.name} logo`}
+                      />
+                    )}
+                    <span className="basis-full truncate">
+                      {operator.metadata.name}
+                    </span>
+                    <span className="basis-2/3">
+                      {(
+                        (parseFloat(operator.strategiesTotal) / totalTVL) *
+                        100
+                      ).toFixed(2)}
+                      %
+                    </span>
+                    <span className="basis-1/3 text-end min-w-fit">
+                      <div>
+                        {formatNumber(operator.strategiesTotal, compact)} ETH
+                      </div>
+                    </span>
                   </div>
-                </span>
-              </div>
-            ))}
+                )
+            )
+          ) : (
+            <div className="w-full p-4 text-foreground-1">
+              No Operator found...
+            </div>
+          )}
         </div>
         <Pagination
           totalPages={state.totalPages}
@@ -190,86 +160,32 @@ export default function Operators({ avsAddress, totalTVL }) {
           handlePageClick={handlePageClick}
         />
       </Card>
-      <div className="flex flex-col gap-4 justify-between items-end w-full">
-        <Card
-          radius="md"
-          className="bg-content1 border border-outline w-full space-y-4"
-        >
-          <div className="font-light text-base text-foreground-1 p-4">
-            Latest aggregated operators
-          </div>
-          <div className="text-sm">
-            <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-              <span className="basis-1/2">Operators</span>
-              <span className="basis-1/4">Joined time</span>
-              <span className="basis-1/3 text-end">TVL</span>
-            </div>
-            {latestAggregatedOperators &&
-              latestAggregatedOperators.slice(0, 5).map((operator, i) => (
-                <div
-                  key={`operator-item-${i}`}
-                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-                >
-                  <div className="min-w-5">{i + 1}</div>
-                  <img
-                    src={operator.metadata.logo}
-                    className="size-5 rounded-full"
-                  />
-                  <span className="basis-1/2 truncate">
-                    {operator.metadata.name}
-                  </span>
-                  <span className="basis-1/3">
-                    {formatDate(operator.registeredAt)}
-                  </span>
-                  <span className="basis-1/3 text-end">
-                    <div>
-                      {formatNumber(operator.strategiesTotal, compact)} ETH
-                    </div>
-                  </span>
-                </div>
-              ))}
-          </div>
-        </Card>
-        <Card
-          radius="md"
-          className="bg-content1 border border-outline w-full space-y-4"
-        >
-          <div className="font-light text-base text-foreground-1 p-4">
-            Inactive operators
-          </div>
-          <div className="text-sm">
-            <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-              <span className="basis-1/2">Operators</span>
-              <span className="basis-1/4">Joined time</span>
-              <span className="basis-1/3 text-end">TVL</span>
-            </div>
-            {mockOperators.slice(0, 3).map((operator, i) => (
-              <div
-                key={`operator-item-${i}`}
-                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
-              >
-                <div className="min-w-5">{i + 1}</div>
-                <img
-                  src={operator.operator.logo}
-                  className="size-5 rounded-full"
-                />
-                <span className="basis-1/2 truncate">
-                  {operator.operator.name}
-                </span>
-                <span className="basis-1/3">{formatDate(operator.joined)}</span>
-                <span className="basis-1/3 text-end">
-                  <div className="text-danger">
-                    -{formatNumber(operator.tvl.eth, compact)}ETH
-                  </div>
-                  <div className="text-foreground-1 text-xs">
-                    $ {formatNumber(operator.tvl.usd, compact)}
-                  </div>
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
     </div>
   );
 }
+
+const OperatorsListSkeleton = () => {
+  return (
+    <div>
+      {[...Array(10)].map((item, i) => (
+        <div
+          key={i}
+          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+        >
+          <div className="md:w-10/12 w-6/12">
+            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          </div>
+          <div className="pl-5 flex justify-between gap-5 w-10/12">
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+
+            <div className="w-3/12">
+              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
