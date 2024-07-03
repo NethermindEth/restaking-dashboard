@@ -20,5 +20,5 @@ const services = {
   avsService: new AVSService(),
   lrtService: new LRTService(),
   operatorService: new OperatorService(),
-  eigenService: new EigenlayerService()
+  eigenlayerService: new EigenlayerService()
 };

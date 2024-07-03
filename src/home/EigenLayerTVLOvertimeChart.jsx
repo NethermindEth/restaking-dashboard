@@ -12,9 +12,10 @@ import { formatDateToVerboseString, formatNumber } from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
-    if (width < 500) return 2;
-    if (width < 800) return 5;
-    return 7;
+    if (width < 500) return 3;
+    if (width < 800) return 4;
+    if (width > 1000) return 6;
+    return 5;
   } else if (axis === 'y') {
     if (width < 500) return 3;
     if (width < 800) return 4;
@@ -22,7 +23,7 @@ const getNumberOfTicks = (width, axis) => {
   }
 };
 
-const EigenTVLOvertimeChart = ({ data, width, height }) => {
+const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
   const {
     tooltipData,
     tooltipLeft = 0,
@@ -36,18 +37,21 @@ const EigenTVLOvertimeChart = ({ data, width, height }) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const getEthTVL = d => parseFloat(d.ethTVL) / 1e18;
-  const getLstTVL = d => parseFloat(d.lstTVL) / 1e18;
+  const getEthTVL = useCallback(d => parseFloat(d.ethTVL) / 1e18, []);
+  const getLstTVL = useCallback(d => parseFloat(d.lstTVL) / 1e18, []);
 
-  const getTvlByDate = date => {
-    const selectedDate = formatDateToVerboseString(date, 'yyyy-MM-dd');
-    const tvl = data.find(
-      item =>
-        formatDateToVerboseString(new Date(item.timestamp), 'yyyy-MM-dd') ===
-        selectedDate
-    );
-    return tvl;
-  };
+  const getTvlByDate = useCallback(
+    date => {
+      const selectedDate = formatDateToVerboseString(date, 'yyyy-MM-dd');
+      const tvl = data.find(
+        item =>
+          formatDateToVerboseString(new Date(item.timestamp), 'yyyy-MM-dd') ===
+          selectedDate
+      );
+      return tvl;
+    },
+    [data]
+  );
 
   const dateScale = useMemo(
     () =>
@@ -80,7 +84,7 @@ const EigenTVLOvertimeChart = ({ data, width, height }) => {
         tooltipTop: y
       });
     },
-    [dateScale, margin.left, showTooltip, getTvlByDate]
+    [dateScale, margin.left, showTooltip]
   );
 
   const legendColorScale = scaleOrdinal({
@@ -120,7 +124,7 @@ const EigenTVLOvertimeChart = ({ data, width, height }) => {
           <AxisLeft
             scale={tvlScale}
             left={0}
-            tickFormat={formatNumber}
+            tickFormat={value => formatNumber(value, true)}
             tickLabelProps={() => ({
               className: 'fill-foreground-active text-xs',
               fontSize: 11,
@@ -194,7 +198,7 @@ const EigenTVLOvertimeChart = ({ data, width, height }) => {
             onTouchStart={handleTooltip}
             onTouchMove={handleTooltip}
             onMouseMove={handleTooltip}
-            onMouseLeave={() => hideTooltip()}
+            onMouseLeave={hideTooltip}
           />
         </Group>
       </svg>
@@ -218,10 +222,10 @@ const EigenTVLOvertimeChart = ({ data, width, height }) => {
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
           <div className="text-base text-purple-500">
-            ETH TVL: {getEthTVL(tooltipData).toFixed(2)}
+            ETH TVL: {formatNumber(getEthTVL(tooltipData), true)}
           </div>
           <div className="text-base text-purple-300">
-            LST TVL: {getLstTVL(tooltipData).toFixed(2)}
+            LST TVL: {formatNumber(getLstTVL(tooltipData), true)}
           </div>
         </TooltipWithBounds>
       )}
@@ -229,4 +233,4 @@ const EigenTVLOvertimeChart = ({ data, width, height }) => {
   );
 };
 
-export default EigenTVLOvertimeChart;
+export default EigenLayerTVLOvertimeChart;

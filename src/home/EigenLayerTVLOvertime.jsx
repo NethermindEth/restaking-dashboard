@@ -4,9 +4,9 @@ import { useCallback, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
-import EigenTVLOvertimeChart from './EigenTVLOvertimeChart';
+import EigenLayerTVLOvertimeChart from './EigenLayerTVLOvertimeChart';
 
-const EigenTVLOvertime = ({ eigenTVLData }) => {
+const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: '7days'
   });
@@ -37,8 +37,8 @@ const EigenTVLOvertime = ({ eigenTVLData }) => {
         <CardHeader className="flex flex-wrap justify-between gap-3">
           <div className="space-y-2 block">
             <div className="font-light">
-              <div className="text-base text-foreground-1">
-                <span>Eigen TVL over time</span>
+              <div className="text-lg text-foreground-1">
+                <span>EigenLayer TVL over time</span>
               </div>
             </div>
           </div>
@@ -51,7 +51,7 @@ const EigenTVLOvertime = ({ eigenTVLData }) => {
           <div className="w-full h-[400px]">
             <ParentSize>
               {({ width, height }) => (
-                <EigenTVLOvertimeChart
+                <EigenLayerTVLOvertimeChart
                   data={filteredData}
                   width={width}
                   height={height}
@@ -72,4 +72,4 @@ const EigenTVLOvertime = ({ eigenTVLData }) => {
   );
 };
 
-export default EigenTVLOvertime;
+export default EigenLayerTVLOvertime;

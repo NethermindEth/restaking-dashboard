@@ -2,7 +2,7 @@ import { Card, Progress } from '@nextui-org/react';
 import { Group } from '@visx/group';
 import { Pie } from '@visx/shape';
 import { Text } from '@visx/text';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
@@ -59,57 +59,60 @@ export default function OverviewLRTDistribution() {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     activePieEntry: null,
     isFetchingData: false,
-    lrtDistributionData: {}
+    lrtDistributionData: {},
+    lrtData: {}
   });
   const width = 300;
   const half = width / 2;
 
-  const fetchLRTDistribution = async () => {
+  const fetchLRTDistribution = useCallback(async () => {
     try {
       dispatch({ isFetchingData: true });
       const data = await lrtService.getLRTDistribution();
       dispatch({ lrtDistributionData: data.protocols, isFetchingData: false });
+
+      const updatedLRTData = Object.keys(lrtMapping).reduce((result, key) => {
+        result[key] = {
+          ...lrtMapping[key],
+          tvl: data.protocols[key] || 0
+        };
+        return result;
+      }, {});
+
+      dispatch({ lrtData: updatedLRTData });
     } catch {
       // TODO: Handle error
       dispatch({
         isFetchingTopOperators: false
       });
     }
-  };
+  }, [lrtService, dispatch]);
 
   useEffect(() => {
     fetchLRTDistribution();
-  }, [lrtService, dispatch]);
+  }, [fetchLRTDistribution]);
 
-  const lrtData = Object.keys(lrtMapping).reduce((result, key) => {
-    result[key] = {
-      ...lrtMapping[key],
-      tvl: state.lrtDistributionData[key] || 0
-    };
-    return result;
-  }, {});
-
-  const calculateTotalAndPercentages = lrtData => {
+  const calculateTotalAndPercentages = useCallback(lrtData => {
     const totalTVL = Object.values(lrtData).reduce(
       (sum, { tvl }) => sum + tvl,
       0
     );
 
-    const lrtDataWithPercentages = Object.entries(lrtData).reduce(
-      (result, [key, data]) => {
+    const lrtDataWithPercentages = Object.entries(lrtData)
+      // sort based on descending order of tvl
+      .sort((a, b) => b[1].tvl - a[1].tvl)
+      .reduce((result, [key, data]) => {
         result[key] = {
           ...data,
           percentage: (data.tvl / totalTVL) * 100
         };
         return result;
-      },
-      {}
-    );
+      }, {});
 
     return { lrtDataWithPercentages, totalTVL };
-  };
+  }, []);
 
-  const mergeSmallEntries = (data, totalTVL, threshold = 1) => {
+  const mergeSmallEntries = useCallback((data, totalTVL, threshold = 1) => {
     let mergedData = {};
     let othersData = {
       logo: '/image-group.svg',
@@ -131,22 +134,33 @@ export default function OverviewLRTDistribution() {
     }
 
     return mergedData;
-  };
+  }, []);
 
-  const lrtPieChartData = lrtData => {
-    return Object.entries(lrtData).map(([name, data], index) => ({
-      label: name,
-      amount: data.tvl,
-      color: getChartColor(index)
-    }));
-  };
+  const lrtPieChartData = useCallback(
+    lrtData => {
+      return Object.entries(lrtData).map(([name, data], index) => ({
+        label: name,
+        amount: data.tvl,
+        color: getChartColor(index)
+      }));
+    },
+    [getChartColor]
+  );
 
-  const { lrtDataWithPercentages, totalTVL } =
-    calculateTotalAndPercentages(lrtData);
+  const { lrtDataWithPercentages, totalTVL } = useMemo(
+    () => calculateTotalAndPercentages(state.lrtData),
+    [state.lrtData]
+  );
 
-  const mergedLrtData = mergeSmallEntries(lrtDataWithPercentages, totalTVL);
+  const mergedLrtData = useMemo(
+    () => mergeSmallEntries(lrtDataWithPercentages, totalTVL),
+    [lrtDataWithPercentages, totalTVL]
+  );
 
-  const chartData = lrtPieChartData(lrtDataWithPercentages);
+  const chartData = useMemo(
+    () => lrtPieChartData(lrtDataWithPercentages),
+    [mergedLrtData]
+  );
 
   return (
     <Card
@@ -157,7 +171,7 @@ export default function OverviewLRTDistribution() {
         LRT Distribution
       </div>
 
-      <div className="w-full flex flex-col gap-10 md:flex-row items-center justify-between px-4">
+      <div className="w-full flex flex-col gap-10 lg:flex-row flex-wrap items-center justify-center lg:justify-between px-4">
         <div className="w-full md:max-w-xl space-y-3">
           {Object.entries(mergedLrtData).map(
             ([name, { logo, tvl, percentage }]) => (
@@ -253,7 +267,7 @@ const LRTShare = ({ label, value, image, share }) => {
       <Progress
         radius="sm"
         classNames={{
-          base: 'max-w-2xl md:w-5/6 w-full',
+          base: 'lg:w-5/6 w-full',
           track: 'drop-shadow-md border bg-cinder-1 border-default',
           indicator: 'bg-cinder-default',
           label: 'text-foreground-active text-sm font-normal capitalize',
@@ -273,8 +287,8 @@ const LRTShare = ({ label, value, image, share }) => {
           maximumFractionDigits: 2
         }}
       />
-      <div className="text-sm text-foreground-2 min-w-fit ml-auto">
-        {formatNumber(share)} ETH
+      <div className="text-sm text-foreground-2 min-w-fit ml-2">
+        {formatNumber(share, true)} ETH
       </div>
     </div>
   );
