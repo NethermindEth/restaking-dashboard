@@ -39,7 +39,7 @@ export default class AVSService {
     return await response.json();
   }
 
-  async getAvsTvlOvertime(address) {
+  async getAVSTotalValue(address) {
     const response = await apiGet(`/avs/${address}/tvl`);
 
     if (response.ok) {
