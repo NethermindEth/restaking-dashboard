@@ -30,7 +30,10 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
     hideTooltip
   } = useTooltip();
 
-  const margin = { top: 0, right: 40, bottom: 40, left: 20 };
+  const margin = useMemo(
+    () => ({ top: 0, right: 40, bottom: 40, left: 20 }),
+    []
+  );
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -69,7 +72,7 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
 
   const handleTooltip = useCallback(
     ev => {
-      const { x, y } = localPoint(ev) || { x: 0, y: 0 };
+      const { x } = localPoint(ev) || { x: 0, y: 0 };
       const x0 = dateScale.invert(x - margin.left);
 
       // find the nearest data point

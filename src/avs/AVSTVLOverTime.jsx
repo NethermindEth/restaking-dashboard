@@ -13,10 +13,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
-import {
-  formatDateToVerboseString,
-  formatNumberToCompactString
-} from '../utils';
+import { formatDateToVerboseString, formatNumber } from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
@@ -204,7 +201,7 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                   scale={yScale}
                   top={margin.top}
                   left={margin.left}
-                  tickFormat={formatNumberToCompactString}
+                  tickFormat={formatNumber}
                   tickLabelProps={() => ({
                     fill: '#7A86A5',
                     fontSize: width < 500 ? 12 : 14,
@@ -277,7 +274,7 @@ const AVSTVLOverTime = ({ avsAddress }) => {
                 {formatDateToVerboseString(new Date(tooltipData.timestamp))}
               </div>
               <div className="text-base">
-                TVL: {formatNumberToCompactString(tooltipData.tvl)}
+                TVL: {formatNumber(tooltipData.tvl)}
               </div>
             </TooltipInPortal>
           )}
