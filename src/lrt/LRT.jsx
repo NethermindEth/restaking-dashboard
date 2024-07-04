@@ -4,6 +4,7 @@ import { reduceState } from '../shared/helpers';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
+import LRTList from './LRTList';
 
 export default function LRT() {
   const { lrtService } = useServices();
@@ -35,8 +36,17 @@ export default function LRT() {
       <div className="font-display font-medium pb-4 mb-4 text-foreground-1 text-3xl">
         Liquid restaking tokens
       </div>
-      <div className="bg-content1 border border-outline p-4 rounded-lg text-sm">
-        {state.results && <LRTDistribution data={state.results} height={512} />}
+      <div className="flex flex-col xl:flex-row gap-4">
+        <div className="basis-full bg-content1 border border-outline p-4 rounded-lg text-sm">
+          {state.results && (
+            <LRTDistribution data={state.results} height={512} />
+          )}
+        </div>
+        <div className="bg-content1 border border-outline rounded-lg text-sm">
+          {state.results && (
+            <LRTList data={state.results[state.results.length - 1]} />
+          )}
+        </div>
       </div>
     </>
   );

@@ -1,5 +1,6 @@
 import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
+import { colors, fullNumFormatter, protocols } from './helpers';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -200,7 +201,9 @@ export default function LRTDistribution({ data, height }) {
         end: scaleBrushDate(data[data.length - 1].timestamp)
       },
       filteredData: data.slice(-90),
-      keys: Object.keys(data?.[data.length - 1].protocols).sort(sortProtocols)
+      keys: Object.entries(data?.[data.length - 1].protocols)
+        .sort(sortProtocols)
+        .map(([k]) => k)
     });
   }, [data, dispatch, scaleBrushDate]);
 
@@ -257,15 +260,15 @@ export default function LRTDistribution({ data, height }) {
               y1={d => scaleValue(getY1(d)) ?? 0}
             >
               {({ stacks, path }) =>
-                stacks.map(stack => (
+                stacks.map((stack, i) => (
                   <path
                     key={`stack-${stack.key}`}
                     d={path(stack) || ''}
-                    fill={protocols[stack.key].color}
+                    fill={colors[i]}
                     onPointerEnter={e => handleAreaPointerMove(e, stack)}
                     onPointerLeave={hideTooltip}
                     onPointerMove={e => handleAreaPointerMove(e, stack)}
-                    stroke={protocols[stack.key].color}
+                    stroke={colors[i]}
                     // opacity={0.75}
                   />
                 ))
@@ -275,7 +278,7 @@ export default function LRTDistribution({ data, height }) {
               <line
                 opacity="0.8"
                 pointerEvents="none"
-                stroke="hsl(var(--app-primary-600))"
+                stroke="hsl(var(--app-foreground))"
                 strokeDasharray="2,2"
                 strokeWidth="1"
                 x1={tooltipLeft - margin.left}
@@ -347,21 +350,18 @@ export default function LRTDistribution({ data, height }) {
           />
         </div>
       </div>
-      <ul className="mt-4 pe-8 w-full">
-        {state.keys
-          ?.slice()
-          .sort()
-          .map(key => (
-            <li key={key} className="inline-block me-4">
-              <div className="flex flex-row gap-1 items-center text-sm">
-                <span
-                  className="inline-block h-3 rounded-full w-3"
-                  style={{ backgroundColor: protocols[key].color }}
-                ></span>
-                {protocols[key]?.name ?? key}
-              </div>
-            </li>
-          ))}
+      <ul className="xl:hidden mt-4 pe-8 w-full">
+        {state.keys?.map((key, i) => (
+          <li key={key} className="inline-block me-4">
+            <div className="flex flex-row gap-1 items-center text-sm">
+              <span
+                className="inline-block h-3 rounded-full w-3"
+                style={{ backgroundColor: colors[i] }}
+              ></span>
+              {protocols[key]?.name ?? key}
+            </div>
+          </li>
+        ))}
       </ul>
       {tooltipOpen && (
         <TooltipInPortal
@@ -376,20 +376,20 @@ export default function LRTDistribution({ data, height }) {
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
-            {Object.keys(tooltipData.data.protocols)
-              .sort()
-              .map(key => (
+            {Object.entries(tooltipData.data.protocols)
+              .sort(sortProtocols)
+              .map(([key], i) => (
                 <li key={`tt-${key}`}>
                   <div
                     className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row gap-1 items-center px-2 py-1`}
                   >
                     <span
                       className="h-3 inline-block rounded-full w-3"
-                      style={{ backgroundColor: protocols[key].color }}
+                      style={{ backgroundColor: colors[i] }}
                     ></span>
                     {protocols[key]?.name ?? key}
                     <span className="grow ps-4 text-end">
-                      {tooltipCurFormatter.format(
+                      {fullNumFormatter.format(
                         Number(
                           tooltipData.data.protocols[key] *
                             (state.useRate ? tooltipData.data.rate : 1)
@@ -430,7 +430,7 @@ const formatValue = value => {
     return `${value / 1e6}m`;
   }
 
-  return `${value / 1_000}k`;
+  return `${value / 1e3}k`;
 };
 const getDate = d => new Date(d.timestamp);
 
@@ -438,28 +438,17 @@ const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
-const protocols = {
-  bedrock: { index: 0, name: 'Bedrock', color: '#b45309' },
-  eigenpie: { index: 6, name: 'Eigenpie', color: '#6d28d9' },
-  etherfi: { index: 1, name: 'ether.fi', color: '#f6a550' },
-  euclid: { index: 9, name: 'Euclid', color: '#5b21b6' },
-  inception: { index: 4, name: 'Inception', color: '#ddd6fe' },
-  kelp: { index: 3, name: 'Kelp', color: '#a78bfa' },
-  prime: { index: 8, name: 'Prime', color: '#db2777' },
-  puffer: { index: 7, name: 'Puffer', color: '#3b0764' },
-  renzo: { index: 2, name: 'Renzo', color: '#faca51' },
-  swell: { index: 5, name: 'Swell', color: '#8b5cf6' }
-};
-const sortProtocols = (p1, p2) => {
-  const i1 = protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
-  const i2 = protocols[p2]?.index ?? Number.MAX_SAFE_INTEGER;
+
+const sortProtocols = ([, p1], [, p2]) => {
+  const i1 = p1; //protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
+  const i2 = p2; //protocols[p2]?.index ?? Number.MAX_SAFE_INTEGER;
 
   if (i1 < i2) {
-    return -1;
+    return 1;
   }
 
   if (i1 > i2) {
-    return 1;
+    return -1;
   }
 
   return 0;
@@ -471,10 +460,6 @@ const tabMap = {
   '1y': 365,
   all: Number.MAX_SAFE_INTEGER
 };
-// eslint-disable-next-line no-undef
-const tooltipCurFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 0
-});
 // eslint-disable-next-line no-undef
 const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium'
