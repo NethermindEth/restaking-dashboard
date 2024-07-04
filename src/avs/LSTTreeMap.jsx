@@ -4,10 +4,11 @@ import { Treemap, hierarchy, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
 import { Text } from '@visx/text';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { assetFormatter } from '../utils';
+import localPoint from '@visx/event/lib/localPointGeneric';
 
 const baseColor = '#465e99';
 const minOpacity = 0.1;
@@ -76,6 +77,15 @@ export default function LSTTreeMap({
   const handleTabChange = tab => {
     dispatch({ selectedTab: tab });
   };
+
+  const handleTooltip = useCallback((event, node) => {
+    const point = localPoint(event.target.ownerSVGElement, event);
+    showTooltip({
+      tooltipData: node.data,
+      tooltipLeft: point.x,
+      tooltipTop: point.y
+    });
+  }, []);
 
   return (
     <Card
@@ -152,26 +162,8 @@ export default function LSTTreeMap({
                             ? opacity + 0.2
                             : opacity
                         }
-                        onPointerEnter={event => {
-                          const { clientX, clientY } = event;
-                          const { left, top } =
-                            event.currentTarget.getBoundingClientRect();
-                          showTooltip({
-                            tooltipData: node.data,
-                            tooltipLeft: clientX - left,
-                            tooltipTop: clientY - top
-                          });
-                        }}
-                        onPointerMove={event => {
-                          const { clientX, clientY } = event;
-                          const { left, top } =
-                            event.currentTarget.getBoundingClientRect();
-                          showTooltip({
-                            tooltipData: node.data,
-                            tooltipLeft: clientX - left,
-                            tooltipTop: clientY - top
-                          });
-                        }}
+                        onPointerEnter={e => handleTooltip(e, node)}
+                        onPointerMove={e => handleTooltip(e, node)}
                         onPointerLeave={hideTooltip}
                       />
                     )}
