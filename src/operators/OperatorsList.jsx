@@ -91,7 +91,7 @@ const OperatorsList = () => {
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <div className="min-w-5"></div>
+          <div className="min-w-8"></div>
           <span className="basis-1/2">Operators</span>
           <span className="basis-1/3">Servicing AVS</span>
           <span className="basis-1/4">Restakers</span>
@@ -107,7 +107,9 @@ const OperatorsList = () => {
                 key={`operator-item-${i}`}
                 className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
               >
-                <div className="min-w-5"></div>
+                <div className="min-w-8 text-foreground-2">
+                  {(searchParams.get('page') - 1) * 10 + i + 1}
+                </div>
                 <img
                   className="h-5 rounded-full min-w-5"
                   src={op.metadata?.logo}
