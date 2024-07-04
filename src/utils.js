@@ -46,3 +46,23 @@ export const assetFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
   minimumFractionDigits: 2
 });
+
+export function formatDateToVerboseString(date) {
+  const day = date.getDate();
+  let daySuffix = 'th';
+  if (day === 1 || day === 21 || day === 31) {
+    daySuffix = 'st';
+  } else if (day === 2 || day === 22) {
+    daySuffix = 'nd';
+  } else if (day === 3 || day === 23) {
+    daySuffix = 'rd';
+  }
+  const month = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+
+  // Check if the year is the current year
+  const currentYear = new Date().getFullYear();
+  const yearSuffix = year !== currentYear ? ` ${year}` : '';
+
+  return `${day}${daySuffix} ${month}${yearSuffix}`;
+}

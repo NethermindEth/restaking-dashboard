@@ -14,13 +14,13 @@ import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
 import { assetFormatter, formatNumber } from '../utils';
+import AVSTotalValueOvertime from './AVSTotalValueOvertime';
 import LSTDistribution from './LSTDistribution';
 import Operators from './Operators';
-import OperatorsOverTime from './OperatorsOverTime';
+import OperatorsOvertime from './OperatorsOvertime';
 import RestakersOverTime from './RestakersOverTime';
 import RestakingLeaderboard from './RestakingLeaderboard';
 import { strategiesData } from './strategies.mapping';
-import TVLOverTime from './TVLOverTime';
 
 export default function AVSDetails() {
   const location = useLocation();
@@ -202,9 +202,6 @@ export default function AVSDetails() {
               <span className="basis-full font-bold text-xl truncate text-foreground-1">
                 {state.avs?.metadata?.name}
               </span>
-              <div className="bg-foreground-2 flex text-content1 items-center justify-center py-1 px-1.5 rounded-md text-sm">
-                #&nbsp;8
-              </div>
             </div>
           </div>
           <div className="py-4 text-sm text-foreground-active">
@@ -271,31 +268,8 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className="space-y-1 block">
-                  <div className="font-light text-lg text-foreground-1">
-                    TVL overtime
-                  </div>
-                  <div className="font-light">
-                    <div className="text-base flex items-center gap-2">
-                      <span>4,554,567 ETH</span>{' '}
-                      <span className="text-success">+1.5%</span>
-                    </div>
-                    <div className="text-sm text-foreground-1">
-                      $ 34,554,567
-                    </div>
-                  </div>
-                </div>
-                <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
-                  onTimelineChange={handleTimelineChange}
-                />
-              </CardHeader>
-              <CardBody>
-                <TVLOverTime />
-              </CardBody>
-            </Card>
+            <AVSTotalValueOvertime avsAddress={avsAddress} />
+
             <LSTDistribution
               lstDistributionData={state.lstDistributionData}
               totalEthDistributionData={state.totalEthDistributionData}
@@ -312,26 +286,7 @@ export default function AVSDetails() {
           }
         >
           <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className="space-y-1 block">
-                  <div className=" font-light text-lg text-foreground-1">
-                    Operators over time
-                  </div>
-                  <div className=" font-light text-base">
-                    364 <span className="text-success">+2.3%</span>
-                  </div>
-                </div>
-                <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
-                  onTimelineChange={handleTimelineChange}
-                />
-              </CardHeader>
-
-              <CardBody>
-                <OperatorsOverTime />
-              </CardBody>
-            </Card>
+            <OperatorsOvertime avsAddress={avsAddress} />
             <Operators avsAddress={avsAddress} totalTVL={state.totalTVL} />
           </div>
         </Tab>

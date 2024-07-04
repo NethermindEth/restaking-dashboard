@@ -25,7 +25,8 @@ export default {
             default: '#e0e7ff',
             content1: '#eef2ff',
             focus: '#34d399',
-            foreground: '#000000'
+            foreground: '#000000',
+            'dark-blue': '#009CDD'
           }
         },
         dark: {
@@ -43,10 +44,11 @@ export default {
               DEFAULT: '#ffffff',
               active: '#CAD7F9',
               1: '#c4cce3',
-              2: '#cad7F9'
+              2: '#7a86a5'
             },
             outline: '#293041',
-            secondary: '#FFCC80'
+            secondary: '#FFCC80',
+            'dark-blue': '#009CDD'
           }
         }
       }
