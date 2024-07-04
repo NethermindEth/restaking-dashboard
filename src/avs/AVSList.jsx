@@ -1,14 +1,16 @@
 import { Skeleton } from '@nextui-org/react';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
+import Pagination from '../shared/Pagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
 
-export default function AVSList({ onSelectionChange }) {
+export default function AVSList() {
   const { avsService } = useServices();
+  const [searchParams, setSearchParams] = useSearchParams();
   const compact = !useTailwindBreakpoint('md');
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
@@ -16,11 +18,11 @@ export default function AVSList({ onSelectionChange }) {
     error: null
   });
 
-  useEffect(() => {
-    async function fetchAVS() {
+  const fetchAVS = useCallback(
+    async pageNumber => {
       try {
         dispatch({ isFetchingAvsData: true, error: null });
-        const response = await avsService.getAll();
+        const response = await avsService.getAll(pageNumber);
         const data = response.results;
 
         for (let i = 0, count = data.length; i < count; i++) {
@@ -42,29 +44,67 @@ export default function AVSList({ onSelectionChange }) {
           return 0;
         });
 
-        dispatch({ selectedAVS: data[0], avs: data, isFetchingAvsData: false });
+        dispatch({
+          avs: data,
+          isFetchingAvsData: false,
+          totalPages: Math.ceil(response.totalCount / 10)
+        });
       } catch (error) {
         dispatch({
           error: 'Failed to fetch AVS data',
           isFetchingAvsData: false
         });
       }
-    }
+    },
+    [avsService, dispatch]
+  );
 
-    fetchAVS();
-  }, [avsService, dispatch, onSelectionChange]);
   const handleAVSItemClick = avs => {
     navigate(`/avs/${avs.address}`, { state: { avs } });
   };
 
+  const handleNext = useCallback(() => {
+    const currentPage = parseInt(searchParams.get('page') || '1');
+    if (currentPage + 1 <= state.totalPages) {
+      setSearchParams({ page: (currentPage + 1).toString() });
+      fetchAVS(currentPage + 1);
+    }
+  }, [searchParams, state.totalPages, setSearchParams, fetchAVS]);
+
+  const handlePrevious = useCallback(() => {
+    const currentPage = parseInt(searchParams.get('page') || '1');
+    if (currentPage - 1 >= 1) {
+      setSearchParams({ page: (currentPage - 1).toString() });
+      fetchAVS(currentPage - 1);
+    }
+  }, [searchParams, fetchAVS]);
+
+  const handlePageClick = useCallback(
+    page => {
+      setSearchParams({ page: page.toString() });
+      fetchAVS(page);
+    },
+    [setSearchParams, fetchAVS]
+  );
+
+  useEffect(() => {
+    const page = parseInt(searchParams.get('page') || '1');
+    fetchAVS(page);
+  }, [searchParams]);
+
   return (
-    <div>
-      <div className="font-display font-medium pb-4 mb-4 text-foreground-1 text-3xl uppercase">
-        AVS
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <div className="font-display font-medium text-foreground-1 text-3xl">
+          AVS
+        </div>
+        <div className="font-display font-medium text-foreground-1 text-base">
+          Actively Validated Services
+        </div>
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <span className="basis-full md:pl-10">Name</span>
+          <span className="basis-full md:pl-8 md:pr-20">Name</span>
           <span className="basis-1/3">Stakers</span>
           <span className="basis-1/4">Operators</span>
           <span className="basis-1/3 text-end">TVL</span>
@@ -72,33 +112,44 @@ export default function AVSList({ onSelectionChange }) {
         {state.isFetchingAvsData ? (
           <AVSListSkeleton />
         ) : (
-          state.avs?.map((avs, i) => (
-            <div
-              key={`avs-item-${i}`}
-              onClick={() => handleAVSItemClick(avs)}
-              className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default ${
-                state.selectedAVS === avs ? 'bg-content1' : ''
-              }`}
-            >
-              <div className="min-w-5">{i + 1}</div>
-              <img src={avs.metadata.logo} className="size-5 rounded-full" />
-              <span className="md:basis-full md:w-full w-[180px] truncate">
-                {avs?.metadata?.name}
-              </span>
-              <span className="basis-1/3">
-                {formatNumber(avs.stakers, compact)}
-              </span>
-              <span className="basis-1/4">
-                {formatNumber(avs.operators, compact)}
-              </span>
-              <span className="basis-1/3 text-end">
-                <div>ETH {formatNumber(avs.tvl, compact)}</div>
-                <div className="text-foreground-1 text-xs">
-                  USD {formatNumber(avs.tvl, compact)}
-                </div>
-              </span>
-            </div>
-          ))
+          <div>
+            {state.avs?.map(
+              (avs, i) =>
+                avs.metadata && (
+                  <div
+                    key={`avs-item-${i}`}
+                    onClick={() => handleAVSItemClick(avs)}
+                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
+                  >
+                    <div className="min-w-5">{i + 1}</div>
+                    <img
+                      src={avs.metadata.logo}
+                      className="size-5 rounded-full"
+                    />
+                    <span className="md:basis-full md:w-full w-[180px] truncate">
+                      {avs?.metadata?.name}
+                    </span>
+                    <span className="basis-1/3">
+                      {formatNumber(avs.stakers, compact)}
+                    </span>
+                    <span className="basis-1/4">
+                      {formatNumber(avs.operators, compact)}
+                    </span>
+                    <span className="basis-1/3 text-end">
+                      <div>{formatNumber(avs.tvl, compact)} ETH</div>
+                    </span>
+                  </div>
+                )
+            )}
+
+            <Pagination
+              totalPages={state.totalPages}
+              currentPage={parseInt(searchParams.get('page') || '1')}
+              handleNext={handleNext}
+              handlePrevious={handlePrevious}
+              handlePageClick={handlePageClick}
+            />
+          </div>
         )}
       </div>
     </div>
@@ -114,17 +165,17 @@ const AVSListSkeleton = () => {
           className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
         >
           <div className="md:w-10/12 w-6/12">
-            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
           </div>
           <div className="pl-5 flex justify-between gap-5 w-10/12">
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
             </div>
           </div>
         </div>
