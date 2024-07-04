@@ -37,7 +37,8 @@ export default {
             content3: 'yellow',
             content4: 'green',
             default: {
-              DEFAULT: '#191c2c'
+              DEFAULT: '#191c2c',
+              2: '#7A86A5'
             },
             focus: '#34d399',
             foreground: {
@@ -48,13 +49,16 @@ export default {
             },
             outline: '#293041',
             secondary: '#FFCC80',
+            success: '#7CCB69',
+            disabled: '#52525B',
             'dark-blue': '#009CDD',
             cinder: {
               default: '#576AA0',
               1: '#2D344D',
               2: '#D0D5E7',
               3: '#A7B2D2',
-              4: '#37446C'
+              4: '#37446C',
+              5: '#7889B8'
             },
             accent: {
               default: '#FFCC80'

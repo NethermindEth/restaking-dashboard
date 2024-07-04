@@ -9,7 +9,7 @@ const Pagination = ({
   handlePrevious,
   handlePageClick
 }) => {
-  const { activePage, range, setPage } = usePagination({
+  const { activePage, range } = usePagination({
     total: totalPages,
     showControls: true,
     page: currentPage
