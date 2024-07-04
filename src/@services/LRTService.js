@@ -11,4 +11,15 @@ export default class LRTService {
     // TODO: Handle error
     return await response.json();
   }
+
+  async getLRTDistribution() {
+    const response = await apiGet('/lrt');
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
 }

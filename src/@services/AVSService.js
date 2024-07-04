@@ -11,4 +11,19 @@ export default class AVSService {
     // TODO: Handle error
     return await response.json();
   }
+
+  async getTopAVS() {
+    const response = await apiGet(`/avs/`, {
+      query: {
+        'page-size': 3
+      }
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
 }
