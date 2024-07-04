@@ -66,26 +66,25 @@ const OperatorDetails = () => {
           </div>
           <div className="w-full h-20 flex rounded-lg border border-outline px-10 py-4 justify-between">
             <div className="flex basis-1/4 flex-col gap-y-2 items-center">
-              <span className="text-foreground-1 text-sm">TVL</span>
-              <span>
+              <span className="text-default-2 text-sm">TVL</span>
+              <span className="text-foreground-active">
                 {state.operator?.strategies &&
                   `${assetFormatter.format(formatEther(state.operatorTVL.toString()))} ETH`}
               </span>
             </div>
             <Divider orientation="vertical" className="bg-outline" />
             <div className="flex basis-1/6 flex-col items-center gap-y-2">
-              <span className="text-foreground-1 text-sm">AVS Subscribed</span>
-              <span>{state.operator?.avs.length}</span>
+              <span className="text-default-2 text-sm">AVS Subscribed</span>
+              <span className="text-foreground-active">
+                {state.operator?.avs.length}
+              </span>
             </div>
             <Divider orientation="vertical" className="bg-outline" />
             <div className="flex basis-2/12 flex-col gap-y-2 items-center">
-              <span className="text-foreground-1 text-sm">Stakers</span>
-              <span>{state.operator?.stakerCount}</span>
-            </div>
-            <Divider orientation="vertical" className="bg-outline" />
-            <div className="flex basis-1/12 flex-col gap-y-2 items-center">
-              <span className="text-foreground-1 text-sm">Uptime</span>
-              <span>TODO</span>
+              <span className="text-default-2 text-sm">Restakers</span>
+              <span className="text-foreground-active">
+                {state.operator?.stakerCount}
+              </span>
             </div>
           </div>
         </CardBody>
@@ -99,17 +98,6 @@ const OperatorDetails = () => {
       />
 
       <div className="flex flex-col lg:flex-row gap-4 w-full">
-        <Card
-          radius="md"
-          className="bg-content1 w-full border border-outline p-0"
-        >
-          <CardHeader className="m-4">
-            <span className="text-foreground-2">Restaking Leaderboard</span>
-          </CardHeader>
-          <CardBody>
-            <RestakingLeaderboard />
-          </CardBody>
-        </Card>
         <div className="w-full flex flex-col gap-y-4">
           <RestakersTrend opAddress={address} />
           <Card

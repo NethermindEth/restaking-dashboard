@@ -45,7 +45,7 @@ const RestakersTrend = ({ opAddress }) => {
     <Card radius="md" className="bg-content1 w-full border border-outline p-4">
       <CardHeader className="flex flex-wrap justify-between gap-3">
         <div className="space-y-2 block">
-          <span className="text-foreground-2">Restaker Trend</span>
+          <span className="text-foreground-active">Restaker Trend</span>
           <div className="font-light">
             <div className="text-base text-foreground-1">
               <span>
