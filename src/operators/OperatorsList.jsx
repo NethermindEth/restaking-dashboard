@@ -4,22 +4,30 @@ import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { Link, useSearchParams } from 'react-router-dom';
 import Pagination from '../shared/Pagination';
-import { Input } from '@nextui-org/react';
+import { Input, Skeleton } from '@nextui-org/react';
 
 const OperatorsList = () => {
   const { operatorService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [state, dispatch] = useMutativeReducer(reduceState, {});
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isFetchingOperatorData: false,
+    error: null
+  });
 
   const getOperators = async pageIndex => {
     try {
+      dispatch({ isFetchingOperatorData: true });
       const data = await operatorService.getAll(pageIndex - 1);
       dispatch({
         operators: data.results,
+        isFetchingOperatorData: false,
         totalPages: Math.ceil(data.totalCount / 10)
       });
     } catch {
-      // TODO: handle error
+      dispatch({
+        error: 'Failed to fetch Operator data',
+        isFetchingOperatorData: false
+      });
     }
   };
 
@@ -89,36 +97,71 @@ const OperatorsList = () => {
           <span className="basis-1/4">Restakers</span>
           <span className="basis-1/3 text-end">TVL</span>
         </div>
-        {state.operators?.map((op, i) => (
-          <Link
-            to={`/operators/${op.address}`}
-            key={`operator-item-${i}`}
-            className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
-          >
-            <div className="min-w-5"></div>
-            <img className="h-5 rounded-full min-w-5" src={op.metadata?.logo} />
-            <span className="basis-1/2 truncate">{op.metadata?.name}</span>
-            <span className="basis-1/3">7 AVS</span>
-            <span className="basis-1/4">{op.stakerCount}</span>
-            <span className="basis-1/3 text-end">
-              <div>ETH {assetFormatter.format(op.strategiesTotal)}</div>
-              <div className="text-foreground-1 text-xs">
-                USD {assetFormatter.format(op.strategiesTotal)}
-              </div>
-            </span>
-          </Link>
-        ))}
+        {state.isFetchingOperatorData ? (
+          <OperatorListSkeleton />
+        ) : (
+          <>
+            {state.operators?.map((op, i) => (
+              <Link
+                to={`/operators/${op.address}`}
+                key={`operator-item-${i}`}
+                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
+              >
+                <div className="min-w-5"></div>
+                <img
+                  className="h-5 rounded-full min-w-5"
+                  src={op.metadata?.logo}
+                />
+                <span className="basis-1/2 truncate">{op.metadata?.name}</span>
+                <span className="basis-1/3">7 AVS</span>
+                <span className="basis-1/4">{op.stakerCount}</span>
+                <span className="basis-1/3 text-end">
+                  <div>ETH {assetFormatter.format(op.strategiesTotal)}</div>
+                  <div className="text-foreground-1 text-xs">
+                    USD {assetFormatter.format(op.strategiesTotal)}
+                  </div>
+                </span>
+              </Link>
+            ))}
 
-        <Pagination
-          totalPages={state.totalPages}
-          currentPage={parseInt(searchParams.get('page'))}
-          handleNext={handleNext}
-          handlePrevious={handlePrevious}
-          handlePageClick={handlePageClick}
-        />
+            <Pagination
+              totalPages={state.totalPages}
+              currentPage={parseInt(searchParams.get('page'))}
+              handleNext={handleNext}
+              handlePrevious={handlePrevious}
+              handlePageClick={handlePageClick}
+            />
+          </>
+        )}
       </div>
     </div>
   );
 };
 
 export default OperatorsList;
+
+const OperatorListSkeleton = () => {
+  return (
+    <div>
+      {[...Array(10)].map((item, i) => (
+        <div
+          key={i}
+          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+        >
+          <div className="basis-1/2">
+            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          </div>
+          <div className="basis-1/3">
+            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          </div>{' '}
+          <div className="basis-1/4">
+            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          </div>{' '}
+          <div className="basis-1/3">
+            <Skeleton className="h-6 rounded-md w-full dark:bg-default" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
