@@ -265,7 +265,7 @@ const CallToActions = () => {
           className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group w-full"
         >
           <div>
-            <img src="/public/nethermind.png" />
+            <img src="/nethermind.png" />
           </div>
           <div className="space-y-1">
             <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
