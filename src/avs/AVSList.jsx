@@ -1,9 +1,10 @@
-import { reduceState } from '../shared/helpers';
 import { useEffect } from 'react';
-import { useMutativeReducer } from 'use-mutative';
 import { useNavigate } from 'react-router-dom';
+import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
+import { reduceState } from '../shared/helpers';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { formatNumber } from '../utils';
 
 export default function AVSList({ onSelectionChange }) {
   const { avsService } = useServices();
@@ -105,22 +106,4 @@ export default function AVSList({ onSelectionChange }) {
       </div>
     </div>
   );
-}
-
-const numberFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 0
-});
-
-function formatNumber(value, compact) {
-  if (compact) {
-    if (value >= 1_000_000) {
-      return `${(value / 1_000_000).toFixed(1)}m`;
-    }
-
-    if (value >= 1_000) {
-      return `${(value / 1_000).toFixed(1)}k`;
-    }
-  }
-
-  return numberFormatter.format(value);
 }

@@ -41,11 +41,22 @@ export default {
             focus: '#34d399',
             foreground: {
               DEFAULT: '#ffffff',
+              active: '#CAD7F9',
               1: '#cad7F9',
               2: '#7a86a5'
             },
             outline: '#293041',
-            secondary: 'orange'
+            secondary: 'orange',
+            cinder: {
+              default: '#576AA0',
+              1: '#2D344D',
+              2: '#D0D5E7',
+              3: '#A7B2D2',
+              4: '#37446C'
+            },
+            accent: {
+              default: '#FFCC80'
+            }
           }
         }
       }

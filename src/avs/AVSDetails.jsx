@@ -1,9 +1,10 @@
 import { Button, Link, Tab, Tabs } from '@nextui-org/react';
-import assets from '../shared/assets';
 import { formatEther } from 'ethers';
-import { reduceState } from '../shared/helpers';
 import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
+import assets from '../shared/assets';
+import { reduceState } from '../shared/helpers';
+import { assetFormatter } from '../utils';
 
 export default function AVSDetails({ avs }) {
   const location = useLocation();
@@ -117,19 +118,3 @@ export default function AVSDetails({ avs }) {
     </div>
   );
 }
-
-const assetFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2
-});
-const compareStrategies = ([, i1], [, i2]) => {
-  if (i1 < i2) {
-    return 1;
-  }
-
-  if (i1 > i2) {
-    return -1;
-  }
-
-  return 0;
-};

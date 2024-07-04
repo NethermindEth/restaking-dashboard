@@ -1,6 +1,8 @@
 import { createContext, useContext } from 'react';
 import AVSService from './AVSService';
+import EigenlayerService from './EigenlayerService';
 import LRTService from './LRTService';
+import OperatorService from './OperatorService';
 
 export const ServiceContext = createContext();
 
@@ -16,5 +18,7 @@ export function ServiceProvider({ children }) {
 
 const services = {
   avsService: new AVSService(),
-  lrtService: new LRTService()
+  lrtService: new LRTService(),
+  operatorService: new OperatorService(),
+  eigenlayerService: new EigenlayerService()
 };
