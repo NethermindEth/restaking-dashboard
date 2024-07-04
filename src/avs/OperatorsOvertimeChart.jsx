@@ -206,7 +206,7 @@ const OperatorsOvertimeChart = ({ data, width, height }) => {
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
           <div className="text-base">
-            TVL: {formatNumber(tooltipData.operators)}
+            Operators: {formatNumber(tooltipData.operators)}
           </div>
         </TooltipWithBounds>
       )}
