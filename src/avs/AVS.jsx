@@ -1,7 +1,7 @@
 import AVSDetails from './AVSDetails';
 import AVSList from './AVSList';
 import { reduceState } from '../shared/helpers';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 
 export default function AVS() {
