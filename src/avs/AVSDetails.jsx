@@ -202,9 +202,6 @@ export default function AVSDetails() {
               <span className="basis-full font-bold text-xl truncate text-foreground-1">
                 {state.avs?.metadata?.name}
               </span>
-              <div className="bg-foreground-2 flex text-content1 items-center justify-center py-1 px-1.5 rounded-md text-sm">
-                #&nbsp;8
-              </div>
             </div>
           </div>
           <div className="py-4 text-sm text-foreground-active">
