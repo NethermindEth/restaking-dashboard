@@ -16,6 +16,21 @@ export default class OperatorService {
     return await response.json();
   }
 
+  async getTopOperators() {
+    const response = await apiGet(`/operators/`, {
+      query: {
+        'page-size': 3
+      }
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
+
   async getOperator(address) {
     const response = await apiGet(`operators/${address}`);
 

@@ -7,10 +7,7 @@ import { extent } from 'd3-array';
 import { GridRows, GridColumns } from '@visx/grid';
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
-import {
-  formatDateToVerboseString,
-  formatNumberToCompactString
-} from '../utils';
+import { formatNumber, formatDateToVerboseString } from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
@@ -119,7 +116,7 @@ const OperatorTVLOverTimeChart = ({ data, width, height }) => {
           />
 
           <AxisLeft
-            tickFormat={formatNumberToCompactString}
+            tickFormat={val => formatNumber(val, true)}
             scale={tvlScale}
             tickLabelProps={() => ({
               className: 'fill-default-2 text-xs',
@@ -194,7 +191,7 @@ const OperatorTVLOverTimeChart = ({ data, width, height }) => {
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
           <div className="text-base">
-            TVL: {formatNumberToCompactString(tooltipData.tvl)}
+            TVL: {formatNumber(tooltipData.tvl, true)}
           </div>
         </TooltipWithBounds>
       )}

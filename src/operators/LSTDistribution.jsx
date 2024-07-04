@@ -187,8 +187,8 @@ const LSTShare = ({ label, value }) => {
       radius="sm"
       classNames={{
         base: 'w-full lg:w-md',
-        track: 'drop-shadow-md border bg-cinder-blue-200  border-default',
-        indicator: 'bg-cinder-blue-100',
+        track: 'drop-shadow-md border bg-cinder-1 border-default',
+        indicator: 'bg-cinder-5',
         label: 'text-foreground-2 text-xs font-normal',
         value: 'text-white text-xs font-normal'
       }}

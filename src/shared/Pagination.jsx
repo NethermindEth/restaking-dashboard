@@ -38,7 +38,7 @@ const Pagination = ({
                 onClick={() => handlePageClick(page)}
                 key={`page-${page}`}
                 aria-label={`page ${page}`}
-                className={`${activePage == page ? 'text-foreground-2' : 'text-slate-500'} cursor-pointer`}
+                className={`${activePage == page ? 'text-foreground-1' : 'text-slate-500'} cursor-pointer`}
               >
                 {page}
               </span>
