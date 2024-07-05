@@ -6,7 +6,7 @@ export default function Header() {
 
   return (
     <div className="bg-background">
-      <header className={`flex items-center gap-x-3 px-5 py-6`} data-theme>
+      <header className="flex items-center gap-x-3 px-5 py-6" data-theme>
         <Button
           color="default"
           isIconOnly={true}
@@ -16,9 +16,11 @@ export default function Header() {
         >
           <span className="material-symbols-outlined">menu</span>
         </Button>
-        <div className="font-bold font-display text-[#ffa726] uppercase">
-          Restaking Dashboard
-        </div>
+        <img
+          alt="Restaking Dashboard"
+          className="h-6 lg:h-5"
+          src="/logo-h.svg"
+        />
         <Modal
           classNames={{
             base: 'h-full m-0 sm:m-0 p-0 rounded-none w-full',

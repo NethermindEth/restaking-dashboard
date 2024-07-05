@@ -21,7 +21,11 @@ export default function Sidebar({ onOpenChange }) {
       data-theme
     >
       <header className="border-l-4 border-transparent flex-none font-display font-bold pb-8 pt-6 px-5 text-[#ffa726] text-sm uppercase">
-        Restaking Dashboard
+        <img
+          alt="Restaking Dashboard"
+          className="h-6 lg:h-5"
+          src="/logo-h.svg"
+        />
       </header>
       <nav className="flex-none">
         {navItems.map((item, i) => {
