@@ -16,6 +16,7 @@ import { ThemeProvider } from './shared/ThemeContext';
 import AVSDetails from './avs/AVSDetails';
 import OperatorsList from './operators/OperatorsList';
 import OperatorDetails from './operators/OperatorDetails';
+import LST from './lst/LST';
 
 export default function App() {
   log.debug('Starting up');
@@ -37,6 +38,7 @@ export default function App() {
                     path="/operators/:address"
                     element={<OperatorDetails />}
                   />
+                  <Route path="/lst" element={<LST />} />
                 </Route>
               )
             )}
