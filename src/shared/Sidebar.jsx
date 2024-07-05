@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import Footer from './Footer';
 import { Link } from '@nextui-org/react';
 import { useCallback } from 'react';
 
@@ -16,11 +15,8 @@ export default function Sidebar({ onOpenChange }) {
     [navigate, onOpenChange]
   );
   return (
-    <div
-      className={`bg-content1 border-b border-e border-outline h-full flex flex-col overflow-y-scroll lg:overflow-hidden rounded-br-lg w-full`}
-      data-theme
-    >
-      <header className="border-l-4 border-transparent flex-none font-display font-bold pb-8 pt-6 px-5 text-[#ffa726] text-sm uppercase">
+    <div>
+      <header className="border-l-4 border-transparent flex-none pb-8 pt-6 px-5">
         <img
           alt="Restaking Dashboard"
           className="h-6 lg:h-5"
@@ -46,7 +42,7 @@ export default function Sidebar({ onOpenChange }) {
           );
         })}
       </nav>
-      <Footer />
+      {/* <Settings /> */}
     </div>
   );
 }
