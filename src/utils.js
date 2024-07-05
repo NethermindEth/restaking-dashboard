@@ -4,6 +4,9 @@ const numberFormatter = new Intl.NumberFormat('en-US', {
 
 export function formatNumber(value, compact) {
   if (compact) {
+    if (value >= 1_000_000_000) {
+      return `${(value / 1_000_000_000).toFixed(1)}b`;
+    }
     if (value >= 1_000_000) {
       return `${(value / 1_000_000).toFixed(1)}m`;
     }

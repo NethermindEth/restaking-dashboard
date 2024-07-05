@@ -8,7 +8,7 @@ import { scaleUtc, scaleLinear } from '@visx/scale';
 import { AreaStack, AreaClosed } from '@visx/shape';
 import { bisector } from '@visx/vendor/d3-array';
 import { useTooltipInPortal } from '@visx/tooltip';
-import React, { useRef, useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import HBrush from '../shared/HBrush';
 import { reduceState } from '../shared/helpers';
@@ -33,9 +33,6 @@ const formatDate = date => {
 };
 const getDate = d => new Date(d.timestamp);
 
-const getValue = (d, strategy) => {
-  return d.tvl[strategy];
-};
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
@@ -50,7 +47,8 @@ export default function LSTDistributionGraph({
   width
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: 'all',
+    currentTimeline: 'all',
+    currentRate: 'usd',
     filteredData: [],
     keys: [],
     maxX: 0,
@@ -63,7 +61,6 @@ export default function LSTDistributionGraph({
       maxY: height - margin.top - margin.bottom
     });
   }, [height, width]);
-  const rootRef = useRef(null);
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -134,15 +131,25 @@ export default function LSTDistributionGraph({
                 value += d.tvl[strategy];
               }
 
-              return value;
+              return value * (state.currentRate === 'usd' ? d.rate : 1);
             })
           ) * 1.2 // 20% padding
         ],
         nice: true,
         range: [state.maxY - brushSize.marginTop - margin.bottom, 0]
       }),
-    [state.filteredData, state.maxY]
+    [state.currentRate, state.filteredData, state.maxY]
   );
+
+  const getValue = useCallback(
+    (d, strategy) => {
+      // console.log('wtf', state.currentRate === 'usd' ? d.rate : 1);
+
+      return d.tvl[strategy] * (state.currentRate === 'usd' ? d.rate : 1);
+    },
+    [state.currentRate]
+  );
+
   const handleBrushChange = useCallback(
     domain => {
       const { x0, x1 } = domain;
@@ -192,7 +199,7 @@ export default function LSTDistributionGraph({
   }, [data, dispatch, scaleBrushDate]);
 
   useEffect(() => {
-    switch (state.timelineTab) {
+    switch (state.currentTimeline) {
       case '7days':
         {
           const filteredData = data.slice(-7);
@@ -230,21 +237,32 @@ export default function LSTDistributionGraph({
           }
         });
     }
-  }, [data, state.timelineTab]);
+  }, [data, state.currentTimeline]);
 
   const handleTimelineChange = useCallback(
-    tab => {
-      dispatch({ timelineTab: tab });
+    timeline => {
+      dispatch({ currentTimeline: timeline });
+    },
+    [dispatch]
+  );
+
+  const handleRateChange = useCallback(
+    rate => {
+      dispatch({ currentRate: rate });
     },
     [dispatch]
   );
 
   return (
-    <div ref={rootRef}>
-      <div className="bg-content1 border border-outline space-y-4 p-4  flex items-start flex-col justify-center">
-        <div>
+    <div>
+      <div className="bg-content1 rounded-lg border border-outline space-y-4 p-4  flex items-start flex-col justify-center">
+        <div className="flex justify-between flex-col sm:flex-row w-full gap-y-4">
+          <RateSelector
+            rate={state.currentRate}
+            onRateChange={handleRateChange}
+          />
           <GraphTimelineSelector
-            timelineTab={state.timelineTab}
+            timelineTab={state.currentTimeline}
             onTimelineChange={handleTimelineChange}
           />
         </div>
@@ -411,7 +429,12 @@ export default function LSTDistributionGraph({
                     <span
                       className={`${key === tooltipData.key ? 'font-bold' : ''} grow ps-2 text-end`}
                     >
-                      {formatNumber(tooltipData.data.tvl[key])}
+                      {formatNumber(
+                        tooltipData.data.tvl[key] *
+                          (state.currentRate === 'usd'
+                            ? tooltipData.data.rate
+                            : 1)
+                      )}
                     </span>
                   </div>
                 </li>
@@ -420,6 +443,35 @@ export default function LSTDistributionGraph({
           </ul>
         </TooltipInPortal>
       )}
+    </div>
+  );
+}
+
+function RateSelector({ rate, onRateChange }) {
+  return (
+    <div className="p-0 w-full flex items-center gap-3">
+      <span className="text-foreground-2">Volume over time in</span>
+      <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+        <div
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+            rate === 'usd' &&
+            'bg-default border border-outline text-foreground-active'
+          }`}
+          onClick={() => onRateChange('usd')}
+        >
+          USD
+        </div>
+
+        <div
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+            rate === 'eth' &&
+            'bg-default border border-outline text-foreground-active'
+          }`}
+          onClick={() => onRateChange('eth')}
+        >
+          ETH
+        </div>
+      </div>
     </div>
   );
 }
