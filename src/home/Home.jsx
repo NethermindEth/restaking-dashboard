@@ -61,7 +61,7 @@ export default function Home() {
   const fetchEigenTVL = useCallback(async () => {
     try {
       dispatch({ isFetchingEigenTVL: true });
-      const eigenTVLData = await eigenlayerService.getEigenlayerTVLOvertime();
+      const eigenTVLData = await eigenlayerService.getEigenLayerTVLOvertime();
       const latestEigenTVL =
         eigenTVLData && eigenTVLData[eigenTVLData.length - 1].ethTVL;
       dispatch({
