@@ -143,8 +143,6 @@ export default function LSTDistributionGraph({
 
   const getValue = useCallback(
     (d, strategy) => {
-      // console.log('wtf', state.currentRate === 'usd' ? d.rate : 1);
-
       return d.tvl[strategy] * (state.currentRate === 'usd' ? d.rate : 1);
     },
     [state.currentRate]
