@@ -10,7 +10,10 @@ export default function Sidebar({ onOpenChange }) {
       event.preventDefault();
 
       navigate(event.target.getAttribute('href'));
-      onOpenChange(false);
+
+      if (onOpenChange) {
+        onOpenChange(false);
+      }
     },
     [navigate, onOpenChange]
   );
