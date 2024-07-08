@@ -64,25 +64,29 @@ const OperatorDetails = () => {
           <div className="py-4 text-sm text-foreground-2">
             {state.operator?.metadata?.description}
           </div>
-          <div className="w-full h-20 flex rounded-lg border border-outline px-10 py-4 justify-between">
+          <div className="w-full min-h-20 flex rounded-lg border border-outline px-10 py-4 justify-between">
             <div className="flex basis-1/4 flex-col gap-y-2 items-center">
-              <span className="text-default-2 text-sm">TVL</span>
-              <span className="text-foreground-active">
+              <span className="text-default-2 text-sm text-center">TVL</span>
+              <span className="text-foreground-active text-center">
                 {state.operator?.strategies &&
                   `${assetFormatter.format(formatEther(state.operatorTVL.toString()))} ETH`}
               </span>
             </div>
-            <Divider orientation="vertical" className="bg-outline" />
+            <Divider orientation="vertical" className="bg-outline min-h-20" />
             <div className="flex basis-1/6 flex-col items-center gap-y-2">
-              <span className="text-default-2 text-sm">AVS Subscribed</span>
-              <span className="text-foreground-active">
+              <span className="text-default-2 text-sm text-center">
+                AVS Subscribed
+              </span>
+              <span className="text-foreground-active text-center">
                 {state.operator?.avs.length}
               </span>
             </div>
-            <Divider orientation="vertical" className="bg-outline" />
+            <Divider orientation="vertical" className="bg-outline min-h-20" />
             <div className="flex basis-2/12 flex-col gap-y-2 items-center">
-              <span className="text-default-2 text-sm">Restakers</span>
-              <span className="text-foreground-active">
+              <span className="text-default-2 text-sm text-center">
+                Restakers
+              </span>
+              <span className="text-foreground-active text-center">
                 {state.operator?.stakerCount}
               </span>
             </div>
