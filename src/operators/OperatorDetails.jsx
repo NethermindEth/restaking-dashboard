@@ -57,7 +57,7 @@ const OperatorDetails = () => {
           <div className="flex flex-row gap-x-2 items-center">
             <div className="flex items-center gap-3">
               <span className="text-foreground-2 text-3xl font-medium">
-                {state.operator?.metadata?.name}
+                {state.operator?.metadata?.name ?? 'Unknown'}
               </span>
             </div>
           </div>

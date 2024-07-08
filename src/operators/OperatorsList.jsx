@@ -110,11 +110,19 @@ const OperatorsList = () => {
                 <div className="min-w-8 text-foreground-2">
                   {(searchParams.get('page') - 1) * 10 + i + 1}
                 </div>
-                <img
-                  className="h-5 rounded-full min-w-5"
-                  src={op.metadata?.logo}
-                />
-                <span className="basis-1/2 truncate">{op.metadata?.name}</span>
+                {op.metadata?.logo ? (
+                  <img
+                    className="h-5 rounded-full min-w-5"
+                    src={op.metadata?.logo}
+                  />
+                ) : (
+                  <span class="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
+                    warning
+                  </span>
+                )}
+                <span className="basis-1/2 truncate">
+                  {op.metadata?.name ?? 'Unknown'}
+                </span>
                 <span className="basis-1/3">7 AVS</span>
                 <span className="basis-1/4">{op.stakerCount}</span>
                 <span className="basis-1/3 text-end">
