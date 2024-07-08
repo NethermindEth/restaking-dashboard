@@ -49,6 +49,7 @@ export default {
             },
             outline: '#293041',
             secondary: '#FFCC80',
+            subtitle: '#7A86A5',
             success: '#7CCB69',
             disabled: '#52525B',
             'dark-blue': '#009CDD',

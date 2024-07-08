@@ -1,5 +1,4 @@
 import { Card, CardBody, CardHeader } from '@nextui-org/react';
-import { ParentSize } from '@visx/responsive';
 import { useCallback, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
@@ -49,15 +48,7 @@ const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
         </CardHeader>
         <CardBody className="w-full space-y-4">
           <div className="w-full h-[400px]">
-            <ParentSize>
-              {({ width, height }) => (
-                <EigenLayerTVLOvertimeChart
-                  data={filteredData}
-                  width={width}
-                  height={height}
-                />
-              )}
-            </ParentSize>
+            <EigenLayerTVLOvertimeChart data={filteredData} height={400} />
           </div>
           <div className="text-xs text-foreground-2 pt-10">
             Due to the expanding pool of Liquid Staking Tokens {`(LST)`} and
