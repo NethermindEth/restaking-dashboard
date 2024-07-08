@@ -3,7 +3,7 @@ import { Link } from '@nextui-org/react';
 
 export default function Footer() {
   return (
-    <footer className="flex flex-row items-start md:items-center gap-8 px-4 py-6 justify-between">
+    <footer className="flex flex-row items-start md:items-center gap-8 px-4 py-6 justify-between content-center">
       <Link href="https://nethermind.io" target="_blank">
         <img
           alt="Powered by Nethermind"
@@ -13,12 +13,8 @@ export default function Footer() {
       </Link>
       <ul className="flex flex-col md:flex-row gap-2 md:gap-8">
         {mainLinks.map((item, i) => (
-          <li key={i} className="inline-block">
-            <Link
-              key={`footer-item-${i}`}
-              className="text-foreground-2 text-xs"
-              href={item.href}
-            >
+          <li key={`footer-main-${i}`} className="inline-block">
+            <Link className="text-foreground-2 text-xs" href={item.href}>
               {item.title}
               <span className="material-symbols-outlined hidden lg:inline">
                 arrow_right_alt
@@ -27,16 +23,17 @@ export default function Footer() {
           </li>
         ))}
       </ul>
-      <ul>
-        <li>
-          <Link
-            className="footer-x-link text-foreground-2 text-xs"
-            href="https://x.com/NethermindEth"
-            target="_blank"
-          >
-            Follow us
-          </Link>
-        </li>
+      <ul className="flex flex-col md:flex-row gap-2 md:gap-8">
+        {socialLinks.map((item, i) => (
+          <li key={`footer-social-${i}`} className="inline-block">
+            <Link
+              className={`${item.className} ps-6 text-foreground-2 text-xs`}
+              href={item.href}
+            >
+              {item.title}
+            </Link>
+          </li>
+        ))}
       </ul>
     </footer>
   );
@@ -54,5 +51,18 @@ const mainLinks = [
   {
     title: 'Legal',
     href: 'https://nethermind.io/legal'
+  }
+];
+
+const socialLinks = [
+  {
+    title: 'Follow us',
+    className: 'footer-x',
+    href: 'https://x.com/NethermindEth'
+  },
+  {
+    title: 'Join us',
+    className: 'footer-discord',
+    href: 'https://discord.com/invite/PaCMRFdvWT'
   }
 ];
