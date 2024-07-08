@@ -72,7 +72,7 @@ const OperatorDetails = () => {
                   `${assetFormatter.format(formatEther(state.operatorTVL.toString()))} ETH`}
               </span>
             </div>
-            <Divider orientation="vertical" className="bg-outline min-h-20" />
+            <Divider orientation="vertical" className="bg-outline min-h-14" />
             <div className="flex basis-1/6 flex-col items-center gap-y-2">
               <span className="text-default-2 text-sm text-center">
                 AVS Subscribed
@@ -81,7 +81,7 @@ const OperatorDetails = () => {
                 {state.operator?.avs.length}
               </span>
             </div>
-            <Divider orientation="vertical" className="bg-outline min-h-20" />
+            <Divider orientation="vertical" className="bg-outline min-h-14" />
             <div className="flex basis-2/12 flex-col gap-y-2 items-center">
               <span className="text-default-2 text-sm text-center">
                 Restakers
