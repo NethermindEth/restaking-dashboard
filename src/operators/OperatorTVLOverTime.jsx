@@ -10,7 +10,7 @@ import OperatorTVLOverTimeChart from './OperatorTVLOverTimeChart';
 const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: '7days',
+    timelineTab: 'all',
     tvlOvertimeData: []
   });
 
@@ -54,7 +54,7 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
     <Card radius="md" className="bg-content1 border border-outline p-4 ">
       <CardHeader className="flex flex-wrap justify-between gap-3">
         <div className="space-y-2 block">
-          <div className="font-light text-lg text-foreground-1">TVL</div>
+          <div className="font-light text-lg text-foreground-active">TVL</div>
           <div className="font-light">
             <div className="text-base ">
               <span>{currentTVL} ETH</span>

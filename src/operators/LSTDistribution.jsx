@@ -39,7 +39,7 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
     lstDistribution: []
   });
   const [active, setActive] = useState(null);
-  const width = 200;
+  const width = 300;
   const half = width / 2;
 
   const assetFormatter = new Intl.NumberFormat('en-US', {
@@ -99,7 +99,7 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-y-4">
-      <div className="w-full lg:w-1/2 flex flex-col gap-y-3">
+      <div className="w-full flex flex-col gap-y-3">
         {state.lstDistribution.map((strategy, i) => (
           <LSTShare
             key={`lst-distribution-item-${i}`}
@@ -119,7 +119,7 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
               pieValue={data => data.tokensInETH}
               outerRadius={half}
               innerRadius={({ data }) => {
-                const size = 30;
+                const size = 50;
                 return half - size;
               }}
               cornerRadius={0}

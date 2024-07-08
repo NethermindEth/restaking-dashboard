@@ -9,7 +9,7 @@ import OperatorsOvertimeChart from './OperatorsOvertimeChart';
 
 const OperatorsOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: '7days',
+    timelineTab: 'all',
     operatorsOvertimeData: null
   });
   const { avsService } = useServices();

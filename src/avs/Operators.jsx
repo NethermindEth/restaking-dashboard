@@ -1,7 +1,7 @@
 import { Card, Input, Skeleton } from '@nextui-org/react';
 import { SearchIcon } from '@nextui-org/shared-icons';
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
@@ -114,7 +114,8 @@ export default function Operators({ avsAddress, totalTVL }) {
             filteredOperators.map(
               (operator, i) =>
                 operator.metadata && (
-                  <div
+                  <Link
+                    to={`/operators/${operator.address}`}
                     key={`operator-item-${i}`}
                     className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
                   >
@@ -143,7 +144,7 @@ export default function Operators({ avsAddress, totalTVL }) {
                         {formatNumber(operator.strategiesTotal, compact)} ETH
                       </div>
                     </span>
-                  </div>
+                  </Link>
                 )
             )
           ) : (

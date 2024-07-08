@@ -6,12 +6,13 @@ import { reduceState } from '../shared/helpers';
 import { ParentSize } from '@visx/responsive';
 import RestakersTrendChart from './RestakersTrendChart';
 import { useServices } from '../@services/ServiceContext';
+import { assetFormatter } from '../utils';
 
 const RestakersTrend = ({ opAddress }) => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     restakerTrend: [],
-    timelineTab: '7days'
+    timelineTab: 'all'
   });
 
   const getDataByRange = useCallback(() => {
@@ -45,13 +46,17 @@ const RestakersTrend = ({ opAddress }) => {
     <Card radius="md" className="bg-content1 w-full border border-outline p-4">
       <CardHeader className="flex flex-wrap justify-between gap-3">
         <div className="space-y-2 block">
-          <span className="text-foreground-2">Restaker Trend</span>
+          <span className="text-foreground-active">Restaker Trend</span>
           <div className="font-light">
             <div className="text-base text-foreground-1">
               <span>
                 Total Restakers:{' '}
-                {state.restakerTrend[state.restakerTrend.length - 1]
-                  ?.restakers ?? 'N/A'}
+                {state.restakerTrend[state.restakerTrend.length - 1]?.restakers
+                  ? assetFormatter.format(
+                      state.restakerTrend[state.restakerTrend.length - 1]
+                        ?.restakers
+                    )
+                  : 'N/A'}
               </span>
             </div>
           </div>

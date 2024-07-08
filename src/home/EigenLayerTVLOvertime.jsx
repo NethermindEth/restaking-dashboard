@@ -7,7 +7,7 @@ import EigenLayerTVLOvertimeChart from './EigenLayerTVLOvertimeChart';
 
 const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: '7days'
+    timelineTab: 'all'
   });
 
   const getDataByRange = useCallback(() => {
