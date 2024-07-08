@@ -11,11 +11,12 @@ import { formatNumber } from '../utils';
 export default function AVSList() {
   const { avsService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
-  const compact = !useTailwindBreakpoint('md');
+  const compact = !useTailwindBreakpoint('sm');
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isFetchingAvsData: false,
-    error: null
+    error: null,
+    rate: 1
   });
 
   const fetchAVS = useCallback(
@@ -47,6 +48,7 @@ export default function AVSList() {
         dispatch({
           avs: data,
           isFetchingAvsData: false,
+          rate: response.rate,
           totalPages: Math.ceil(response.totalCount / 10)
         });
       } catch (error) {
@@ -107,7 +109,8 @@ export default function AVSList() {
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <span className="basis-full md:pl-8 md:pr-20">Name</span>
+          <div className="min-w-5"></div>
+          <span className="basis-1/2">Name</span>
           <span className="basis-1/3">Stakers</span>
           <span className="basis-1/4">Operators</span>
           <span className="basis-1/3 text-end">TVL</span>
@@ -131,7 +134,7 @@ export default function AVSList() {
                       src={avs.metadata.logo}
                       className="size-5 rounded-full"
                     />
-                    <span className="md:basis-full md:w-full w-[180px] truncate">
+                    <span className="basis-1/2 truncate">
                       {avs?.metadata?.name}
                     </span>
                     <span className="basis-1/3">
@@ -141,7 +144,10 @@ export default function AVSList() {
                       {formatNumber(avs.operators, compact)}
                     </span>
                     <span className="basis-1/3 text-end">
-                      <div>{formatNumber(avs.tvl, compact)} ETH</div>
+                      <div>${formatNumber(avs.tvl * state.rate, compact)}</div>
+                      <div className="text-xs text-subtitle">
+                        {formatNumber(avs.tvl, compact)} ETH
+                      </div>
                     </span>
                   </div>
                 )
@@ -167,21 +173,19 @@ const AVSListSkeleton = () => {
       {[...Array(10)].map((item, i) => (
         <div
           key={i}
-          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+          className="p-4 flex justify-between gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
         >
-          <div className="md:w-10/12 w-6/12">
-            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          <div className="basis-1/2">
+            <Skeleton className="h-6 rounded-md w-2/3 dark:bg-default" />
           </div>
-          <div className="pl-5 flex justify-between gap-5 w-10/12">
-            <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
-            </div>
-            <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
-            </div>
-            <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
-            </div>
+          <div className="basis-1/3">
+            <Skeleton className="h-6 rounded-md w-2/3 bg-default dark:bg-default" />
+          </div>
+          <div className="basis-1/4">
+            <Skeleton className="h-6 rounded-md w-2/3 bg-default dark:bg-default" />
+          </div>
+          <div className="basis-1/3">
+            <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
           </div>
         </div>
       ))}
