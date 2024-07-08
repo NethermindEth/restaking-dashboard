@@ -57,10 +57,6 @@ export default function AVSDetails() {
     return Number(tokens / BigInt(1e18));
   };
 
-  const formatTVL = tvl => {
-    return tvl < 1e-18 ? '0' : assetFormatter.format(tvl);
-  };
-
   const calculateLstDistributionData = strategiesMap => {
     const excludedProxies = new Set([
       '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0',
@@ -120,10 +116,7 @@ export default function AVSDetails() {
       0
     );
 
-    const totalTVL =
-      Number(eigenTVL / BigInt(1e18)) +
-      Number(beaconTVL / BigInt(1e18)) +
-      liquidityStakedTVL;
+    const totalTVL = Number(beaconTVL / BigInt(1e18)) + liquidityStakedTVL;
 
     const totalEthDistributionData = [
       beaconEntry && {
