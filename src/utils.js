@@ -69,3 +69,8 @@ export function formatDateToVerboseString(date) {
 
   return `${day}${daySuffix} ${month}${yearSuffix}`;
 }
+
+export function getGrowthPercentage(oldValue, newValue) {
+  const growth = ((newValue - oldValue) / oldValue) * 100;
+  return growth;
+}

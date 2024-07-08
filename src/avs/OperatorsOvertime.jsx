@@ -6,11 +6,13 @@ import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
 import OperatorsOvertimeChart from './OperatorsOvertimeChart';
+import { formatNumber, getGrowthPercentage } from '../utils';
 
 const OperatorsOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: '7days',
-    operatorsOvertimeData: null
+    operatorsOvertimeData: null,
+    growth: 0
   });
   const { avsService } = useServices();
 
@@ -42,9 +44,14 @@ const OperatorsOvertime = ({ avsAddress }) => {
       try {
         const operatorsOvertimeData =
           await avsService.getAVSOperatorsOvertime(avsAddress);
+        const growthPercentage = getGrowthPercentage(
+          operatorsOvertimeData[operatorsOvertimeData.length - 2].operators,
+          operatorsOvertimeData[operatorsOvertimeData.length - 1].operators
+        );
 
         dispatch({
-          operatorsOvertimeData: operatorsOvertimeData
+          operatorsOvertimeData: operatorsOvertimeData,
+          growth: growthPercentage
         });
       } catch (error) {
         // TODO: handle error
@@ -57,8 +64,22 @@ const OperatorsOvertime = ({ avsAddress }) => {
   return (
     <Card radius="md" className="bg-content1 border border-outline p-4 ">
       <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="font-light text-lg text-foreground-1">
-          Total operators over time
+        <div className="space-y-2 block">
+          <div className="font-light text-lg text-foreground-1">
+            Total operators over time
+          </div>
+
+          <div className="flex gap-2">
+            <div className="font-light text-sm">
+              {filteredData &&
+                formatNumber(filteredData[filteredData.length - 1].operators)}
+            </div>
+            <div
+              className={`font-light text-sm ${state.growth > 0 ? 'text-success' : 'text-fail'}`}
+            >
+              {`${state.growth > 0 ? '+' : ''}${state.growth.toFixed(2)} %`}
+            </div>
+          </div>
         </div>
         <GraphTimelineSelector
           timelineTab={state.timelineTab}
