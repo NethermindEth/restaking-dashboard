@@ -62,11 +62,14 @@ export default function Home() {
     try {
       dispatch({ isFetchingEigenTVL: true });
       const eigenTVLData = await eigenlayerService.getEigenLayerTVLOvertime();
-      const latestEigenTVL =
+      const ethTVL =
         eigenTVLData && eigenTVLData[eigenTVLData.length - 1].ethTVL;
+      const lstTVL =
+        eigenTVLData && eigenTVLData[eigenTVLData.length - 1].lstTVL;
+
       dispatch({
         eigenTVLData,
-        latestEigenTVL,
+        latestEigenTVL: BigInt(ethTVL) + BigInt(lstTVL),
         isFetchingEigenTVL: false
       });
     } catch {
