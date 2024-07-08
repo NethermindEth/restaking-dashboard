@@ -29,11 +29,7 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
 
   const filteredData = useMemo(() => {
     if (!state.avsTotalValueOvertimeData) return null;
-    const data = getDataByRange();
-    dispatch({
-      growth: getGrowthPercentage(data[0].tvl, data[data.length - 1].tvl)
-    });
-    return data;
+    return getDataByRange();
   }, [state.avsTotalValueOvertimeData, state.timelineTab]);
 
   const handleTimelineChange = useCallback(
@@ -58,6 +54,17 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
     }
     fetchTvlOvertime();
   }, [avsService, dispatch, avsAddress]);
+
+  useEffect(() => {
+    if (filteredData) {
+      dispatch({
+        growth: getGrowthPercentage(
+          filteredData[0].tvl,
+          filteredData[filteredData.length - 1].tvl
+        )
+      });
+    }
+  }, [filteredData]);
 
   return (
     <Card radius="md" className="bg-content1 border border-outline p-4 ">

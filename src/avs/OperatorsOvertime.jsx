@@ -29,14 +29,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
 
   const filteredData = useMemo(() => {
     if (!state.operatorsOvertimeData) return null;
-    const data = getDataByRange();
-    dispatch({
-      growth: getGrowthPercentage(
-        data[0].operators,
-        data[data.length - 1].operators
-      )
-    });
-    return data;
+    return getDataByRange();
   }, [state.operatorsOvertimeData, state.timelineTab]);
 
   const handleTimelineChange = useCallback(
@@ -62,6 +55,17 @@ const OperatorsOvertime = ({ avsAddress }) => {
 
     fetchOperatorsOvertime();
   }, [avsService, dispatch, avsAddress]);
+
+  useEffect(() => {
+    if (filteredData) {
+      dispatch({
+        growth: getGrowthPercentage(
+          filteredData[0].operators,
+          filteredData[filteredData.length - 1].operators
+        )
+      });
+    }
+  }, [filteredData]);
 
   return (
     <Card radius="md" className="bg-content1 border border-outline p-4 ">
