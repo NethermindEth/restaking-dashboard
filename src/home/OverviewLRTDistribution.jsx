@@ -53,7 +53,7 @@ const lrtMapping = {
   }
 };
 
-export default function OverviewLRTDistribution() {
+export default function OverviewLRTDistribution({ rate }) {
   const { lrtService } = useServices();
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
@@ -227,7 +227,17 @@ export default function OverviewLRTDistribution() {
                   fill="white"
                   fontWeight={500}
                   className="text-lg"
-                  dy={0}
+                  dy={-5}
+                >
+                  {`$${formatNumber(state.activePieEntry.amount * rate)}`}
+                </Text>
+
+                <Text
+                  textAnchor="middle"
+                  fill="#7CCB69"
+                  fontWeight={500}
+                  className="text-xs"
+                  dy={15}
                 >
                   {`${formatNumber(state.activePieEntry.amount)} ETH`}
                 </Text>
@@ -236,7 +246,8 @@ export default function OverviewLRTDistribution() {
                   textAnchor="middle"
                   fill="#CAD7F9"
                   className="text-sm capitalize"
-                  dy={25}
+                  // extra 8 for padding
+                  dy={35 + 8}
                 >
                   {state.activePieEntry.label}
                 </Text>
@@ -248,7 +259,17 @@ export default function OverviewLRTDistribution() {
                   fill="white"
                   fontWeight={500}
                   className="text-lg"
-                  dy={10}
+                  dy={5}
+                >
+                  {`$${formatNumber(totalTVL * rate)}`}
+                </Text>
+
+                <Text
+                  textAnchor="middle"
+                  fill="#7CCB69"
+                  fontWeight={500}
+                  className="text-xs"
+                  dy={25}
                 >
                   {`${formatNumber(totalTVL)} ETH`}
                 </Text>
