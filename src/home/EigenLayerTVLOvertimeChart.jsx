@@ -39,7 +39,6 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
 
   // const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
-  console.log(state.width);
   const getEthTVL = useCallback(d => parseFloat(d.ethTVL) / 1e18, []);
   const getLstTVL = useCallback(d => parseFloat(d.lstTVL) / 1e18, []);
 
@@ -127,7 +126,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
         <Group left={margin.left} top={margin.top}>
           <GridRows
             scale={tvlScale}
-            width="100%"
+            width={state.width}
             height={innerHeight}
             stroke="#7A86A5"
             strokeOpacity={0.2}
@@ -135,7 +134,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           />
           <GridColumns
             scale={dateScale}
-            width="100%"
+            width={state.width}
             height={innerHeight}
             stroke="#7A86A5"
             strokeOpacity={0.2}
