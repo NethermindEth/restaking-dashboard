@@ -228,7 +228,10 @@ export default function LRTDistribution({ data, height }) {
   }, [data, dispatch, scaleBrushDate]);
 
   return (
-    <div ref={rootRef}>
+    <div
+      ref={rootRef}
+      className="basis-full bg-content1 border border-outline p-4 rounded-lg text-sm"
+    >
       <div className="flex mb-6 gap-2">
         <div className="flex flex-1 gap-2 justify-between">
           <div className="hidden sm:block">

@@ -2,7 +2,18 @@ import { apiGet } from './apiCall';
 
 export default class LRTService {
   async getAll() {
-    const response = await apiGet('distribution/lrt');
+    const response = await apiGet('/lrt/all');
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    // TODO: Handle error
+    return await response.json();
+  }
+
+  async getLatestDelegations() {
+    const response = await apiGet('/lrt/delegations/latest');
 
     if (response.ok) {
       return await response.json();

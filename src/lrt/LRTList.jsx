@@ -2,7 +2,7 @@ import { colors, fullNumFormatter, protocols } from './helpers';
 
 export default function LRTList({ data }) {
   return (
-    <>
+    <div className="bg-content1 border border-outline rounded-lg text-sm">
       <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-xs">
         <span className="basis-1/2 ps-6">Protocol</span>
         <span className="basis-1/2 text-end">Total value</span>
@@ -31,7 +31,7 @@ export default function LRTList({ data }) {
             </div>
           </div>
         ))}
-    </>
+    </div>
   );
 }
 

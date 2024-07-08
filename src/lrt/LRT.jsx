@@ -1,18 +1,23 @@
+import { formatEther } from 'ethers';
 import log from '../shared/logger';
 import LRTDistribution from './LRTDistribution';
 import LRTList from './LRTList';
+import LRTTotalValue from './LRTTotalValue';
 import { reduceState } from '../shared/helpers';
+import { Spinner } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 
 export default function LRT() {
-  const { lrtService } = useServices();
+  const { eigenlayerService, lrtService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {});
 
   useEffect(() => {
     async function fetchData() {
       log.debug('Fetching LRT data');
+
+      dispatch({ isLoadingLRTData: true });
 
       try {
         const results = await lrtService.getAll();
@@ -23,13 +28,66 @@ export default function LRT() {
       } catch (e) {
         // TODO: handle error
         log.error('Failed fetching LRT data', e);
+      } finally {
+        dispatch({ isLoadingLRTData: false });
       }
     }
 
-    // TODO: loading indicators
+    async function fetchDelegations() {
+      log.debug('Fetching LRT data');
+
+      dispatch({ isLoadingDelegations: true });
+
+      try {
+        const delegations = await lrtService.getLatestDelegations();
+
+        log.debug('Fetched LRT delegations:', delegations.length);
+
+        let total = Number(
+          formatEther(
+            delegations.protocols
+              .map(p => BigInt(p.amount))
+              .reduce((acc, amount) => (acc += amount), 0n)
+          )
+        ).toFixed(0);
+
+        dispatch({ delegations: { total, rate: delegations.rate } });
+      } catch (e) {
+        // TODO: handle error
+        log.error('Failed fetching LRT delegations', e);
+      } finally {
+        dispatch({ isLoadingDelegations: false });
+      }
+    }
+
+    async function fetchELTotal() {
+      log.debug('Fetching EigenLayer TVL');
+
+      dispatch({ isLoadingTVL: true });
+
+      try {
+        const tvls = await eigenlayerService.getEigenLayerTVLOvertime();
+
+        log.debug('Fetched EigenLayer TVL:', tvls.length);
+
+        const latest = tvls[tvls.length - 1];
+        const tvl = Number(
+          formatEther(BigInt(latest.ethTVL) + BigInt(latest.lstTVL))
+        );
+
+        dispatch({ elTVL: tvl });
+      } catch (e) {
+        // TODO: handle error
+        log.error('Failed fetching LRT delegations', e);
+      } finally {
+        dispatch({ isLoadingTVL: false });
+      }
+    }
 
     fetchData();
-  }, [dispatch, lrtService]);
+    fetchDelegations();
+    fetchELTotal();
+  }, [dispatch, eigenlayerService, lrtService]);
 
   return (
     <>
@@ -44,17 +102,24 @@ export default function LRT() {
         restaking while maintaining liquidity, as the tokens can be traded,
         transferred, or used in various DeFi applications.
       </div>
+      <LRTTotalValue
+        delegations={state.delegations}
+        isLoadingDelegations={state.isLoadingDelegations}
+        isLoadingTVL={state.isLoadingTVL}
+        tvl={state.elTVL}
+      />
       <div className="flex flex-col xl:flex-row gap-4">
-        <div className="basis-full bg-content1 border border-outline p-4 rounded-lg text-sm">
-          {state.results && (
+        {state.isLoadingLRTData && (
+          <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
+            <Spinner color="primary" size="lg" />
+          </div>
+        )}
+        {!state.isLoadingLRTData && state.results && (
+          <>
             <LRTDistribution data={state.results} height={512} />
-          )}
-        </div>
-        <div className="bg-content1 border border-outline rounded-lg text-sm">
-          {state.results && (
             <LRTList data={state.results[state.results.length - 1]} />
-          )}
-        </div>
+          </>
+        )}
       </div>
     </>
   );

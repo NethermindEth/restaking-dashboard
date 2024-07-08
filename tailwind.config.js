@@ -33,12 +33,13 @@ export default {
           colors: {
             background: '#080a0f',
             content1: '#0f111a',
-            content2: 'red',
+            content2: '#191c2c',
             content3: 'yellow',
             content4: 'green',
             default: {
               DEFAULT: '#191c2c',
-              2: '#7A86A5'
+              2: '#7A86A5',
+              700: '#cad7F9'
             },
             focus: '#34d399',
             foreground: {
@@ -48,6 +49,7 @@ export default {
               2: '#7a86a5'
             },
             outline: '#293041',
+            primary: '#cad7F9',
             secondary: '#FFCC80',
             subtitle: '#7A86A5',
             success: '#7CCB69',
