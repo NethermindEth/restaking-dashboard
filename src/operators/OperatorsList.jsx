@@ -5,10 +5,13 @@ import { reduceState } from '../shared/helpers';
 import { Link, useSearchParams } from 'react-router-dom';
 import Pagination from '../shared/Pagination';
 import { Input, Skeleton } from '@nextui-org/react';
+import { formatNumber } from '../utils';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 const OperatorsList = () => {
   const { operatorService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
+  const compact = !useTailwindBreakpoint('md');
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isFetchingOperatorData: false,
     error: null
@@ -91,9 +94,8 @@ const OperatorsList = () => {
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <div className="min-w-8"></div>
+          <div className="min-w-5 lg:min-w-8"></div>
           <span className="basis-1/2">Operators</span>
-          <span className="basis-1/3">Servicing AVS</span>
           <span className="basis-1/4">Restakers</span>
           <span className="basis-1/3 text-end">TVL</span>
         </div>
@@ -107,7 +109,7 @@ const OperatorsList = () => {
                 key={`operator-item-${i}`}
                 className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center px-4 py-2 cursor-pointer hover:bg-default`}
               >
-                <div className="min-w-8 text-foreground-2">
+                <div className="min-w-5 lg:min-w-8 text-foreground-2">
                   {(searchParams.get('page') - 1) * 10 + i + 1}
                 </div>
                 {op.metadata?.logo ? (
@@ -123,8 +125,9 @@ const OperatorsList = () => {
                 <span className="basis-1/2 truncate">
                   {op.metadata?.name ?? 'Unknown'}
                 </span>
-                <span className="basis-1/3">7 AVS</span>
-                <span className="basis-1/4">{op.stakerCount}</span>
+                <span className="basis-1/4">
+                  {formatNumber(op.stakerCount, compact)}
+                </span>
                 <span className="basis-1/3 text-end">
                   <div>ETH {assetFormatter.format(op.strategiesTotal)}</div>
                   <div className="text-foreground-1 text-xs">
@@ -161,9 +164,6 @@ const OperatorListSkeleton = () => {
           <div className="basis-1/2">
             <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
           </div>
-          <div className="basis-1/3">
-            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
-          </div>{' '}
           <div className="basis-1/4">
             <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
           </div>{' '}
