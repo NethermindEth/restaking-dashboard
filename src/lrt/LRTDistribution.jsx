@@ -209,9 +209,11 @@ export default function LRTDistribution({ data, height }) {
 
   return (
     <div ref={rootRef}>
-      <div className="flex mb-6 justify-between">
-        <div className="flex text-foreground-2 gap-2 items-center text-lg">
-          <span className="hidden md:inline">Volume over time in</span>
+      <div className="flex mb-6 gap-2">
+        <div className="flex flex-1 gap-2 justify-between">
+          <span className="hidden sm:inline text-foreground-2 text-lg">
+            Volume trend
+          </span>
           <Tabs
             classNames={tabs}
             defaultSelectedKey="usd"
