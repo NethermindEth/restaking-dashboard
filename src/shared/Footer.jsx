@@ -49,11 +49,7 @@ const mainLinks = [
   },
   {
     title: 'Nethermind operator',
-    href: 'https://nethermind.io'
-  },
-  {
-    title: 'Resources',
-    href: 'https://nethermind.io'
+    href: 'https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e'
   },
   {
     title: 'Legal',
