@@ -6,6 +6,7 @@ import { reduceState } from '../shared/helpers';
 import { ParentSize } from '@visx/responsive';
 import RestakersTrendChart from './RestakersTrendChart';
 import { useServices } from '../@services/ServiceContext';
+import { assetFormatter } from '../utils';
 
 const RestakersTrend = ({ opAddress }) => {
   const { operatorService } = useServices();
@@ -50,8 +51,12 @@ const RestakersTrend = ({ opAddress }) => {
             <div className="text-base text-foreground-1">
               <span>
                 Total Restakers:{' '}
-                {state.restakerTrend[state.restakerTrend.length - 1]
-                  ?.restakers ?? 'N/A'}
+                {state.restakerTrend[state.restakerTrend.length - 1]?.restakers
+                  ? assetFormatter.format(
+                      state.restakerTrend[state.restakerTrend.length - 1]
+                        ?.restakers
+                    )
+                  : 'N/A'}
               </span>
             </div>
           </div>

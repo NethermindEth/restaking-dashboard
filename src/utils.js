@@ -43,8 +43,8 @@ export function formatDate(dateString) {
 }
 
 export const assetFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2
+  maximumFractionDigits: 0,
+  minimumFractionDigits: 0
 });
 
 export function formatDateToVerboseString(date) {
