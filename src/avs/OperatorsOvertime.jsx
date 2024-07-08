@@ -6,11 +6,13 @@ import { useServices } from '../@services/ServiceContext';
 import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
 import OperatorsOvertimeChart from './OperatorsOvertimeChart';
+import { formatNumber, getGrowthPercentage } from '../utils';
 
 const OperatorsOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: 'all',
-    operatorsOvertimeData: null
+    operatorsOvertimeData: null,
+    growth: 0
   });
   const { avsService } = useServices();
 
@@ -54,11 +56,36 @@ const OperatorsOvertime = ({ avsAddress }) => {
     fetchOperatorsOvertime();
   }, [avsService, dispatch, avsAddress]);
 
+  useEffect(() => {
+    if (filteredData) {
+      dispatch({
+        growth: getGrowthPercentage(
+          filteredData[0].operators,
+          filteredData[filteredData.length - 1].operators
+        )
+      });
+    }
+  }, [filteredData]);
+
   return (
     <Card radius="md" className="bg-content1 border border-outline p-4 ">
       <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="font-light text-lg text-foreground-1">
-          Total operators over time
+        <div className="space-y-2 block">
+          <div className="font-light text-lg text-foreground-1">
+            Total operators over time
+          </div>
+
+          <div className="flex gap-2">
+            <div className="font-light text-sm">
+              {filteredData &&
+                formatNumber(filteredData[filteredData.length - 1].operators)}
+            </div>
+            <div
+              className={`font-light text-sm ${state.growth > 0 ? 'text-success' : 'text-fail'}`}
+            >
+              {`${state.growth > 0 ? '+' : ''}${state.growth.toFixed(2)} %`}
+            </div>
+          </div>
         </div>
         <GraphTimelineSelector
           timelineTab={state.timelineTab}

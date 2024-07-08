@@ -88,8 +88,11 @@ export default function AVSList() {
   );
 
   useEffect(() => {
-    const page = parseInt(searchParams.get('page') || '1');
-    fetchAVS(page);
+    const page = searchParams.get('page');
+    if (!page) {
+      setSearchParams({ page: 1 }, { replace: true });
+      fetchAVS(1);
+    } else fetchAVS(searchParams.get('page'));
   }, [searchParams]);
 
   return (
@@ -121,7 +124,9 @@ export default function AVSList() {
                     onClick={() => handleAVSItemClick(avs)}
                     className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
                   >
-                    <div className="min-w-5">{i + 1}</div>
+                    <div className="min-w-5">
+                      {(searchParams.get('page') - 1) * 10 + i + 1}
+                    </div>
                     <img
                       src={avs.metadata.logo}
                       className="size-5 rounded-full"

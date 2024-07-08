@@ -192,8 +192,8 @@ export default function AVSDetails() {
               className="size-5 rounded-full"
             />
             <div className="flex items-center gap-3">
-              <span className="basis-full font-bold text-xl truncate text-foreground-1">
-                {state.avs?.metadata?.name}
+              <span className="basis-full font-medium text-3xl truncate text-foreground-1">
+                {state.avsDetails?.metadata?.name}
               </span>
             </div>
           </div>

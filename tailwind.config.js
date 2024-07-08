@@ -52,6 +52,7 @@ export default {
             subtitle: '#7A86A5',
             success: '#7CCB69',
             disabled: '#52525B',
+            fail: '#D24646',
             'dark-blue': '#009CDD',
             cinder: {
               default: '#576AA0',
