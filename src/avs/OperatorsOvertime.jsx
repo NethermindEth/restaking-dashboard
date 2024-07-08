@@ -29,7 +29,14 @@ const OperatorsOvertime = ({ avsAddress }) => {
 
   const filteredData = useMemo(() => {
     if (!state.operatorsOvertimeData) return null;
-    return getDataByRange();
+    const data = getDataByRange();
+    dispatch({
+      growth: getGrowthPercentage(
+        data[0].operators,
+        data[data.length - 1].operators
+      )
+    });
+    return data;
   }, [state.operatorsOvertimeData, state.timelineTab]);
 
   const handleTimelineChange = useCallback(
@@ -44,14 +51,9 @@ const OperatorsOvertime = ({ avsAddress }) => {
       try {
         const operatorsOvertimeData =
           await avsService.getAVSOperatorsOvertime(avsAddress);
-        const growthPercentage = getGrowthPercentage(
-          operatorsOvertimeData[operatorsOvertimeData.length - 2].operators,
-          operatorsOvertimeData[operatorsOvertimeData.length - 1].operators
-        );
 
         dispatch({
-          operatorsOvertimeData: operatorsOvertimeData,
-          growth: growthPercentage
+          operatorsOvertimeData: operatorsOvertimeData
         });
       } catch (error) {
         // TODO: handle error
