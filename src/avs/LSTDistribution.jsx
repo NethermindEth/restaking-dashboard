@@ -1,8 +1,39 @@
 import React from 'react';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
-import { Card, cn } from '@nextui-org/react';
+import { Card, cn, Tooltip } from '@nextui-org/react';
 import LSTTreeMap from './LSTTreeMap';
+
+function EigenDisclaimer() {
+  return (
+    <div className="inline-flex gap-x-1">
+      N/A
+      <Tooltip
+        showArrow={true}
+        placement="top"
+        color="bg-black/75"
+        content={
+          <div className="max-w-[250px]">
+            <div className="text-sm">
+              EIGEN is currently not listed on any exchanges so we are unable to
+              get its USD value. Information will be updated when the token is
+              available on centralized/decentralized exchanges.
+            </div>
+          </div>
+        }
+      >
+        <span
+          className="text-base material-symbols-outlined"
+          style={{
+            fontVariationSettings: `'FILL' 0`
+          }}
+        >
+          info
+        </span>
+      </Tooltip>
+    </div>
+  );
+}
 
 export default function LSTDistribution({
   totalEthDistributionData,
@@ -54,9 +85,11 @@ export default function LSTDistribution({
                   </div>
                   <div className="text-end">
                     <div>
-                      {lst.token !== 'EIGEN'
-                        ? `$${formatNumber(lst.tvl * rate, compact)}`
-                        : '-'}
+                      {lst.token !== 'EIGEN' ? (
+                        `$${formatNumber(lst.tvl * rate, compact)}`
+                      ) : (
+                        <EigenDisclaimer />
+                      )}
                     </div>
                     <div className="text-sm text-subtitle text-end">
                       {formatNumber(lst.tvl, compact)} ETH
