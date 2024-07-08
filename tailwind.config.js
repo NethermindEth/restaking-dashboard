@@ -35,7 +35,7 @@ export default {
             content1: '#0f111a',
             content2: '#191c2c',
             content3: 'yellow',
-            content4: 'green',
+            content4: 'transparent',
             default: {
               DEFAULT: '#191c2c',
               2: '#7A86A5',
