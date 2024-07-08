@@ -7,8 +7,10 @@ import { scaleLinear, scaleOrdinal, scaleTime } from '@visx/scale';
 import { Circle, LinePath } from '@visx/shape';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { extent, max } from 'd3-array';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { formatDateToVerboseString, formatNumber } from '../utils';
+import { useMutativeReducer } from 'use-mutative';
+import { reduceState } from '../shared/helpers';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
@@ -31,12 +33,13 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
     showTooltip,
     hideTooltip
   } = useTooltip();
-
+  const rootRef = useRef(null);
+  const [state, dispatch] = useMutativeReducer(reduceState, { width: 100 });
   const margin = { top: 40, right: 0, bottom: 40, left: 45 };
 
-  const innerWidth = width - margin.left - margin.right;
+  // const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
-
+  console.log(state.width);
   const getEthTVL = useCallback(d => parseFloat(d.ethTVL) / 1e18, []);
   const getLstTVL = useCallback(d => parseFloat(d.lstTVL) / 1e18, []);
 
@@ -56,11 +59,11 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
   const dateScale = useMemo(
     () =>
       scaleTime({
-        range: [0, innerWidth],
+        range: [0, state.width],
         domain: extent(data, d => new Date(d.timestamp)),
         nice: true
       }),
-    [data, innerWidth]
+    [data, state.width]
   );
 
   const tvlScale = useMemo(
@@ -92,9 +95,27 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
     range: ['#7828C8', '#C9A9E9']
   });
 
+  useEffect(() => {
+    const ro = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.target === rootRef.current) {
+          dispatch({
+            width: entry.contentRect.width - margin.left - margin.right
+          });
+        }
+      }
+    });
+
+    if (rootRef.current) {
+      ro.observe(rootRef.current);
+    }
+
+    return () => ro.disconnect();
+  }, [dispatch, height, margin.left, margin.right]);
+
   return (
-    <div>
-      <svg width={width} height={height} className="overflow-visible">
+    <div ref={rootRef}>
+      <svg width="100%" height={height} className="overflow-visible">
         <rect
           x={0}
           y={0}
@@ -106,7 +127,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
         <Group left={margin.left} top={margin.top}>
           <GridRows
             scale={tvlScale}
-            width={innerWidth}
+            width="100%"
             height={innerHeight}
             stroke="#7A86A5"
             strokeOpacity={0.2}
@@ -114,7 +135,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           />
           <GridColumns
             scale={dateScale}
-            width={innerWidth}
+            width="100%"
             height={innerHeight}
             stroke="#7A86A5"
             strokeOpacity={0.2}
@@ -192,7 +213,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           <rect
             x={0}
             y={0}
-            width={innerWidth}
+            width="100%"
             height={innerHeight}
             fill="transparent"
             onTouchStart={handleTooltip}
