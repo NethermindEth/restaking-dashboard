@@ -75,6 +75,7 @@ const OperatorsList = () => {
     }
     setSearchParams(params, { replace: true });
     getOperators(params.page, params.search);
+    dispatch({ searchTriggered: false });
   }, [searchParams, debouncedSearchTerm]);
 
   useEffect(() => {
