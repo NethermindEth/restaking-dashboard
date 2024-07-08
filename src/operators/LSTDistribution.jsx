@@ -144,23 +144,36 @@ const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
 
             {active ? (
               <>
-                <Text textAnchor="middle" fill="#fff" fontSize={18} dy={0}>
-                  {`${formatNumber(active.tokensInETH, true)} ETH`}
+                <Text textAnchor="middle" fill="#fff" fontSize={16} dy={-10}>
+                  {`$${formatNumber(active.tokensInETH * rate, true)}`}
                 </Text>
 
                 <Text
                   textAnchor="middle"
                   fill={active.color}
-                  fontSize={14}
-                  dy={20}
+                  fontSize={12}
+                  dy={10}
                 >
-                  {`$${formatNumber(active.tokensInETH * rate, true)}`}
+                  {`${formatNumber(active.tokensInETH, true)} ETH`}
+                </Text>
+
+                <Text
+                  textAnchor="middle"
+                  fontSize={14}
+                  fill="#CAD7F9"
+                  dy={30 + 8}
+                >
+                  {active.symbol}
                 </Text>
               </>
             ) : (
               <>
                 <Text textAnchor="middle" fill="#fff" fontSize={16} dy={0}>
-                  {`${formatNumber(formatEther(operatorTVL))} ETH`}
+                  {`$
+                  ${formatNumber(
+                    (parseFloat(operatorTVL) / 1e18) * rate,
+                    true
+                  )}`}
                 </Text>
 
                 <Text
@@ -169,11 +182,7 @@ const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
                   fontSize={14}
                   dy={20}
                 >
-                  {`$
-                  ${formatNumber(
-                    (parseFloat(operatorTVL) / 1e18) * rate,
-                    true
-                  )}`}
+                  {`${formatNumber(formatEther(operatorTVL))} ETH`}
                 </Text>
               </>
             )}
