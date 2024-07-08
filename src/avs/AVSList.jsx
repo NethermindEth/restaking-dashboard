@@ -88,8 +88,11 @@ export default function AVSList() {
   );
 
   useEffect(() => {
-    const page = parseInt(searchParams.get('page') || '1');
-    fetchAVS(page);
+    const page = searchParams.get('page');
+    if (!page) {
+      setSearchParams({ page: 1 }, { replace: true });
+      fetchAVS(1);
+    } else fetchAVS(searchParams.get('page'));
   }, [searchParams]);
 
   return (
