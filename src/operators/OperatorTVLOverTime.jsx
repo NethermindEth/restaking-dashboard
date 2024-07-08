@@ -6,12 +6,15 @@ import { reduceState } from '../shared/helpers';
 import { ParentSize } from '@visx/responsive';
 import { useServices } from '../@services/ServiceContext';
 import OperatorTVLOverTimeChart from './OperatorTVLOverTimeChart';
+import { formatNumber } from '../utils';
 
 const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: 'all',
-    tvlOvertimeData: []
+    tvlOvertimeData: [],
+    currentRate: 'usd',
+    rate: 1
   });
 
   const getDataByRange = useCallback(() => {
@@ -37,12 +40,21 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
     [dispatch]
   );
 
+  const handleRateChange = useCallback(
+    rate => {
+      dispatch({ currentRate: rate });
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     (async () => {
       try {
         const tvlOvertimeData = await operatorService.getOperatorTVL(opAddress);
+
         dispatch({
-          tvlOvertimeData
+          tvlOvertimeData,
+          rate: tvlOvertimeData[tvlOvertimeData.length - 1].rate
         });
       } catch (error) {
         // TODO: handle error
@@ -59,13 +71,22 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
             <div className="text-base ">
               <span>{currentTVL} ETH</span>
             </div>
-            <div className="text-xs text-success">TODO USD</div>
+            <div className="text-xs text-success">
+              ${formatNumber(parseFloat(currentTVL) * state.rate)}
+            </div>
           </div>
         </div>
-        <GraphTimelineSelector
-          timelineTab={state.timelineTab}
-          onTimelineChange={handleTimelineChange}
-        />
+
+        <div className="flex gap-x-6">
+          <RateSelector
+            rate={state.currentRate}
+            onRateChange={handleRateChange}
+          />
+          <GraphTimelineSelector
+            timelineTab={state.timelineTab}
+            onTimelineChange={handleTimelineChange}
+          />
+        </div>
       </CardHeader>
       <CardBody className="w-full h-[400px]">
         <ParentSize>
@@ -75,6 +96,7 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
               width={width}
               height={height}
               opAddress={opAddress}
+              useUsdRate={state.currentRate === 'usd'}
             />
           )}
         </ParentSize>
@@ -82,5 +104,33 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
     </Card>
   );
 };
+
+function RateSelector({ rate, onRateChange }) {
+  return (
+    <div className="p-0 w-full flex items-center gap-3">
+      <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+        <div
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+            rate === 'usd' &&
+            'bg-default border border-outline text-foreground-active'
+          }`}
+          onClick={() => onRateChange('usd')}
+        >
+          USD
+        </div>
+
+        <div
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+            rate === 'eth' &&
+            'bg-default border border-outline text-foreground-active'
+          }`}
+          onClick={() => onRateChange('eth')}
+        >
+          ETH
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default OperatorTVLOverTime;

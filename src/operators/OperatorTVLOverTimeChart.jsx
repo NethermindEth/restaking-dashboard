@@ -21,7 +21,7 @@ const getNumberOfTicks = (width, axis) => {
   }
 };
 
-const OperatorTVLOverTimeChart = ({ data, width, height }) => {
+const OperatorTVLOverTimeChart = ({ data, useUsdRate, width, height }) => {
   const {
     tooltipData,
     tooltipLeft = 0,
@@ -35,7 +35,10 @@ const OperatorTVLOverTimeChart = ({ data, width, height }) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const getTVL = d => d.tvl;
+  const getTVL = useCallback(
+    d => d.tvl * (useUsdRate ? d.rate : 1),
+    [useUsdRate]
+  );
 
   const getTVLByDate = date => {
     const selectedDate = formatDateToVerboseString(new Date(date));
@@ -60,8 +63,8 @@ const OperatorTVLOverTimeChart = ({ data, width, height }) => {
   );
 
   const tvlScale = useMemo(() => {
-    const maxValue = Math.max(...data.map(d => d.tvl));
-    const minValue = Math.min(...data.map(d => d.tvl));
+    const maxValue = Math.max(...data.map(getTVL));
+    const minValue = Math.min(...data.map(getTVL));
     const yDomain = [minValue, maxValue + (maxValue - minValue) * 0.1];
 
     return scaleLinear({
@@ -159,7 +162,7 @@ const OperatorTVLOverTimeChart = ({ data, width, height }) => {
             <g>
               <Circle
                 cx={dateScale(new Date(tooltipData.timestamp)).toString()}
-                cy={tvlScale(tooltipData.tvl).toString()}
+                cy={tvlScale(getTVL(tooltipData)).toString()}
                 r={4}
                 className="cursor-pointer fill-dark-blue"
                 stroke="white"
@@ -191,7 +194,8 @@ const OperatorTVLOverTimeChart = ({ data, width, height }) => {
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
           <div className="text-base">
-            TVL: {formatNumber(tooltipData.tvl, true)}
+            TVL: {useUsdRate && '$'}
+            {formatNumber(getTVL(tooltipData), true)} {!useUsdRate && ' ETH'}
           </div>
         </TooltipWithBounds>
       )}

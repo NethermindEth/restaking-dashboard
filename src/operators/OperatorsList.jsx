@@ -12,7 +12,7 @@ import useDebounce from '../shared/hooks/useDebounce';
 const OperatorsList = () => {
   const { operatorService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
-  const compact = !useTailwindBreakpoint('md');
+  const compact = !useTailwindBreakpoint('sm');
   const [state, dispatch] = useMutativeReducer(reduceState, {
     searchTerm: searchParams.get('search'),
     searchTriggered: false,
@@ -26,7 +26,8 @@ const OperatorsList = () => {
       dispatch({
         operators: data.results,
         isFetchingOperatorData: false,
-        totalPages: Math.ceil(data.totalCount / 10)
+        totalPages: Math.ceil(data.totalCount / 10),
+        rate: 1
       });
     } catch {
       dispatch({
@@ -35,11 +36,6 @@ const OperatorsList = () => {
       });
     }
   };
-
-  const assetFormatter = new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2
-  });
 
   const handleNext = useCallback(() => {
     const currentPage = parseInt(searchParams.get('page'));
@@ -149,12 +145,14 @@ const OperatorsList = () => {
                 <span className="basis-1/4">
                   {formatNumber(op.stakerCount, compact)}
                 </span>
-                <span className="basis-1/3 text-end">
-                  <div>ETH {assetFormatter.format(op.strategiesTotal)}</div>
-                  <div className="text-foreground-1 text-xs">
-                    USD {assetFormatter.format(op.strategiesTotal)}
+                <div className="basis-1/3 text-end">
+                  <div>
+                    ${formatNumber(op.strategiesTotal * state.rate, compact)}
                   </div>
-                </span>
+                  <div className="text-xs text-subtitle">
+                    {formatNumber(op.strategiesTotal, compact)} ETH
+                  </div>
+                </div>
               </Link>
             ))}
 

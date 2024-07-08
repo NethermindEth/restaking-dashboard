@@ -21,7 +21,7 @@ const getNumberOfTicks = (width, axis) => {
   }
 };
 
-const AVSTotalValueOvertimeChart = ({ rate, data, width, height }) => {
+const AVSTotalValueOvertimeChart = ({ useUsdRate, data, width, height }) => {
   const {
     tooltipData,
     tooltipLeft = 0,
@@ -34,8 +34,6 @@ const AVSTotalValueOvertimeChart = ({ rate, data, width, height }) => {
     () => ({ top: 0, right: 40, bottom: 40, left: 20 }),
     []
   );
-
-  const useUsdRate = useMemo(() => rate === 'usd', [rate]);
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
