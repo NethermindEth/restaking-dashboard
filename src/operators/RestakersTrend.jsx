@@ -11,7 +11,7 @@ const RestakersTrend = ({ opAddress }) => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     restakerTrend: [],
-    timelineTab: '7days'
+    timelineTab: 'all'
   });
 
   const getDataByRange = useCallback(() => {

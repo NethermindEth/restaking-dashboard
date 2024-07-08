@@ -9,7 +9,7 @@ import AVSTotalValueOvertimeChart from './AVSTotalValueOvertimeChart';
 
 const AVSTotalValueOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: '7days',
+    timelineTab: 'all',
     avsTotalValueOvertimeData: null
   });
   const { avsService } = useServices();

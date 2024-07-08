@@ -105,7 +105,7 @@ const OperatorsList = () => {
               <Link
                 to={`/operators/${op.address}`}
                 key={`operator-item-${i}`}
-                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
+                className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center px-4 py-2 cursor-pointer hover:bg-default`}
               >
                 <div className="min-w-8 text-foreground-2">
                   {(searchParams.get('page') - 1) * 10 + i + 1}

@@ -10,7 +10,7 @@ import OperatorTVLOverTimeChart from './OperatorTVLOverTimeChart';
 const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: '7days',
+    timelineTab: 'all',
     tvlOvertimeData: []
   });
 

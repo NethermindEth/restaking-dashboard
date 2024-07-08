@@ -28,7 +28,7 @@ export default function AVSDetails() {
   const { avsService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avsDetails: null,
-    timelineTab: '7days',
+    timelineTab: 'all',
     lstDistributionData: [],
     eigenTVL: BigInt(0),
     beaconTVL: BigInt(0),

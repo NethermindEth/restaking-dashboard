@@ -15,7 +15,7 @@ const OperatorDetails = () => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     operatorTVL: 0,
-    timelineTab: '7days'
+    timelineTab: 'all'
   });
 
   const calculateTVL = strategies => {
