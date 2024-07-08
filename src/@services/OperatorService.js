@@ -1,10 +1,11 @@
 import { apiGet } from './apiCall';
 
 export default class OperatorService {
-  async getAll(pageIndex) {
+  async getAll(pageIndex, search) {
     const response = await apiGet(`operators`, {
       query: {
-        'page-index': pageIndex
+        'page-index': pageIndex,
+        search
       }
     });
 

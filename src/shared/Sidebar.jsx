@@ -25,10 +25,11 @@ export default function Sidebar({ onOpenChange }) {
       </header>
       <nav className="flex-none">
         {navItems.map((item, i) => {
-          const selected =
-            item.href === location.pathname
-              ? 'border-foreground-1 bg-default text-foreground-1'
-              : 'border-transparent';
+          const selected = new RegExp(`(^|/)${item.href}(/|$)`).test(
+            location.pathname
+          )
+            ? 'border-foreground-1 bg-default text-foreground-1'
+            : 'border-transparent';
           return (
             <Link
               key={`nav-item-${i}`}

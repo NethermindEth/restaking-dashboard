@@ -10,7 +10,7 @@ import { formatNumber, getGrowthPercentage } from '../utils';
 
 const AVSTotalValueOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    timelineTab: '7days',
+    timelineTab: 'all',
     avsTotalValueOvertimeData: null,
     growth: 0
   });
