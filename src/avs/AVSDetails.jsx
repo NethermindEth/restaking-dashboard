@@ -35,7 +35,8 @@ export default function AVSDetails() {
     liquidityStakedTVL: 0,
     totalTVL: 0,
     totalEthDistributionData: [],
-    strategiesMap: {}
+    strategiesMap: {},
+    rate: 1
   });
 
   const handleTimelineChange = useCallback(
@@ -169,7 +170,8 @@ export default function AVSDetails() {
         dispatch({
           avsDetails: avsDetailsData,
           strategiesMap,
-          ...derivedValues
+          ...derivedValues,
+          rate: avsDetailsData.rate
         });
       } catch (error) {
         // TODO: handle error
@@ -266,6 +268,7 @@ export default function AVSDetails() {
             <LSTDistribution
               lstDistributionData={state.lstDistributionData}
               totalEthDistributionData={state.totalEthDistributionData}
+              rate={state.rate}
             />
           </div>
         </Tab>

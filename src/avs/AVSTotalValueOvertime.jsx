@@ -12,7 +12,8 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     timelineTab: 'all',
     avsTotalValueOvertimeData: null,
-    growth: 0
+    growth: 0,
+    currentRate: 'usd'
   });
   const { avsService } = useServices();
 
@@ -35,6 +36,13 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
   const handleTimelineChange = useCallback(
     tab => {
       dispatch({ timelineTab: tab });
+    },
+    [dispatch]
+  );
+
+  const handleRateChange = useCallback(
+    rate => {
+      dispatch({ currentRate: rate });
     },
     [dispatch]
   );
@@ -89,16 +97,23 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
           <div className="font-light text-xs text-default-2">$ 4,554,567</div>
         </div>
 
-        <GraphTimelineSelector
-          timelineTab={state.timelineTab}
-          onTimelineChange={handleTimelineChange}
-        />
+        <div className="flex gap-x-6">
+          <RateSelector
+            rate={state.currentRate}
+            onRateChange={handleRateChange}
+          />
+          <GraphTimelineSelector
+            timelineTab={state.timelineTab}
+            onTimelineChange={handleTimelineChange}
+          />
+        </div>
       </CardHeader>
       <CardBody className="w-full h-[400px]">
         <ParentSize>
           {({ width, height }) => (
             <AVSTotalValueOvertimeChart
               data={filteredData}
+              rate={state.currentRate}
               width={width}
               height={height}
             />
@@ -108,5 +123,33 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
     </Card>
   );
 };
+
+function RateSelector({ rate, onRateChange }) {
+  return (
+    <div className="p-0 w-full flex items-center gap-3">
+      <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+        <div
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+            rate === 'usd' &&
+            'bg-default border border-outline text-foreground-active'
+          }`}
+          onClick={() => onRateChange('usd')}
+        >
+          USD
+        </div>
+
+        <div
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+            rate === 'eth' &&
+            'bg-default border border-outline text-foreground-active'
+          }`}
+          onClick={() => onRateChange('eth')}
+        >
+          ETH
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default AVSTotalValueOvertime;

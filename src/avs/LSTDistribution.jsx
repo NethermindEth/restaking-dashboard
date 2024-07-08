@@ -6,9 +6,11 @@ import LSTTreeMap from './LSTTreeMap';
 
 export default function LSTDistribution({
   totalEthDistributionData,
-  lstDistributionData
+  lstDistributionData,
+  rate
 }) {
   const compact = !useTailwindBreakpoint('md');
+
   return (
     <div className="w-full flex md:flex-row flex-col items-start justify-between gap-4 relative">
       <div className="space-y-4 w-full">
@@ -17,6 +19,7 @@ export default function LSTDistribution({
           className="bg-content1 border border-outline space-y-4 p-4"
         >
           <div className="font-light text-base text-foreground-1">
+            {' '}
             Total ETH distribution
           </div>
 
@@ -49,12 +52,14 @@ export default function LSTDistribution({
                       </span>
                     )}
                   </div>
-                  <div className="font-light">
-                    <div className="text-base flex items-center gap-2">
-                      {formatNumber(lst.tvl, compact)} ETH
+                  <div className="text-end">
+                    <div>
+                      {lst.token !== 'EIGEN'
+                        ? `$${formatNumber(lst.tvl * rate, compact)}`
+                        : '-'}
                     </div>
-                    <div className="text-foreground-2 text-xs text-end">
-                      $ {formatNumber(lst.tvl, compact)}
+                    <div className="text-sm text-subtitle text-end">
+                      {formatNumber(lst.tvl, compact)} ETH
                     </div>
                   </div>
                 </div>
@@ -87,12 +92,10 @@ export default function LSTDistribution({
                   </div>
                   <span className="text-foreground-active">{lst.token}</span>
                 </div>
-                <div className="font-light">
-                  <div className="text-base flex items-center gap-2">
+                <div className="text-end">
+                  <div>${formatNumber(lst.tvl * rate, compact)}</div>
+                  <div className="text-sm text-subtitle">
                     {formatNumber(lst.tvl, compact)} ETH
-                  </div>
-                  <div className="text-foreground-2 text-xs text-end">
-                    $ {formatNumber(lst.tvl, compact)}
                   </div>
                 </div>
               </div>
