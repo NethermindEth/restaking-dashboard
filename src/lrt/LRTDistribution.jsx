@@ -104,6 +104,26 @@ export default function LRTDistribution({ data, height }) {
       }),
     [state.useRate, state.filteredData, state.maxY]
   );
+  const getLatestTotal = useMemo(() => {
+    const last = data[data.length - 1];
+
+    let total = 0;
+
+    for (let p in last.protocols) {
+      total += last.protocols[p];
+    }
+
+    let symbol;
+
+    if (state.useRate) {
+      symbol = '$';
+      total *= last.rate;
+    } else {
+      symbol = 'ETH ';
+    }
+
+    return `${symbol}${fullNumFormatter.format(total)}`;
+  }, [data, state.useRate]);
   const getValue = useCallback(
     (d, k) => d.protocols[k] * (state.useRate ? d.rate : 1),
     [state.useRate]
@@ -211,9 +231,10 @@ export default function LRTDistribution({ data, height }) {
     <div ref={rootRef}>
       <div className="flex mb-6 gap-2">
         <div className="flex flex-1 gap-2 justify-between">
-          <span className="hidden sm:inline text-foreground-2 text-lg">
-            Volume trend
-          </span>
+          <div className="hidden sm:block">
+            <div className="text-foreground-1 text-lg">Volume trend</div>
+            <div className="text-foreground-2 text-xs">{getLatestTotal}</div>
+          </div>
           <Tabs
             classNames={tabs}
             defaultSelectedKey="usd"
@@ -352,19 +373,6 @@ export default function LRTDistribution({ data, height }) {
           />
         </div>
       </div>
-      <ul className="xl:hidden mt-4 pe-8 w-full">
-        {state.keys?.map((key, i) => (
-          <li key={key} className="inline-block me-4">
-            <div className="flex flex-row gap-1 items-center text-sm">
-              <span
-                className="inline-block h-3 rounded-full w-3"
-                style={{ backgroundColor: colors[i] }}
-              ></span>
-              {protocols[key]?.name ?? key}
-            </div>
-          </li>
-        ))}
-      </ul>
       {tooltipOpen && (
         <TooltipInPortal
           key={Math.random()}
