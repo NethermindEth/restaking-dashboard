@@ -5,15 +5,20 @@ import { reduceState } from '../shared/helpers';
 import { Link, useSearchParams } from 'react-router-dom';
 import Pagination from '../shared/Pagination';
 import { Input } from '@nextui-org/react';
+import useDebounce from '../shared/hooks/useDebounce';
 
 const OperatorsList = () => {
   const { operatorService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [state, dispatch] = useMutativeReducer(reduceState, {});
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    searchTerm: searchParams.get('search'),
+    searchTriggered: false
+  });
+  const debouncedSearchTerm = useDebounce(state.searchTerm, 300);
 
-  const getOperators = async pageIndex => {
+  const getOperators = async (pageIndex, search) => {
     try {
-      const data = await operatorService.getAll(pageIndex - 1);
+      const data = await operatorService.getAll(pageIndex - 1, search);
       dispatch({
         operators: data.results,
         totalPages: Math.ceil(data.totalCount / 10)
@@ -32,7 +37,6 @@ const OperatorsList = () => {
     const currentPage = parseInt(searchParams.get('page'));
     if (currentPage + 1 <= state.totalPages) {
       setSearchParams({ page: currentPage + 1 });
-      getOperators(currentPage + 1);
     }
   }, [searchParams, state.totalPages, setSearchParams, getOperators]);
 
@@ -40,25 +44,42 @@ const OperatorsList = () => {
     const currentPage = parseInt(searchParams.get('page'));
     if (currentPage - 1 >= 1) {
       setSearchParams({ page: currentPage - 1 });
-      getOperators(currentPage - 1);
     }
   }, [searchParams, setSearchParams, getOperators]);
 
   const handlePageClick = useCallback(
     page => {
       setSearchParams({ page });
-      getOperators(page);
     },
     [setSearchParams, getOperators]
   );
 
+  const handleSearch = e => {
+    dispatch({ searchTerm: e.target.value });
+  };
+
   useEffect(() => {
     const page = searchParams.get('page');
-    if (!page) {
-      setSearchParams({ page: 1 }, { replace: true });
-      getOperators(1);
-    } else getOperators(searchParams.get('page'));
-  }, [searchParams]);
+
+    const params = {};
+    if (page && debouncedSearchTerm) {
+      params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
+      params.search = debouncedSearchTerm;
+    } else if (page) {
+      params.page = page;
+    } else if (debouncedSearchTerm) {
+      params.page = 1;
+      params.search = debouncedSearchTerm;
+    } else {
+      params.page = 1;
+    }
+    setSearchParams(params, { replace: true });
+    getOperators(params.page, params.search);
+  }, [searchParams, debouncedSearchTerm]);
+
+  useEffect(() => {
+    dispatch({ searchTriggered: true });
+  }, [debouncedSearchTerm]);
 
   return (
     <div>
@@ -73,6 +94,8 @@ const OperatorsList = () => {
           Operators may also be Stakers; these are not mutually exclusive.
         </span>
         <Input
+          value={state.searchTerm}
+          onChange={handleSearch}
           type="text"
           placeholder="Search by operator"
           radius="sm"
