@@ -94,7 +94,13 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
             </div>
           </div>
 
-          <div className="font-light text-xs text-default-2">$ 4,554,567</div>
+          <div className="font-light text-xs text-default-2">
+            {filteredData &&
+              `$${formatNumber(
+                filteredData[filteredData.length - 1].tvl *
+                  filteredData[filteredData.length - 1].rate
+              )}`}
+          </div>
         </div>
 
         <div className="flex gap-x-6">
