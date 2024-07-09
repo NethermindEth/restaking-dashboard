@@ -113,7 +113,7 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
           {({ width, height }) => (
             <AVSTotalValueOvertimeChart
               data={filteredData}
-              isUsdRate={state.currentRate === 'usd'}
+              useUsdRate={state.currentRate === 'usd'}
               width={width}
               height={height}
             />
