@@ -122,7 +122,9 @@ export default function Operators({ avsAddress, totalTVL }) {
                     key={`operator-item-${i}`}
                     className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
                   >
-                    <div className="min-w-5">{i + 1}</div>
+                    <div className="min-w-5">
+                      {(searchParams.get('page') - 1) * 10 + i + 1}
+                    </div>
                     {state.isFetchingOperators ? (
                       <Skeleton className="bg-default dark:bg-default min-w-5 size-5 rounded-full" />
                     ) : (
