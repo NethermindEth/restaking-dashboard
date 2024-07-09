@@ -71,6 +71,10 @@ export function formatDateToVerboseString(date) {
 }
 
 export function getGrowthPercentage(oldValue, newValue) {
+  if (oldValue === 0) {
+    return 100;
+  }
+
   const growth = ((newValue - oldValue) / oldValue) * 100;
   return growth;
 }

@@ -17,13 +17,14 @@ export default function Operators({ avsAddress, totalTVL }) {
     avsOperators: null,
     searchInput: '',
     isFetchingOperators: false,
-    rate: 1
+    rate: 1,
+    totalPages: 1
   });
 
-  const fetchOperators = async pageIndex => {
+  const fetchOperators = async page => {
     try {
       dispatch({ isFetchingOperators: true });
-      const data = await avsService.getAvsOperators(avsAddress, pageIndex - 1);
+      const data = await avsService.getAvsOperators(avsAddress, page);
       dispatch({
         avsOperators: data.results,
         totalPages: Math.ceil(data.totalCount / 10),
@@ -121,7 +122,9 @@ export default function Operators({ avsAddress, totalTVL }) {
                     key={`operator-item-${i}`}
                     className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
                   >
-                    <div className="min-w-5">{i + 1}</div>
+                    <div className="min-w-5">
+                      {(searchParams.get('page') - 1) * 10 + i + 1}
+                    </div>
                     {state.isFetchingOperators ? (
                       <Skeleton className="bg-default dark:bg-default min-w-5 size-5 rounded-full" />
                     ) : (
