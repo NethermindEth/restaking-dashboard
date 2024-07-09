@@ -16,12 +16,16 @@ const OperatorsList = () => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     searchTerm: searchParams.get('search'),
     searchTriggered: false,
-    error: null
+    error: null,
+    isFetchingOperatorData: true
   });
   const debouncedSearchTerm = useDebounce(state.searchTerm, 300);
 
   const getOperators = async (pageIndex, search) => {
     try {
+      dispatch({
+        isFetchingOperatorData: true
+      });
       const data = await operatorService.getAll(pageIndex - 1, search);
       dispatch({
         operators: data.results,
