@@ -17,13 +17,14 @@ export default function Operators({ avsAddress, totalTVL }) {
     avsOperators: null,
     searchInput: '',
     isFetchingOperators: false,
-    rate: 1
+    rate: 1,
+    totalPages: 1
   });
 
-  const fetchOperators = async pageIndex => {
+  const fetchOperators = async page => {
     try {
       dispatch({ isFetchingOperators: true });
-      const data = await avsService.getAvsOperators(avsAddress, pageIndex - 1);
+      const data = await avsService.getAvsOperators(avsAddress, page);
       dispatch({
         avsOperators: data.results,
         totalPages: Math.ceil(data.totalCount / 10),
