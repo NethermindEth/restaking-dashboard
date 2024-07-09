@@ -117,7 +117,11 @@ export default function AVSDetails() {
       0
     );
 
-    const totalTVL = Number(beaconTVL / BigInt(1e18)) + liquidityStakedTVL;
+    // total ETH
+    const totalTVL =
+      Number(beaconTVL / BigInt(1e18)) +
+      liquidityStakedTVL +
+      Number(eigenTVL / BigInt(1e18));
 
     const totalEthDistributionData = [
       beaconEntry && {
