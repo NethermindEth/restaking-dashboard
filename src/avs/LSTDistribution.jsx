@@ -3,8 +3,11 @@ import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
 import { Card, cn, Tooltip } from '@nextui-org/react';
 import LSTTreeMap from './LSTTreeMap';
+import { useState } from 'react';
 
 function EigenDisclaimer() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="inline-flex gap-x-1">
       N/A
@@ -21,12 +24,16 @@ function EigenDisclaimer() {
             </div>
           </div>
         }
+        isOpen={isOpen}
       >
         <span
           className="text-base material-symbols-outlined"
           style={{
             fontVariationSettings: `'FILL' 0`
           }}
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
+          onPress={() => setIsOpen(!isOpen)}
         >
           info
         </span>
