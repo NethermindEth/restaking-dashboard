@@ -198,7 +198,7 @@ export default function LSTTreeMap({
             <span className="text-xs">{`(${tooltipData.token})`}</span>
           </div>
           <div className="text-base">
-            TVL: {assetFormatter.format(tooltipData.tvl)}
+            TVL: {assetFormatter.format(tooltipData.tvl)} ETH
           </div>
         </TooltipInPortal>
       )}

@@ -10,13 +10,14 @@ import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
 
 export default function Operators({ avsAddress, totalTVL }) {
-  const compact = !useTailwindBreakpoint('md');
+  const compact = !useTailwindBreakpoint('sm');
   const { avsService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avsOperators: null,
     searchInput: '',
-    isFetchingOperators: false
+    isFetchingOperators: false,
+    rate: 1
   });
 
   const fetchOperators = async pageIndex => {
@@ -26,7 +27,8 @@ export default function Operators({ avsAddress, totalTVL }) {
       dispatch({
         avsOperators: data.results,
         totalPages: Math.ceil(data.totalCount / 10),
-        isFetchingOperators: false
+        isFetchingOperators: false,
+        rate: data.rate
       });
     } catch {
       // TODO: handle error
@@ -139,11 +141,18 @@ export default function Operators({ avsAddress, totalTVL }) {
                       ).toFixed(2)}
                       %
                     </span>
-                    <span className="basis-1/3 text-end min-w-fit">
+                    <div className="basis-1/3 text-end min-w-fit">
                       <div>
+                        $
+                        {formatNumber(
+                          operator.strategiesTotal * state.rate,
+                          compact
+                        )}
+                      </div>
+                      <div className="text-xs text-subtitle">
                         {formatNumber(operator.strategiesTotal, compact)} ETH
                       </div>
-                    </span>
+                    </div>
                   </Link>
                 )
             )

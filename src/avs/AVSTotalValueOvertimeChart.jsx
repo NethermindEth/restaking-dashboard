@@ -21,7 +21,7 @@ const getNumberOfTicks = (width, axis) => {
   }
 };
 
-const AVSTotalValueOvertimeChart = ({ data, width, height }) => {
+const AVSTotalValueOvertimeChart = ({ useUsdRate, data, width, height }) => {
   const {
     tooltipData,
     tooltipLeft = 0,
@@ -38,7 +38,10 @@ const AVSTotalValueOvertimeChart = ({ data, width, height }) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const getTVL = d => d.tvl;
+  const getTVL = useCallback(
+    d => d.tvl * (useUsdRate ? d.rate : 1),
+    [useUsdRate]
+  );
 
   const dateScale = useMemo(() => {
     if (!data || data.length === 0) return null;
@@ -52,7 +55,9 @@ const AVSTotalValueOvertimeChart = ({ data, width, height }) => {
 
   const tvlScale = useMemo(() => {
     if (!data || data.length === 0) return null;
-    const tvl = data.map(d => d.tvl).filter(o => !isNaN(o));
+    const tvl = data
+      .filter(d => !isNaN(d.tvl))
+      .map(d => d.tvl * (useUsdRate ? d.rate : 1));
     if (tvl.length === 0) return null;
     const maxValue = Math.max(...tvl);
     const minValue = Math.min(...tvl);
@@ -68,7 +73,7 @@ const AVSTotalValueOvertimeChart = ({ data, width, height }) => {
       range: [height - margin.bottom, margin.top],
       nice: true
     });
-  }, [data, height, margin]);
+  }, [useUsdRate, data, height, margin]);
 
   const handleTooltip = useCallback(
     ev => {
@@ -89,11 +94,11 @@ const AVSTotalValueOvertimeChart = ({ data, width, height }) => {
         showTooltip({
           tooltipData: d,
           tooltipLeft: dateScale(new Date(d.timestamp)) + margin.left,
-          tooltipTop: tvlScale(d.tvl)
+          tooltipTop: tvlScale(d.tvl * (useUsdRate ? d.rate : 1))
         });
       }
     },
-    [data, dateScale, tvlScale, margin, showTooltip]
+    [data, dateScale, tvlScale, margin, showTooltip, useUsdRate]
   );
 
   return (
@@ -205,7 +210,13 @@ const AVSTotalValueOvertimeChart = ({ data, width, height }) => {
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}
           </div>
-          <div className="text-base">TVL: {formatNumber(tooltipData.tvl)}</div>
+          <div className="text-base">
+            TVL: {useUsdRate && '$'}
+            {formatNumber(
+              tooltipData.tvl * (useUsdRate ? tooltipData.rate : 1)
+            )}{' '}
+            {!useUsdRate && 'ETH'}
+          </div>
         </TooltipWithBounds>
       )}
     </div>

@@ -6,6 +6,7 @@ import { Progress } from '@nextui-org/react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { formatEther } from 'ethers';
+import { formatNumber } from '../utils';
 
 const pieChartColors = [
   '#9C4FD9',
@@ -34,7 +35,7 @@ const lstTokenMapping = {
   '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7': 'EIGEN'
 };
 
-const LSTDistribution = ({ strategies, operatorTVL }) => {
+const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     lstDistribution: []
   });
@@ -143,32 +144,45 @@ const LSTDistribution = ({ strategies, operatorTVL }) => {
 
             {active ? (
               <>
-                <Text textAnchor="middle" fill="#fff" fontSize={18} dy={0}>
-                  {`$${Math.floor(active.tokensInETH)}`}
+                <Text textAnchor="middle" fill="#fff" fontSize={16} dy={-10}>
+                  {`$${formatNumber(active.tokensInETH * rate, true)}`}
                 </Text>
 
                 <Text
                   textAnchor="middle"
                   fill={active.color}
-                  fontSize={14}
-                  dy={20}
+                  fontSize={12}
+                  dy={10}
                 >
-                  $ 3,120,070,554
+                  {`${formatNumber(active.tokensInETH, true)} ETH`}
+                </Text>
+
+                <Text
+                  textAnchor="middle"
+                  fontSize={14}
+                  fill="#CAD7F9"
+                  dy={30 + 8}
+                >
+                  {active.symbol}
                 </Text>
               </>
             ) : (
               <>
                 <Text textAnchor="middle" fill="#fff" fontSize={16} dy={0}>
-                  {assetFormatter.format(formatEther(operatorTVL))} ETH
+                  {`$
+                  ${formatNumber(
+                    (parseFloat(operatorTVL) / 1e18) * rate,
+                    true
+                  )}`}
                 </Text>
 
                 <Text
                   className="fill-success"
                   textAnchor="middle"
-                  fontSize={12}
+                  fontSize={14}
                   dy={20}
                 >
-                  $ 728,8392,3783
+                  {`${formatNumber(formatEther(operatorTVL))} ETH`}
                 </Text>
               </>
             )}

@@ -21,7 +21,8 @@ export default function Home() {
     latestEigenTVL: null,
     isFetchingEigenTVL: false,
     isFetchingTopAVS: false,
-    isFetchingTopOperators: false
+    isFetchingTopOperators: false,
+    rate: 1
   });
 
   const fetchTopAVS = useCallback(async () => {
@@ -31,7 +32,8 @@ export default function Home() {
       dispatch({
         topAVS: data.results,
         totalAVSCount: data.totalCount,
-        isFetchingTopAVS: false
+        isFetchingTopAVS: false,
+        rate: data.rate
       });
     } catch {
       // TODO: Handle error
@@ -48,7 +50,8 @@ export default function Home() {
       dispatch({
         topOperators: data.results,
         totalOperatorsCount: data.totalCount,
-        isFetchingTopOperators: false
+        isFetchingTopOperators: false,
+        rate: data.rate
       });
     } catch {
       // TODO: Handle error
@@ -100,9 +103,21 @@ export default function Home() {
             {state.isFetchingEigenTVL ? (
               <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
             ) : (
-              <div className="text-2xl font-normal text-white">
-                {formatNumber(parseFloat(state.latestEigenTVL) / 1e18, compact)}{' '}
-                ETH
+              <div>
+                <div className="text-2xl font-normal text-white">
+                  $
+                  {formatNumber(
+                    (parseFloat(state.latestEigenTVL) / 1e18) * state.rate,
+                    compact
+                  )}
+                </div>
+                <div className="text-sm text-success">
+                  {formatNumber(
+                    parseFloat(state.latestEigenTVL) / 1e18,
+                    compact
+                  )}{' '}
+                  ETH
+                </div>
               </div>
             )}
           </div>
@@ -173,9 +188,14 @@ export default function Home() {
                   <span className="basis-1/2">
                     {formatNumber(avs.operators, compact)}
                   </span>
-                  <span className="basis-1/3 text-end min-w-fit">
-                    <div>ETH {formatNumber(avs.strategiesTotal, compact)}</div>
-                  </span>
+                  <div className="basis-1/3 text-end min-w-fit">
+                    <div>
+                      ${formatNumber(avs.strategiesTotal * state.rate, compact)}
+                    </div>
+                    <div className="text-xs text-subtitle">
+                      {formatNumber(avs.strategiesTotal, compact)} ETH
+                    </div>
+                  </div>
                 </Link>
               ))
             )}
@@ -214,9 +234,14 @@ export default function Home() {
                   <span className="basis-1/2">
                     {formatNumber(op.stakerCount, compact)}
                   </span>
-                  <span className="basis-1/3 text-end min-w-fit">
-                    <div>ETH {formatNumber(op.strategiesTotal, compact)}</div>
-                  </span>
+                  <div className="basis-1/3 text-end min-w-fit">
+                    <div>
+                      ${formatNumber(op.strategiesTotal * state.rate, compact)}
+                    </div>
+                    <div className="text-xs text-subtitle">
+                      {formatNumber(op.strategiesTotal, compact)} ETH
+                    </div>
+                  </div>
                 </Link>
               ))
             )}
@@ -225,7 +250,7 @@ export default function Home() {
       </div>
 
       <EigenLayerTVLOvertime eigenTVLData={state.eigenTVLData} />
-      <OverviewLRTDistribution />
+      <OverviewLRTDistribution rate={state.rate} />
     </div>
   );
 }

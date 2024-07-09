@@ -15,7 +15,8 @@ const OperatorDetails = () => {
   const { operatorService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     operatorTVL: 0,
-    timelineTab: 'all'
+    timelineTab: 'all',
+    rate: 1
   });
 
   const calculateTVL = strategies => {
@@ -32,7 +33,7 @@ const OperatorDetails = () => {
     try {
       const data = await operatorService.getOperator(address);
       const operatorTVL = calculateTVL(data.strategies);
-      dispatch({ operator: data, operatorTVL });
+      dispatch({ operator: data, operatorTVL, rate: data.rate });
     } catch {
       // TODO: handle error
     }
@@ -115,6 +116,7 @@ const OperatorDetails = () => {
               <LSTDistribution
                 strategies={state.operator?.strategies}
                 operatorTVL={state.operatorTVL}
+                rate={state.rate}
               />
             </CardBody>
           </Card>
