@@ -2,7 +2,7 @@
 
 ## Running locally
 
-To start the app in locally, run the following commands from the project's root directory:
+This project uses [Vite](https://vitejs.dev). To start locally, run the following commands from the project's root directory:
 
 ```bash
 npm i
