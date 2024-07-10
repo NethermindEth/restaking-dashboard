@@ -17,6 +17,7 @@ import AVSDetails from './avs/AVSDetails';
 import OperatorsList from './operators/OperatorsList';
 import OperatorDetails from './operators/OperatorDetails';
 import LST from './lst/LST';
+import NotFound from './shared/NotFound';
 
 export default function App() {
   log.debug('Starting up');
@@ -39,6 +40,7 @@ export default function App() {
                     element={<OperatorDetails />}
                   />
                   <Route path="/lst" element={<LST />} />
+                  <Route path="*" element={<NotFound />} />
                 </Route>
               )
             )}
