@@ -1,4 +1,13 @@
-import { Skeleton } from '@nextui-org/react';
+import {
+  Skeleton,
+  Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow
+} from '@nextui-org/react';
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
@@ -7,6 +16,33 @@ import { reduceState } from '../shared/helpers';
 import Pagination from '../shared/Pagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
+
+const columns = [
+  {
+    key: 'AVS',
+    label: 'AVS',
+    align: 'start',
+    width: '40%'
+  },
+  {
+    key: 'Restakers',
+    label: 'Restakers',
+    align: 'start',
+    width: '25%'
+  },
+  {
+    key: 'Operators',
+    label: 'Operators',
+    align: 'center',
+    width: '25%'
+  },
+  {
+    key: 'TVL',
+    label: 'TVL',
+    align: 'end',
+    width: '10%'
+  }
+];
 
 export default function AVSList() {
   const { avsService } = useServices();
@@ -61,10 +97,6 @@ export default function AVSList() {
     [avsService, dispatch]
   );
 
-  const handleAVSItemClick = avs => {
-    navigate(`/avs/${avs.address}`, { state: { avs } });
-  };
-
   const handleNext = useCallback(() => {
     const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage + 1 <= state.totalPages) {
@@ -107,62 +139,75 @@ export default function AVSList() {
           Actively Validated Services
         </div>
       </div>
-      <div className="bg-content1 border border-outline rounded-lg text-sm">
-        <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <div className="min-w-5"></div>
-          <span className="basis-1/2">Name</span>
-          <span className="basis-1/3">Stakers</span>
-          <span className="basis-1/4">Operators</span>
-          <span className="basis-1/3 text-end">TVL</span>
-        </div>
-        {state.isFetchingAvsData ? (
-          <AVSListSkeleton />
-        ) : (
-          <div>
-            {state.avs?.map(
-              (avs, i) =>
-                avs.metadata && (
-                  <div
-                    key={`avs-item-${i}`}
-                    onClick={() => handleAVSItemClick(avs)}
-                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
-                  >
-                    <div className="min-w-5">
-                      {(searchParams.get('page') - 1) * 10 + i + 1}
-                    </div>
-                    <img
-                      src={avs.metadata.logo}
-                      className="size-5 rounded-full"
-                    />
-                    <span className="basis-1/2 truncate">
-                      {avs?.metadata?.name}
-                    </span>
-                    <span className="basis-1/3">
-                      {formatNumber(avs.stakers, compact)}
-                    </span>
-                    <span className="basis-1/4">
-                      {formatNumber(avs.operators, compact)}
-                    </span>
-                    <span className="basis-1/3 text-end">
-                      <div>${formatNumber(avs.tvl * state.rate, compact)}</div>
-                      <div className="text-xs text-subtitle">
-                        {formatNumber(avs.tvl, compact)} ETH
-                      </div>
-                    </span>
-                  </div>
-                )
-            )}
-
-            <Pagination
-              totalPages={state.totalPages}
-              currentPage={parseInt(searchParams.get('page') || '1')}
-              handleNext={handleNext}
-              handlePrevious={handlePrevious}
-              handlePageClick={handlePageClick}
-            />
-          </div>
-        )}
-      </div>
+      <Table
+        removeWrapper
+        className="bg-content1 border border-outline rounded-lg text-sm"
+        bottomContent={
+          <Pagination
+            totalPages={state.totalPages}
+            currentPage={parseInt(searchParams.get('page') || '1')}
+            handleNext={handleNext}
+            handlePrevious={handlePrevious}
+            handlePageClick={handlePageClick}
+          />
+        }
+      >
+        <TableHeader columns={columns}>
+          {column => (
+            <TableColumn
+              width={column.width}
+              align={'end'}
+              className="bg-transparent py-4 text-foreground-active text-sm font-normal leading-5"
+              key={column.key}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody
+          isLoading={state.isFetchingAvsData}
+          loadingContent={<Spinner />}
+          emptyContent={
+            <span className="text-foreground-active">No AVS found.</span>
+          }
+        >
+          {state.avs?.map((avs, i) => (
+            <TableRow
+              onClick={() =>
+                navigate(`/avs/${avs.address}`, { state: { avs: avs } })
+              }
+              key={`avs-item-${i}`}
+              className="cursor-pointer border-t border-outline hover:bg-default"
+            >
+              <TableCell className="p-4 flex gap-x-3">
+                <span className="size-3">
+                  {' '}
+                  {(searchParams.get('page') - 1) * 10 + i + 1}
+                </span>
+                {avs.metadata?.logo ? (
+                  <img
+                    className="size-5 rounded-full "
+                    src={avs.metadata?.logo}
+                  />
+                ) : (
+                  <span class="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
+                    warning
+                  </span>
+                )}
+                <span>{avs.metadata?.name ?? 'N/A'}</span>
+              </TableCell>
+              <TableCell>{formatNumber(avs.stakers, compact)}</TableCell>
+              <TableCell>{formatNumber(avs.operators, compact)}</TableCell>
+              <TableCell>
+                <div>${formatNumber(avs.tvl * state.rate, compact)}</div>
+                <div className="text-xs text-subtitle">
+                  {formatNumber(avs.tvl, compact)} ETH
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
