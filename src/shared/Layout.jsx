@@ -9,15 +9,15 @@ export default function Layout() {
 
   return (
     <div className="bg-background flex flex-col gap-4 min-h-screen text-foreground">
-      <div className="basis-0 flex flex-1">
+      <div className="flex flex-1">
         {showSidebar && (
           <div className="sticky top-0 max-h-screen w-64 bg-content1 border-b border-e border-outline flex flex-col overflow-y-scroll lg:overflow-hidden rounded-br-lg">
             <Sidebar />
           </div>
         )}
-        <div className="basis-0 flex-1">
+        <div className="flex flex-col flex-1">
           {!showSidebar && <Header />}
-          <main className="px-4 pt-6 h-full">
+          <main className="flex-1 px-4 pt-6">
             <Outlet />
           </main>
         </div>
