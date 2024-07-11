@@ -3,7 +3,7 @@ import { Link } from '@nextui-org/react';
 
 export default function Footer() {
   return (
-    <footer className="flex flex-row items-start content-center md:items-center gap-8 px-4 py-6 justify-between text-foreground-2">
+    <footer className="flex flex-row items-start content-center md:items-center gap-5 md:gap-8 px-4 py-6 justify-between text-foreground-2">
       <div>
         <Link href="https://nethermind.io" target="_blank">
           <img
