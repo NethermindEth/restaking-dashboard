@@ -1,16 +1,16 @@
 /**
- * Formats the given value as a rounded ETH amount.
- * @param {number | bigint} value The value to format.
- * @returns {string} The formatted value.
- */
-export const formatIntETH = value => ethIntFormatter.format(value);
-
-/**
  * Formats the given value as a rounded integer.
  * @param {number | bigint} value The value to format.
  * @returns {string} The formatted value.
  */
 export const formatInt = value => intFormatter.format(value);
+
+/**
+ * Formats the given value as a rounded ETH amount.
+ * @param {number | bigint} value The value to format.
+ * @returns {string} The formatted value.
+ */
+export const formatIntETH = value => ethIntFormatter.format(value);
 
 /**
  * Formats the given value as a rounded USD amount.
