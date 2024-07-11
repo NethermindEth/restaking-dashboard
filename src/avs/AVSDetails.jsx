@@ -1,330 +1,162 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Link,
-  Tab,
-  Tabs
-} from '@nextui-org/react';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
-import { useServices } from '../@services/ServiceContext';
-import GraphTimelineSelector from '../shared/GraphTimelineSelector';
 import { reduceState } from '../shared/helpers';
-import { assetFormatter, formatNumber } from '../utils';
-import AVSTotalValueOvertime from './AVSTotalValueOvertime';
-import LSTDistribution from './LSTDistribution';
-import Operators from './Operators';
-import OperatorsOvertime from './OperatorsOvertime';
-import RestakersOverTime from './RestakersOverTime';
-import RestakingLeaderboard from './RestakingLeaderboard';
-import { strategiesData } from './strategies.mapping';
+import { useEffect } from 'react';
+import { Skeleton, Tab, Tabs } from '@nextui-org/react';
+import { useServices } from '../@services/ServiceContext';
+import { useParams } from 'react-router-dom';
+import AVSDetailsHeader from './AVSDetailsHeader';
+import AVSDetailsTVLTab from './AVSDetailsTVLTab';
+import AVSDetailsOperatorsTab from './AVSDetailsOperatorsTab';
+import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
+import { formatNumber } from '../utils';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function AVSDetails() {
-  const location = useLocation();
-  const avsAddress = location.pathname.split('/')[2];
-  const { avsService } = useServices();
+  const { address } = useParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    avsDetails: null,
-    timelineTab: 'all',
-    lstDistributionData: [],
-    eigenTVL: BigInt(0),
-    beaconTVL: BigInt(0),
-    liquidityStakedTVL: 0,
-    totalTVL: 0,
-    totalEthDistributionData: [],
-    strategiesMap: {},
-    rate: 1
-  });
-
-  const handleTimelineChange = useCallback(
-    tab => {
-      dispatch({ timelineTab: tab });
+    isAVSLoading: true,
+    strategies: undefined,
+    avs: undefined,
+    totalTokens: {
+      lst: 0,
+      eth: 0,
+      eigen: 0
     },
-    [dispatch]
-  );
-
-  const createStrategiesMap = strategies => {
-    return strategies.reduce((acc, strategy) => {
-      acc[strategy.address] = strategy;
-      return acc;
-    }, {});
-  };
-
-  const calculateTVL = strategyData => {
-    const tokens = BigInt(strategyData?.tokens || '0');
-    return Number(tokens / BigInt(1e18));
-  };
-
-  const calculateLstDistributionData = strategiesMap => {
-    const excludedProxies = new Set([
-      '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0',
-      '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
-    ]);
-
-    return Object.values(strategiesData)
-      .map(strategy => {
-        const proxyAddress = strategy.proxy;
-        const strategyData = strategiesMap[proxyAddress];
-
-        return strategyData
-          ? { ...strategy, tvl: calculateTVL(strategyData) }
-          : { ...strategy, tvl: 0 };
-      })
-      .filter(strategy => !excludedProxies.has(strategy.proxy));
-  };
-
-  const findStrategyByProxy = proxy => strategiesData[proxy];
-
-  // calculate eigen specific tvl
-  const calculateEigenTVL = (strategiesMap, avsAddress) => {
-    const eigenEntry =
-      strategiesData['0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'];
-    if (!eigenEntry || !strategiesMap) return BigInt(0);
-
-    const strategy = strategiesMap[eigenEntry.proxy];
-    return strategy ? BigInt(strategy.tokens) : BigInt(0);
-  };
-
-  const calculateBeaconTVL = strategiesMap => {
-    const beaconEntry =
-      strategiesData['0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'];
-    if (!beaconEntry || !strategiesMap) return BigInt(0);
-
-    const strategy = strategiesMap[beaconEntry.proxy];
-    return strategy ? BigInt(strategy.tokens) : BigInt(0);
-  };
-
-  function calculateDerivedValues(avsDetailsData) {
-    const strategiesMap = createStrategiesMap(avsDetailsData.strategies || []);
-
-    const lstDistributionData = calculateLstDistributionData(strategiesMap);
-
-    const eigenEntry = findStrategyByProxy(
-      '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7'
-    );
-    const beaconEntry = findStrategyByProxy(
-      '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0'
-    );
-
-    const eigenTVL = calculateEigenTVL(strategiesMap, avsDetailsData.address);
-    const beaconTVL = calculateBeaconTVL(strategiesMap);
-
-    const liquidityStakedTVL = lstDistributionData.reduce(
-      (sum, strategy) => sum + strategy.tvl,
-      0
-    );
-
-    // total ETH
-    const totalTVL =
-      Number(beaconTVL / BigInt(1e18)) +
-      liquidityStakedTVL +
-      Number(eigenTVL / BigInt(1e18));
-
-    const totalEthDistributionData = [
-      beaconEntry && {
-        ...beaconEntry,
-        token: beaconEntry.token,
-        tvl: convertToEther(beaconTVL),
-        tvlPercentage: ((convertToEther(beaconTVL) / totalTVL) * 100).toFixed(2)
-      },
-      eigenEntry && {
-        ...eigenEntry,
-        token: eigenEntry.token,
-        tvl: convertToEther(eigenTVL),
-        tvlPercentage: ((convertToEther(eigenTVL) / totalTVL) * 100).toFixed(2)
-      },
-      {
-        name: 'Liquidity Staked Tokens',
-        logo: 'https://w7.pngwing.com/pngs/268/1013/png-transparent-ethereum-eth-hd-logo-thumbnail.png',
-        tvl: liquidityStakedTVL,
-        tvlPercentage: ((liquidityStakedTVL / totalTVL) * 100).toFixed(2)
-      }
-    ].filter(Boolean);
-
-    return {
-      lstDistributionData,
-      eigenTVL,
-      beaconTVL,
-      liquidityStakedTVL,
-      totalTVL,
-      totalEthDistributionData
-    };
-  }
-
-  const convertToEther = useMemo(
-    () => bigIntValue => Number(bigIntValue / BigInt(1e18)),
-    []
-  );
+    ethRate: 1
+  });
+  const { avsService } = useServices();
+  const compact = !useTailwindBreakpoint('lg');
 
   useEffect(() => {
-    async function fetchAvsDetails() {
-      try {
-        const avsDetailsData = await avsService.getAVSDetails(avsAddress);
-        const strategiesMap = createStrategiesMap(
-          avsDetailsData.strategies || []
-        );
-        const derivedValues = calculateDerivedValues(
-          avsDetailsData,
-          strategiesMap
-        );
+    dispatch({ isAVSLoading: true });
+    (async () => {
+      const avs = await avsService.getAVSDetails(address);
 
-        dispatch({
-          avsDetails: avsDetailsData,
-          strategiesMap,
-          ...derivedValues,
-          rate: avsDetailsData.rate
-        });
-      } catch (error) {
-        // TODO: handle error
+      const strategies = avs.strategies.reduce((acc, strategy) => {
+        acc[strategy.address] = BigInt(strategy.tokens) / BigInt(1e18);
+        return acc;
+      }, Object.create(null));
+
+      const totals = { lst: 0n, eth: 0n, eigen: 0n };
+
+      for (const strategy in strategies) {
+        if (strategy === EIGEN_STRATEGY) {
+          totals.eigen += strategies[strategy];
+        } else if (strategy === BEACON_STRATEGY) {
+          totals.eth += strategies[strategy];
+        } else {
+          totals.lst += strategies[strategy];
+        }
       }
-    }
-    fetchAvsDetails();
-  }, [avsService, dispatch, avsAddress]);
 
-  if (state.avsDetails === null) {
-    return null;
-  }
+      totals.eigen = Number(totals.eigen);
+      totals.eth = Number(totals.eth);
+      totals.lst = Number(totals.lst);
+
+      dispatch({
+        avs,
+        ethRate: avs.rate,
+        strategies,
+        totalTokens: totals,
+        isAVSLoading: false
+      });
+    })();
+  }, []);
 
   return (
-    <div className="basis-1/2 w-full space-y-4">
-      <Card radius="md" className="bg-content1 border border-outline p-4">
-        <CardBody>
-          <div className="flex flex-row gap-x-2 items-center">
-            <img
-              src={state.avsDetails.metadata.logo}
-              className="size-5 rounded-full"
-            />
-            <div className="flex items-center gap-3">
-              <span className="basis-full font-medium text-3xl truncate text-foreground-1">
-                {state.avsDetails?.metadata?.name}
-              </span>
-            </div>
+    <>
+      {state.isAVSLoading ? (
+        <div className="bg-content1 border border-outline rounded-lg w-full min-h-[128px] p-4">
+          <div className="flex items-center max-w-[300px]">
+            <Skeleton className="border border-outline rounded-full size-12 shrink-0" />
+            <Skeleton className="w-full h-8 rounded-md ml-2" />
           </div>
-          <div className="py-4 text-sm text-foreground-active">
-            {state.avsDetails.metadata.description}
+          <div className="my-4">
+            <Skeleton className="h-16 w-full rounded-md" />
           </div>
+        </div>
+      ) : (
+        <AVSDetailsHeader avs={state.avs} />
+      )}
 
-          <div className="space-y-2">
-            {state.avsDetails.metadata.website && (
-              <Link
-                href={state.avsDetails.metadata.website}
-                target="_blank"
-                rel="noreferrer"
-                className="py-4 text-sm text-secondary"
-              >
-                {state.avsDetails.metadata.website}
-              </Link>
-            )}
-
-            <div className="flex flex-row gap-4 mt-4">
-              <Button
-                as={Link}
-                href={`https://etherscan.io/address/${state.avsDetails.address}`}
-                target="_blank"
-                showAnchorIcon
-                size="sm"
-                variant="flat"
-                className="text-secondary p-0"
-              >{`${state.avsDetails.address.slice(0, 6)}...${state.avsDetails.address.slice(-4)}`}</Button>
-              <Button
-                as={Link}
-                href={state.avsDetails.metadata.twitter}
-                target="_blank"
-                showAnchorIcon
-                size="sm"
-                variant="flat"
-                className="text-secondary p-0"
-              >
-                @
-                {state.avsDetails.metadata.twitter.substring(
-                  state.avsDetails.metadata.twitter.lastIndexOf('/') + 1
-                )}
-              </Button>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
       <Tabs
-        className="w-full border border-outline p-2 rounded-lg "
-        classNames={{
-          tab: 'px-6 py-8',
-          tabList: 'bg-content1 w-full'
-        }}
+        size="lg"
         disabledKeys={['restakers']}
+        className="my-4"
+        radius="sm"
+        classNames={{
+          base: 'flex w-full',
+          tabList: 'w-full bg-content1 border border-outline rounded-lg p-0',
+          tab: 'h-100 m-2',
+          panel: 'p-0'
+        }}
       >
         <Tab
-          key="assets"
+          key="tvl"
           title={
-            <div className="text-center">
-              <div>Total ETH value</div>
-              <div className="font-bold">
-                {formatNumber(state.totalTVL, true)}
+            <div className="flex flex-col">
+              <div className="group-aria-selected:text-foreground-1 text-foreground-2">
+                Total ETH value
+              </div>
+              <div>
+                {state.isAVSLoading ? (
+                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                ) : (
+                  <span className="group-aria-selected:text-foreground text-foreground-1">
+                    {`${formatNumber(
+                      state.totalTokens.lst + state.totalTokens.eth,
+                      compact
+                    )} ETH`}
+                  </span>
+                )}
               </div>
             </div>
           }
         >
-          <div className="space-y-4 -mt-2">
-            <AVSTotalValueOvertime avsAddress={avsAddress} />
-
-            <LSTDistribution
-              lstDistributionData={state.lstDistributionData}
-              totalEthDistributionData={state.totalEthDistributionData}
-              rate={state.rate}
-            />
-          </div>
+          <AVSDetailsTVLTab
+            totalTokens={state.totalTokens}
+            lst={state.strategies}
+            ethRate={state.ethRate}
+            isAVSLoading={state.isAVSLoading}
+          />
         </Tab>
+
         <Tab
           key="operators"
           title={
-            <div className="text-center">
-              <div>Operators</div>
-              <div className="font-bold">{state.avsDetails.operators}</div>
+            <div className="flex flex-col">
+              <div className="group-aria-selected:text-foreground-1 text-foreground-2">
+                Operators
+              </div>
+              <div>
+                {state.isAVSLoading ? (
+                  <Skeleton className="my-1 h-4 w-full rounded-md" />
+                ) : (
+                  <span className="group-aria-selected:text-foreground text-foreground-1">{`${formatNumber(state.avs.operators)}`}</span>
+                )}
+              </div>
             </div>
           }
         >
-          <div className="space-y-4 -mt-2">
-            <OperatorsOvertime avsAddress={avsAddress} />
-            <Operators avsAddress={avsAddress} totalTVL={state.totalTVL} />
-          </div>
+          <AVSDetailsOperatorsTab />
         </Tab>
+
         <Tab
           key="restakers"
-          disabled
           title={
-            <div className="text-center">
+            <div className="flex flex-col">
               <div>Restakers</div>
-              <div className="font-bold">{state.avsDetails.stakers}</div>
+              <div>
+                {state.isAVSLoading ? (
+                  <Skeleton className="my-1 h-4 w-full rounded-md" />
+                ) : (
+                  <span>{`${formatNumber(state.avs.stakers)}`}</span>
+                )}
+              </div>
             </div>
           }
-        >
-          <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className="space-y-1 block">
-                  <div className=" font-light text-lg text-foreground-1">
-                    Restakers overtime
-                  </div>
-                  <div className=" font-light text-base">
-                    12,234 <span className="text-success">+1.5%</span>
-                  </div>
-                </div>
-                <GraphTimelineSelector
-                  timelineTab={state.timelineTab}
-                  onTimelineChange={handleTimelineChange}
-                />
-              </CardHeader>
-
-              <CardBody>
-                <RestakersOverTime />
-              </CardBody>
-            </Card>
-            <RestakingLeaderboard />
-          </div>
-        </Tab>
+        />
       </Tabs>
-    </div>
+    </>
   );
 }
