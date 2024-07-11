@@ -1,4 +1,5 @@
 import {
+  Input,
   Skeleton,
   Spinner,
   Table,
@@ -16,6 +17,7 @@ import { reduceState } from '../shared/helpers';
 import Pagination from '../shared/Pagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
+import useDebounce from '../shared/hooks/useDebounce';
 
 const columns = [
   {
@@ -51,38 +53,22 @@ export default function AVSList() {
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isFetchingAvsData: false,
+    searchTerm: searchParams.get('search'),
     error: null,
-    rate: 1
+    rate: 1,
+    searchTriggered: false
   });
 
+  const debouncedSearchTerm = useDebounce(state.searchTerm, 300);
+
   const fetchAVS = useCallback(
-    async pageNumber => {
+    async (pageNumber, search) => {
       try {
         dispatch({ isFetchingAvsData: true, error: null });
-        const response = await avsService.getAll(pageNumber);
-        const data = response.results;
-
-        for (let i = 0, count = data.length; i < count; i++) {
-          let item = data[i];
-          item.tvl = item.strategiesTotal;
-          item.address = item.address.toLowerCase();
-        }
-
-        // Sort descending by TVL
-        data.sort((i1, i2) => {
-          if (i1.tvl < i2.tvl) {
-            return 1;
-          }
-
-          if (i1.tvl > i2.tvl) {
-            return -1;
-          }
-
-          return 0;
-        });
+        const response = await avsService.getAll(pageNumber, search);
 
         dispatch({
-          avs: data,
+          avs: response.results,
           isFetchingAvsData: false,
           rate: response.rate,
           totalPages: Math.ceil(response.totalCount / 10)
@@ -101,7 +87,6 @@ export default function AVSList() {
     const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage + 1 <= state.totalPages) {
       setSearchParams({ page: (currentPage + 1).toString() });
-      fetchAVS(currentPage + 1);
     }
   }, [searchParams, state.totalPages, setSearchParams, fetchAVS]);
 
@@ -109,25 +94,43 @@ export default function AVSList() {
     const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage - 1 >= 1) {
       setSearchParams({ page: (currentPage - 1).toString() });
-      fetchAVS(currentPage - 1);
     }
   }, [searchParams, fetchAVS]);
 
   const handlePageClick = useCallback(
     page => {
       setSearchParams({ page: page.toString() });
-      fetchAVS(page);
     },
     [setSearchParams, fetchAVS]
   );
 
+  const handleSearch = e => {
+    dispatch({ searchTerm: e.target.value });
+  };
+
   useEffect(() => {
     const page = searchParams.get('page');
-    if (!page) {
-      setSearchParams({ page: 1 }, { replace: true });
-      fetchAVS(1);
-    } else fetchAVS(searchParams.get('page'));
-  }, [searchParams]);
+
+    const params = {};
+    if (page && debouncedSearchTerm) {
+      params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
+      params.search = debouncedSearchTerm;
+    } else if (page) {
+      params.page = page;
+    } else if (debouncedSearchTerm) {
+      params.page = 1;
+      params.search = debouncedSearchTerm;
+    } else {
+      params.page = 1;
+    }
+    setSearchParams(params, { replace: true });
+    fetchAVS(params.page, params.search);
+    dispatch({ searchTriggered: false });
+  }, [searchParams, debouncedSearchTerm]);
+
+  useEffect(() => {
+    dispatch({ searchTriggered: true });
+  }, [debouncedSearchTerm]);
 
   return (
     <div className="space-y-4">
@@ -135,8 +138,22 @@ export default function AVSList() {
         <div className="font-display font-medium text-foreground-1 text-3xl">
           AVS
         </div>
-        <div className="font-display font-medium text-foreground-1 text-base">
-          Actively Validated Services
+        <div className="flex flex-col lg:flex-row gap-4 w-full justify-between lg:items-center items-start mb-6">
+          <div className="font-display font-medium text-foreground-1 text-base">
+            Actively Validated Services
+          </div>
+          <Input
+            value={state.searchTerm}
+            onChange={handleSearch}
+            type="text"
+            placeholder="Search by AVS"
+            radius="sm"
+            className="lg:w-96"
+            variant="bordered"
+            endContent={
+              <span className="material-symbols-outlined">search</span>
+            }
+          />
         </div>
       </div>
       <Table
@@ -199,9 +216,11 @@ export default function AVSList() {
               <TableCell>{formatNumber(avs.stakers, compact)}</TableCell>
               <TableCell>{formatNumber(avs.operators, compact)}</TableCell>
               <TableCell>
-                <div>${formatNumber(avs.tvl * state.rate, compact)}</div>
+                <div>
+                  ${formatNumber(avs.strategiesTotal * state.rate, compact)}
+                </div>
                 <div className="text-xs text-subtitle">
-                  {formatNumber(avs.tvl, compact)} ETH
+                  {formatNumber(avs.strategiesTotal, compact)} ETH
                 </div>
               </TableCell>
             </TableRow>
