@@ -1,4 +1,5 @@
-import { colors, fullNumFormatter, protocols } from './helpers';
+import { colors, protocols } from './helpers';
+import { formatIntETH, formatIntUSD } from '../shared/formatters';
 
 export default function LRTList({ data }) {
   return (
@@ -24,9 +25,9 @@ export default function LRTList({ data }) {
               {protocols[name].name}
             </span>
             <div className="basis-1/3 ps-9 text-end">
-              <div>${fullNumFormatter.format(value * data.rate)}</div>
+              <div>{formatIntUSD(value * data.rate)}</div>
               <div className="text-foreground-1 text-xs">
-                ETH {fullNumFormatter.format(value)}
+                {formatIntETH(value)}
               </div>
             </div>
           </div>

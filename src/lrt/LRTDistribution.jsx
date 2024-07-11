@@ -1,6 +1,11 @@
 import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { colors, fullNumFormatter, protocols } from './helpers';
+import { colors, protocols } from './helpers';
+import {
+  formatIntETH,
+  formatIntUSD,
+  formatShortened
+} from '../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -113,16 +118,9 @@ export default function LRTDistribution({ data, height }) {
       total += last.protocols[p];
     }
 
-    let symbol;
-
-    if (state.useRate) {
-      symbol = '$';
-      total *= last.rate;
-    } else {
-      symbol = 'ETH ';
-    }
-
-    return `${symbol}${fullNumFormatter.format(total)}`;
+    return state.useRate
+      ? formatIntUSD(total * last.rate)
+      : formatIntETH(total);
   }, [data, state.useRate]);
   const getValue = useCallback(
     (d, k) => d.protocols[k] * (state.useRate ? d.rate : 1),
@@ -319,7 +317,7 @@ export default function LRTDistribution({ data, height }) {
               left={state.maxX}
               numTicks={4}
               scale={scaleValue}
-              tickFormat={formatValue}
+              tickFormat={formatShortened}
               tickClassName="[&_line]:stroke-foreground-2"
               tickLabelProps={{
                 className: 'text-xs',
@@ -402,12 +400,14 @@ export default function LRTDistribution({ data, height }) {
                     ></span>
                     {protocols[key]?.name ?? key}
                     <span className="grow ps-4 text-end">
-                      {fullNumFormatter.format(
-                        Number(
-                          tooltipData.data.protocols[key] *
-                            (state.useRate ? tooltipData.data.rate : 1)
-                        )
-                      )}
+                      {state.useRate
+                        ? formatIntUSD(
+                            Number(
+                              tooltipData.data.protocols[key] *
+                                tooltipData.data.rate
+                            )
+                          )
+                        : formatIntETH(Number(tooltipData.data.protocols[key]))}
                     </span>
                   </div>
                 </li>
@@ -434,19 +434,7 @@ const formatDate = date => {
 
   return axisDateFormatter.format(date);
 };
-const formatValue = value => {
-  if (value >= 1e9) {
-    return `${value / 1e9}b`;
-  }
-
-  if (value >= 1e6) {
-    return `${value / 1e6}m`;
-  }
-
-  return `${value / 1e3}k`;
-};
 const getDate = d => new Date(d.timestamp);
-
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
