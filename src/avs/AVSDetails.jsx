@@ -95,8 +95,8 @@ export default function AVSDetails() {
           key="tvl"
           title={
             <div className="flex flex-col">
-              <div className="group-aria-selected:text-foreground-1 text-foreground-2">
-                Total ETH value
+              <div className="group-aria-selected:text-foreground-1 text-foreground-2 text-sm">
+                Total value
               </div>
               <div>
                 {state.isAVSLoading ? (
@@ -125,7 +125,7 @@ export default function AVSDetails() {
           key="operators"
           title={
             <div className="flex flex-col">
-              <div className="group-aria-selected:text-foreground-1 text-foreground-2">
+              <div className="group-aria-selected:text-foreground-1 text-foreground-2 text-sm">
                 Operators
               </div>
               <div>
@@ -145,7 +145,7 @@ export default function AVSDetails() {
           key="restakers"
           title={
             <div className="flex flex-col">
-              <div>Restakers</div>
+              <div className="text-sm">Restakers</div>
               <div>
                 {state.isAVSLoading ? (
                   <Skeleton className="my-1 h-4 w-full rounded-md" />

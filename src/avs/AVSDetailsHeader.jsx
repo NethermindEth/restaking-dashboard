@@ -32,11 +32,11 @@ export default function AVSDetailsHeader({ avs }) {
     <div className="bg-content1 border border-outline rounded-lg w-full p-4 break-words">
       <div className="flex items-center">
         <AVSLogo avs={avs} />
-        <span className="ml-2 text-foreground-1 text-3xl">
+        <span className="ml-2 text-foreground-1 text-3xl font-display font-medium">
           {avs.metadata?.name ?? 'N/A'}
         </span>
       </div>
-      <div className="my-4 text-sm text-foreground-1 break-words">
+      <div className="my-4 text-xs text-foreground-1 break-words">
         {avs.metadata?.description ?? 'N/A'}
       </div>
 
@@ -45,7 +45,7 @@ export default function AVSDetailsHeader({ avs }) {
           href={avs.metadata.website}
           target="_blank"
           rel="noreferrer"
-          className="text-sm text-secondary"
+          className="text-xs text-secondary"
         >
           {avs.metadata.website}
         </Link>
@@ -57,7 +57,7 @@ export default function AVSDetailsHeader({ avs }) {
             href={formatEtherscanLink(avs.address)}
             target="blank"
             rel="noreferrer"
-            className="text-sm text-secondary"
+            className="text-xs text-secondary"
           >
             {avs.address.substr(0, 6)}...
             {avs.address.substr(-4)}

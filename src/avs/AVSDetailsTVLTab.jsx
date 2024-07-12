@@ -136,7 +136,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="flex justify-end">
+              <TableCell className="text-sm flex justify-end">
                 <div className="text-end">
                   {key === 'eigen' ? (
                     <EigenDisclaimer />
@@ -144,7 +144,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                     <div>${formatNumber(total * ethRate, compact)}</div>
                   )}
 
-                  <div className="text-sm text-subtitle">
+                  <div className="text-xs text-foreground-2">
                     {formatNumber(total, compact)} tokens
                   </div>
                 </div>
@@ -223,7 +223,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
                 <div className="text-end">
                   <div>${formatNumber(Number(total) * ethRate, compact)}</div>
 
-                  <div className="text-sm text-subtitle">
+                  <div className="text-xs text-foreground-2">
                     {formatNumber(Number(total), compact)} ETH
                   </div>
                 </div>
