@@ -113,7 +113,7 @@ function AVSLogo({ avs }) {
   if (state.isError) {
     return (
       <Skeleton
-        className="border border-outline rounded-full size-12"
+        className="border border-outline rounded-full h-12 max-w-12 w-full"
         disableAnimation={state.isError}
       />
     );
@@ -125,7 +125,11 @@ function AVSLogo({ avs }) {
       height={48}
       width={48}
       radius="full"
-      classNames={{ wrapper: 'border border-outline' }}
+      classNames={{
+        wrapper: 'border border-outline',
+        // override tailwind's base img styling that doesn't respect specified dimensions
+        img: 'object-contain bg-white h-12 w-12 max-w-none'
+      }}
       onError={() => dispatch({ isError: true })}
     />
   );
