@@ -23,7 +23,7 @@ export default function Sidebar({ onOpenChange }) {
         <img
           alt="Restaking Dashboard"
           className="h-6 lg:h-5"
-          src="/logo-h.svg"
+          src="/assets/logo-h.svg"
         />
       </header>
       <nav className="flex-none">
