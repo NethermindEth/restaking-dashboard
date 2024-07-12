@@ -1,11 +1,7 @@
 import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { colors, protocols } from './helpers';
-import {
-  formatIntETH,
-  formatIntUSD,
-  formatShortened
-} from '../shared/formatters';
+import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -118,9 +114,7 @@ export default function LRTDistribution({ data, height }) {
       total += last.protocols[p];
     }
 
-    return state.useRate
-      ? formatIntUSD(total * last.rate)
-      : formatIntETH(total);
+    return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
   }, [data, state.useRate]);
   const getValue = useCallback(
     (d, k) => d.protocols[k] * (state.useRate ? d.rate : 1),
@@ -317,7 +311,7 @@ export default function LRTDistribution({ data, height }) {
               left={state.maxX}
               numTicks={4}
               scale={scaleValue}
-              tickFormat={formatShortened}
+              tickFormat={v => formatNumber(v, true)}
               tickClassName="[&_line]:stroke-foreground-2"
               tickLabelProps={{
                 className: 'text-xs',
@@ -401,13 +395,13 @@ export default function LRTDistribution({ data, height }) {
                     {protocols[key]?.name ?? key}
                     <span className="grow ps-4 text-end">
                       {state.useRate
-                        ? formatIntUSD(
+                        ? formatUSD(
                             Number(
                               tooltipData.data.protocols[key] *
                                 tooltipData.data.rate
                             )
                           )
-                        : formatIntETH(Number(tooltipData.data.protocols[key]))}
+                        : formatETH(Number(tooltipData.data.protocols[key]))}
                     </span>
                   </div>
                 </li>

@@ -1,4 +1,4 @@
-import { formatIntETH, formatIntUSD } from '../shared/formatters';
+import { formatETH, formatUSD } from '../shared/formatters';
 import { Skeleton } from '@nextui-org/react';
 
 export default function LRTTotalValue({
@@ -20,10 +20,10 @@ export default function LRTTotalValue({
           {!isLoadingDelegations && (
             <div className="text-center">
               <div className="text-foreground-1 text-sm">
-                {formatIntUSD(delegations?.total * delegations?.rate)}
+                {formatUSD(delegations?.total * delegations?.rate)}
               </div>
               <div className="text-foreground-2 text-xs">
-                {formatIntETH(delegations?.total)}
+                {formatETH(delegations?.total)}
               </div>
             </div>
           )}
