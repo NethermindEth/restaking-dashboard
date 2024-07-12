@@ -3,35 +3,99 @@
   <head>
     <meta charset="utf-8" />
     <meta name="description" content="Ethereum restaking stats" />
-    <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1"
     />
+    <!-- <link rel="icon" type="image/svg+xml" href="/favicon.svg" /> -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Exo:ital,wght@0,100..900;1,100..900&family=Syncopate&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Exo:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
       rel="stylesheet"
     />
     <title>Restaking Dashboard</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        body {
+          background-color: #080a0f;
+          color: #7a86a5;
+          font-family: system-ui, sans-serif;
+          margin: 0;
+        }
+        noscript {
+          margin-top: 16px;
+          max-width: 40rem;
+          padding: 16px;
+        }
+        .splash {
+          align-items: center;
+          display: flex;
+          flex-flow: column;
+          height: 100vh;
+          justify-content: center;
+        }
+        .spinner {
+          animation: rotate 1s infinite linear;
+          aspect-ratio: 1;
+          border: 3px solid #0000;
+          border-radius: 50%;
+          border-color: #7a86a5 #0000;
+          display: grid;
+          width: 40px;
+        }
+        .spinner::before,
+        .spinner::after {
+          border: inherit;
+          border-radius: 50%;
+          content: '';
+          grid-area: 1/1;
+          margin: 2px;
+        }
+        .spinner::before {
+          animation: inherit;
+          animation-direction: reverse;
+          animation-duration: 0.5s;
+          border-color: #cad7f9 #0000;
+        }
+        .spinner::after {
+          margin: 8px;
+        }
+        @keyframes rotate {
+          100% {
+            transform: rotate(1turn);
+          }
+        }
+      </style>
+      <div class="splash">
+        <div class="spinner"></div>
+        <noscript>
+          We've detected that JavaScript is disabled in this browser. Please
+          enable JavaScript or switch to a supported browser to continue using
+          Restaking Dashboard.
+        </noscript>
+      </div>
+    </div>
     <script src="/src/main.jsx" type="module"></script>
+    <script type="text/javascript">
+      var _paq = (window._paq = window._paq || []);
+      _paq.push(['disableCookies']);
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function () {
+        var u = '//nethermind.matomo.cloud/';
+        _paq.push(['setTrackerUrl', u + 'matomo.php']);
+        _paq.push(['setSiteId', '4']);
+        var d = document,
+          g = d.createElement('script'),
+          s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.src = u + 'matomo.js';
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script>
   </body>
-  <script type="text/javascript">
-    var _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(["disableCookies"]);
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function () {
-      var u = "https://nethermind.matomo.cloud/";
-      _paq.push(['setTrackerUrl', u + 'matomo.php']);
-      _paq.push(['setSiteId', '4']);
-      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-      g.async = true; g.src = '//cdn.matomo.cloud/nethermind.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g, s);
-    })();
-  </script>
 </html>
