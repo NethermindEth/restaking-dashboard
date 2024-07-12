@@ -64,12 +64,25 @@ export default function AVSDetailsHeader({ avs }) {
           </Link>
           <Button
             variant="ghost"
-            isIconOnly={true}
-            className="pd-0 border-none ml-1"
+            isIconOnly
+            className="border-none ml-1"
             size="sm"
             onClick={() => handleCopy(avs.address)}
           >
-            {state.isCopied ? <CheckIcon /> : <CopyIcon />}
+            {state.isCopied ? (
+              <span
+                className="material-symbols-outlined text-secondary text-2xl"
+                style={{
+                  fontVariationSettings: `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20`
+                }}
+              >
+                check
+              </span>
+            ) : (
+              <span className="material-symbols-outlined text-secondary text-2xl">
+                content_copy
+              </span>
+            )}
           </Button>
         </div>
 
@@ -81,8 +94,8 @@ export default function AVSDetailsHeader({ avs }) {
             target="_blank"
             rel="noreferrer"
             size="sm"
-            isIconOnly={true}
-            className="ml-4 pd-0 border-none"
+            isIconOnly
+            className="ml-12 border-none text-secondary"
           >
             <TwitterIcon />
           </Button>
@@ -118,51 +131,14 @@ function AVSLogo({ avs }) {
   );
 }
 
-function CopyIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g id="Icons">
-        <path
-          id="Vector"
-          d="M7.54813 14.5832C7.17299 14.5832 6.8559 14.4537 6.59687 14.1946C6.33785 13.9356 6.20833 13.6185 6.20833 13.2434V3.7563C6.20833 3.38116 6.33785 3.06407 6.59687 2.80505C6.8559 2.54602 7.17299 2.4165 7.54813 2.4165H15.0352C15.4103 2.4165 15.7274 2.54602 15.9865 2.80505C16.2455 3.06407 16.375 3.38116 16.375 3.7563V13.2434C16.375 13.6185 16.2455 13.9356 15.9865 14.1946C15.7274 14.4537 15.4103 14.5832 15.0352 14.5832H7.54813ZM4.96479 17.1665C4.58965 17.1665 4.27257 17.037 4.01354 16.778C3.75451 16.5189 3.625 16.2019 3.625 15.8267V5.2563H4.70833V15.8267C4.70833 15.8909 4.73507 15.9496 4.78854 16.003C4.84188 16.0564 4.90062 16.0832 4.96479 16.0832H13.5352V17.1665H4.96479Z"
-          className="fill-secondary"
-        />
-      </g>
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      focusable="false"
-      height="20"
-      width="20"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      className="stroke-secondary"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
 function TwitterIcon() {
   return (
-    <svg height="20" width="20" viewBox="0 0 24 24" className="fill-secondary">
-      <g>
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-      </g>
-    </svg>
+    <span
+      className="h-5 w-5 ps-5"
+      style={{
+        mask: 'url(/assets/x.svg) no-repeat',
+        backgroundColor: 'hsl(var(--app-secondary))'
+      }}
+    ></span>
   );
 }
