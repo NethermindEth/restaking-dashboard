@@ -132,7 +132,7 @@ function AVSLogo({ avs }) {
       classNames={{
         wrapper: 'border border-outline',
         // override tailwind's base img styling that doesn't respect specified dimensions
-        img: 'object-contain bg-white h-12 w-12 max-w-none'
+        img: 'object-contain bg-foreground-2 h-12 w-12 max-w-none'
       }}
       onError={() => dispatch({ isError: true })}
     />
