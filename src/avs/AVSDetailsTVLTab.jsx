@@ -17,8 +17,8 @@ import {
   EIGEN_STRATEGY,
   STRATEGY_ASSET_MAPPING
 } from './helpers';
-import { formatNumber } from '../utils';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { formatUSD, formatETH, formatNumber } from '../shared/formatters';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -141,7 +141,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                   {key === 'eigen' ? (
                     <EigenDisclaimer />
                   ) : (
-                    <div>${formatNumber(total * ethRate, compact)}</div>
+                    <div>{formatUSD(total * ethRate, compact)}</div>
                   )}
 
                   <div className="text-xs text-foreground-2">
@@ -221,10 +221,10 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
               </TableCell>
               <TableCell className="flex justify-end">
                 <div className="text-end">
-                  <div>${formatNumber(Number(total) * ethRate, compact)}</div>
+                  <div>{formatUSD(Number(total) * ethRate, compact)}</div>
 
                   <div className="text-xs text-foreground-2">
-                    {formatNumber(Number(total), compact)} ETH
+                    {formatETH(Number(total), compact)}
                   </div>
                 </div>
               </TableCell>

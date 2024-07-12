@@ -8,8 +8,8 @@ import AVSDetailsHeader from './AVSDetailsHeader';
 import AVSDetailsTVLTab from './AVSDetailsTVLTab';
 import AVSDetailsOperatorsTab from './AVSDetailsOperatorsTab';
 import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
-import { formatNumber } from '../utils';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { formatETH, formatNumber } from '../shared/formatters';
 
 export default function AVSDetails() {
   const { address } = useParams();
@@ -103,10 +103,10 @@ export default function AVSDetails() {
                   <Skeleton className="mt-2 h-4 w-full rounded-md" />
                 ) : (
                   <span className="group-aria-selected:text-foreground text-foreground-1">
-                    {`${formatNumber(
+                    {formatETH(
                       state.totalTokens.lst + state.totalTokens.eth,
                       compact
-                    )} ETH`}
+                    )}
                   </span>
                 )}
               </div>
@@ -132,7 +132,9 @@ export default function AVSDetails() {
                 {state.isAVSLoading ? (
                   <Skeleton className="my-1 h-4 w-full rounded-md" />
                 ) : (
-                  <span className="group-aria-selected:text-foreground text-foreground-1">{`${formatNumber(state.avs.operators)}`}</span>
+                  <span className="group-aria-selected:text-foreground text-foreground-1">
+                    {formatNumber(state.avs.operators)}
+                  </span>
                 )}
               </div>
             </div>
@@ -150,7 +152,7 @@ export default function AVSDetails() {
                 {state.isAVSLoading ? (
                   <Skeleton className="my-1 h-4 w-full rounded-md" />
                 ) : (
-                  <span>{`${formatNumber(state.avs.stakers)}`}</span>
+                  <span>{formatNumber(state.avs.stakers)}</span>
                 )}
               </div>
             </div>
