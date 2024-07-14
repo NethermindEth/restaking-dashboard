@@ -191,76 +191,65 @@ export default function AVSList() {
           )}
         </TableHeader>
         <TableBody
-          isLoading={state.isFetchingAvsData}
-          loadingContent={<Spinner />}
           emptyContent={
             <span className="text-foreground-active">No AVS found.</span>
           }
         >
-          {state.avs?.map((avs, i) => (
-            <TableRow
-              onClick={() =>
-                navigate(`/avs/${avs.address}`, { state: { avs: avs } })
-              }
-              key={`avs-item-${i}`}
-              className="cursor-pointer border-t border-outline hover:bg-default"
-            >
-              <TableCell className="p-4 flex gap-x-3">
-                <span className="size-3">
-                  {(searchParams.get('page') - 1) * 10 + i + 1}
-                </span>
-                {avs.metadata?.logo ? (
-                  <img
-                    className="size-5 rounded-full"
-                    src={avs.metadata?.logo}
-                  />
-                ) : (
-                  <span class="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
-                    warning
-                  </span>
-                )}
-                <span>{avs.metadata?.name ?? 'N/A'}</span>
-              </TableCell>
-              <TableCell>{formatNumber(avs.stakers, compact)}</TableCell>
-              <TableCell>{formatNumber(avs.operators, compact)}</TableCell>
-              <TableCell>
-                <div>
-                  ${formatNumber(avs.strategiesTotal * state.rate, compact)}
-                </div>
-                <div className="text-xs text-subtitle">
-                  {formatNumber(avs.strategiesTotal, compact)} ETH
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {state.isFetchingAvsData
+            ? [...Array(10)].map(_ => (
+                <TableRow className="border-t border-outline">
+                  <TableCell className="p-4 basis-1/2">
+                    <Skeleton className="h-5 rounded-md w-2/3 dark:bg-default" />
+                  </TableCell>
+                  <TableCell className="basis-1/3">
+                    <Skeleton className="h-5 rounded-md w-2/3 bg-default dark:bg-default" />
+                  </TableCell>
+                  <TableCell className="basis-1/4">
+                    <Skeleton className="h-5 rounded-md w-2/3 bg-default dark:bg-default" />
+                  </TableCell>
+                  <TableCell className="basis-1/3">
+                    <Skeleton className="h-5 rounded-md w-full bg-default dark:bg-default" />
+                  </TableCell>
+                </TableRow>
+              ))
+            : state.avs?.map((avs, i) => (
+                <TableRow
+                  onClick={() =>
+                    navigate(`/avs/${avs.address}`, { state: { avs: avs } })
+                  }
+                  key={`avs-item-${i}`}
+                  className="cursor-pointer border-t border-outline hover:bg-default"
+                >
+                  <TableCell className="p-4 flex gap-x-3">
+                    <span className="size-3">
+                      {(searchParams.get('page') - 1) * 10 + i + 1}
+                    </span>
+                    {avs.metadata?.logo ? (
+                      <img
+                        className="size-5 rounded-full"
+                        src={avs.metadata?.logo}
+                      />
+                    ) : (
+                      <span class="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
+                        warning
+                      </span>
+                    )}
+                    <span>{avs.metadata?.name ?? 'N/A'}</span>
+                  </TableCell>
+                  <TableCell>{formatNumber(avs.stakers, compact)}</TableCell>
+                  <TableCell>{formatNumber(avs.operators, compact)}</TableCell>
+                  <TableCell>
+                    <div>
+                      ${formatNumber(avs.strategiesTotal * state.rate, compact)}
+                    </div>
+                    <div className="text-xs text-subtitle">
+                      {formatNumber(avs.strategiesTotal, compact)} ETH
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
         </TableBody>
       </Table>
     </div>
   );
 }
-
-const AVSListSkeleton = () => {
-  return (
-    <div>
-      {[...Array(10)].map((item, i) => (
-        <div
-          key={i}
-          className="p-4 flex justify-between gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
-        >
-          <div className="basis-1/2">
-            <Skeleton className="h-6 rounded-md w-2/3 dark:bg-default" />
-          </div>
-          <div className="basis-1/3">
-            <Skeleton className="h-6 rounded-md w-2/3 bg-default dark:bg-default" />
-          </div>
-          <div className="basis-1/4">
-            <Skeleton className="h-6 rounded-md w-2/3 bg-default dark:bg-default" />
-          </div>
-          <div className="basis-1/3">
-            <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
