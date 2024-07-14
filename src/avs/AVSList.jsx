@@ -149,7 +149,7 @@ export default function AVSList() {
             Actively Validated Services
           </div>
           <Input
-            value={state.searchTerm}
+            value={state.searchTerm ?? ''}
             onChange={handleSearch}
             type="text"
             placeholder="Search by AVS"
@@ -196,8 +196,8 @@ export default function AVSList() {
           }
         >
           {state.isFetchingAvsData
-            ? [...Array(10)].map(_ => (
-                <TableRow className="border-t border-outline">
+            ? [...Array(10)].map((_, i) => (
+                <TableRow key={i} className="border-t border-outline">
                   <TableCell className="p-4 basis-1/2">
                     <Skeleton className="h-5 rounded-md w-2/3 dark:bg-default" />
                   </TableCell>
