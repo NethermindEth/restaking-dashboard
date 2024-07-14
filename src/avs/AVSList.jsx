@@ -52,11 +52,13 @@ export default function AVSList() {
   const compact = !useTailwindBreakpoint('sm');
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    avs: [],
     isFetchingAvsData: false,
     searchTerm: searchParams.get('search'),
     error: null,
     rate: 1,
-    searchTriggered: false
+    searchTriggered: false,
+    sortDescriptor: null
   });
 
   const debouncedSearchTerm = useDebounce(state.searchTerm, 300);
@@ -132,6 +134,10 @@ export default function AVSList() {
     dispatch({ searchTriggered: true });
   }, [debouncedSearchTerm]);
 
+  useEffect(() => {
+    console.log(state.sortDescriptor); // capture user's selection and recall the API with sorting params
+  }, [state.sortDescriptor]);
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -168,10 +174,13 @@ export default function AVSList() {
             handlePageClick={handlePageClick}
           />
         }
+        sortDescriptor={state.sortDescriptor}
+        onSortChange={e => dispatch({ sortDescriptor: e })}
       >
         <TableHeader columns={columns}>
           {column => (
             <TableColumn
+              allowsSorting
               width={column.width}
               align={'end'}
               className="bg-transparent py-4 text-foreground-active text-sm font-normal leading-5"
@@ -198,12 +207,11 @@ export default function AVSList() {
             >
               <TableCell className="p-4 flex gap-x-3">
                 <span className="size-3">
-                  {' '}
                   {(searchParams.get('page') - 1) * 10 + i + 1}
                 </span>
                 {avs.metadata?.logo ? (
                   <img
-                    className="size-5 rounded-full "
+                    className="size-5 rounded-full"
                     src={avs.metadata?.logo}
                   />
                 ) : (
