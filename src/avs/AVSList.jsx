@@ -16,8 +16,8 @@ import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
 import Pagination from '../shared/Pagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
-import { formatNumber } from '../utils';
 import useDebounce from '../shared/hooks/useDebounce';
+import { formatNumber } from '../shared/formatters';
 
 const columns = [
   {
@@ -42,7 +42,8 @@ const columns = [
     key: 'TVL',
     label: 'TVL',
     align: 'end',
-    width: '10%'
+    width: '10%',
+    className: 'text-end'
   }
 ];
 
@@ -183,7 +184,7 @@ export default function AVSList() {
               allowsSorting
               width={column.width}
               align={'end'}
-              className="bg-transparent py-4 text-foreground-active text-sm font-normal leading-5"
+              className={`bg-transparent py-4 text-foreground-active text-sm font-normal leading-5 ${column.className}`}
               key={column.key}
             >
               {column.label}
@@ -198,17 +199,17 @@ export default function AVSList() {
           {state.isFetchingAvsData
             ? [...Array(10)].map((_, i) => (
                 <TableRow key={i} className="border-t border-outline">
-                  <TableCell className="p-4 basis-1/2">
-                    <Skeleton className="h-5 rounded-md w-2/3 dark:bg-default" />
+                  <TableCell className="p-4 w-2/5">
+                    <Skeleton className="h-5 rounded-md dark:bg-default" />
                   </TableCell>
-                  <TableCell className="basis-1/3">
-                    <Skeleton className="h-5 rounded-md w-2/3 bg-default dark:bg-default" />
+                  <TableCell className="w-1/4">
+                    <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
                   </TableCell>
-                  <TableCell className="basis-1/4">
-                    <Skeleton className="h-5 rounded-md w-2/3 bg-default dark:bg-default" />
+                  <TableCell className="w-1/4">
+                    <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
                   </TableCell>
-                  <TableCell className="basis-1/3">
-                    <Skeleton className="h-5 rounded-md w-full bg-default dark:bg-default" />
+                  <TableCell className="w-1/12">
+                    <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
                   </TableCell>
                 </TableRow>
               ))
@@ -226,7 +227,7 @@ export default function AVSList() {
                     </span>
                     {avs.metadata?.logo ? (
                       <img
-                        className="size-5 rounded-full"
+                        className="size-5 rounded-full bg-foreground-2"
                         src={avs.metadata?.logo}
                       />
                     ) : (
@@ -234,7 +235,9 @@ export default function AVSList() {
                         warning
                       </span>
                     )}
-                    <span>{avs.metadata?.name ?? 'N/A'}</span>
+                    <span className="truncate">
+                      {avs.metadata?.name ?? 'N/A'}
+                    </span>
                   </TableCell>
                   <TableCell>{formatNumber(avs.stakers, compact)}</TableCell>
                   <TableCell>{formatNumber(avs.operators, compact)}</TableCell>
