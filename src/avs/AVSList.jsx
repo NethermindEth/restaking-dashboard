@@ -23,27 +23,22 @@ const columns = [
   {
     key: 'AVS',
     label: 'AVS',
-    align: 'start',
-    width: '40%'
+    className: 'w-2/5'
   },
   {
     key: 'Restakers',
     label: 'Restakers',
-    align: 'start',
-    width: '25%'
+    className: 'text-end w-1/5'
   },
   {
     key: 'Operators',
     label: 'Operators',
-    align: 'center',
-    width: '25%'
+    className: 'text-end w-1/5'
   },
   {
     key: 'TVL',
     label: 'TVL',
-    align: 'end',
-    width: '10%',
-    className: 'text-end'
+    className: 'text-end w-1/5'
   }
 ];
 
@@ -165,7 +160,10 @@ export default function AVSList() {
       </div>
       <Table
         removeWrapper
+        layout="fixed"
         className="bg-content1 border border-outline rounded-lg text-sm"
+        sortDescriptor={state.sortDescriptor}
+        onSortChange={e => dispatch({ sortDescriptor: e })}
         bottomContent={
           <Pagination
             totalPages={state.totalPages}
@@ -175,15 +173,11 @@ export default function AVSList() {
             handlePageClick={handlePageClick}
           />
         }
-        sortDescriptor={state.sortDescriptor}
-        onSortChange={e => dispatch({ sortDescriptor: e })}
       >
         <TableHeader columns={columns}>
           {column => (
             <TableColumn
               allowsSorting
-              width={column.width}
-              align={'end'}
               className={`bg-transparent py-4 text-foreground-active text-sm font-normal leading-5 ${column.className}`}
               key={column.key}
             >
@@ -202,13 +196,13 @@ export default function AVSList() {
                   <TableCell className="p-4 w-2/5">
                     <Skeleton className="h-5 rounded-md dark:bg-default" />
                   </TableCell>
-                  <TableCell className="w-1/4">
+                  <TableCell className="w-1/5">
                     <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
                   </TableCell>
-                  <TableCell className="w-1/4">
+                  <TableCell className="w-1/5">
                     <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
                   </TableCell>
-                  <TableCell className="w-1/12">
+                  <TableCell className="w-1/5">
                     <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
                   </TableCell>
                 </TableRow>
@@ -239,9 +233,13 @@ export default function AVSList() {
                       {avs.metadata?.name ?? 'N/A'}
                     </span>
                   </TableCell>
-                  <TableCell>{formatNumber(avs.stakers, compact)}</TableCell>
-                  <TableCell>{formatNumber(avs.operators, compact)}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-end md:pr-8">
+                    {formatNumber(avs.stakers, compact)}
+                  </TableCell>
+                  <TableCell className="text-end md:pr-8">
+                    {formatNumber(avs.operators, compact)}
+                  </TableCell>
+                  <TableCell className="flex flex-col items-end justify-center md:pr-8">
                     <div>
                       ${formatNumber(avs.strategiesTotal * state.rate, compact)}
                     </div>
