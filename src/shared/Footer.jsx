@@ -3,20 +3,20 @@ import { Link } from '@nextui-org/react';
 
 export default function Footer() {
   return (
-    <footer className="flex flex-row items-start content-center md:items-center gap-8 px-4 py-6 justify-between text-foreground-2">
+    <footer className="flex flex-row items-start content-center md:items-center gap-5 md:gap-8 px-4 py-6 justify-between text-foreground-2">
       <div>
         <Link href="https://nethermind.io" target="_blank">
           <img
             alt="Powered by Nethermind"
             className="max-h-[61px]"
-            srcSet="/powered-by.png 1x, /powered-by.png 2x"
+            srcSet="/assets/powered-by.png 1x, /assets/powered-by.png 2x"
           />
         </Link>
         <div className="text-xs">&copy;2024 Nethermind</div>
       </div>
       <ul className="flex flex-col md:flex-row gap-2 md:gap-8">
         {mainLinks.map((item, i) => (
-          <li key={`footer-main-${i}`} className="inline-block">
+          <li key={`footer-main-${i}`} className="flex items-center h-6">
             <Link className="text-foreground-2 text-xs" href={item.href}>
               {item.title}
               <span className="material-symbols-outlined hidden lg:inline">
@@ -28,11 +28,12 @@ export default function Footer() {
       </ul>
       <ul className="flex flex-col md:flex-row gap-2 md:gap-8">
         {socialLinks.map((item, i) => (
-          <li key={`footer-social-${i}`} className="inline-block">
+          <li key={`footer-social-${i}`} className="flex items-center h-6">
             <Link
-              className={`${item.className} ps-6 text-foreground-2 text-xs`}
+              className={`${item.className} text-foreground-2 text-xs`}
               href={item.href}
             >
+              <span className="icon"></span>
               {item.title}
             </Link>
           </li>

@@ -36,11 +36,6 @@ export const colors = [
   '#7dd3fc'
 ];
 
-// eslint-disable-next-line no-undef
-export const fullNumFormatter = new Intl.NumberFormat('en-us', {
-  maximumFractionDigits: 0
-});
-
 export const protocols = {
   bedrock: { index: 0, name: 'Bedrock' },
   eigenpie: { index: 6, name: 'Eigenpie' },
