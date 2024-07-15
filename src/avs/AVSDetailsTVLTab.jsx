@@ -1,4 +1,9 @@
+// @ts-check
+
 import {
+  Image,
+  Skeleton,
+  Spacer,
   Spinner,
   Table,
   TableBody,
@@ -6,19 +11,22 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Image,
-  Skeleton,
-  Spacer,
   Tooltip
 } from '@nextui-org/react';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useMutativeReducer } from 'use-mutative';
+import { useServices } from '../@services/ServiceContext';
+import { reduceState } from '../shared/helpers';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
   STRATEGY_ASSET_MAPPING
 } from './helpers';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatUSD, formatETH, formatNumber } from '../shared/formatters';
+import TVLTabLineChart from './charts/TVLTabLineChart';
+import { ParentSize } from '@visx/responsive';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -26,12 +34,55 @@ export default function AVSDetailsTVLTab({
   ethRate,
   isAVSLoading
 }) {
+  const { address } = useParams();
+
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    points: undefined,
+    isChartLoading: true
+  });
+  const { avsService } = useServices();
+
+  useEffect(() => {
+    (async () => {
+      dispatch({ isChartLoading: true });
+      const response = await avsService.getAVSTotalValue(address);
+      dispatch({
+        isChartLoading: false,
+        points: response
+      });
+    })();
+  }, []);
+
+  // our endpoint only returns up to yesterdays data. We need to append today's data point
+  // into the graph
+  const currentPoint = useMemo(
+    () => ({
+      timestamp: new Date(),
+      // use current eth rate as "historical" rate
+      rate: ethRate,
+      tvl: totalTokens.eth + totalTokens.lst
+    }),
+    [totalTokens]
+  );
+
   return (
     <>
-      {/*line chart*/}
-      <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
-        <Spinner color="primary" size="lg" />
-      </div>
+      {/* line chart */}
+      {isAVSLoading || state.isChartLoading ? (
+        <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
+          <Spinner color="primary" size="lg" />
+        </div>
+      ) : (
+        <ParentSize>
+          {parent => (
+            <TVLTabLineChart
+              height={512}
+              points={state.points.concat(currentPoint)}
+              width={parent.width}
+            />
+          )}
+        </ParentSize>
+      )}
 
       {/*layout*/}
       <div className="flex flex-col md:flex-row w-full h-full">

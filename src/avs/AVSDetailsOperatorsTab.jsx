@@ -1,3 +1,4 @@
+// @ts-check
 import {
   Spinner,
   Table,
@@ -8,6 +9,10 @@ import {
   TableRow,
   Skeleton
 } from '@nextui-org/react';
+import React, { useEffect } from 'react';
+import { useMutativeReducer } from 'use-mutative';
+import { reduceState } from '../shared/helpers';
+import { useServices } from '../@services/ServiceContext';
 
 export default function AVSDetailsOperatorsTab() {
   return (
