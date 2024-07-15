@@ -140,7 +140,7 @@ export default function AVSDetails() {
             </div>
           }
         >
-          <AVSDetailsOperatorsTab />
+          <AVSDetailsOperatorsTab operators={state.avs?.operators} />
         </Tab>
 
         <Tab

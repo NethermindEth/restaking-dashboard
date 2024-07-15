@@ -9,18 +9,60 @@ import {
   TableRow,
   Skeleton
 } from '@nextui-org/react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import { useServices } from '../@services/ServiceContext';
+import { useParams } from 'react-router-dom';
+import { ParentSize } from '@visx/responsive';
+import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
 
-export default function AVSDetailsOperatorsTab() {
+export default function AVSDetailsOperatorsTab({ operators }) {
+  const { address } = useParams();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    points: undefined,
+    isChartLoading: true
+  });
+
+  const { avsService } = useServices();
+
+  useEffect(() => {
+    (async () => {
+      dispatch({ isChartLoading: true });
+
+      const response = await avsService.getAVSOperatorsOvertime(address);
+      dispatch({ points: response, isChartLoading: false });
+    })();
+  }, []);
+
+  // our endpoint only returns up to yesterdays data. We need to append today's data point
+  // into the graph
+  const currentPoint = useMemo(
+    () => ({
+      timestamp: new Date(),
+      operators
+    }),
+    [operators]
+  );
+
   return (
     <>
       {/*line chart*/}
-      <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
-        <Spinner color="primary" size="lg" />
-      </div>
+      {state.isChartLoading ? (
+        <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
+          <Spinner color="primary" size="lg" />
+        </div>
+      ) : (
+        <ParentSize>
+          {parent => (
+            <OperatorsTabLineChart
+              height={512}
+              points={state.points.concat(currentPoint)}
+              width={parent.width}
+            />
+          )}
+        </ParentSize>
+      )}
 
       {/*layout*/}
       <div className="flex w-full h-full">

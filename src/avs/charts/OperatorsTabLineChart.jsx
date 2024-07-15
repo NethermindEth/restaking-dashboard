@@ -52,14 +52,13 @@ const calculateDisabledTimelines = totalPoints => {
 const getDate = d => new Date(d.timestamp);
 const bisectDate = bisector(getDate).left;
 
-export default function TVLTabLineChart({ points, height, width }) {
+export default function OperatorsTabLineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
     filteredPoints: points,
     maxX: Math.max(width - margin.left - margin.right, 0),
-    maxY: height - margin.top - margin.bottom,
-    useRate: true
+    maxY: height - margin.top - margin.bottom
   });
 
   useEffect(() => {
@@ -89,10 +88,7 @@ export default function TVLTabLineChart({ points, height, width }) {
     tooltipTop
   } = useTooltip();
 
-  const getValue = useCallback(
-    d => (state.useRate ? d.tvl * d.rate : d.tvl),
-    [state.useRate]
-  );
+  const getValue = useCallback(d => d.operators, []);
 
   const scaleDate = useMemo(() => {
     return scaleUtc({
@@ -118,19 +114,14 @@ export default function TVLTabLineChart({ points, height, width }) {
   const getLatestTotals = useMemo(() => {
     const latest = points[points.length - 1];
 
-    return state.useRate
-      ? formatUSD(latest.tvl * latest.rate, compact)
-      : formatETH(latest.tvl, compact);
+    return latest.operators;
   }, [points, state.useRate]);
 
   const growthPercentage = useMemo(() => {
     const first = state.filteredPoints[0];
-    const lastest = state.filteredPoints[state.filteredPoints.length - 1];
+    const latest = state.filteredPoints[state.filteredPoints.length - 1];
 
-    return getGrowthPercentage(
-      state.useRate ? first.tvl * first.rate : first.tvl,
-      state.useRate ? lastest.tvl * lastest.rate : lastest.tvl
-    );
+    return getGrowthPercentage(first.operators, latest.operators);
   }, [state.filteredPoints, state.useRate]);
 
   const disabledKeys = useMemo(
@@ -146,12 +137,6 @@ export default function TVLTabLineChart({ points, height, width }) {
       });
     },
     [points, dispatch]
-  );
-  const handleRateSelectionChange = useCallback(
-    key => {
-      dispatch({ useRate: key === 'usd' });
-    },
-    [dispatch]
   );
   const handlePointerMove = useCallback(
     event => {
@@ -183,7 +168,7 @@ export default function TVLTabLineChart({ points, height, width }) {
       <div className="flex justify-between mb-6 p-4">
         <div className="flex-1 hidden sm:block">
           <div className="font-display text-foreground-1 text-xl">
-            TVL over time
+            Operators over time
           </div>
           <div className="flex gap-x-2 text-foreground-2 text-xs">
             <span>{getLatestTotals}</span>
@@ -197,15 +182,6 @@ export default function TVLTabLineChart({ points, height, width }) {
         </div>
 
         <div className="flex flex-1 w-full flex-col gap-y-2 justify-between sm:flex-row sm:justify-end gap-x-2">
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="usd"
-            onSelectionChange={handleRateSelectionChange}
-            size="sm"
-          >
-            <Tab key="usd" title="USD" />
-            <Tab key="eth" title="ETH" />
-          </Tabs>
           <Tabs
             classNames={tabs}
             defaultSelectedKey="all"
@@ -311,9 +287,7 @@ export default function TVLTabLineChart({ points, height, width }) {
             {tooltipDateFormatter.format(new Date(tooltipData.timestamp))}
           </div>
           <div className="text-base px-2">
-            {state.useRate
-              ? formatUSD(tooltipData.tvl * tooltipData.rate, compact)
-              : formatETH(tooltipData.tvl, compact)}
+            {formatNumber(tooltipData.operators, compact)}
           </div>
         </TooltipInPortal>
       )}
