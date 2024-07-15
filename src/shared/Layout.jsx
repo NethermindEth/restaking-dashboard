@@ -15,7 +15,7 @@ export default function Layout() {
             <Sidebar />
           </div>
         )}
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col w-full">
           {!showSidebar && <Header />}
           <main className="flex-1 px-4 pt-6">
             <Outlet />
