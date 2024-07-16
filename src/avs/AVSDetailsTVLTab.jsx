@@ -67,6 +67,7 @@ const tokens = {
   },
   lst: {
     name: 'Liquid Staking Tokens',
+    symbol: 'ETH',
     logo: '/eth.png'
   },
   eigen: {
@@ -129,7 +130,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                     {tokens[key].name}
                   </span>{' '}
                   <span className="text-foreground-1">
-                    {tokens[key].symbol}
+                    {key !== 'lst' && tokens[key].symbol}
                   </span>
                   <span className="text-foreground-1">
                     {((total / sum) * 100).toFixed(2)}%
@@ -145,7 +146,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                   )}
 
                   <div className="text-xs text-foreground-2">
-                    {formatNumber(total, compact)} tokens
+                    {formatNumber(total, compact)} {tokens[key].symbol}
                   </div>
                 </div>
               </TableCell>
@@ -263,7 +264,7 @@ function EigenDisclaimer() {
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
           // to make tooltip work on mobile
-          onPress={() => setIsOpen(!isOpen)}
+          onPointerDown={() => setIsOpen(!isOpen)}
         >
           info
         </span>

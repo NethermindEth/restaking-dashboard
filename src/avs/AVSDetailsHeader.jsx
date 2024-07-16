@@ -3,10 +3,6 @@ import React, { useCallback } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 
-const formatEtherscanLink = address => {
-  return `https://etherscan.io/address/${address}`;
-};
-
 export default function AVSDetailsHeader({ avs }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isCopied: false,
@@ -58,8 +54,8 @@ export default function AVSDetailsHeader({ avs }) {
       <div className="flex">
         <div className="flex items-center">
           <Link
-            href={formatEtherscanLink(avs.address)}
-            target="blank"
+            href={`https://etherscan.io/address/${avs.address}`}
+            target="_blank"
             rel="noreferrer"
             className="text-xs text-secondary"
           >
@@ -69,28 +65,17 @@ export default function AVSDetailsHeader({ avs }) {
           <Button
             variant="ghost"
             isIconOnly
-            className="border-none ml-1"
+            className="border-none ml-1 text-secondary"
             size="sm"
             onClick={() => handleCopy(avs.address)}
           >
-            {state.isCopied ? (
-              <span
-                className="material-symbols-outlined text-secondary text-2xl"
-                style={{
-                  fontVariationSettings: `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20`
-                }}
-              >
-                check
-              </span>
-            ) : (
-              <span className="material-symbols-outlined text-secondary text-2xl">
-                content_copy
-              </span>
-            )}
+            <span className="material-symbols-outlined text-secondary text-2xl">
+              {state.isCopied ? 'check' : 'content_copy'}
+            </span>
           </Button>
         </div>
 
-        {avs.metadata?.twitter !== '' && (
+        {!!avs.metadata?.twitter && (
           <Button
             variant="ghost"
             as={Link}
@@ -98,10 +83,19 @@ export default function AVSDetailsHeader({ avs }) {
             target="_blank"
             rel="noreferrer"
             size="sm"
-            isIconOnly
             className="ml-12 border-none text-secondary"
           >
-            <TwitterIcon />
+            <span
+              className="bg-secondary h-4 w-4"
+              style={{
+                mask: 'url(/assets/x.svg) no-repeat',
+                backgroundColor: 'hsl(var(--app-secondary))'
+              }}
+            ></span>
+            @
+            {avs.metadata.twitter.substring(
+              avs.metadata.twitter.lastIndexOf('/') + 1
+            )}
           </Button>
         )}
       </div>
@@ -139,14 +133,3 @@ function AVSLogo({ avs }) {
   );
 }
 
-function TwitterIcon() {
-  return (
-    <span
-      className="h-5 w-5 ps-5"
-      style={{
-        mask: 'url(/assets/x.svg) no-repeat',
-        backgroundColor: 'hsl(var(--app-secondary))'
-      }}
-    ></span>
-  );
-}
