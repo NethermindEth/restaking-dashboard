@@ -2,14 +2,14 @@ name: Deploy to Amplify Stage
 
 on:
   push:
-    branches: [new]
+    branches: [main]
   workflow_dispatch:
     inputs:
       ref:
         type: string
         required: true
         description: Git ref
-        default: new
+        default: main
 
 jobs:
   deploy:
