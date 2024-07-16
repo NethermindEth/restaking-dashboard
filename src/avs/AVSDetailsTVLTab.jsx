@@ -1,5 +1,3 @@
-// @ts-check
-
 import {
   Image,
   Skeleton,
@@ -22,11 +20,12 @@ import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
-  STRATEGY_ASSET_MAPPING
+  LST_STRATEGY_ASSET_MAPPING
 } from './helpers';
 import { formatUSD, formatETH, formatNumber } from '../shared/formatters';
 import TVLTabLineChart from './charts/TVLTabLineChart';
 import { ParentSize } from '@visx/responsive';
+import TVLTabTreemap from './charts/TVLTabTreemap';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -41,6 +40,7 @@ export default function AVSDetailsTVLTab({
     isChartLoading: true
   });
   const { avsService } = useServices();
+
 
   useEffect(() => {
     (async () => {
@@ -85,8 +85,8 @@ export default function AVSDetailsTVLTab({
       )}
 
       {/*layout*/}
-      <div className="flex flex-col md:flex-row w-full h-full">
-        <div className="basis-1/2 mt-4">
+      <div className="flex flex-col md:flex-row w-full h-min">
+        <div className="basis-1/2 w-full md:w-1/2 mt-4">
           <TokensBreakdownList
             totalTokens={totalTokens}
             isAVSLoading={isAVSLoading}
@@ -100,12 +100,31 @@ export default function AVSDetailsTVLTab({
           />
         </div>
         {/* treemap */}
-        <div className="basis-1/2 mt-4 md:ml-4">
-          <div className="bg-content1 border border-outline flex items-center justify-center h-full min-h-[512px] p-4 rounded-lg w-full">
-            <Spinner color="primary" size="lg" />
+        {isAVSLoading ? (
+          <div className="basis-1/2 mt-4 md:ml-4">
+            <div className="bg-content1 border border-outline flex items-center justify-center h-full min-h-[512px] p-4 rounded-lg w-full">
+              <Spinner color="primary" size="lg" />
+            </div>
           </div>
-        </div>
-      </div>
+        ) : (
+          <>
+            <div className="basis-1/2 w-full md:w-1/2 mt-4 md:ml-4">
+              <ParentSize className="h-full">
+                {parent => (
+                  <TVLTabTreemap
+                    // the extra 88 is from 1px top/bottom border , 16px top/bottomp padding
+                    // 38px title and control, 16px margin bottom for title
+                    // otherwise we will have an infinitely growing SVG because there is no fixed height
+                    height={(parent.height || 512) - 2 - 32 - 38 - 16}
+                    // 1px left/right border, 16px left/right padding
+                    width={parent.width - 2 - 32}
+                    lst={lst}
+                    ethRate={ethRate}
+                  />)}
+              </ParentSize>
+            </div>
+          </>
+        )}</div>
     </>
   );
 }
@@ -260,14 +279,14 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
                   <Image
                     height={16}
                     width={16}
-                    src={STRATEGY_ASSET_MAPPING[key].logo}
+                    src={LST_STRATEGY_ASSET_MAPPING[key].logo}
                     fallbackSrc="/eth.png"
                   />
                   <span className="text-foreground-2 truncate">
-                    {STRATEGY_ASSET_MAPPING[key]?.name}
+                    {LST_STRATEGY_ASSET_MAPPING[key]?.name}
                   </span>{' '}
                   <span className="text-foreground-1">
-                    {STRATEGY_ASSET_MAPPING[key]?.symbol}
+                    {LST_STRATEGY_ASSET_MAPPING[key]?.symbol}
                   </span>
                 </div>
               </TableCell>

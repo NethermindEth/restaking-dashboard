@@ -1,4 +1,4 @@
-export const STRATEGY_ASSET_MAPPING = {
+export const LST_STRATEGY_ASSET_MAPPING = {
   '0x93c4b944d05dfe6df7645a86cd2206016c51564d': {
     symbol: 'stETH',
     name: 'Lido Staked Ether',
