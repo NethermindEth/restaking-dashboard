@@ -206,23 +206,25 @@ export default function AVSList() {
                     key={`avs-item-${i}`}
                     className="cursor-pointer border-t border-outline hover:bg-default"
                   >
-                    <TableCell className="p-4 flex gap-x-3">
-                      <span className="size-3">
-                        {(searchParams.get('page') - 1) * 10 + i + 1}
-                      </span>
-                      {avs.metadata?.logo ? (
-                        <img
-                          className="size-5 rounded-full bg-foreground-2"
-                          src={avs.metadata?.logo}
-                        />
-                      ) : (
-                        <span className="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
-                          warning
+                    <TableCell className="p-5">
+                      <div className="flex gap-x-3">
+                        <span className="size-3">
+                          {(searchParams.get('page') - 1) * 10 + i + 1}
                         </span>
-                      )}
-                      <span className="truncate">
-                        {avs.metadata?.name ?? 'N/A'}
-                      </span>
+                        {avs.metadata?.logo ? (
+                          <img
+                            className="size-5 rounded-full bg-foreground-2"
+                            src={avs.metadata?.logo}
+                          />
+                        ) : (
+                          <span className="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
+                            warning
+                          </span>
+                        )}
+                        <span className="truncate">
+                          {avs.metadata?.name ?? 'N/A'}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className="text-end pr-8">
                       {formatNumber(avs.stakers)}
