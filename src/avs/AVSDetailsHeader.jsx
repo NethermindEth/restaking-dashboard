@@ -22,7 +22,7 @@ export default function AVSDetailsHeader({ avs }) {
         copyTimeout: setTimeout(() => dispatch({ isCopied: false }), 2000)
       });
     }
-  }, []);
+  }, [dispatch, state.copyTimeout]);
 
   return (
     <div className="bg-content1 border border-outline rounded-lg w-full p-4 break-words">
