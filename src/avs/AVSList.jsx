@@ -158,6 +158,7 @@ export default function AVSList() {
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <Table
+          aria-label="Actively validated services list"
           layout="fixed"
           removeWrapper
           className="overflow-x-auto"
@@ -215,7 +216,7 @@ export default function AVSList() {
                           src={avs.metadata?.logo}
                         />
                       ) : (
-                        <span class="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
+                        <span className="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
                           warning
                         </span>
                       )}
@@ -241,13 +242,15 @@ export default function AVSList() {
                 ))}
           </TableBody>
         </Table>
-        <Pagination
-          totalPages={state.totalPages}
-          currentPage={parseInt(searchParams.get('page') || '1')}
-          handleNext={handleNext}
-          handlePrevious={handlePrevious}
-          handlePageClick={handlePageClick}
-        />
+        {state.avs && (
+          <Pagination
+            totalPages={state.totalPages}
+            currentPage={parseInt(searchParams.get('page') || '1')}
+            handleNext={handleNext}
+            handlePrevious={handlePrevious}
+            handlePageClick={handlePageClick}
+          />
+        )}
       </div>
     </div>
   );
