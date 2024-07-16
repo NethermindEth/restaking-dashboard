@@ -14,7 +14,6 @@ import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
 import Pagination from '../shared/Pagination';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import useDebounce from '../shared/hooks/useDebounce';
 import { formatNumber } from '../shared/formatters';
 
@@ -70,10 +69,12 @@ export default function AVSList() {
           totalPages: Math.ceil(response.totalCount / 10)
         });
       } catch (error) {
-        dispatch({
-          error: 'Failed to fetch AVS data',
-          isFetchingAvsData: false
-        });
+        if (error.name !== 'AbortError') {
+          dispatch({
+            error: 'Failed to fetch AVS data',
+            isFetchingAvsData: false
+          });
+        }
       }
     },
     [avsService, dispatch]
@@ -129,7 +130,7 @@ export default function AVSList() {
   }, [debouncedSearchTerm]);
 
   useEffect(() => {
-    console.log(state.sortDescriptor); // capture user's selection and recall the API with sorting params
+    if (state.sortDescriptor) console.log(state.sortDescriptor); // capture user's selection and recall the API with sorting params
   }, [state.sortDescriptor]);
 
   return (
