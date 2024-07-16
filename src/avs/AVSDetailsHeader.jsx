@@ -28,12 +28,13 @@ export default function AVSDetailsHeader({ avs }) {
     <div className="bg-content1 border border-outline rounded-lg w-full p-4 break-words">
       <div className="flex items-center">
         <AVSLogo avs={avs} />
-        <span className="ml-2 text-foreground-1 text-3xl font-display font-medium">
-          {avs.metadata?.name ?? 'N/A'}
-        </span>
-        {/*TODO: implement ranking when coming from list view & accessing directly avs*/}
-        <div className="text-xs ml-2 p-1 rounded-md bg-foreground-2 text-content1">
-          # 1
+        <div className="ml-2 text-foreground-1 text-3xl font-display font-medium">
+          <span>{avs.metadata?.name ?? 'N/A'}</span>
+
+          {/*TODO: implement ranking when coming from list view & accessing directly avs*/}
+          <span className="inline-block text-xs ml-2 p-1 rounded-md bg-foreground-2 text-content1 translate-y-[-25%]">
+            # 1
+          </span>
         </div>
       </div>
       <div className="my-4 text-xs text-foreground-1 break-words">
