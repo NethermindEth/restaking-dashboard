@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -44,6 +44,7 @@ export default function AVSList() {
   const { avsService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const abortController = useRef(null);
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avs: [],
     isFetchingAvsData: false,
@@ -60,7 +61,17 @@ export default function AVSList() {
     async (pageNumber, search) => {
       try {
         dispatch({ isFetchingAvsData: true, error: null });
-        const response = await avsService.getAll(pageNumber, search);
+
+        if (abortController.current) {
+          abortController.current.abort();
+        }
+        abortController.current = new AbortController();
+
+        const response = await avsService.getAll(
+          pageNumber,
+          search,
+          abortController.current.signal
+        );
 
         dispatch({
           avs: response.results,
@@ -68,6 +79,8 @@ export default function AVSList() {
           rate: response.rate,
           totalPages: Math.ceil(response.totalCount / 10)
         });
+
+        abortController.current = null;
       } catch (error) {
         if (error.name !== 'AbortError') {
           dispatch({
