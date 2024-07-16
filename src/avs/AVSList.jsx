@@ -22,29 +22,28 @@ const columns = [
   {
     key: 'AVS',
     label: 'AVS',
-    className: 'w-2/5'
+    className: 'w-64 md:w-2/5'
   },
   {
     key: 'Restakers',
     label: 'Restakers',
-    className: 'text-end w-1/5'
+    className: 'text-end w-36 md:w-1/5'
   },
   {
     key: 'Operators',
     label: 'Operators',
-    className: 'text-end w-1/5'
+    className: 'text-end w-36 md:w-1/5'
   },
   {
     key: 'TVL',
     label: 'TVL',
-    className: 'text-end w-1/5'
+    className: 'text-end w-40 md:w-1/5'
   }
 ];
 
 export default function AVSList() {
   const { avsService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
-  const compact = !useTailwindBreakpoint('sm');
   const navigate = useNavigate();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avs: [],
@@ -159,8 +158,9 @@ export default function AVSList() {
       </div>
       <div className="bg-content1 border border-outline rounded-lg text-sm">
         <Table
+          layout="fixed"
           removeWrapper
-          className="overflow-x-scroll"
+          className="overflow-x-auto"
           sortDescriptor={state.sortDescriptor}
           onSortChange={e => dispatch({ sortDescriptor: e })}
         >
@@ -224,21 +224,17 @@ export default function AVSList() {
                       </span>
                     </TableCell>
                     <TableCell className="text-end pr-8">
-                      {formatNumber(avs.stakers, compact)}
+                      {formatNumber(avs.stakers)}
                     </TableCell>
                     <TableCell className="text-end pr-8">
-                      {formatNumber(avs.operators, compact)}
+                      {formatNumber(avs.operators)}
                     </TableCell>
                     <TableCell className="flex flex-col items-end justify-center pr-8">
                       <div>
-                        $
-                        {formatNumber(
-                          avs.strategiesTotal * state.rate,
-                          compact
-                        )}
+                        ${formatNumber(avs.strategiesTotal * state.rate)}
                       </div>
                       <div className="text-xs text-subtitle">
-                        {formatNumber(avs.strategiesTotal, compact)} ETH
+                        {formatNumber(avs.strategiesTotal)} ETH
                       </div>
                     </TableCell>
                   </TableRow>
