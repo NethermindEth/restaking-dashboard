@@ -200,7 +200,15 @@ export default function AVSList() {
           </TableHeader>
           <TableBody
             emptyContent={
-              <span className="text-foreground-active">No AVS found.</span>
+              <div className="flex flex-col h-[38rem] items-center justify-center">
+                <img src="/notFound.svg" className="w-56 h-40" />
+                <span className="text-foreground-active mt-7">
+                  We could not find what you were looking for
+                </span>
+                <span className="text-foreground-2">
+                  Please try again with a different search
+                </span>
+              </div>
             }
           >
             {state.isFetchingAvsData
@@ -264,7 +272,7 @@ export default function AVSList() {
                 ))}
           </TableBody>
         </Table>
-        {state.avs && (
+        {state.avs && state.avs.length !== 0 && (
           <Pagination
             totalPages={state.totalPages}
             currentPage={parseInt(searchParams.get('page') || '1')}
