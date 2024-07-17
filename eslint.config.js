@@ -13,7 +13,7 @@ export default [
   eslintPluginPrettierRecommended,
   {
     files: ['**/*.{js,jsx}'],
-    ignores: ['dist'],
+    ignores: ['dist/'],
     languageOptions: {
       globals: { ...globals.browser },
       parserOptions: {
