@@ -11,6 +11,7 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import log from '../shared/logger';
 import Pagination from '../shared/Pagination';
 import { reduceState } from '../shared/helpers';
 import useDebounce from '../shared/hooks/useDebounce';
@@ -150,7 +151,7 @@ export default function AVSList() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (state.sortDescriptor) console.log(state.sortDescriptor); // capture user's selection and recall the API with sorting params
+    if (state.sortDescriptor) log.debug(state.sortDescriptor); // capture user's selection and recall the API with sorting params
   }, [state.sortDescriptor]);
 
   return (

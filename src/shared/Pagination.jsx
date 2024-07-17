@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { PaginationItemType, usePagination } from '@nextui-org/react';
 
 const Pagination = ({
@@ -17,12 +15,13 @@ const Pagination = ({
 
   return (
     <div className="flex border-t border-outline gap-x-2 justify-between items-center p-4 text-foreground-1 mt-austo">
-      <span
-        className={`cursor-pointer material-symbols-outlined ${activePage === 1 && 'text-disabled'}`}
+      <button
+        className={`material-symbols-outlined ${activePage === 1 && 'text-disabled'} disabled:cursor-not-allowed`}
         onClick={handlePrevious}
+        disabled={currentPage === 1}
       >
         arrow_back_ios
-      </span>
+      </button>
       <div className="flex gap-x-2">
         {range
           .filter(
@@ -34,23 +33,24 @@ const Pagination = ({
             }
 
             return (
-              <span
+              <button
                 onClick={() => handlePageClick(page)}
                 key={`page-${page}`}
                 aria-label={`page ${page}`}
-                className={`${activePage == page ? 'text-foreground-1' : 'text-slate-500'} cursor-pointer`}
+                className={`${activePage == page ? 'text-foreground-1' : 'text-slate-500'}`}
               >
                 {page}
-              </span>
+              </button>
             );
           })}
       </div>
-      <div
-        className={`cursor-pointer material-symbols-outlined ${activePage === totalPages && 'text-disabled'}`}
+      <button
+        className={`material-symbols-outlined ${activePage === totalPages && 'text-disabled'} disabled:cursor-not-allowed`}
         onClick={handleNext}
+        disabled={currentPage === totalPages}
       >
         arrow_forward_ios
-      </div>
+      </button>
     </div>
   );
 };
