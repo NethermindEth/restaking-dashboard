@@ -41,7 +41,6 @@ export default function AVSDetailsTVLTab({
   });
   const { avsService } = useServices();
 
-
   useEffect(() => {
     (async () => {
       dispatch({ isChartLoading: true });
@@ -69,11 +68,11 @@ export default function AVSDetailsTVLTab({
     <>
       {/* line chart */}
       {isAVSLoading || state.isChartLoading ? (
-        <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
+        <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] mb-4 p-4 rounded-lg w-full">
           <Spinner color="primary" size="lg" />
         </div>
       ) : (
-        <ParentSize>
+        <ParentSize className="mb-4">
           {parent => (
             <TVLTabLineChart
               height={512}
@@ -85,8 +84,8 @@ export default function AVSDetailsTVLTab({
       )}
 
       {/*layout*/}
-      <div className="flex flex-col md:flex-row w-full h-min">
-        <div className="basis-1/2 w-full md:w-1/2 mt-4">
+      <div className="flex flex-col gap-4 md:flex-row w-full h-min">
+        <div className="basis-1/2 w-full md:w-1/2">
           <TokensBreakdownList
             totalTokens={totalTokens}
             isAVSLoading={isAVSLoading}
@@ -101,14 +100,14 @@ export default function AVSDetailsTVLTab({
         </div>
         {/* treemap */}
         {isAVSLoading ? (
-          <div className="basis-1/2 mt-4 md:ml-4">
+          <div className="basis-1/2">
             <div className="bg-content1 border border-outline flex items-center justify-center h-full min-h-[512px] p-4 rounded-lg w-full">
               <Spinner color="primary" size="lg" />
             </div>
           </div>
         ) : (
           <>
-            <div className="basis-1/2 w-full md:w-1/2 mt-4 md:ml-4">
+            <div className="basis-1/2 w-full md:w-1/2">
               <ParentSize className="h-full">
                 {parent => (
                   <TVLTabTreemap
@@ -120,11 +119,13 @@ export default function AVSDetailsTVLTab({
                     width={parent.width - 2 - 32}
                     lst={lst}
                     ethRate={ethRate}
-                  />)}
+                  />
+                )}
               </ParentSize>
             </div>
           </>
-        )}</div>
+        )}
+      </div>
     </>
   );
 }
