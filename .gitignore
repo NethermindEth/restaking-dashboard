@@ -33,3 +33,8 @@ dist/
 # misc
 *.DS_Store
 
+# Terraform files
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform/
