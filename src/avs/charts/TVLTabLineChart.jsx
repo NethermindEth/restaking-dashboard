@@ -15,45 +15,6 @@ import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
 import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
 
-const margin = { top: 20, right: 40, bottom: 40, left: 20 };
-const timelines = {
-  '1w': 7,
-  '1m': 30,
-  '3m': 90,
-  '1y': 365,
-  all: Number.MAX_SAFE_INTEGER
-};
-
-// eslint-disable-next-line no-undef
-const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
-  day: 'numeric',
-  month: 'short'
-});
-
-// eslint-disable-next-line no-undef
-const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium'
-});
-const formatDate = date => {
-  if (date.getMonth() == 0 && date.getDate() == 1) {
-    return date.getFullYear();
-  }
-
-  return axisDateFormatter.format(date);
-};
-const calculateDisabledTimelines = totalPoints => {
-  const disabled = [];
-  for (const timeline in timelines) {
-    if (timeline !== 'all' && timelines[timeline] > totalPoints) {
-      disabled.push(timeline);
-    }
-  }
-
-  return disabled;
-};
-const getDate = d => new Date(d.timestamp);
-const bisectDate = bisector(getDate).left;
-
 export default function TVLTabLineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
@@ -322,3 +283,42 @@ export default function TVLTabLineChart({ points, height, width }) {
     </div>
   );
 }
+
+const margin = { top: 20, right: 40, bottom: 40, left: 20 };
+const timelines = {
+  '1w': 7,
+  '1m': 30,
+  '3m': 90,
+  '1y': 365,
+  all: Number.MAX_SAFE_INTEGER
+};
+
+// eslint-disable-next-line no-undef
+const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
+  day: 'numeric',
+  month: 'short'
+});
+
+// eslint-disable-next-line no-undef
+const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium'
+});
+const formatDate = date => {
+  if (date.getMonth() == 0 && date.getDate() == 1) {
+    return date.getFullYear();
+  }
+
+  return axisDateFormatter.format(date);
+};
+const calculateDisabledTimelines = totalPoints => {
+  const disabled = [];
+  for (const timeline in timelines) {
+    if (timeline !== 'all' && timelines[timeline] > totalPoints) {
+      disabled.push(timeline);
+    }
+  }
+
+  return disabled;
+};
+const getDate = d => new Date(d.timestamp);
+const bisectDate = bisector(getDate).left;

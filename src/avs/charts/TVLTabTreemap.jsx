@@ -17,13 +17,6 @@ import { Text } from '@visx/text';
 import { useMutativeReducer } from 'use-mutative';
 import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
 
-const margin = { top: 0, right: 0, bottom: 0, left: 0 };
-const ALL_STRATEGY_ASSET_MAPPING = {
-  ...LST_STRATEGY_ASSET_MAPPING,
-  [EIGEN_STRATEGY]: { name: 'Eigen', symbol: 'EIGEN' },
-  [BEACON_STRATEGY]: { name: 'Beacon', symbol: 'ETH' }
-};
-
 export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   const compact = !useTailwindBreakpoint('sm');
   const [state, dispatch] = useMutativeReducer(reduceState, {
@@ -102,8 +95,8 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
 
       showTooltip({
         tooltipData: node.data,
-        tooltipLeft: point.x,
-        tooltipTop: point.y
+        tooltipLeft: point?.x,
+        tooltipTop: point?.y
       });
     },
     [showTooltip]
@@ -116,10 +109,7 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   return (
     <div className="bg-content1 border border-outline h-full rounded-lg w-full p-4">
       <div className="flex justify-between mb-4">
-        <div className="font-display text-foreground-1 text-xl">
-          LST distribution
-        </div>
-
+        <div className="text-foreground-1 text-medium">LST distribution</div>
         <Tabs
           classNames={tabs}
           defaultSelectedKey="usd"
@@ -201,7 +191,7 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
             <div>
               {tooltipData.symbol !== 'EIGEN'
                 ? formatETH(tooltipData.value, compact)
-                : `${formatNumber(tooltipData.value, compact)} EIGEN`}
+                : `EIGEN ${formatNumber(tooltipData.value, compact)}`}
             </div>
           </div>
         </TooltipInPortal>
@@ -209,3 +199,10 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     </div>
   );
 }
+
+const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+const ALL_STRATEGY_ASSET_MAPPING = {
+  ...LST_STRATEGY_ASSET_MAPPING,
+  [EIGEN_STRATEGY]: { name: 'Eigen', symbol: 'EIGEN' },
+  [BEACON_STRATEGY]: { name: 'Beacon', symbol: 'ETH' }
+};
