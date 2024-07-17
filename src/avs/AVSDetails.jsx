@@ -1,15 +1,15 @@
-import { useMutativeReducer } from 'use-mutative';
+import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
+import { formatETH, formatNumber } from '../shared/formatters';
+import { Skeleton, Tab, Tabs } from '@nextui-org/react';
+import AVSDetailsHeader from './AVSDetailsHeader';
+import AVSDetailsOperatorsTab from './AVSDetailsOperatorsTab';
+import AVSDetailsTVLTab from './AVSDetailsTVLTab';
 import { reduceState } from '../shared/helpers';
 import { useEffect } from 'react';
-import { Skeleton, Tab, Tabs } from '@nextui-org/react';
-import { useServices } from '../@services/ServiceContext';
+import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
-import AVSDetailsHeader from './AVSDetailsHeader';
-import AVSDetailsTVLTab from './AVSDetailsTVLTab';
-import AVSDetailsOperatorsTab from './AVSDetailsOperatorsTab';
-import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
+import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
-import { formatETH, formatNumber } from '../shared/formatters';
 
 export default function AVSDetails() {
   const { address } = useParams();
@@ -61,7 +61,7 @@ export default function AVSDetails() {
         isAVSLoading: false
       });
     })();
-  }, []);
+  }, [address, avsService, dispatch]);
 
   return (
     <>
@@ -80,16 +80,16 @@ export default function AVSDetails() {
       )}
 
       <Tabs
-        size="lg"
-        disabledKeys={['restakers']}
         className="my-4"
-        radius="sm"
         classNames={{
           base: 'flex w-full',
           tabList: 'w-full bg-content1 border border-outline rounded-lg p-0',
           tab: 'h-100 m-2',
           panel: 'p-0'
         }}
+        disabledKeys={['restakers']}
+        radius="sm"
+        size="lg"
       >
         <Tab
           key="tvl"
@@ -114,10 +114,10 @@ export default function AVSDetails() {
           }
         >
           <AVSDetailsTVLTab
-            totalTokens={state.totalTokens}
-            lst={state.strategies}
             ethRate={state.ethRate}
             isAVSLoading={state.isAVSLoading}
+            lst={state.strategies}
+            totalTokens={state.totalTokens}
           />
         </Tab>
 
