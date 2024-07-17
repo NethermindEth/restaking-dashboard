@@ -1,20 +1,20 @@
 import {
+  Skeleton,
   Spinner,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
-  Skeleton
+  TableRow
 } from '@nextui-org/react';
-import React, { useEffect, useMemo } from 'react';
-import { useMutativeReducer } from 'use-mutative';
-import { reduceState } from '../shared/helpers';
-import { useServices } from '../@services/ServiceContext';
-import { useParams } from 'react-router-dom';
-import { ParentSize } from '@visx/responsive';
+import { useEffect, useMemo } from 'react';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
+import { ParentSize } from '@visx/responsive';
+import { reduceState } from '../shared/helpers';
+import { useMutativeReducer } from 'use-mutative';
+import { useParams } from 'react-router-dom';
+import { useServices } from '../@services/ServiceContext';
 
 export default function AVSDetailsOperatorsTab({ operators }) {
   const { address } = useParams();
@@ -32,7 +32,7 @@ export default function AVSDetailsOperatorsTab({ operators }) {
       const response = await avsService.getAVSOperatorsOvertime(address);
       dispatch({ points: response, isChartLoading: false });
     })();
-  }, []);
+  }, [address, avsService, dispatch]);
 
   // our endpoint only returns up to yesterdays data. We need to append today's data point
   // into the graph

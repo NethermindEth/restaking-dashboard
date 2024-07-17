@@ -1,18 +1,18 @@
-import { scaleUtc, scaleLinear } from '@visx/scale';
-import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useMutativeReducer } from 'use-mutative';
-import { reduceState } from '../../shared/helpers';
-import { Group } from '@visx/group';
-import { GridColumns, GridRows } from '@visx/grid';
-import { Circle, LinePath } from '@visx/shape';
-import { Tab, Tabs } from '@nextui-org/react';
-import { tabs } from '../../shared/slots';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { formatNumber, getGrowthPercentage } from '../../utils';
-import { localPoint } from '@visx/event';
-import { bisector } from '@visx/vendor/d3-array';
+import { Circle, LinePath } from '@visx/shape';
 import { formatETH, formatUSD } from '../../shared/formatters';
+import { formatNumber, getGrowthPercentage } from '../../utils';
+import { GridColumns, GridRows } from '@visx/grid';
+import { scaleLinear, scaleUtc } from '@visx/scale';
+import { Tab, Tabs } from '@nextui-org/react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import { bisector } from '@visx/vendor/d3-array';
+import { Group } from '@visx/group';
+import { localPoint } from '@visx/event';
+import { reduceState } from '../../shared/helpers';
+import { tabs } from '../../shared/slots';
+import { useMutativeReducer } from 'use-mutative';
 import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
 
 const margin = { top: 20, right: 40, bottom: 40, left: 20 };
@@ -24,11 +24,13 @@ const timelines = {
   all: Number.MAX_SAFE_INTEGER
 };
 
+// eslint-disable-next-line no-undef
 const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'short'
 });
 
+// eslint-disable-next-line no-undef
 const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium'
 });
@@ -66,7 +68,7 @@ export default function TVLTabLineChart({ points, height, width }) {
     dispatch({
       filteredPoints: points
     });
-  }, [points]);
+  }, [dispatch, points]);
 
   useEffect(() => {
     dispatch({
@@ -121,7 +123,7 @@ export default function TVLTabLineChart({ points, height, width }) {
     return state.useRate
       ? formatUSD(latest.tvl * latest.rate, compact)
       : formatETH(latest.tvl, compact);
-  }, [points, state.useRate]);
+  }, [compact, points, state.useRate]);
 
   const growthPercentage = useMemo(() => {
     const first = state.filteredPoints[0];
@@ -175,7 +177,7 @@ export default function TVLTabLineChart({ points, height, width }) {
         tooltipTop: scaleValue(getValue(d))
       });
     },
-    [scaleDate, scaleValue, state.filteredPoints]
+    [getValue, showTooltip, scaleDate, scaleValue, state.filteredPoints]
   );
 
   return (
@@ -224,48 +226,48 @@ export default function TVLTabLineChart({ points, height, width }) {
 
       <svg
         className="touch-pan-y w-full"
+        height={height}
         ref={containerRef}
         width={width}
-        height={height}
       >
         <Group left={margin.left} top={margin.top}>
           <GridRows
+            className="[&_line]:stroke-foreground-2 opacity-25"
+            height={state.maxY}
+            numTicks={4}
             scale={scaleValue}
             width={state.maxX - margin.right}
-            height={state.maxY}
-            numTicks={4}
-            className="[&_line]:stroke-foreground-2 opacity-25"
           />
           <GridColumns
-            scale={scaleDate}
-            width={state.maxX}
+            className="[&_line]:stroke-foreground-2 opacity-25"
             height={state.maxY}
             numTicks={Math.floor(state.maxX / 120)}
-            className="[&_line]:stroke-foreground-2 opacity-25"
+            scale={scaleDate}
+            width={state.maxX}
           />
           <AxisRight
-            left={state.maxX - margin.right}
-            scale={scaleValue}
-            numTicks={4}
-            tickFormat={v => formatNumber(v, true)}
             axisLineClassName="stroke-foreground-2"
+            left={state.maxX - margin.right}
+            numTicks={4}
+            scale={scaleValue}
             tickClassName="[&_line]:stroke-foreground-2"
+            tickFormat={v => formatNumber(v, true)}
             tickLabelProps={{
               className: 'text-xs',
               fill: 'hsl(var(--app-foreground))'
             }}
           />
           <AxisBottom
-            top={state.maxY}
-            scale={scaleDate}
-            numTicks={Math.floor(state.maxX / 120)}
-            tickFormat={formatDate}
             axisLineClassName="stroke-foreground-2"
+            numTicks={Math.floor(state.maxX / 120)}
+            scale={scaleDate}
             tickClassName="[&_line]:stroke-foreground-2"
+            tickFormat={formatDate}
             tickLabelProps={{
               className: 'text-xs',
               fill: 'hsl(var(--app-foreground))'
             }}
+            top={state.maxY}
           />
           <LinePath
             className="stroke-dark-blue"
@@ -277,32 +279,32 @@ export default function TVLTabLineChart({ points, height, width }) {
           {tooltipOpen && (
             <g>
               <Circle
+                className="cursor-pointer fill-dark-blue stroke-white stroke-2"
                 cx={tooltipLeft}
                 cy={tooltipTop}
                 r={4}
-                className="cursor-pointer fill-dark-blue stroke-white stroke-2"
               />
             </g>
           )}
 
           <rect
-            x={0}
-            y={0}
-            width={Math.max(state.maxX - margin.right, 0)}
+            fill="transparent"
             height={state.maxY}
             onPointerEnter={handlePointerMove}
-            onPointerMove={handlePointerMove}
             onPointerLeave={hideTooltip}
-            fill="transparent"
+            onPointerMove={handlePointerMove}
+            width={Math.max(state.maxX - margin.right, 0)}
+            x={0}
+            y={0}
           />
         </Group>
       </svg>
 
       {tooltipOpen && (
         <TooltipInPortal
-          key={Math.random()}
           applyPositionStyle={true}
           className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
+          key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
           unstyled={true}

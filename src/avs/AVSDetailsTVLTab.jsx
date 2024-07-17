@@ -50,7 +50,7 @@ export default function AVSDetailsTVLTab({
         points: response
       });
     })();
-  }, []);
+  }, [address, avsService, dispatch]);
 
   // our endpoint only returns up to yesterdays data. We need to append today's data point
   // into the graph
@@ -61,7 +61,7 @@ export default function AVSDetailsTVLTab({
       rate: ethRate,
       tvl: totalTokens.eth + totalTokens.lst
     }),
-    [totalTokens]
+    [ethRate, totalTokens]
   );
 
   return (
@@ -111,14 +111,14 @@ export default function AVSDetailsTVLTab({
               <ParentSize className="h-full">
                 {parent => (
                   <TVLTabTreemap
+                    ethRate={ethRate}
                     // the extra 88 is from 1px top/bottom border , 16px top/bottomp padding
                     // 38px title and control, 16px margin bottom for title
                     // otherwise we will have an infinitely growing SVG because there is no fixed height
                     height={(parent.height || 512) - 2 - 32 - 38 - 16}
+                    lst={lst}
                     // 1px left/right border, 16px left/right padding
                     width={parent.width - 2 - 32}
-                    lst={lst}
-                    ethRate={ethRate}
                   />
                 )}
               </ParentSize>
