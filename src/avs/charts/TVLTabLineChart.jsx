@@ -1,13 +1,13 @@
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
-import { formatETH, formatUSD } from '../../shared/formatters';
-import { formatNumber, getGrowthPercentage } from '../../utils';
+import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { GridColumns, GridRows } from '@visx/grid';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
+import { getGrowthPercentage } from '../../utils';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
 import { reduceState } from '../../shared/helpers';
