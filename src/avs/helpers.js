@@ -1,3 +1,7 @@
+export const BEACON_STRATEGY = '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0';
+
+export const EIGEN_STRATEGY = '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7';
+
 export const LST_STRATEGY_ASSET_MAPPING = {
   '0x93c4b944d05dfe6df7645a86cd2206016c51564d': {
     symbol: 'stETH',
@@ -60,7 +64,3 @@ export const LST_STRATEGY_ASSET_MAPPING = {
     logo: new URL('/mETH.svg', import.meta.url).href
   }
 };
-
-export const BEACON_STRATEGY = '0xbeac0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeebeac0';
-
-export const EIGEN_STRATEGY = '0xacb55c530acdb2849e6d4f36992cd8c9d50ed8f7';

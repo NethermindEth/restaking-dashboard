@@ -1,4 +1,10 @@
 import {
+  BEACON_STRATEGY,
+  EIGEN_STRATEGY,
+  LST_STRATEGY_ASSET_MAPPING
+} from './helpers';
+import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import {
   Image,
   Skeleton,
   Spacer,
@@ -11,21 +17,15 @@ import {
   TableRow,
   Tooltip
 } from '@nextui-org/react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useMutativeReducer } from 'use-mutative';
-import { useServices } from '../@services/ServiceContext';
-import { reduceState } from '../shared/helpers';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
-import {
-  BEACON_STRATEGY,
-  EIGEN_STRATEGY,
-  LST_STRATEGY_ASSET_MAPPING
-} from './helpers';
-import { formatUSD, formatETH, formatNumber } from '../shared/formatters';
-import TVLTabLineChart from './charts/TVLTabLineChart';
+import { useEffect, useMemo, useState } from 'react';
 import { ParentSize } from '@visx/responsive';
+import { reduceState } from '../shared/helpers';
+import TVLTabLineChart from './charts/TVLTabLineChart';
 import TVLTabTreemap from './charts/TVLTabTreemap';
+import { useMutativeReducer } from 'use-mutative';
+import { useParams } from 'react-router-dom';
+import { useServices } from '../@services/ServiceContext';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -87,15 +87,15 @@ export default function AVSDetailsTVLTab({
       <div className="flex flex-col gap-4 md:flex-row w-full h-min">
         <div className="basis-1/2 w-full md:w-1/2">
           <TokensBreakdownList
-            totalTokens={totalTokens}
-            isAVSLoading={isAVSLoading}
             ethRate={ethRate}
+            isAVSLoading={isAVSLoading}
+            totalTokens={totalTokens}
           />
           <Spacer y={4} />
           <LSTBreakdownList
-            lst={lst}
-            isAVSLoading={isAVSLoading}
             ethRate={ethRate}
+            isAVSLoading={isAVSLoading}
+            lst={lst}
           />
         </div>
         {/* treemap */}
@@ -156,6 +156,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
   }, [totalTokens]);
 
   const sum = useMemo(
+    // eslint-disable-next-line no-unused-vars
     () => sortedTotalTokens.reduce((acc, [_, total]) => acc + total, 0),
     [sortedTotalTokens]
   );
@@ -165,12 +166,12 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
   return (
     <Table
       aria-label="Breakdown of ETH, EIGEN and Liquid Staking Tokens"
-      layout="fixed"
-      hideHeader
       classNames={{
         wrapper: 'border border-outline rounded-lg',
         tr: 'border-b border-outline last:border-none'
       }}
+      hideHeader
+      layout="fixed"
       topContent={
         <div className="text-foreground-1 text-medium">Tokens distribution</div>
       }
@@ -196,7 +197,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
             <TableRow key={key}>
               <TableCell className="text-sm pl-0">
                 <div className="flex truncate gap-x-2 items-center">
-                  <Image height={16} width={16} src={tokens[key].logo} />
+                  <Image height={16} src={tokens[key].logo} width={16} />
                   <span className="text-foreground-2 truncate">
                     {tokens[key].name}
                   </span>{' '}
@@ -246,12 +247,12 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
   return (
     <Table
       aria-label="Breakdown of Liquid Staking Tokens"
-      hideHeader
-      layout="fixed"
       classNames={{
         wrapper: 'border border-outline rounded-lg',
         tr: 'border-b border-outline last:border-none'
       }}
+      hideHeader
+      layout="fixed"
       topContent={
         <div className="text-foreground-1 text-medium">LST distribution</div>
       }
@@ -278,10 +279,10 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
               <TableCell className="text-sm pl-0">
                 <div className="flex items-center gap-x-2">
                   <Image
-                    height={16}
-                    width={16}
-                    src={LST_STRATEGY_ASSET_MAPPING[key].logo}
                     fallbackSrc="/eth.png"
+                    height={16}
+                    src={LST_STRATEGY_ASSET_MAPPING[key].logo}
+                    width={16}
                   />
                   <span className="text-foreground-2 truncate">
                     {LST_STRATEGY_ASSET_MAPPING[key]?.name}
@@ -314,8 +315,6 @@ function EigenDisclaimer() {
     <div className="inline-flex gap-x-1 items-center">
       N/A
       <Tooltip
-        showArrow={true}
-        placement="top"
         content={
           <div className="max-w-[250px] p-4 break-words">
             <div className="text-sm">
@@ -326,16 +325,18 @@ function EigenDisclaimer() {
           </div>
         }
         isOpen={isOpen}
+        placement="top"
+        showArrow={true}
       >
         <span
           className="text-sm material-symbols-outlined cursor-pointer"
-          style={{
-            fontVariationSettings: `'FILL' 0`
-          }}
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
           // to make tooltip work on mobile
           onPointerDown={() => setIsOpen(!isOpen)}
+          style={{
+            fontVariationSettings: `'FILL' 0`
+          }}
         >
           info
         </span>
