@@ -1,3 +1,4 @@
+import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import {
   Input,
   Skeleton,
@@ -10,12 +11,11 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Pagination from '../shared/Pagination';
+import { reduceState } from '../shared/helpers';
+import useDebounce from '../shared/hooks/useDebounce';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
-import { reduceState } from '../shared/helpers';
-import Pagination from '../shared/Pagination';
-import useDebounce from '../shared/hooks/useDebounce';
-import { formatNumber } from '../shared/formatters';
 
 const columns = [
   {
@@ -98,20 +98,20 @@ export default function AVSList() {
     if (currentPage + 1 <= state.totalPages) {
       setSearchParams({ page: (currentPage + 1).toString() });
     }
-  }, [searchParams, state.totalPages, setSearchParams, fetchAVS]);
+  }, [searchParams, state.totalPages, setSearchParams]);
 
   const handlePrevious = useCallback(() => {
     const currentPage = parseInt(searchParams.get('page') || '1');
     if (currentPage - 1 >= 1) {
       setSearchParams({ page: (currentPage - 1).toString() });
     }
-  }, [searchParams, fetchAVS]);
+  }, [searchParams, setSearchParams]);
 
   const handlePageClick = useCallback(
     page => {
       setSearchParams({ page: page.toString() });
     },
-    [setSearchParams, fetchAVS]
+    [setSearchParams]
   );
 
   const handleSearch = e => {
@@ -136,11 +136,18 @@ export default function AVSList() {
     setSearchParams(params, { replace: true });
     fetchAVS(params.page, params.search);
     dispatch({ searchTriggered: false });
-  }, [searchParams, debouncedSearchTerm]);
+  }, [
+    debouncedSearchTerm,
+    dispatch,
+    fetchAVS,
+    searchParams,
+    setSearchParams,
+    state.searchTriggered
+  ]);
 
   useEffect(() => {
     dispatch({ searchTriggered: true });
-  }, [debouncedSearchTerm]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (state.sortDescriptor) console.log(state.sortDescriptor); // capture user's selection and recall the API with sorting params
@@ -247,11 +254,9 @@ export default function AVSList() {
                       {formatNumber(avs.operators)}
                     </TableCell>
                     <TableCell className="flex flex-col items-end justify-center pr-8">
-                      <div>
-                        ${formatNumber(avs.strategiesTotal * state.rate)}
-                      </div>
+                      <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
                       <div className="text-xs text-subtitle">
-                        {formatNumber(avs.strategiesTotal)} ETH
+                        {formatETH(avs.strategiesTotal)}
                       </div>
                     </TableCell>
                   </TableRow>
