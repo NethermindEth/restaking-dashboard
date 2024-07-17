@@ -200,7 +200,7 @@ export default function AVSList() {
           </TableHeader>
           <TableBody
             emptyContent={
-              <div className="flex flex-col h-[38rem] items-center justify-center">
+              <div className="flex flex-col h-[41.8rem] items-center justify-center">
                 <img src="/notFound.svg" className="w-56 h-40" />
                 <span className="text-foreground-active mt-7">
                   We could not find what you were looking for
@@ -214,7 +214,7 @@ export default function AVSList() {
             {state.isFetchingAvsData
               ? [...Array(10)].map((_, i) => (
                   <TableRow key={i} className="border-t border-outline">
-                    <TableCell className="p-5 w-2/5">
+                    <TableCell className="h-table-skeleton-item w-2/5">
                       <Skeleton className="h-5 rounded-md dark:bg-default" />
                     </TableCell>
                     <TableCell className="w-1/5">
@@ -270,6 +270,17 @@ export default function AVSList() {
                     </TableCell>
                   </TableRow>
                 ))}
+
+            {!state.isFetchingAvsData &&
+              state.avs &&
+              [...Array(10 - state.avs.length)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell className="h-table-skeleton-item w-2/5"></TableCell>
+                  <TableCell className="w-1/5"></TableCell>
+                  <TableCell className="w-1/5"></TableCell>
+                  <TableCell className="w-1/5"></TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
         {state.avs && state.avs.length !== 0 && (
