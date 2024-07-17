@@ -49,6 +49,7 @@
     "globals": "^15.3.0",
     "postcss": "^8.4.38",
     "prettier": "^3.3.1",
+    "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.4",
     "vite": "^5.2.12"
   }
