@@ -1,13 +1,14 @@
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
-import { GridColumns, GridRows } from '@visx/grid';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
+import { curveMonotoneX } from '@visx/curve';
 import { formatNumber } from '../../shared/formatters';
 import { getGrowthPercentage } from '../../utils';
+import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
 import { reduceState } from '../../shared/helpers';
@@ -175,13 +176,6 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             scale={scaleValue}
             width={state.maxX - margin.right}
           />
-          <GridColumns
-            className="[&_line]:stroke-foreground-2 opacity-25"
-            height={state.maxY}
-            numTicks={Math.floor(state.maxX / 120)}
-            scale={scaleDate}
-            width={state.maxX}
-          />
           <AxisRight
             axisLineClassName="stroke-foreground-2"
             left={state.maxX - margin.right}
@@ -191,7 +185,9 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             tickFormat={v => formatNumber(v, true)}
             tickLabelProps={{
               className: 'text-xs',
-              fill: 'hsl(var(--app-foreground))'
+              fill: 'hsl(var(--app-foreground))',
+              fontFamily: undefined,
+              fontSize: undefined
             }}
           />
           <AxisBottom
@@ -202,26 +198,29 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             tickFormat={formatDate}
             tickLabelProps={{
               className: 'text-xs',
-              fill: 'hsl(var(--app-foreground))'
+              fill: 'hsl(var(--app-foreground))',
+              fontFamily: undefined,
+              fontSize: undefined
             }}
             top={state.maxY}
           />
           <LinePath
+            /* TODO: define in tailwind config */
             className="stroke-dark-blue"
+            curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
             y={d => scaleValue(getValue(d)) ?? 0}
           />
 
           {tooltipOpen && (
-            <g>
-              <Circle
-                className="cursor-pointer fill-dark-blue stroke-white stroke-2"
-                cx={tooltipLeft}
-                cy={tooltipTop}
-                r={4}
-              />
-            </g>
+            <Circle
+              /* TODO: define in tailwind config */
+              className="cursor-pointer fill-dark-blue stroke-white stroke-2"
+              cx={tooltipLeft}
+              cy={tooltipTop}
+              r={4}
+            />
           )}
 
           <rect

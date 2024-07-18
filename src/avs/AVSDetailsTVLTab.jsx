@@ -68,14 +68,14 @@ export default function AVSDetailsTVLTab({
     <>
       {/* line chart */}
       {isAVSLoading || state.isChartLoading ? (
-        <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] mb-4 p-4 rounded-lg w-full">
+        <div className="bg-content1 border border-outline flex items-center justify-center h-[390px] mb-4 p-4 rounded-lg w-full">
           <Spinner color="primary" size="lg" />
         </div>
       ) : (
         <ParentSize className="mb-4">
           {parent => (
             <TVLTabLineChart
-              height={512}
+              height={288}
               points={state.points.concat(currentPoint)}
               width={parent.width}
             />

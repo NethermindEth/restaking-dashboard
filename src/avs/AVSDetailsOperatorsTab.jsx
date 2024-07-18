@@ -48,14 +48,14 @@ export default function AVSDetailsOperatorsTab({ operators }) {
     <>
       {/*line chart*/}
       {state.isChartLoading ? (
-        <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
+        <div className="bg-content1 border border-outline flex items-center justify-center h-[390px] p-4 rounded-lg w-full">
           <Spinner color="primary" size="lg" />
         </div>
       ) : (
         <ParentSize>
           {parent => (
             <OperatorsTabLineChart
-              height={512}
+              height={288}
               points={state.points.concat(currentPoint)}
               width={parent.width}
             />
