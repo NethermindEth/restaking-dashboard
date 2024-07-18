@@ -1,7 +1,7 @@
 import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
-  LST_STRATEGY_ASSET_MAPPING
+  lstStrategyAssetMapping
 } from './helpers';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import {
@@ -283,14 +283,14 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
                   <Image
                     fallbackSrc="/eth.png"
                     height={16}
-                    src={LST_STRATEGY_ASSET_MAPPING[key].logo}
+                    src={lstStrategyAssetMapping[key].logo}
                     width={16}
                   />
                   <span className="text-foreground-2 truncate">
-                    {LST_STRATEGY_ASSET_MAPPING[key]?.name}
+                    {lstStrategyAssetMapping[key]?.name}
                   </span>{' '}
                   <span className="text-foreground-1">
-                    {LST_STRATEGY_ASSET_MAPPING[key]?.symbol}
+                    {lstStrategyAssetMapping[key]?.symbol}
                   </span>
                 </div>
               </TableCell>

@@ -1,7 +1,7 @@
 import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
-  LST_STRATEGY_ASSET_MAPPING
+  lstStrategyAssetMapping
 } from '../helpers';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
@@ -43,8 +43,8 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     return Object.entries(lst)
       .filter(([strategy]) => !filters.has(strategy))
       .map(([strategy, value]) => ({
-        name: ALL_STRATEGY_ASSET_MAPPING[strategy].name,
-        symbol: ALL_STRATEGY_ASSET_MAPPING[strategy].symbol,
+        name: allStrategyAssetMapping[strategy].name,
+        symbol: allStrategyAssetMapping[strategy].symbol,
         value: Number(value)
       }));
   }, [lst, state.useAllStrategies]);
@@ -202,8 +202,8 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
 }
 
 const margin = { top: 0, right: 0, bottom: 0, left: 0 };
-const ALL_STRATEGY_ASSET_MAPPING = {
-  ...LST_STRATEGY_ASSET_MAPPING,
+const allStrategyAssetMapping = {
+  ...lstStrategyAssetMapping,
   [EIGEN_STRATEGY]: { name: 'Eigen', symbol: 'EIGEN' },
   [BEACON_STRATEGY]: { name: 'Beacon', symbol: 'ETH' }
 };
