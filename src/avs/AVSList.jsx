@@ -56,7 +56,7 @@ export default function AVSList() {
     sortDescriptor: null
   });
 
-  const debouncedSearchTerm = useDebounce(state.searchTerm, 300);
+  const debouncedSearchTerm = useDebounce(state.searchTerm, 300, true);
 
   const fetchAVS = useCallback(
     async (pageNumber, search) => {
