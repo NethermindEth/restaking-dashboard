@@ -169,6 +169,11 @@ export default function AVSList() {
             Actively Validated Services
           </div>
           <Input
+            classNames={{
+              inputWrapper:
+                'border border-outline data-[hover=true]:border-foreground-1',
+              input: 'placeholder:text-subtitle'
+            }}
             value={state.searchTerm ?? ''}
             onChange={handleSearch}
             type="text"
@@ -177,7 +182,9 @@ export default function AVSList() {
             className="lg:w-96"
             variant="bordered"
             endContent={
-              <span className="material-symbols-outlined">search</span>
+              <span className="material-symbols-outlined text-subtitle">
+                search
+              </span>
             }
           />
         </div>
