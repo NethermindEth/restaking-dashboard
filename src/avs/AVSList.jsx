@@ -119,6 +119,10 @@ export default function AVSList() {
     dispatch({ searchTerm: e.target.value });
   };
 
+  const truncate = str => {
+    return str.length > 42 ? str.substring(0, 42) + '...' : str;
+  };
+
   useEffect(() => {
     const page = searchParams.get('page');
 
@@ -148,7 +152,7 @@ export default function AVSList() {
 
   useEffect(() => {
     dispatch({ searchTriggered: true });
-  }, [dispatch]);
+  }, [dispatch, debouncedSearchTerm]);
 
   useEffect(() => {
     if (state.sortDescriptor) log.debug(state.sortDescriptor); // capture user's selection and recall the API with sorting params
@@ -201,12 +205,8 @@ export default function AVSList() {
           <TableBody
             emptyContent={
               <div className="flex flex-col h-[41.8rem] items-center justify-center">
-                <img src="/notFound.svg" className="w-56 h-40" />
-                <span className="text-foreground-active mt-7">
-                  We could not find what you were looking for
-                </span>
-                <span className="text-foreground-2">
-                  Please try again with a different search
+                <span className="text-foreground-2 text-lg">
+                  No result found for {truncate(state.searchTerm ?? '')}
                 </span>
               </div>
             }
