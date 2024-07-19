@@ -197,7 +197,13 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
             <TableRow key={key}>
               <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2 truncate">
-                  <Image height={16} src={tokens[key].logo} width={16} />
+                  <Image
+                    classNames={{
+                      // override tailwind's base img styling that doesn't respect specified dimensions
+                      img: 'h-4 w-4 max-w-none object-contain'
+                    }}
+                    src={tokens[key].logo}
+                  />
                   <span className="truncate text-foreground-2">
                     {tokens[key].name}
                   </span>{' '}
@@ -281,6 +287,10 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
               <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2">
                   <Image
+                    classNames={{
+                      // override tailwind's base img styling that doesn't respect specified dimensions
+                      img: 'h-4 w-4 max-w-none object-contain'
+                    }}
                     fallbackSrc="/eth.png"
                     height={16}
                     src={lstStrategyAssetMapping[key].logo}
