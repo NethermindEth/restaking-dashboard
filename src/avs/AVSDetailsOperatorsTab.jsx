@@ -48,7 +48,7 @@ export default function AVSDetailsOperatorsTab({ operators }) {
     <>
       {/*line chart*/}
       {state.isChartLoading ? (
-        <div className="bg-content1 border border-outline flex items-center justify-center h-[390px] p-4 rounded-lg w-full">
+        <div className="flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
           <Spinner color="primary" size="lg" />
         </div>
       ) : (
@@ -64,8 +64,8 @@ export default function AVSDetailsOperatorsTab({ operators }) {
       )}
 
       {/*layout*/}
-      <div className="flex w-full h-full">
-        <div className="w-full mt-4">
+      <div className="flex h-full w-full">
+        <div className="mt-4 w-full">
           <AVSOperatorsList />
         </div>
       </div>
@@ -84,7 +84,7 @@ function AVSOperatorsList() {
       }}
       layout="fixed"
       topContent={
-        <div className="p-4 text-foreground-1 text-medium">All operators</div>
+        <div className="p-4 text-medium text-foreground-1">All operators</div>
       }
     >
       <TableHeader>

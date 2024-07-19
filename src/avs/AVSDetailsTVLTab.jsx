@@ -68,7 +68,7 @@ export default function AVSDetailsTVLTab({
     <>
       {/* line chart */}
       {isAVSLoading || state.isChartLoading ? (
-        <div className="bg-content1 border border-outline flex items-center justify-center h-[390px] mb-4 p-4 rounded-lg w-full">
+        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
           <Spinner color="primary" size="lg" />
         </div>
       ) : (
@@ -84,8 +84,8 @@ export default function AVSDetailsTVLTab({
       )}
 
       {/*layout*/}
-      <div className="flex flex-col gap-4 md:flex-row w-full h-min">
-        <div className="basis-1/2 w-full md:w-1/2">
+      <div className="flex h-min w-full flex-col gap-4 md:flex-row">
+        <div className="w-full basis-1/2 md:w-1/2">
           <TokensBreakdownList
             ethRate={ethRate}
             isAVSLoading={isAVSLoading}
@@ -101,13 +101,13 @@ export default function AVSDetailsTVLTab({
         {/* treemap */}
         {isAVSLoading ? (
           <div className="basis-1/2">
-            <div className="bg-content1 border border-outline flex items-center justify-center h-full min-h-[512px] p-4 rounded-lg w-full">
+            <div className="flex h-full min-h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
               <Spinner color="primary" size="lg" />
             </div>
           </div>
         ) : (
           <>
-            <div className="basis-1/2 w-full md:w-1/2">
+            <div className="w-full basis-1/2 md:w-1/2">
               <ParentSize className="h-full">
                 {parent => (
                   <TVLTabTreemap
@@ -173,7 +173,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
       hideHeader
       layout="fixed"
       topContent={
-        <div className="text-foreground-1 text-medium">Tokens distribution</div>
+        <div className="text-medium text-foreground-1">Tokens distribution</div>
       }
     >
       <TableHeader>
@@ -209,7 +209,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="text-sm flex justify-end">
+              <TableCell className="flex justify-end text-sm">
                 <div className="text-end">
                   {key === 'eigen' ? (
                     <EigenDisclaimer />
@@ -256,7 +256,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
       hideHeader
       layout="fixed"
       topContent={
-        <div className="text-foreground-1 text-medium">LST distribution</div>
+        <div className="text-medium text-foreground-1">LST distribution</div>
       }
     >
       <TableHeader>
@@ -278,7 +278,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
         {!isAVSLoading &&
           sortedTokens.map(([key, total]) => (
             <TableRow key={key}>
-              <TableCell className="text-sm pl-0">
+              <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2">
                   <Image
                     classNames={{
@@ -290,7 +290,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
                     src={lstStrategyAssetMapping[key].logo}
                     width={16}
                   />
-                  <span className="text-foreground-2 truncate">
+                  <span className="truncate text-foreground-2">
                     {lstStrategyAssetMapping[key]?.name}
                   </span>{' '}
                   <span className="text-foreground-1">
@@ -318,11 +318,11 @@ function EigenDisclaimer() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="inline-flex gap-x-1 items-center">
+    <div className="inline-flex items-center gap-x-1">
       N/A
       <Tooltip
         content={
-          <div className="max-w-[250px] p-4 break-words">
+          <div className="max-w-[250px] break-words p-4">
             <div className="text-sm">
               EIGEN is currently not listed on any exchanges so we are unable to
               get its USD value. Information will be updated when the token is
@@ -335,7 +335,7 @@ function EigenDisclaimer() {
         showArrow={true}
       >
         <span
-          className="text-sm material-symbols-outlined cursor-pointer"
+          className="material-symbols-outlined cursor-pointer text-sm"
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
           // to make tooltip work on mobile

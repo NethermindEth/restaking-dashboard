@@ -128,13 +128,13 @@ export default function OperatorsTabLineChart({ points, height, width }) {
   );
 
   return (
-    <div className="bg-content1 border border-outline rounded-lg">
-      <div className="flex justify-between mb-6 p-4">
-        <div className="flex-1 hidden sm:block">
-          <div className="font-display text-foreground-1 text-xl">
+    <div className="rounded-lg border border-outline bg-content1">
+      <div className="mb-6 flex justify-between p-4">
+        <div className="hidden flex-1 sm:block">
+          <div className="font-display text-xl text-foreground-1">
             Operators over time
           </div>
-          <div className="flex gap-x-2 text-foreground-2 text-xs">
+          <div className="flex gap-x-2 text-xs text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
               className={`${growthPercentage >= 0 ? 'text-success' : 'text-danger'}`}
@@ -145,7 +145,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
           </div>
         </div>
 
-        <div className="flex flex-1 w-full flex-col gap-y-2 justify-between sm:flex-row sm:justify-end gap-x-2">
+        <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
           <Tabs
             classNames={tabs}
             defaultSelectedKey="all"
@@ -163,14 +163,14 @@ export default function OperatorsTabLineChart({ points, height, width }) {
       </div>
 
       <svg
-        className="touch-pan-y w-full"
+        className="w-full touch-pan-y"
         height={height}
         ref={containerRef}
         width={width}
       >
         <Group left={margin.left} top={margin.top}>
           <GridRows
-            className="[&_line]:stroke-foreground-2 opacity-25"
+            className="opacity-25 [&_line]:stroke-foreground-2"
             height={state.maxY}
             numTicks={4}
             scale={scaleValue}
@@ -239,16 +239,16 @@ export default function OperatorsTabLineChart({ points, height, width }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
+          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
           key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
           unstyled={true}
         >
-          <div className="font-bold mb-2 px-2 text-sm">
+          <div className="mb-2 px-2 text-sm font-bold">
             {tooltipDateFormatter.format(new Date(tooltipData.timestamp))}
           </div>
-          <div className="text-base px-2">
+          <div className="px-2 text-base">
             {formatNumber(tooltipData.operators, compact)}
           </div>
         </TooltipInPortal>
