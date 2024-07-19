@@ -83,7 +83,7 @@ export default function AVSDetails() {
         className="my-4"
         classNames={{
           base: 'flex w-full',
-          tabList: 'w-full bg-content1 border border-outline rounded-lg p-0',
+          tabList: 'w-full rounded-lg border border-outline bg-content1 p-0',
           tab: 'h-100 m-2',
           panel: 'p-0'
         }}

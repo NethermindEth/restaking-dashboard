@@ -200,11 +200,11 @@ const LSTShare = ({ label, value }) => {
     <Progress
       radius="sm"
       classNames={{
-        base: 'w-full lg:w-md',
-        track: 'drop-shadow-md border bg-cinder-1 border-default',
+        base: 'lg:w-md w-full',
+        track: 'border border-default bg-cinder-1 drop-shadow-md',
         indicator: 'bg-cinder-5',
-        label: 'text-foreground-2 text-xs font-normal',
-        value: 'text-white text-xs font-normal'
+        label: 'text-xs font-normal text-foreground-2',
+        value: 'text-xs font-normal text-white'
       }}
       label={label}
       value={value}
