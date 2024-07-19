@@ -1,6 +1,6 @@
 import { Card } from '@nextui-org/react';
 import { Group } from '@visx/group';
-import { Treemap, hierarchy, treemapBinary } from '@visx/hierarchy';
+import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
 import { scaleLinear } from '@visx/scale';
 import { Text } from '@visx/text';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
@@ -90,10 +90,10 @@ export default function LSTTreeMap({
   return (
     <Card
       radius="md"
-      className="bg-content1 border border-outline space-y-4 p-4 w-full flex items-start flex-col justify-center"
+      className="flex w-full flex-col items-start justify-center space-y-4 border border-outline bg-content1 p-4"
     >
-      <div className="flex items-center justify-between w-full flex-wrap gap-3">
-        <div className="font-light text-base text-foreground-1 px-2">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3">
+        <div className="px-2 text-base font-light text-foreground-1">
           {state.selectedTab === 'all-assets'
             ? 'All assets distribution'
             : state.selectedTab === 'lst'
@@ -101,11 +101,11 @@ export default function LSTTreeMap({
               : 'All Assets'}
         </div>
 
-        <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+        <div className="flex w-full items-center gap-3 rounded-lg border border-outline p-2 md:w-fit">
           <div
-            className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-32 cursor-pointer ${
+            className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-32 ${
               state.selectedTab === 'all-assets' &&
-              'bg-default border border-outline text-foreground-active'
+              'border border-outline bg-default text-foreground-active'
             }`}
             onClick={() => handleTabChange('all-assets')}
           >
@@ -113,9 +113,9 @@ export default function LSTTreeMap({
           </div>
 
           <div
-            className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-32 cursor-pointer ${
+            className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-32 ${
               state.selectedTab === 'lst' &&
-              'bg-default border border-outline text-foreground-active'
+              'border border-outline bg-default text-foreground-active'
             }`}
             onClick={() => handleTabChange('lst')}
           >
@@ -191,7 +191,7 @@ export default function LSTTreeMap({
           key={Math.random()}
           top={tooltipTop}
           left={tooltipLeft}
-          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
+          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
         >
           <div className="text-sm">
             {tooltipData.name}{' '}

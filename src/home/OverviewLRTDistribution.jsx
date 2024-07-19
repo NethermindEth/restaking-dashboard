@@ -165,14 +165,14 @@ export default function OverviewLRTDistribution({ rate }) {
   return (
     <Card
       radius="md"
-      className="bg-content1 border border-outline space-y-4 p-4"
+      className="space-y-4 border border-outline bg-content1 p-4"
     >
-      <div className="font-normal text-lg text-foreground-active px-2">
+      <div className="px-2 text-lg font-normal text-foreground-active">
         LRT Distribution
       </div>
 
-      <div className="w-full flex flex-col gap-10 lg:flex-row flex-wrap items-center justify-center lg:justify-between px-4">
-        <div className="w-full md:max-w-xl space-y-3">
+      <div className="flex w-full flex-col flex-wrap items-center justify-center gap-10 px-4 lg:flex-row lg:justify-between">
+        <div className="w-full space-y-3 md:max-w-xl">
           {Object.entries(mergedLrtData).map(
             ([name, { logo, tvl, percentage }]) => (
               <LRTShare
@@ -284,7 +284,7 @@ export default function OverviewLRTDistribution({ rate }) {
 
 const LRTShare = ({ label, value, image, share }) => {
   return (
-    <div className="flex items-end md:flex-row flex-col gap-2">
+    <div className="flex flex-col items-end gap-2 md:flex-row">
       <Progress
         radius="sm"
         classNames={{
@@ -308,7 +308,7 @@ const LRTShare = ({ label, value, image, share }) => {
           maximumFractionDigits: 2
         }}
       />
-      <div className="text-sm text-foreground-2 min-w-fit ml-2">
+      <div className="ml-2 min-w-fit text-sm text-foreground-2">
         {formatNumber(share, true)} ETH
       </div>
     </div>

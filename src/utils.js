@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const numberFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0
 });
@@ -45,6 +46,7 @@ export function formatDate(dateString) {
   }
 }
 
+// eslint-disable-next-line no-undef
 export const assetFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
   minimumFractionDigits: 0

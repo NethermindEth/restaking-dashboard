@@ -161,11 +161,11 @@ export default function AVSList() {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <div className="font-display font-medium text-foreground-1 text-3xl">
+        <div className="font-display text-3xl font-medium text-foreground-1">
           AVS
         </div>
-        <div className="flex flex-col lg:flex-row gap-4 w-full justify-between lg:items-center items-start mb-6">
-          <div className="font-display font-medium text-foreground-1 text-base">
+        <div className="mb-6 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+          <div className="font-display text-base font-medium text-foreground-1">
             Actively Validated Services
           </div>
           <Input
@@ -189,7 +189,7 @@ export default function AVSList() {
           />
         </div>
       </div>
-      <div className="bg-content1 border border-outline rounded-lg text-sm">
+      <div className="rounded-lg border border-outline bg-content1 text-sm">
         <Table
           aria-label="Actively validated services list"
           layout="fixed"
@@ -202,7 +202,7 @@ export default function AVSList() {
             {column => (
               <TableColumn
                 allowsSorting
-                className={`bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5 ${column.className}`}
+                className={`bg-transparent py-4 text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 ${column.className}`}
                 key={column.key}
               >
                 {column.label}
@@ -211,8 +211,8 @@ export default function AVSList() {
           </TableHeader>
           <TableBody
             emptyContent={
-              <div className="flex flex-col h-[41.8rem] items-center justify-center">
-                <span className="text-foreground-2 text-lg">
+              <div className="flex h-[41.8rem] flex-col items-center justify-center">
+                <span className="text-lg text-foreground-2">
                   No result found for {truncate(state.searchTerm ?? '')}
                 </span>
               </div>
@@ -254,7 +254,7 @@ export default function AVSList() {
                             src={avs.metadata?.logo}
                           />
                         ) : (
-                          <span className="material-symbols-outlined h-5 rounded-full text-lg text-yellow-300 min-w-5 flex justify-center items-center">
+                          <span className="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
                             warning
                           </span>
                         )}
@@ -263,10 +263,10 @@ export default function AVSList() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-end pr-8">
+                    <TableCell className="pr-8 text-end">
                       {formatNumber(avs.stakers)}
                     </TableCell>
-                    <TableCell className="text-end pr-8">
+                    <TableCell className="pr-8 text-end">
                       {formatNumber(avs.operators)}
                     </TableCell>
                     <TableCell className="flex flex-col items-end justify-center pr-8">

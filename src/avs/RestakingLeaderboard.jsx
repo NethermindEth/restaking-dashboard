@@ -108,14 +108,14 @@ export default function RestakingLeaderboard() {
   return (
     <Card
       radius="md"
-      className="bg-content1 border border-outline w-full space-y-4"
+      className="w-full space-y-4 border border-outline bg-content1"
     >
-      <div className="font-light text-base text-foreground-1 p-4">
+      <div className="p-4 text-base font-light text-foreground-1">
         Restaking leaderboard
       </div>
 
       <div className="text-sm">
-        <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+        <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
           <span className="basis-full">Re-stakers</span>
           <span className="basis-1/4">Share</span>
           <span className="basis-1/3 text-end">TVL</span>
@@ -123,7 +123,7 @@ export default function RestakingLeaderboard() {
         {mockdata.map((operator, i) => (
           <div
             key={`operator-item-${i}`}
-            className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
+            className={`flex flex-row items-center justify-between gap-x-2 border-t border-outline p-4 hover:bg-default`}
           >
             <div className="min-w-5">{i + 1}</div>
             <img src={operator.operator.logo} className="size-5 rounded-full" />
@@ -135,7 +135,7 @@ export default function RestakingLeaderboard() {
             </span>
             <span className="basis-1/3 text-end">
               <div>{formatNumber(operator.tvl.eth, compact)}ETH</div>
-              <div className="text-foreground-1 text-xs">
+              <div className="text-xs text-foreground-1">
                 $ {formatNumber(operator.tvl.usd, compact)}
               </div>
             </span>

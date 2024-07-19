@@ -189,16 +189,16 @@ export default function AVSDetails() {
   }
 
   return (
-    <div className="basis-1/2 w-full space-y-4">
-      <Card radius="md" className="bg-content1 border border-outline p-4">
+    <div className="w-full basis-1/2 space-y-4">
+      <Card radius="md" className="border border-outline bg-content1 p-4">
         <CardBody>
-          <div className="flex flex-row gap-x-2 items-center">
+          <div className="flex flex-row items-center gap-x-2">
             <img
               src={state.avsDetails.metadata.logo}
               className="size-5 rounded-full"
             />
             <div className="flex items-center gap-3">
-              <span className="basis-full font-medium text-3xl truncate text-foreground-1">
+              <span className="basis-full truncate text-3xl font-medium text-foreground-1">
                 {state.avsDetails?.metadata?.name}
               </span>
             </div>
@@ -219,7 +219,7 @@ export default function AVSDetails() {
               </Link>
             )}
 
-            <div className="flex flex-row gap-4 mt-4">
+            <div className="mt-4 flex flex-row gap-4">
               <Button
                 as={Link}
                 href={`https://etherscan.io/address/${state.avsDetails.address}`}
@@ -227,7 +227,7 @@ export default function AVSDetails() {
                 showAnchorIcon
                 size="sm"
                 variant="flat"
-                className="text-secondary p-0"
+                className="p-0 text-secondary"
               >{`${state.avsDetails.address.slice(0, 6)}...${state.avsDetails.address.slice(-4)}`}</Button>
               <Button
                 as={Link}
@@ -236,7 +236,7 @@ export default function AVSDetails() {
                 showAnchorIcon
                 size="sm"
                 variant="flat"
-                className="text-secondary p-0"
+                className="p-0 text-secondary"
               >
                 @
                 {state.avsDetails.metadata.twitter.substring(
@@ -248,7 +248,7 @@ export default function AVSDetails() {
         </CardBody>
       </Card>
       <Tabs
-        className="w-full border border-outline p-2 rounded-lg "
+        className="w-full rounded-lg border border-outline p-2"
         classNames={{
           tab: 'px-6 py-8',
           tabList: 'bg-content1 w-full'
@@ -266,7 +266,7 @@ export default function AVSDetails() {
             </div>
           }
         >
-          <div className="space-y-4 -mt-2">
+          <div className="-mt-2 space-y-4">
             <AVSTotalValueOvertime avsAddress={avsAddress} />
 
             <LSTDistribution
@@ -285,7 +285,7 @@ export default function AVSDetails() {
             </div>
           }
         >
-          <div className="space-y-4 -mt-2">
+          <div className="-mt-2 space-y-4">
             <OperatorsOvertime avsAddress={avsAddress} />
             <Operators avsAddress={avsAddress} totalTVL={state.totalTVL} />
           </div>
@@ -300,14 +300,14 @@ export default function AVSDetails() {
             </div>
           }
         >
-          <div className="space-y-4 -mt-2">
-            <Card radius="md" className="bg-content1 border border-outline p-4">
-              <CardHeader className="flex items-end flex-wrap justify-between gap-3">
-                <div className="space-y-1 block">
-                  <div className=" font-light text-lg text-foreground-1">
+          <div className="-mt-2 space-y-4">
+            <Card radius="md" className="border border-outline bg-content1 p-4">
+              <CardHeader className="flex flex-wrap items-end justify-between gap-3">
+                <div className="block space-y-1">
+                  <div className="text-lg font-light text-foreground-1">
                     Restakers overtime
                   </div>
-                  <div className=" font-light text-base">
+                  <div className="text-base font-light">
                     12,234 <span className="text-success">+1.5%</span>
                   </div>
                 </div>

@@ -8,7 +8,7 @@ const Pagination = ({
   handlePageClick
 }) => {
   return (
-    <div className="flex border-t border-outline justify-between items-center p-4">
+    <div className="flex items-center justify-between border-t border-outline p-4">
       <Button
         className={`bg-transparent ${currentPage === 1 && 'text-disabled'}`}
         onPress={handlePrevious}
