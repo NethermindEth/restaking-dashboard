@@ -8,11 +8,7 @@ export default {
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
-    extend: {
-      height: {
-        'table-skeleton-item': '3.82rem'
-      }
-    },
+    extend: {},
     fontFamily: {
       sans: ['"DM Sans", system-ui, sans-serif', { fontOpticalSizing: 'auto' }],
       display: ['Exo, system-ui, sans-serif', { fontOpticalSizing: 'auto' }]

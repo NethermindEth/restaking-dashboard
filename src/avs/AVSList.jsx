@@ -217,7 +217,7 @@ export default function AVSList() {
             {state.isFetchingAvsData
               ? [...Array(10)].map((_, i) => (
                   <TableRow key={i} className="border-t border-outline">
-                    <TableCell className="h-table-skeleton-item w-2/5">
+                    <TableCell className="h-[3.82rem] w-2/5">
                       <Skeleton className="h-5 rounded-md dark:bg-default" />
                     </TableCell>
                     <TableCell className="w-1/5">
@@ -278,7 +278,7 @@ export default function AVSList() {
               state.avs &&
               [...Array(10 - state.avs.length)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell className="h-table-skeleton-item w-2/5"></TableCell>
+                  <TableCell className="h-[3.82rem] w-2/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
