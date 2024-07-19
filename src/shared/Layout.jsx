@@ -8,14 +8,14 @@ export default function Layout() {
   const showSidebar = useTailwindBreakpoint('lg');
 
   return (
-    <div className="bg-background flex flex-col gap-4 min-h-screen text-foreground">
+    <div className="flex min-h-screen flex-col gap-4 bg-background text-foreground">
       <div className="flex flex-1">
         {showSidebar && (
-          <div className="sticky top-0 max-h-screen w-64 bg-content1 border-b border-e border-outline flex flex-col overflow-y-scroll lg:overflow-hidden rounded-br-lg">
+          <div className="sticky top-0 flex max-h-screen w-64 flex-col overflow-y-scroll rounded-br-lg border-b border-e border-outline bg-content1 lg:overflow-hidden">
             <Sidebar />
           </div>
         )}
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-1 flex-col">
           {!showSidebar && <Header />}
           <main className="flex-1 px-4 pt-6">
             <Outlet />

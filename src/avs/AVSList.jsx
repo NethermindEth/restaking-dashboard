@@ -100,15 +100,15 @@ export default function AVSList() {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <div className="font-display font-medium text-foreground-1 text-3xl">
+        <div className="font-display text-3xl font-medium text-foreground-1">
           AVS
         </div>
-        <div className="font-display font-medium text-foreground-1 text-base">
+        <div className="font-display text-base font-medium text-foreground-1">
           Actively Validated Services
         </div>
       </div>
-      <div className="bg-content1 border border-outline rounded-lg text-sm">
-        <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+      <div className="rounded-lg border border-outline bg-content1 text-sm">
+        <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
           <div className="min-w-5"></div>
           <span className="basis-1/2">Name</span>
           <span className="basis-1/3">Stakers</span>
@@ -125,7 +125,7 @@ export default function AVSList() {
                   <div
                     key={`avs-item-${i}`}
                     onClick={() => handleAVSItemClick(avs)}
-                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
+                    className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 hover:bg-default`}
                   >
                     <div className="min-w-5">
                       {(searchParams.get('page') - 1) * 10 + i + 1}
@@ -173,19 +173,19 @@ const AVSListSkeleton = () => {
       {[...Array(10)].map((item, i) => (
         <div
           key={i}
-          className="p-4 flex justify-between gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+          className="flex w-full justify-between gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
         >
           <div className="basis-1/2">
-            <Skeleton className="h-6 rounded-md w-2/3 dark:bg-default" />
+            <Skeleton className="h-6 w-2/3 rounded-md dark:bg-default" />
           </div>
           <div className="basis-1/3">
-            <Skeleton className="h-6 rounded-md w-2/3 bg-default dark:bg-default" />
+            <Skeleton className="h-6 w-2/3 rounded-md bg-default dark:bg-default" />
           </div>
           <div className="basis-1/4">
-            <Skeleton className="h-6 rounded-md w-2/3 bg-default dark:bg-default" />
+            <Skeleton className="h-6 w-2/3 rounded-md bg-default dark:bg-default" />
           </div>
           <div className="basis-1/3">
-            <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+            <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
           </div>
         </div>
       ))}

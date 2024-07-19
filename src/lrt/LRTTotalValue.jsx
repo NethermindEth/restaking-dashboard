@@ -9,9 +9,9 @@ export default function LRTTotalValue({
 }) {
   return (
     <>
-      <div className="bg-content1 border border-outline flex flex-row items-center justify-between mb-4 p-4 rounded-lg">
-        <div className="basis-1/2 border-r border-outline flex flex-col gap-2 items-center">
-          <div className="text-foreground-2 text-sm">TVL</div>
+      <div className="mb-4 flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-4">
+        <div className="flex basis-1/2 flex-col items-center gap-2 border-r border-outline">
+          <div className="text-sm text-foreground-2">TVL</div>
           {isLoadingDelegations && (
             <Skeleton
               classNames={{ base: 'border-none h-4 rounded-md w-20' }}
@@ -19,17 +19,17 @@ export default function LRTTotalValue({
           )}
           {!isLoadingDelegations && (
             <div className="text-center">
-              <div className="text-foreground-1 text-sm">
+              <div className="text-sm text-foreground-1">
                 {formatUSD(delegations?.total * delegations?.rate)}
               </div>
-              <div className="text-foreground-2 text-xs">
+              <div className="text-xs text-foreground-2">
                 {formatETH(delegations?.total)}
               </div>
             </div>
           )}
         </div>
-        <div className="basis-1/2 flex flex-col gap-2 items-center">
-          <div className="text-foreground-2 text-sm">
+        <div className="flex basis-1/2 flex-col items-center gap-2">
+          <div className="text-sm text-foreground-2">
             Percentage on EigenLayer
           </div>
           {(isLoadingTVL || isLoadingDelegations) && (
@@ -38,7 +38,7 @@ export default function LRTTotalValue({
             />
           )}
           {!isLoadingTVL && !isLoadingDelegations && (
-            <div className="text-foreground-1 text-sm">
+            <div className="text-sm text-foreground-1">
               {Math.round((delegations?.total * 100) / tvl)}%
             </div>
           )}

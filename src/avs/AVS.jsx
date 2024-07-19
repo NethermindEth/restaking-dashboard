@@ -15,10 +15,10 @@ export default function AVS() {
 
   return (
     <>
-      <div className="border-b font-display font-medium pb-4 mb-12 text-foreground-1 text-3xl uppercase">
+      <div className="mb-12 border-b pb-4 font-display text-3xl font-medium uppercase text-foreground-1">
         AVS
       </div>
-      <div className="flex flex-col lg:flex-row gap-6 md:gap-4">
+      <div className="flex flex-col gap-6 md:gap-4 lg:flex-row">
         <AVSList onSelectionChange={handleSelectionChange} />
         {state.selectedAVS && <AVSDetails avs={state.selectedAVS} />}
       </div>

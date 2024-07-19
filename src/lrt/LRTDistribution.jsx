@@ -222,13 +222,13 @@ export default function LRTDistribution({ data, height }) {
   return (
     <div
       ref={rootRef}
-      className="basis-full bg-content1 border border-outline p-4 rounded-lg text-sm"
+      className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
     >
-      <div className="flex mb-6 gap-2">
-        <div className="flex flex-1 gap-2 justify-between">
+      <div className="mb-6 flex gap-2">
+        <div className="flex flex-1 justify-between gap-2">
           <div className="hidden sm:block">
-            <div className="text-foreground-1 text-lg">Volume trend</div>
-            <div className="text-foreground-2 text-xs">{getLatestTotal}</div>
+            <div className="text-lg text-foreground-1">Volume trend</div>
+            <div className="text-xs text-foreground-2">{getLatestTotal}</div>
           </div>
           <Tabs
             classNames={tabs}
@@ -256,10 +256,10 @@ export default function LRTDistribution({ data, height }) {
         </Tabs>
       </div>
       <div className="relative">
-        <svg ref={containerRef} height={height} className="touch-pan-y w-full">
+        <svg ref={containerRef} height={height} className="w-full touch-pan-y">
           <Group top={margin.top} left={margin.left}>
             <GridRows
-              className="[&_line]:stroke-outline opacity-25"
+              className="opacity-25 [&_line]:stroke-outline"
               height={state.maxY}
               numTicks={4}
               scale={scaleValue}
@@ -353,7 +353,7 @@ export default function LRTDistribution({ data, height }) {
           </Group>
         </svg>
         <div
-          className="absolute border border-outline bottom-px"
+          className="absolute bottom-px border border-outline"
           style={{
             height: brushSize.height,
             width: state.maxX ?? 0
@@ -372,12 +372,12 @@ export default function LRTDistribution({ data, height }) {
         <TooltipInPortal
           key={Math.random()}
           applyPositionStyle={true}
-          className="backdrop-blur bg-white/75 dark:bg-background/75 py-2 rounded min-w-40 shadow-md text-foreground"
+          className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-background/75"
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="font-bold text-xs mb-2 px-2">
+          <div className="mb-2 px-2 text-xs font-bold">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
@@ -386,10 +386,10 @@ export default function LRTDistribution({ data, height }) {
               .map(([key], i) => (
                 <li key={`tt-${key}`}>
                   <div
-                    className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row gap-1 items-center px-2 py-1`}
+                    className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
                   >
                     <span
-                      className="h-3 inline-block rounded-full w-3"
+                      className="inline-block h-3 w-3 rounded-full"
                       style={{ backgroundColor: colors[i] }}
                     ></span>
                     {protocols[key]?.name ?? key}

@@ -205,7 +205,7 @@ const AVSTotalValueOvertimeChart = ({ useUsdRate, data, width, height }) => {
           key={Math.random()}
           top={tooltipTop + 10}
           left={tooltipLeft}
-          className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
+          className="z-10 min-w-40 rounded bg-white p-2 text-foreground shadow-md"
         >
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}

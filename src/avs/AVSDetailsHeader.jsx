@@ -28,19 +28,19 @@ export default function AVSDetailsHeader({ avs }) {
   );
 
   return (
-    <div className="bg-content1 border border-outline rounded-lg w-full p-4 break-words">
+    <div className="w-full break-words rounded-lg border border-outline bg-content1 p-4">
       <div className="flex items-center">
         <AVSLogo avs={avs} />
-        <div className="ml-2 text-foreground-1 text-3xl font-display font-medium">
+        <div className="ml-2 font-display text-3xl font-medium text-foreground-1">
           <span>{avs.metadata?.name ?? 'N/A'}</span>
 
           {/*TODO: implement ranking when coming from list view & accessing directly avs*/}
-          <span className="inline-block text-xs ml-2 p-1 rounded-md bg-foreground-2 text-content1 translate-y-[-25%]">
+          <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1">
             # 1
           </span>
         </div>
       </div>
-      <div className="my-4 text-xs text-foreground-1 break-words">
+      <div className="my-4 break-words text-xs text-foreground-1">
         {avs.metadata?.description ?? 'N/A'}
       </div>
 
@@ -67,13 +67,13 @@ export default function AVSDetailsHeader({ avs }) {
             {avs.address.substr(-4)}
           </Link>
           <Button
-            className="border-none ml-1 text-secondary"
+            className="ml-1 border-none text-secondary"
             isIconOnly
             onClick={() => handleCopy(avs.address)}
             size="sm"
             variant="ghost"
           >
-            <span className="material-symbols-outlined text-secondary text-2xl">
+            <span className="material-symbols-outlined text-2xl text-secondary">
               {state.isCopied ? 'check' : 'content_copy'}
             </span>
           </Button>
@@ -90,7 +90,7 @@ export default function AVSDetailsHeader({ avs }) {
             variant="ghost"
           >
             <span
-              className="bg-secondary h-4 w-4"
+              className="h-4 w-4 bg-secondary"
               style={{
                 mask: 'url(/assets/x.svg) no-repeat',
                 backgroundColor: 'hsl(var(--app-secondary))'
@@ -115,7 +115,7 @@ function AVSLogo({ avs }) {
   if (state.isError) {
     return (
       <Skeleton
-        className="border border-outline rounded-full h-12 max-w-12 w-full"
+        className="h-12 w-full max-w-12 rounded-full border border-outline"
         disableAnimation={state.isError}
       />
     );
