@@ -249,7 +249,7 @@ const BrushHandle = forwardRef(function BrushHandle(props, ref) {
 
   return (
     <div
-      className="absolute flex cursor-ew-resize items-center justify-center rounded-md bg-foreground-2 drop-shadow"
+      className="absolute bg-foreground-2 cursor-ew-resize drop-shadow flex items-center justify-center rounded-md"
       ref={ref}
       style={{
         height: `${height}px`,
@@ -258,7 +258,7 @@ const BrushHandle = forwardRef(function BrushHandle(props, ref) {
         [left ? 'left' : 'right']: `-${width / 2}px`
       }}
     >
-      <div className="h-2 w-1 border-x-1 border-background"></div>
+      <div className="border-background border-x-1 h-2 w-1"></div>
     </div>
   );
 });

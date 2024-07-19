@@ -228,7 +228,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           scale={legendColorScale}
           shape="circle"
           direction="row"
-          className="flex w-full items-center justify-between text-sm uppercase text-foreground-active"
+          className="flex items-center justify-between w-full text-foreground-active text-sm uppercase"
         />
       </div>
       {tooltipData && (
@@ -236,7 +236,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           key={Math.random()}
           top={tooltipTop + 10}
           left={tooltipLeft}
-          className="z-10 min-w-40 rounded bg-white p-2 text-foreground shadow-md"
+          className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
         >
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}

@@ -75,26 +75,26 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
   }, [filteredData]);
 
   return (
-    <Card radius="md" className="border border-outline bg-content1 p-4">
+    <Card radius="md" className="bg-content1 border border-outline p-4 ">
       <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="block space-y-2">
-          <div className="text-xl font-light text-foreground-1">
+        <div className="space-y-2 block">
+          <div className="font-light text-xl text-foreground-1">
             TVL over time
           </div>
           <div className="flex gap-2">
-            <div className="text-sm font-light">
+            <div className="font-light text-sm">
               {filteredData &&
                 formatNumber(filteredData[filteredData.length - 1].tvl)}{' '}
               ETH
             </div>
             <div
-              className={`text-sm font-light ${state.growth > 0 ? 'text-success' : 'text-fail'}`}
+              className={`font-light text-sm ${state.growth > 0 ? 'text-success' : 'text-fail'}`}
             >
               {`${state.growth > 0 ? '+' : ''}${state.growth.toFixed(2)} %`}
             </div>
           </div>
 
-          <div className="text-xs font-light text-default-2">
+          <div className="font-light text-xs text-default-2">
             {filteredData &&
               `$${formatNumber(
                 filteredData[filteredData.length - 1].tvl *
@@ -114,7 +114,7 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
           />
         </div>
       </CardHeader>
-      <CardBody className="h-[400px] w-full">
+      <CardBody className="w-full h-[400px]">
         <ParentSize>
           {({ width, height }) => (
             <AVSTotalValueOvertimeChart
@@ -132,12 +132,12 @@ const AVSTotalValueOvertime = ({ avsAddress }) => {
 
 function RateSelector({ rate, onRateChange }) {
   return (
-    <div className="flex w-full items-center gap-3 p-0">
-      <div className="flex w-full items-center gap-3 rounded-lg border border-outline p-2 md:w-fit">
+    <div className="p-0 w-full flex items-center gap-3">
+      <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
         <div
-          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
             rate === 'usd' &&
-            'border border-outline bg-default text-foreground-active'
+            'bg-default border border-outline text-foreground-active'
           }`}
           onClick={() => onRateChange('usd')}
         >
@@ -145,9 +145,9 @@ function RateSelector({ rate, onRateChange }) {
         </div>
 
         <div
-          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
+          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
             rate === 'eth' &&
-            'border border-outline bg-default text-foreground-active'
+            'bg-default border border-outline text-foreground-active'
           }`}
           onClick={() => onRateChange('eth')}
         >

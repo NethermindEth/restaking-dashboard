@@ -107,9 +107,9 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   }
 
   return (
-    <div className="h-full w-full rounded-lg border border-outline bg-content1 p-4">
-      <div className="mb-4 flex justify-between">
-        <div className="text-medium text-foreground-1">LST distribution</div>
+    <div className="bg-content1 border border-outline h-full rounded-lg w-full p-4">
+      <div className="flex justify-between mb-4">
+        <div className="text-foreground-1 text-medium">LST distribution</div>
         <Tabs
           classNames={tabs}
           defaultSelectedKey="usd"
@@ -155,7 +155,7 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
 
                     {nodeWidth > 55 && nodeHeight > 20 && (
                       <Text
-                        className="fill-white text-xs"
+                        className="text-xs fill-white"
                         dx={8}
                         dy={16}
                         width={nodeWidth}
@@ -173,16 +173,16 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
           key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-sm font-bold">
+          <div className="font-bold mb-2 px-2 text-sm">
             {`${tooltipData.name} (${tooltipData.symbol})`}
           </div>
-          <div className="px-2 text-base">
+          <div className="text-base px-2">
             <div>
               {' '}
               {tooltipData.symbol !== 'EIGEN'

@@ -181,7 +181,7 @@ const RestakersTrendChart = ({ data, width, height }) => {
           key={Math.random()}
           top={tooltipTop + 10}
           left={tooltipLeft}
-          className="z-10 min-w-40 rounded bg-white p-2 text-foreground shadow-md"
+          className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
         >
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}

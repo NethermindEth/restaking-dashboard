@@ -43,9 +43,9 @@ const RestakersTrend = ({ opAddress }) => {
   }, []);
 
   return (
-    <Card radius="md" className="w-full border border-outline bg-content1 p-4">
+    <Card radius="md" className="bg-content1 w-full border border-outline p-4">
       <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="block space-y-2">
+        <div className="space-y-2 block">
           <span className="text-foreground-active">Restaker Trend</span>
           <div className="font-light">
             <div className="text-base text-foreground-1">
@@ -66,7 +66,7 @@ const RestakersTrend = ({ opAddress }) => {
           onTimelineChange={handleTimelineChange}
         />
       </CardHeader>
-      <CardBody className="h-[400px] w-full">
+      <CardBody className="w-full h-[400px]">
         <ParentSize>
           {({ width, height }) => (
             <RestakersTrendChart

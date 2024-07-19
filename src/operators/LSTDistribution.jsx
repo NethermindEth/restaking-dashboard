@@ -99,8 +99,8 @@ const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
   }, [strategies]);
 
   return (
-    <div className="flex flex-col gap-y-4 lg:flex-row">
-      <div className="flex w-full flex-col gap-y-3">
+    <div className="flex flex-col lg:flex-row gap-y-4">
+      <div className="w-full flex flex-col gap-y-3">
         {state.lstDistribution.map((strategy, i) => (
           <LSTShare
             key={`lst-distribution-item-${i}`}
@@ -112,7 +112,7 @@ const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
           />
         ))}
       </div>
-      <div className="flex w-full flex-row items-center justify-center px-4 lg:w-1/2">
+      <div className="w-full lg:w-1/2 flex flex-row items-center justify-center px-4">
         <svg width={width} height={width}>
           <Group top={half} left={half} className="relative">
             <Pie

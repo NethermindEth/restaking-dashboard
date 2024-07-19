@@ -16,9 +16,9 @@ const Pagination = ({
   });
 
   return (
-    <div className="mt-austo flex items-center justify-between gap-x-2 border-t border-outline p-4 text-foreground-1">
+    <div className="flex border-t border-outline gap-x-2 justify-between items-center p-4 text-foreground-1 mt-austo">
       <span
-        className={`material-symbols-outlined cursor-pointer ${activePage === 1 && 'text-disabled'}`}
+        className={`cursor-pointer material-symbols-outlined ${activePage === 1 && 'text-disabled'}`}
         onClick={handlePrevious}
       >
         arrow_back_ios
@@ -46,7 +46,7 @@ const Pagination = ({
           })}
       </div>
       <div
-        className={`material-symbols-outlined cursor-pointer ${activePage === totalPages && 'text-disabled'}`}
+        className={`cursor-pointer material-symbols-outlined ${activePage === totalPages && 'text-disabled'}`}
         onClick={handleNext}
       >
         arrow_forward_ios

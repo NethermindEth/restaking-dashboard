@@ -66,10 +66,10 @@ export default function AVSDetails() {
   return (
     <>
       {state.isAVSLoading ? (
-        <div className="min-h-[128px] w-full rounded-lg border border-outline bg-content1 p-4">
-          <div className="flex max-w-[300px] items-center">
-            <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
-            <Skeleton className="ml-2 h-8 w-full rounded-md" />
+        <div className="bg-content1 border border-outline rounded-lg w-full min-h-[128px] p-4">
+          <div className="flex items-center max-w-[300px]">
+            <Skeleton className="border border-outline rounded-full size-12 shrink-0" />
+            <Skeleton className="w-full h-8 rounded-md ml-2" />
           </div>
           <div className="my-4">
             <Skeleton className="h-16 w-full rounded-md" />
@@ -96,14 +96,14 @@ export default function AVSDetails() {
           key="tvl"
           title={
             <div className="flex flex-col">
-              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+              <div className="group-aria-selected:text-foreground-1 text-foreground-2 text-sm">
                 Total value
               </div>
               <div>
                 {state.isAVSLoading ? (
                   <Skeleton className="mt-2 h-4 w-full rounded-md" />
                 ) : (
-                  <span className="text-foreground-1 group-aria-selected:text-foreground">
+                  <span className="group-aria-selected:text-foreground text-foreground-1">
                     {formatETH(
                       state.totalTokens.lst + state.totalTokens.eth,
                       compact
@@ -126,14 +126,14 @@ export default function AVSDetails() {
           key="operators"
           title={
             <div className="flex flex-col">
-              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+              <div className="group-aria-selected:text-foreground-1 text-foreground-2 text-sm">
                 Operators
               </div>
               <div>
                 {state.isAVSLoading ? (
                   <Skeleton className="my-1 h-4 w-full rounded-md" />
                 ) : (
-                  <span className="text-foreground-1 group-aria-selected:text-foreground">
+                  <span className="group-aria-selected:text-foreground text-foreground-1">
                     {formatNumber(state.avs.operators)}
                   </span>
                 )}
