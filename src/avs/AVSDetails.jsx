@@ -83,9 +83,10 @@ export default function AVSDetails() {
         className="my-4"
         classNames={{
           base: 'flex w-full',
-          tabList: 'w-full rounded-lg border border-outline bg-content1 p-0',
-          tab: 'h-100 m-2',
-          panel: 'p-0'
+          cursor: 'rounded border border-outline shadow-none',
+          panel: 'p-0',
+          tab: 'h-fit p-2',
+          tabList: 'w-full rounded-lg border border-outline bg-content1 p-2'
         }}
         disabledKeys={['restakers']}
         radius="sm"
