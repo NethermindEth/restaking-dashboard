@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const useDebounce = (value, delay, isSearchTerm) => {
+const useDebouncedSearch = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   const validateSearchTerm = query => {
@@ -10,17 +10,15 @@ const useDebounce = (value, delay, isSearchTerm) => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (isSearchTerm) {
-        if (validateSearchTerm(value)) setDebouncedValue(value);
-      } else setDebouncedValue(value);
+      if (validateSearchTerm(value)) setDebouncedValue(value);
     }, delay);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [value, delay, isSearchTerm]);
+  }, [value, delay]);
 
   return debouncedValue;
 };
 
-export default useDebounce;
+export default useDebouncedSearch;

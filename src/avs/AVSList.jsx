@@ -14,7 +14,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import log from '../shared/logger';
 import Pagination from '../shared/Pagination';
 import { reduceState } from '../shared/helpers';
-import useDebounce from '../shared/hooks/useDebounce';
+import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 
@@ -56,7 +56,11 @@ export default function AVSList() {
     sortDescriptor: null
   });
 
-  const debouncedSearchTerm = useDebounce(state.searchTerm, 300, true);
+  const debouncedSearchTerm = useDebouncedSearch(
+    state.searchTerm ?? '',
+    300,
+    false
+  );
 
   const fetchAVS = useCallback(
     async (pageNumber, search) => {
@@ -127,17 +131,9 @@ export default function AVSList() {
     const page = searchParams.get('page');
 
     const params = {};
-    if (page && debouncedSearchTerm) {
-      params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
-      params.search = debouncedSearchTerm;
-    } else if (page) {
-      params.page = page;
-    } else if (debouncedSearchTerm) {
-      params.page = 1;
-      params.search = debouncedSearchTerm;
-    } else {
-      params.page = 1;
-    }
+    params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
+    if (debouncedSearchTerm) params.search = debouncedSearchTerm;
+
     setSearchParams(params, { replace: true });
     fetchAVS(params.page, params.search);
     dispatch({ searchTriggered: false });
