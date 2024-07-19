@@ -11,7 +11,6 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import log from '../shared/logger';
 import Pagination from '../shared/Pagination';
 import { reduceState } from '../shared/helpers';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
@@ -20,22 +19,22 @@ import { useServices } from '../@services/ServiceContext';
 
 const columns = [
   {
-    key: 'AVS',
+    key: 'avs',
     label: 'AVS',
     className: 'w-64 md:w-2/5'
   },
   {
-    key: 'Restakers',
+    key: 'staker',
     label: 'Restakers',
     className: 'text-end w-36 md:w-1/5'
   },
   {
-    key: 'Operators',
+    key: 'operator',
     label: 'Operators',
     className: 'text-end w-36 md:w-1/5'
   },
   {
-    key: 'TVL',
+    key: 'tvl',
     label: 'TVL',
     className: 'text-end w-40 md:w-1/5'
   }
@@ -53,7 +52,14 @@ export default function AVSList() {
     error: null,
     rate: 1,
     searchTriggered: false,
-    sortDescriptor: null
+    sortDescriptor: searchParams.get('sort')
+      ? {
+          column: searchParams.get('sort').replace('-', ''),
+          direction: searchParams.get('sort').startsWith('-')
+            ? 'descending'
+            : 'ascending'
+        }
+      : null
   });
 
   const debouncedSearchTerm = useDebouncedSearch(
@@ -63,7 +69,7 @@ export default function AVSList() {
   );
 
   const fetchAVS = useCallback(
-    async (pageNumber, search) => {
+    async (pageNumber, search, sort) => {
       try {
         dispatch({ isFetchingAvsData: true, error: null });
 
@@ -75,6 +81,7 @@ export default function AVSList() {
         const response = await avsService.getAll(
           pageNumber,
           search,
+          sort,
           abortController.current.signal
         );
 
@@ -128,14 +135,24 @@ export default function AVSList() {
   };
 
   useEffect(() => {
-    const page = searchParams.get('page');
+    const page = searchParams.get('page') ?? 1;
 
     const params = {};
     params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
     if (debouncedSearchTerm) params.search = debouncedSearchTerm;
+    if (state.sortDescriptor) {
+      params.sort =
+        state.sortDescriptor.direction === 'ascending'
+          ? state.sortDescriptor.column
+          : `-${state.sortDescriptor.column}`;
+    } else {
+      if (searchParams.get('sort')) {
+        params.sort = searchParams.get('sort');
+      }
+    }
 
     setSearchParams(params, { replace: true });
-    fetchAVS(params.page, params.search);
+    fetchAVS(params.page, params.search, params.sort);
     dispatch({ searchTriggered: false });
   }, [
     debouncedSearchTerm,
@@ -143,16 +160,13 @@ export default function AVSList() {
     fetchAVS,
     searchParams,
     setSearchParams,
-    state.searchTriggered
+    state.searchTriggered,
+    state.sortDescriptor
   ]);
 
   useEffect(() => {
     dispatch({ searchTriggered: true });
   }, [dispatch, debouncedSearchTerm]);
-
-  useEffect(() => {
-    if (state.sortDescriptor) log.debug(state.sortDescriptor); // capture user's selection and recall the API with sorting params
-  }, [state.sortDescriptor]);
 
   return (
     <div className="space-y-4">

@@ -1,12 +1,13 @@
 import { apiGet } from './apiCall';
 
 export default class AVSService {
-  async getAll(pageNumber, search, signal) {
+  async getAll(pageNumber, search, sort, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
     const response = await apiGet('/avs', {
       query: {
         'page-index': pageIndex,
-        search
+        search,
+        sort
       },
       signal
     });
