@@ -1,5 +1,5 @@
 .footer-social {
-  @apply h-4 w-4 ps-6;
+  @apply h-4 ps-6 w-4;
 }
 
 .footer-discord .icon {

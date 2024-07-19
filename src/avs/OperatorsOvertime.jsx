@@ -68,20 +68,20 @@ const OperatorsOvertime = ({ avsAddress }) => {
   }, [filteredData]);
 
   return (
-    <Card radius="md" className="border border-outline bg-content1 p-4">
+    <Card radius="md" className="bg-content1 border border-outline p-4 ">
       <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="block space-y-2">
-          <div className="text-lg font-light text-foreground-1">
+        <div className="space-y-2 block">
+          <div className="font-light text-lg text-foreground-1">
             Total operators over time
           </div>
 
           <div className="flex gap-2">
-            <div className="text-sm font-light">
+            <div className="font-light text-sm">
               {filteredData &&
                 formatNumber(filteredData[filteredData.length - 1].operators)}
             </div>
             <div
-              className={`text-sm font-light ${state.growth > 0 ? 'text-success' : 'text-fail'}`}
+              className={`font-light text-sm ${state.growth > 0 ? 'text-success' : 'text-fail'}`}
             >
               {`${state.growth > 0 ? '+' : ''}${state.growth.toFixed(2)} %`}
             </div>
@@ -92,7 +92,7 @@ const OperatorsOvertime = ({ avsAddress }) => {
           onTimelineChange={handleTimelineChange}
         />
       </CardHeader>
-      <CardBody className="h-[400px] w-full">
+      <CardBody className="w-full h-[400px]">
         <ParentSize>
           {({ width, height }) => (
             <OperatorsOvertimeChart

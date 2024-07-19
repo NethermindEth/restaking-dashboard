@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { Group } from '@visx/group';
 import { scaleLinear, scaleTime } from '@visx/scale';
-import { AxisBottom, AxisLeft } from '@visx/axis';
+import { AxisLeft, AxisBottom } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
 import { extent } from 'd3-array';
-import { GridColumns, GridRows } from '@visx/grid';
-import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
+import { GridRows, GridColumns } from '@visx/grid';
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
-import { formatDateToVerboseString, formatNumber } from '../utils';
+import { formatNumber, formatDateToVerboseString } from '../utils';
 
 const getNumberOfTicks = (width, axis) => {
   if (axis === 'x') {
@@ -188,7 +188,7 @@ const OperatorTVLOverTimeChart = ({ data, useUsdRate, width, height }) => {
           key={Math.random()}
           top={tooltipTop + 10}
           left={tooltipLeft}
-          className="z-10 min-w-40 rounded bg-white p-2 text-foreground shadow-md"
+          className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
         >
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}

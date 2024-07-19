@@ -27,7 +27,7 @@ function EigenDisclaimer() {
         isOpen={isOpen}
       >
         <span
-          className="material-symbols-outlined text-base"
+          className="text-base material-symbols-outlined"
           style={{
             fontVariationSettings: `'FILL' 0`
           }}
@@ -50,13 +50,13 @@ export default function LSTDistribution({
   const compact = !useTailwindBreakpoint('md');
 
   return (
-    <div className="relative flex w-full flex-col items-start justify-between gap-4 md:flex-row">
-      <div className="w-full space-y-4">
+    <div className="w-full flex md:flex-row flex-col items-start justify-between gap-4 relative">
+      <div className="space-y-4 w-full">
         <Card
           radius="md"
-          className="space-y-4 border border-outline bg-content1 p-4"
+          className="bg-content1 border border-outline space-y-4 p-4"
         >
-          <div className="text-base font-light text-foreground-1">
+          <div className="font-light text-base text-foreground-1">
             {' '}
             Total ETH distribution
           </div>
@@ -68,7 +68,7 @@ export default function LSTDistribution({
                   key={`lst-item-${i}`}
                   className={cn(
                     i !== 0 && 'border-t',
-                    `flex flex-row items-center justify-between gap-x-2 border-outline p-4 hover:bg-default`
+                    `border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function LSTDistribution({
                         <EigenDisclaimer />
                       )}
                     </div>
-                    <div className="text-end text-sm text-subtitle">
+                    <div className="text-sm text-subtitle text-end">
                       {formatNumber(lst.tvl, compact)} ETH
                     </div>
                   </div>
@@ -110,9 +110,9 @@ export default function LSTDistribution({
 
         <Card
           radius="md"
-          className="w-full space-y-4 border border-outline bg-content1 p-4"
+          className="bg-content1 border border-outline w-full space-y-4 p-4"
         >
-          <div className="text-base font-light text-foreground-1">
+          <div className="font-light text-base text-foreground-1">
             LST distribution
           </div>
 
@@ -122,7 +122,7 @@ export default function LSTDistribution({
                 key={`lst-item-${i}`}
                 className={cn(
                   i !== 0 && 'border-t',
-                  `flex flex-row items-center justify-between gap-x-2 border-outline p-4 hover:bg-default`
+                  `border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function LSTDistribution({
           </div>
         </Card>
       </div>
-      <div className="top-4 flex w-full flex-col items-end justify-between gap-4 md:sticky">
+      <div className="flex flex-col gap-4 justify-between items-end w-full md:sticky top-4">
         <LSTTreeMap
           height={500}
           totalEthDistributionData={totalEthDistributionData}

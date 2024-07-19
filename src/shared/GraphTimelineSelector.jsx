@@ -1,13 +1,15 @@
+import React from 'react';
+
 export default function GraphTimelineSelector({
   timelineTab,
   onTimelineChange
 }) {
   return (
-    <div className="flex w-full items-center gap-3 rounded-lg border border-outline p-2 md:w-fit">
+    <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
       <div
-        className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
+        className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
           timelineTab === '7days' &&
-          'border border-outline bg-default text-foreground-active'
+          'bg-default border border-outline text-foreground-active'
         }`}
         onClick={() => onTimelineChange('7days')}
       >
@@ -15,9 +17,9 @@ export default function GraphTimelineSelector({
       </div>
 
       <div
-        className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
+        className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
           timelineTab === '30days' &&
-          'border border-outline bg-default text-foreground-active'
+          'bg-default border border-outline text-foreground-active'
         }`}
         onClick={() => onTimelineChange('30days')}
       >
@@ -25,9 +27,9 @@ export default function GraphTimelineSelector({
       </div>
 
       <div
-        className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
+        className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
           timelineTab === 'all' &&
-          'border border-outline bg-default text-foreground-active'
+          'bg-default border border-outline text-foreground-active'
         }`}
         onClick={() => onTimelineChange('all')}
       >

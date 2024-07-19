@@ -9,7 +9,6 @@ const levels = {
   warn: 'WRN'
 };
 const methodFactory = log.methodFactory;
-// eslint-disable-next-line no-undef
 const timeFormatter = Intl.DateTimeFormat('en', {
   hourCycle: 'h23',
   timeStyle: 'medium'
