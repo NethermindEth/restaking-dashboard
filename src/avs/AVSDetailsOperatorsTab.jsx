@@ -78,8 +78,8 @@ function AVSOperatorsList() {
     <Table
       aria-label="List of operators registered for AVS"
       classNames={{
-        wrapper: 'rounded-lg border border-outline px-0',
-        th: 'border-b border-outline bg-transparent px-4 text-sm text-foreground',
+        wrapper: 'border border-outline rounded-lg px-0',
+        th: 'border-b border-outline bg-transparent text-sm text-foreground px-4',
         tr: 'border-b border-outline last:border-none'
       }}
       layout="fixed"

@@ -14,7 +14,7 @@ export default function LRTTotalValue({
           <div className="text-foreground-2 text-sm">TVL</div>
           {isLoadingDelegations && (
             <Skeleton
-              classNames={{ base: 'h-4 w-20 rounded-md border-none' }}
+              classNames={{ base: 'border-none h-4 rounded-md w-20' }}
             />
           )}
           {!isLoadingDelegations && (
@@ -34,7 +34,7 @@ export default function LRTTotalValue({
           </div>
           {(isLoadingTVL || isLoadingDelegations) && (
             <Skeleton
-              classNames={{ base: 'h-4 w-20 rounded-md border-none' }}
+              classNames={{ base: 'border-none h-4 rounded-md w-20' }}
             />
           )}
           {!isLoadingTVL && !isLoadingDelegations && (

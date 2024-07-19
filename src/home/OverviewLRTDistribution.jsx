@@ -288,11 +288,11 @@ const LRTShare = ({ label, value, image, share }) => {
       <Progress
         radius="sm"
         classNames={{
-          base: 'w-full lg:w-5/6',
-          track: 'border border-default bg-cinder-1 drop-shadow-md',
+          base: 'lg:w-5/6 w-full',
+          track: 'drop-shadow-md border bg-cinder-1 border-default',
           indicator: 'bg-cinder-default',
-          label: 'text-sm font-normal capitalize text-foreground-active',
-          value: 'text-xs font-normal text-white'
+          label: 'text-foreground-active text-sm font-normal capitalize',
+          value: 'text-white text-xs font-normal'
         }}
         label={
           <div className="flex items-center gap-2">

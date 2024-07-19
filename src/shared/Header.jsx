@@ -23,8 +23,8 @@ export default function Header() {
         />
         <Modal
           classNames={{
-            base: 'm-0 h-full w-full rounded-none p-0 sm:m-0',
-            closeButton: 'text-foreground hover:bg-default/20',
+            base: 'h-full m-0 sm:m-0 p-0 rounded-none w-full',
+            closeButton: 'hover:bg-default/20 text-foreground',
             wrapper: [
               'bottom-0',
               'fixed',
