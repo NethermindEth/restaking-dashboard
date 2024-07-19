@@ -1,5 +1,6 @@
 export default {
   arrowParens: 'avoid',
   singleQuote: true,
-  trailingComma: 'none'
+  trailingComma: 'none',
+  plugins: ['prettier-plugin-tailwindcss']
 };
