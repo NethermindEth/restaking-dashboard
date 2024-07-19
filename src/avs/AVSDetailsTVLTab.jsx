@@ -1,7 +1,7 @@
 import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
-  STRATEGY_ASSET_MAPPING
+  lstStrategyAssetMapping
 } from './helpers';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import {
@@ -17,7 +17,14 @@ import {
   TableRow,
   Tooltip
 } from '@nextui-org/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ParentSize } from '@visx/responsive';
+import { reduceState } from '../shared/helpers';
+import TVLTabLineChart from './charts/TVLTabLineChart';
+import TVLTabTreemap from './charts/TVLTabTreemap';
+import { useMutativeReducer } from 'use-mutative';
+import { useParams } from 'react-router-dom';
+import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function AVSDetailsTVLTab({
@@ -26,16 +33,59 @@ export default function AVSDetailsTVLTab({
   ethRate,
   isAVSLoading
 }) {
+  const { address } = useParams();
+
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    points: undefined,
+    isChartLoading: true
+  });
+  const { avsService } = useServices();
+
+  useEffect(() => {
+    (async () => {
+      dispatch({ isChartLoading: true });
+      const response = await avsService.getAVSTotalValue(address);
+      dispatch({
+        isChartLoading: false,
+        points: response
+      });
+    })();
+  }, [address, avsService, dispatch]);
+
+  // our endpoint only returns up to yesterdays data. We need to append today's data point
+  // into the graph
+  const currentPoint = useMemo(
+    () => ({
+      timestamp: new Date(),
+      // use current eth rate as "historical" rate
+      rate: ethRate,
+      tvl: totalTokens.eth + totalTokens.lst
+    }),
+    [ethRate, totalTokens]
+  );
+
   return (
     <>
-      {/*line chart*/}
-      <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
-        <Spinner color="primary" size="lg" />
-      </div>
+      {/* line chart */}
+      {isAVSLoading || state.isChartLoading ? (
+        <div className="bg-content1 border border-outline flex items-center justify-center h-[390px] mb-4 p-4 rounded-lg w-full">
+          <Spinner color="primary" size="lg" />
+        </div>
+      ) : (
+        <ParentSize className="mb-4">
+          {parent => (
+            <TVLTabLineChart
+              height={288}
+              points={state.points.concat(currentPoint)}
+              width={parent.width}
+            />
+          )}
+        </ParentSize>
+      )}
 
       {/*layout*/}
-      <div className="flex flex-col md:flex-row w-full h-full">
-        <div className="basis-1/2 mt-4">
+      <div className="flex flex-col gap-4 md:flex-row w-full h-min">
+        <div className="basis-1/2 w-full md:w-1/2">
           <TokensBreakdownList
             ethRate={ethRate}
             isAVSLoading={isAVSLoading}
@@ -49,11 +99,32 @@ export default function AVSDetailsTVLTab({
           />
         </div>
         {/* treemap */}
-        <div className="basis-1/2 mt-4 md:ml-4">
-          <div className="bg-content1 border border-outline flex items-center justify-center h-full min-h-[512px] p-4 rounded-lg w-full">
-            <Spinner color="primary" size="lg" />
+        {isAVSLoading ? (
+          <div className="basis-1/2">
+            <div className="bg-content1 border border-outline flex items-center justify-center h-full min-h-[512px] p-4 rounded-lg w-full">
+              <Spinner color="primary" size="lg" />
+            </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="basis-1/2 w-full md:w-1/2">
+              <ParentSize className="h-full">
+                {parent => (
+                  <TVLTabTreemap
+                    ethRate={ethRate}
+                    // the extra 88 is from 1px top/bottom border , 16px top/bottomp padding
+                    // 38px title and control, 16px margin bottom for title
+                    // otherwise we will have an infinitely growing SVG because there is no fixed height
+                    height={(parent.height || 512) - 2 - 32 - 38 - 16}
+                    lst={lst}
+                    // 1px left/right border, 16px left/right padding
+                    width={parent.width - 2 - 32}
+                  />
+                )}
+              </ParentSize>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
@@ -147,7 +218,9 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
                   )}
 
                   <div className="text-xs text-foreground-2">
-                    {formatNumber(total, compact)} {tokens[key].symbol}
+                    {key !== 'eigen'
+                      ? formatETH(total, compact)
+                      : `EIGEN ${formatNumber(total, compact)}`}
                   </div>
                 </div>
               </TableCell>
@@ -210,14 +283,14 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
                   <Image
                     fallbackSrc="/eth.png"
                     height={16}
-                    src={STRATEGY_ASSET_MAPPING[key].logo}
+                    src={lstStrategyAssetMapping[key].logo}
                     width={16}
                   />
                   <span className="text-foreground-2 truncate">
-                    {STRATEGY_ASSET_MAPPING[key]?.name}
+                    {lstStrategyAssetMapping[key]?.name}
                   </span>{' '}
                   <span className="text-foreground-1">
-                    {STRATEGY_ASSET_MAPPING[key]?.symbol}
+                    {lstStrategyAssetMapping[key]?.symbol}
                   </span>
                 </div>
               </TableCell>
