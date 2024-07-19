@@ -202,7 +202,7 @@ export default function AVSList() {
             {column => (
               <TableColumn
                 allowsSorting
-                className={`bg-transparent py-4 text-foreground-active text-sm font-normal leading-5 ${column.className}`}
+                className={`bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5 ${column.className}`}
                 key={column.key}
               >
                 {column.label}
