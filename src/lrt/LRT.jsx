@@ -1,9 +1,9 @@
-import { formatEther } from 'ethers';
+import { handleServiceError, reduceState } from '../shared/helpers';
+import ErrorMessage from '../shared/ErrorMessage';
 import log from '../shared/logger';
 import LRTDistribution from './LRTDistribution';
 import LRTList from './LRTList';
 import LRTTotalValue from './LRTTotalValue';
-import { reduceState } from '../shared/helpers';
 import { Spinner } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
@@ -19,82 +19,31 @@ export default function LRT() {
 
       dispatch({ isLoadingLRTData: true });
 
+      let results;
+      let error;
+
       try {
-        const results = await lrtService.getAll();
+        results = await lrtService.getAll();
 
         log.debug('Fetched LRT data:', results.length);
-
-        dispatch({ results });
       } catch (e) {
-        // TODO: handle error
         log.error('Failed fetching LRT data', e);
-      } finally {
-        dispatch({ isLoadingLRTData: false });
+
+        error = handleServiceError(e);
       }
-    }
 
-    async function fetchDelegations() {
-      log.debug('Fetching LRT data');
-
-      dispatch({ isLoadingDelegations: true });
-
-      try {
-        const delegations = await lrtService.getLatestDelegations();
-
-        log.debug('Fetched LRT delegations:', delegations.length);
-
-        let total = Number(
-          formatEther(
-            delegations.protocols
-              .map(p => BigInt(p.amount))
-              .reduce((acc, amount) => (acc += amount), 0n)
-          )
-        ).toFixed(0);
-
-        dispatch({ delegations: { total, rate: delegations.rate } });
-      } catch (e) {
-        // TODO: handle error
-        log.error('Failed fetching LRT delegations', e);
-      } finally {
-        dispatch({ isLoadingDelegations: false });
-      }
-    }
-
-    async function fetchELTotal() {
-      log.debug('Fetching EigenLayer TVL');
-
-      dispatch({ isLoadingTVL: true });
-
-      try {
-        const tvls = await eigenlayerService.getEigenLayerTVLOvertime();
-
-        log.debug('Fetched EigenLayer TVL:', tvls.length);
-
-        const latest = tvls[tvls.length - 1];
-        const tvl = Number(
-          formatEther(BigInt(latest.ethTVL) + BigInt(latest.lstTVL))
-        );
-
-        dispatch({ elTVL: tvl });
-      } catch (e) {
-        // TODO: handle error
-        log.error('Failed fetching LRT delegations', e);
-      } finally {
-        dispatch({ isLoadingTVL: false });
-      }
+      dispatch({ error, isLoadingLRTData: false, lrtData: results });
     }
 
     fetchData();
-    fetchDelegations();
-    fetchELTotal();
   }, [dispatch, eigenlayerService, lrtService]);
 
   return (
     <>
-      <div className="font-display font-medium mb-4 text-foreground-1 text-3xl">
+      <div className="mb-4 font-display text-3xl font-medium text-foreground-1">
         Liquid restaking tokens
       </div>
-      <div className="text-foreground-1 text-xs mb-4">
+      <div className="mb-4 text-xs text-foreground-1">
         Liquid Restaking Tokens (LRTs) are similar to Liquid Staking Tokens
         except they not only capture the rewards from staking, but also the
         rewards generated from restaking liquid staked assets (such as LSTs or
@@ -102,22 +51,20 @@ export default function LRT() {
         restaking while maintaining liquidity, as the tokens can be traded,
         transferred, or used in various DeFi applications.
       </div>
-      <LRTTotalValue
-        delegations={state.delegations}
-        isLoadingDelegations={state.isLoadingDelegations}
-        isLoadingTVL={state.isLoadingTVL}
-        tvl={state.elTVL}
-      />
-      <div className="flex flex-col xl:flex-row gap-4">
-        {state.isLoadingLRTData && (
-          <div className="bg-content1 border border-outline flex items-center justify-center h-[512px] p-4 rounded-lg w-full">
-            <Spinner color="primary" size="lg" />
+      <LRTTotalValue />
+      <div className="flex flex-col gap-4 xl:flex-row">
+        {(state.isLoadingLRTData || state.error) && (
+          <div className="flex h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+            {state.isLoadingLRTData && <Spinner color="primary" size="lg" />}
+            {!state.isLoadingLRTData && state.error && (
+              <ErrorMessage error={state.error} />
+            )}
           </div>
         )}
-        {!state.isLoadingLRTData && state.results && (
+        {!state.isLoadingLRTData && state.lrtData && (
           <>
-            <LRTDistribution data={state.results} height={512} />
-            <LRTList data={state.results[state.results.length - 1]} />
+            <LRTDistribution data={state.lrtData} height={512} />
+            <LRTList data={state.lrtData[state.lrtData.length - 1]} />
           </>
         )}
       </div>

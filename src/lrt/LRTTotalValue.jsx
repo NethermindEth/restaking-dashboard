@@ -1,47 +1,127 @@
 import { formatETH, formatUSD } from '../shared/formatters';
+import { handleServiceError, reduceState } from '../shared/helpers';
+import ErrorMessage from '../shared/ErrorMessage';
+import log from '../shared/logger';
 import { Skeleton } from '@nextui-org/react';
+import { useEffect } from 'react';
+import { useMutativeReducer } from 'use-mutative';
+import { useServices } from '../@services/ServiceContext';
 
-export default function LRTTotalValue({
-  delegations,
-  isLoadingDelegations,
-  isLoadingTVL,
-  tvl
-}) {
+export default function LRTTotalValue() {
+  const { eigenlayerService, lrtService } = useServices();
+  const [state, dispatch] = useMutativeReducer(reduceState, {});
+
+  useEffect(() => {
+    async function fetchDelegations() {
+      log.debug('Fetching LRT data');
+
+      dispatch({ isLoadingDelegations: true });
+
+      let delegations;
+      let error;
+
+      try {
+        const results = await lrtService.getLatestDelegations();
+
+        log.debug('Fetched LRT delegations:', results.length);
+
+        let total = Number(
+          results.protocols
+            .map(p => BigInt(p.amount))
+            .reduce((acc, amount) => (acc += amount), 0n) / BigInt(1e18)
+        );
+
+        delegations = { rate: results.rate, total };
+      } catch (e) {
+        log.error('Failed fetching LRT delegations', e);
+
+        error = handleServiceError(e);
+      }
+
+      dispatch({
+        delegations,
+        delegationsError: error,
+        isLoadingDelegations: false
+      });
+    }
+
+    async function fetchELTotal() {
+      log.debug('Fetching EigenLayer TVL');
+
+      dispatch({ isLoadingTVL: true });
+
+      let tvl;
+      let error;
+
+      try {
+        const results = await eigenlayerService.getEigenLayerTVLOvertime();
+
+        log.debug('Fetched EigenLayer TVL:', results.length);
+
+        const latest = results[results.length - 1];
+
+        tvl = Number(
+          (BigInt(latest.ethTVL) + BigInt(latest.lstTVL)) / BigInt(1e18)
+        );
+      } catch (e) {
+        log.error('Failed fetching LRT delegations', e);
+
+        error = handleServiceError(e);
+      }
+
+      dispatch({ isLoadingTVL: false, tvl, tvlError: error });
+    }
+
+    fetchDelegations();
+    fetchELTotal();
+  }, [dispatch, eigenlayerService, lrtService]);
+
   return (
     <>
-      <div className="bg-content1 border border-outline flex flex-row items-center justify-between mb-4 p-4 rounded-lg">
-        <div className="basis-1/2 border-r border-outline flex flex-col gap-2 items-center">
-          <div className="text-foreground-2 text-sm">TVL</div>
-          {isLoadingDelegations && (
+      <div className="mb-4 flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-4">
+        <div className="flex basis-1/2 flex-col items-center gap-2 border-r border-outline">
+          <div className="text-sm text-foreground-2">TVL</div>
+          {state.isLoadingDelegations && (
             <Skeleton
               classNames={{ base: 'border-none h-4 rounded-md w-20' }}
             />
           )}
-          {!isLoadingDelegations && (
+          {!state.isLoadingDelegations && state.delegationsError && (
+            <ErrorMessage message="Failed loading LRT TVL" />
+          )}
+          {!state.isLoadingDelegations && state.delegations && (
             <div className="text-center">
-              <div className="text-foreground-1 text-sm">
-                {formatUSD(delegations?.total * delegations?.rate)}
+              <div className="text-sm text-foreground-1">
+                {formatUSD(state.delegations?.total * state.delegations?.rate)}
               </div>
-              <div className="text-foreground-2 text-xs">
-                {formatETH(delegations?.total)}
+              <div className="text-xs text-foreground-2">
+                {formatETH(state.delegations?.total)}
               </div>
             </div>
           )}
         </div>
-        <div className="basis-1/2 flex flex-col gap-2 items-center">
-          <div className="text-foreground-2 text-sm">
+        <div className="flex basis-1/2 flex-col items-center gap-2">
+          <div className="text-sm text-foreground-2">
             Percentage on EigenLayer
           </div>
-          {(isLoadingTVL || isLoadingDelegations) && (
+          {(state.isLoadingTVL || state.isLoadingDelegations) && (
             <Skeleton
               classNames={{ base: 'border-none h-4 rounded-md w-20' }}
             />
           )}
-          {!isLoadingTVL && !isLoadingDelegations && (
-            <div className="text-foreground-1 text-sm">
-              {Math.round((delegations?.total * 100) / tvl)}%
-            </div>
-          )}
+          {!state.isLoadingDelegations &&
+            !state.isLoadingTVL &&
+            (state.delegationsError || state.tvlError) && (
+              <ErrorMessage message="Failed loading EigenLayer TVL" />
+            )}
+          {!state.isLoadingTVL &&
+            !state.isLoadingDelegations &&
+            state.delegations &&
+            state.tvl && (
+              <div className="text-sm text-foreground-1">
+                {Math.round((state.delegations?.total * 100) / state.tvl)}%
+              </div>
+            )}
         </div>
       </div>
     </>
