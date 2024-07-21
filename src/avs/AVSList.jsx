@@ -145,10 +145,6 @@ export default function AVSList() {
         state.sortDescriptor.direction === 'ascending'
           ? state.sortDescriptor.column
           : `-${state.sortDescriptor.column}`;
-    } else {
-      if (searchParams.get('sort')) {
-        params.sort = searchParams.get('sort');
-      }
     }
 
     setSearchParams(params, { replace: true });
@@ -165,7 +161,7 @@ export default function AVSList() {
   ]);
 
   useEffect(() => {
-    dispatch({ searchTriggered: true });
+    if (debouncedSearchTerm) dispatch({ searchTriggered: true });
   }, [dispatch, debouncedSearchTerm]);
 
   return (
