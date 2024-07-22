@@ -260,8 +260,7 @@ function AVSOperatorsList({ address, tvl }) {
         className="overflow-x-scroll"
         classNames={{
           wrapper: 'rounded-lg border border-outline px-0',
-          th: 'border-b border-outline bg-transparent px-4 text-sm text-foreground',
-          tr: 'border-b border-outline last:border-none'
+          th: 'bg-transparent px-4 text-sm text-foreground'
         }}
         layout="fixed"
         removeWrapper
@@ -302,7 +301,7 @@ function AVSOperatorsList({ address, tvl }) {
         >
           {state.isTableLoading &&
             [...new Array(10)].map((_, i) => (
-              <TableRow key={i}>
+              <TableRow className="border-t border-outline" key={i}>
                 <TableCell>
                   <Skeleton className="h-4 w-4/5 rounded-md" />
                 </TableCell>
@@ -320,7 +319,7 @@ function AVSOperatorsList({ address, tvl }) {
           {!state.isTableLoading &&
             state.operators.map((op, i) => (
               <TableRow
-                className="cursor-pointer border-t border-outline text-sm hover:bg-default"
+                className="cursor-pointer border-t border-outline hover:bg-default"
                 key={`avs-operator-${i}`}
                 onClick={() => {
                   navigate(`/operators/${op.address}`, {
