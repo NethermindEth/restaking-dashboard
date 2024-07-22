@@ -1,4 +1,6 @@
+import { formatETH, formatUSD } from '../shared/formatters';
 import {
+  Input,
   Skeleton,
   Spinner,
   Table,
@@ -8,15 +10,18 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/react';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
+import Pagination from '../shared/Pagination';
 import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../shared/helpers';
+import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
-import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
-export default function AVSDetailsOperatorsTab({ operators }) {
+export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
   const { address } = useParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     points: undefined,
@@ -64,51 +69,276 @@ export default function AVSDetailsOperatorsTab({ operators }) {
       )}
 
       {/*layout*/}
-      <div className="flex h-full w-full">
-        <div className="mt-4 w-full">
-          <AVSOperatorsList />
+      <div className="flex w-full h-full">
+        <div className="w-full mt-4">
+          <AVSOperatorsList
+            address={address}
+            tvl={totalTokens.lst + totalTokens.eth}
+          />
         </div>
       </div>
     </>
   );
 }
 
-function AVSOperatorsList() {
-  return (
-    <Table
-      aria-label="List of operators registered for AVS"
-      classNames={{
-        wrapper: 'border border-outline rounded-lg px-0',
-        th: 'border-b border-outline bg-transparent text-sm text-foreground px-4',
-        tr: 'border-b border-outline last:border-none'
-      }}
-      layout="fixed"
-      topContent={
-        <div className="p-4 text-medium text-foreground-1">All operators</div>
+function AVSOperatorsList({ address, tvl }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    currentRate: 1,
+    operators: [],
+    isError: true,
+    isInputTouched: false,
+    isTableLoading: true,
+    totalPages: undefined,
+    search: searchParams.get('search') || ''
+  });
+  const { avsService } = useServices();
+  const debouncedSearch = useDebouncedSearch(state.search, 300);
+  const compact = !useTailwindBreakpoint('md');
+  const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
+  const abortController = useRef(null);
+
+  useEffect(() => {
+    // initial page load and the search bar is not touched
+    if (!state.isInputTouched) {
+      return;
+    }
+
+    setSearchParams(
+      prev => {
+        // otherwise it will mutate the url string in real time
+        // https://github.com/remix-run/react-router/issues/11449#issuecomment-2056957988
+        const params = Object.fromEntries(prev);
+
+        if (!debouncedSearch) {
+          delete params['search'];
+        } else {
+          params['search'] = debouncedSearch;
+        }
+
+        // reset to page 1
+        params['page'] = '1';
+
+        return params;
+      },
+      { replace: true }
+    );
+    // this is a bug, we should expect setSearchParams to be stable like setState but it isn't
+    // https://github.com/remix-run/react-router/issues/9991
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, state.isInputTouched]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        dispatch({ isTableLoading: true });
+
+        if (abortController.current) {
+          abortController.current.abort();
+        }
+
+        abortController.current = new AbortController();
+
+        const response = await avsService.getAVSOperators(
+          address,
+          page,
+          debouncedSearch,
+          abortController.current.signal
+        );
+
+        dispatch({
+          operators: response.results,
+          isTableLoading: false,
+          totalPages: Math.ceil(response.totalCount / 10),
+          currentRate: response.rate
+        });
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          dispatch({
+            isError: true,
+            operators: [],
+            totalPages: undefined,
+            isTableLoading: false
+          });
+        } else {
+          dispatch({
+            isTableLoading: false
+          });
+        }
       }
-    >
-      <TableHeader>
-        <TableColumn className="w-1/3">Operators</TableColumn>
-        <TableColumn className="w-1/3 text-center">Share</TableColumn>
-        <TableColumn className="w-1/3 text-end">TVL</TableColumn>
-      </TableHeader>
-      <TableBody>
-        {[...new Array(10)].map((_, i) => (
-          <TableRow key={i}>
-            <TableCell className="">
-              <Skeleton className="h-5 w-3/4 rounded-md" />
-            </TableCell>
-            <TableCell>
-              <div className="flex justify-center">
-                <Skeleton className="h-5 w-1/2 rounded-md" />
+    })();
+  }, [address, avsService, debouncedSearch, dispatch, page]);
+
+  const handleInputChange = e => {
+    dispatch({ search: e.target.value, isInputTouched: true });
+  };
+
+  const handlePageClick = useCallback(
+    page => {
+      searchParams.set('page', page);
+      setSearchParams(searchParams, { replace: true });
+    },
+
+    [searchParams, setSearchParams]
+  );
+
+  // increment can be both negative and positive
+  const handleArrowClick = useCallback(
+    (page, increment) => {
+      searchParams.set('page', page + increment);
+      setSearchParams(searchParams, { replace: true });
+    },
+    [searchParams, setSearchParams]
+  );
+
+  return (
+    <div className="bg-content1 border border-outline rounded-lg text-sm">
+      <div className="flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center p-4">
+        <div className="text-foreground-1 text-medium">All operators</div>
+        <Input
+          className="w-full lg:w-[40%]"
+          classNames={{
+            inputWrapper:
+              'border border-outline data-[hover=true]:border-foreground-1',
+            input: 'placeholder:text-foreground-2'
+          }}
+          endContent={<span className="material-symbols-outlined">search</span>}
+          onChange={handleInputChange}
+          placeholder="Search by address/name with 3 characters or more..."
+          radius="sm"
+          type="text"
+          value={state.search ?? ''}
+          variant="bordered"
+        />
+      </div>
+
+      <Table
+        aria-label="List of operators registered for AVS"
+        className="overflow-x-scroll"
+        classNames={{
+          wrapper: 'border border-outline rounded-lg px-0',
+          th: 'border-b border-outline bg-transparent text-sm text-foreground px-4',
+          tr: 'border-b border-outline last:border-none'
+        }}
+        layout="fixed"
+        removeWrapper
+      >
+        <TableHeader>
+          <TableColumn
+            allowsSorting
+            className="w-64 md:w-1/3 bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5"
+          >
+            Operators
+          </TableColumn>
+          <TableColumn
+            allowsSorting
+            className="w-32 md:w-1/3 bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5 text-center"
+          >
+            Share
+          </TableColumn>
+          <TableColumn
+            allowsSorting
+            className="w-32 md:w-1/3 bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5 text-end"
+          >
+            TVL
+          </TableColumn>
+        </TableHeader>
+        <TableBody
+          emptyContent={
+            !state.isTableLoading && (
+              <div className="flex h-[33rem] flex-col items-center justify-center">
+                <span className="text-lg text-foreground-2">
+                  No result found for {truncate(state.search ?? '')}
+                </span>
               </div>
-            </TableCell>
-            <TableCell className="flex justify-end">
-              <Skeleton className="h-10 w-1/2 rounded-md" />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+            )
+          }
+        >
+          {state.isTableLoading &&
+            [...new Array(10)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <Skeleton className="h-4 w-4/5 rounded-md" />
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-center">
+                    <Skeleton className="h-4 w-full rounded-md" />
+                  </div>
+                </TableCell>
+                <TableCell className="flex justify-end">
+                  <Skeleton className="h-9 w-4/5 rounded-md" />
+                </TableCell>
+              </TableRow>
+            ))}
+
+          {!state.isTableLoading &&
+            state.operators.map((op, i) => (
+              <TableRow className="text-sm" key={`avs-operator-${i}`}>
+                <TableCell className="pl-4">
+                  <div className="flex gap-x-2">
+                    <span>{(page - 1) * 10 + i + 1}</span>
+                    {op.metadata?.logo ? (
+                      <img
+                        className="size-5 rounded-full bg-foreground-2"
+                        src={op.metadata?.logo}
+                      />
+                    ) : (
+                      <span className="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
+                        warning
+                      </span>
+                    )}{' '}
+                    <span className="truncate">
+                      {op.metadata?.name ?? 'N/A'}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-center">
+                    {((op.strategiesTotal / tvl) * 100).toFixed(2)}%
+                  </div>
+                </TableCell>
+                <TableCell className="flex justify-end pr-4">
+                  <div className="flex flex-col text-end">
+                    <span>
+                      {formatUSD(
+                        op.strategiesTotal * state.currentRate,
+                        compact
+                      )}
+                    </span>
+                    <span className="text-xs text-foreground-2">
+                      {formatETH(op.strategiesTotal, compact)}
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+
+          {!state.isTableLoading &&
+            state.operators.length > 0 &&
+            [...Array(10 - state.operators.length)].map((_, i) => (
+              <TableRow className="border-none" key={i}>
+                <TableCell className="h-[3.25rem] w-1/3"></TableCell>
+                <TableCell className="w-1/3"></TableCell>
+                <TableCell className="w-1/3"></TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+
+      {state.totalPages !== undefined && (
+        <Pagination
+          currentPage={page}
+          handleNext={() => handleArrowClick(page, 1)}
+          handlePageClick={handlePageClick}
+          handlePrevious={() => handleArrowClick(page, -1)}
+          totalPages={state.totalPages}
+        />
+      )}
+    </div>
   );
 }
+
+const truncate = str => {
+  return str.length > 42 ? str.substring(0, 42) + '...' : str;
+};

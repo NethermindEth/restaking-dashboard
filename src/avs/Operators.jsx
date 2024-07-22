@@ -24,7 +24,7 @@ export default function Operators({ avsAddress, totalTVL }) {
   const fetchOperators = async page => {
     try {
       dispatch({ isFetchingOperators: true });
-      const data = await avsService.getAvsOperators(avsAddress, page);
+      const data = await avsService.getAVSOperators(avsAddress, page);
       dispatch({
         avsOperators: data.results,
         totalPages: Math.ceil(data.totalCount / 10),
