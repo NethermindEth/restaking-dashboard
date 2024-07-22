@@ -11,7 +11,7 @@ import {
   TableRow
 } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
 import Pagination from '../shared/Pagination';
 import { ParentSize } from '@visx/responsive';
@@ -83,6 +83,7 @@ export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
 
 function AVSOperatorsList({ address, tvl }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
     currentRate: 1,
@@ -102,11 +103,12 @@ function AVSOperatorsList({ address, tvl }) {
       : { column: 'tvl', direction: 'descending' }
   });
   const { avsService } = useServices();
+  const abortController = useRef(null);
   const debouncedSearch = useDebouncedSearch(state.search, 300);
   const compact = !useTailwindBreakpoint('md');
+
   const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
   const sort = searchParams.get('sort') || '-tvl';
-  const abortController = useRef(null);
 
   useEffect(() => {
     // initial page load and the search bar is not touched
@@ -317,7 +319,15 @@ function AVSOperatorsList({ address, tvl }) {
 
           {!state.isTableLoading &&
             state.operators.map((op, i) => (
-              <TableRow className="text-sm" key={`avs-operator-${i}`}>
+              <TableRow
+                className="cursor-pointer border-t border-outline text-sm hover:bg-default"
+                key={`avs-operator-${i}`}
+                onClick={() => {
+                  navigate(`/operators/${op.address}`, {
+                    state: { operator: op }
+                  });
+                }}
+              >
                 <TableCell className="pl-4">
                   <div className="flex gap-x-2">
                     <span>{(page - 1) * 10 + i + 1}</span>
