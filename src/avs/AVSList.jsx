@@ -209,13 +209,13 @@ export default function AVSList() {
                     <TableCell className="w-2/5 px-5 py-6">
                       <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
-                    <TableCell className="w-1/5">
+                    <TableCell className="w-1/5 px-5 py-6">
                       <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
-                    <TableCell className="w-1/5">
+                    <TableCell className="w-1/5 px-5 py-6">
                       <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
-                    <TableCell className="w-1/5">
+                    <TableCell className="w-1/5 px-5 py-6">
                       <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
                   </TableRow>
@@ -267,7 +267,7 @@ export default function AVSList() {
               state.avs &&
               [...Array(10 - state.avs.length)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell className="h-[3.82rem] w-2/5"></TableCell>
+                  <TableCell className="w-2/5 p-5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
