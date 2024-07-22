@@ -113,10 +113,6 @@ export default function AVSList() {
     dispatch({ searchTerm: e.target.value });
   };
 
-  const truncate = str => {
-    return str.length > 42 ? str.substring(0, 42) + '...' : str;
-  };
-
   useEffect(() => {
     const page = searchParams.get('page') ?? 1;
 
@@ -148,43 +144,42 @@ export default function AVSList() {
   }, [dispatch, debouncedSearchTerm]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-1">
-        <div className="font-display text-3xl font-medium text-foreground-1">
-          AVS
-        </div>
-        <div className="mb-6 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-          <div className="font-display text-base font-medium text-foreground-1">
-            Actively Validated Services
-          </div>
-          <Input
-            classNames={{
-              inputWrapper:
-                'border-outline data-[hover=true]:border-foreground-1',
-              input: 'placeholder:text-subtitle'
-            }}
-            value={state.searchTerm ?? ''}
-            onChange={handleSearch}
-            type="text"
-            color="primary"
-            placeholder="Search by AVS"
-            radius="sm"
-            className="lg:w-96"
-            variant="bordered"
-            endContent={
-              <span className="material-symbols-outlined text-foreground-2">
-                search
-              </span>
-            }
-          />
-        </div>
+    <div className="flex h-full flex-col">
+      <div className="font-display text-3xl font-medium text-foreground-1">
+        AVS
       </div>
-      <div className="rounded-lg border border-outline bg-content1 text-sm">
+      <div className="mb-4 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+        <div className="text-foreground-1">Actively Validated Services</div>
+        <Input
+          classNames={{
+            inputWrapper:
+              'border-outline data-[hover=true]:border-foreground-1',
+            input: 'placeholder:text-subtitle'
+          }}
+          value={state.searchTerm ?? ''}
+          onChange={handleSearch}
+          type="text"
+          color="primary"
+          placeholder="Search by AVS"
+          radius="sm"
+          className="lg:w-96"
+          variant="bordered"
+          endContent={
+            <span className="material-symbols-outlined text-foreground-2">
+              search
+            </span>
+          }
+        />
+      </div>
+      <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
         <Table
-          aria-label="Actively validated services list"
+          aria-label="AVS list"
           layout="fixed"
           removeWrapper
-          className="overflow-x-auto"
+          classNames={{
+            base: 'overflow-x-auto h-full',
+            table: 'h-full'
+          }}
           sortDescriptor={state.sortDescriptor}
           onSortChange={e => dispatch({ sortDescriptor: e })}
         >
@@ -201,9 +196,9 @@ export default function AVSList() {
           </TableHeader>
           <TableBody
             emptyContent={
-              <div className="flex h-[41.8rem] flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center">
                 <span className="text-lg text-foreground-2">
-                  No result found for {truncate(state.searchTerm ?? '')}
+                  No result found for {state.searchTerm?.substring(0, 42)}...
                 </span>
               </div>
             }
@@ -211,17 +206,17 @@ export default function AVSList() {
             {state.isFetchingAvsData
               ? [...Array(10)].map((_, i) => (
                   <TableRow key={i} className="border-t border-outline">
-                    <TableCell className="h-[3.82rem] w-2/5">
-                      <Skeleton className="h-5 rounded-md dark:bg-default" />
+                    <TableCell className="w-2/5 px-5 py-6">
+                      <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
                     <TableCell className="w-1/5">
-                      <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
+                      <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
                     <TableCell className="w-1/5">
-                      <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
+                      <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
                     <TableCell className="w-1/5">
-                      <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
+                      <Skeleton className="h-5 rounded-md bg-default" />
                     </TableCell>
                   </TableRow>
                 ))
