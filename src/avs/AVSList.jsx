@@ -160,12 +160,13 @@ export default function AVSList() {
           <Input
             classNames={{
               inputWrapper:
-                'border border-outline data-[hover=true]:border-foreground-1',
+                'border-outline data-[hover=true]:border-foreground-1',
               input: 'placeholder:text-subtitle'
             }}
             value={state.searchTerm ?? ''}
             onChange={handleSearch}
             type="text"
+            color="primary"
             placeholder="Search by AVS"
             radius="sm"
             className="lg:w-96"
