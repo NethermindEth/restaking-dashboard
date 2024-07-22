@@ -1,5 +1,6 @@
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import {
+  Image,
   Input,
   Skeleton,
   Table,
@@ -226,28 +227,28 @@ export default function AVSList() {
               : state.avs?.map((avs, i) => (
                   <TableRow
                     onClick={() =>
-                      navigate(`/avs/${avs.address}`, { state: { avs: avs } })
+                      navigate(`/avs/${avs.address}`, { state: { avs } })
                     }
                     key={`avs-item-${i}`}
                     className="cursor-pointer border-t border-outline hover:bg-default"
                   >
                     <TableCell className="p-5">
-                      <div className="flex gap-x-3">
-                        <span className="size-3">
+                      <div className="flex items-center gap-x-3">
+                        <span className="min-w-5">
                           {(searchParams.get('page') - 1) * 10 + i + 1}
                         </span>
                         {avs.metadata?.logo ? (
-                          <img
-                            className="size-5 rounded-full bg-foreground-2"
+                          <Image
+                            className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
                             src={avs.metadata?.logo}
                           />
                         ) : (
-                          <span className="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
-                            warning
+                          <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
+                            question_mark
                           </span>
                         )}
                         <span className="truncate">
-                          {avs.metadata?.name ?? 'N/A'}
+                          {avs.metadata?.name || avs.address}
                         </span>
                       </div>
                     </TableCell>
@@ -257,7 +258,7 @@ export default function AVSList() {
                     <TableCell className="pr-8 text-end">
                       {formatNumber(avs.operators)}
                     </TableCell>
-                    <TableCell className="flex flex-col items-end justify-center pr-8">
+                    <TableCell className="pr-8 text-end">
                       <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
                       <div className="text-xs text-subtitle">
                         {formatETH(avs.strategiesTotal)}
