@@ -27,7 +27,8 @@ export default class BaseService {
         'content-type': `application/json; charset=utf-8`,
         ...options?.headers
       },
-      method: options?.method?.toUpperCase() || 'get'
+      method: options?.method?.toUpperCase() || 'get',
+      signal: options?.signal
     };
 
     if (options?.body != null) {
