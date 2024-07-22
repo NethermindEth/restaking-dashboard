@@ -230,7 +230,7 @@ export default function AVSList() {
                       navigate(`/avs/${avs.address}`, { state: { avs } })
                     }
                     key={`avs-item-${i}`}
-                    className="cursor-pointer border-t border-outline hover:bg-default"
+                    className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                   >
                     <TableCell className="p-5">
                       <div className="flex items-center gap-x-3">
