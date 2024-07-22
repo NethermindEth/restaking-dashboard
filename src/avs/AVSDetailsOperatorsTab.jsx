@@ -69,8 +69,8 @@ export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
       )}
 
       {/*layout*/}
-      <div className="flex w-full h-full">
-        <div className="w-full mt-4">
+      <div className="flex h-full w-full">
+        <div className="mt-4 w-full">
           <AVSOperatorsList
             address={address}
             tvl={totalTokens.lst + totalTokens.eth}
@@ -193,9 +193,9 @@ function AVSOperatorsList({ address, tvl }) {
   );
 
   return (
-    <div className="bg-content1 border border-outline rounded-lg text-sm">
-      <div className="flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center p-4">
-        <div className="text-foreground-1 text-medium">All operators</div>
+    <div className="rounded-lg border border-outline bg-content1 text-sm">
+      <div className="flex flex-col justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
+        <div className="text-medium text-foreground-1">All operators</div>
         <Input
           className="w-full lg:w-[40%]"
           classNames={{
@@ -217,8 +217,8 @@ function AVSOperatorsList({ address, tvl }) {
         aria-label="List of operators registered for AVS"
         className="overflow-x-scroll"
         classNames={{
-          wrapper: 'border border-outline rounded-lg px-0',
-          th: 'border-b border-outline bg-transparent text-sm text-foreground px-4',
+          wrapper: 'rounded-lg border border-outline px-0',
+          th: 'border-b border-outline bg-transparent px-4 text-sm text-foreground',
           tr: 'border-b border-outline last:border-none'
         }}
         layout="fixed"
@@ -227,19 +227,19 @@ function AVSOperatorsList({ address, tvl }) {
         <TableHeader>
           <TableColumn
             allowsSorting
-            className="w-64 md:w-1/3 bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5"
+            className="w-64 bg-transparent py-4 text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
           >
             Operators
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 md:w-1/3 bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5 text-center"
+            className="w-32 bg-transparent py-4 text-center text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
           >
             Share
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 md:w-1/3 bg-transparent py-4 data-[hover=true]:text-foreground-2 text-foreground-active text-sm font-normal leading-5 text-end"
+            className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
           >
             TVL
           </TableColumn>
