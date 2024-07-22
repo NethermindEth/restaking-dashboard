@@ -35,9 +35,9 @@ export default function AVSDetailsHeader({ avs }) {
           <span>{avs.metadata?.name ?? 'N/A'}</span>
 
           {/*TODO: implement ranking when coming from list view & accessing directly avs*/}
-          <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1">
-            # 1
-          </span>
+          {/* <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1"> */}
+          {/*   # 1 */}
+          {/* </span> */}
         </div>
       </div>
       <div className="my-4 break-words text-xs text-foreground-1">
@@ -126,7 +126,7 @@ function AVSLogo({ avs }) {
       classNames={{
         wrapper: 'border border-outline',
         // override tailwind's base img styling that doesn't respect specified dimensions
-        img: 'object-contain bg-foreground-2 h-12 w-12 max-w-none'
+        img: 'h-12 w-12 max-w-none bg-foreground-2 object-contain'
       }}
       height={48}
       onError={() => dispatch({ isError: true })}
