@@ -92,7 +92,9 @@ function AVSOperatorsList({ address, tvl }) {
     isInputTouched: false,
     isTableLoading: true,
     totalPages: undefined,
+    page: Math.max(parseInt(searchParams.get('page') || '1'), 1),
     search: searchParams.get('search') || '',
+    sort: searchParams.get('sort') || '-tvl',
     sortDescriptor: searchParams.get('sort')
       ? {
           column: searchParams.get('sort').replace('-', ''),
@@ -100,50 +102,29 @@ function AVSOperatorsList({ address, tvl }) {
             ? 'descending'
             : 'ascending'
         }
-      : { column: 'tvl', direction: 'descending' }
+      : { column: 'tvl', direction: 'descending' },
+    updateSearchParams: false
   });
   const { avsService } = useServices();
   const abortController = useRef(null);
   const debouncedSearch = useDebouncedSearch(state.search, 300);
   const compact = !useTailwindBreakpoint('md');
 
-  const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
-  const sort = searchParams.get('sort') || '-tvl';
-
   useEffect(() => {
-    // initial page load and the search bar is not touched
+    // initial page load + new search results after typing in search query
     if (!state.isInputTouched) {
       return;
     }
 
-    setSearchParams(
-      prev => {
-        // otherwise it will mutate the url string in real time
-        // https://github.com/remix-run/react-router/issues/11449#issuecomment-2056957988
-        const params = Object.fromEntries(prev);
-
-        if (!debouncedSearch) {
-          delete params['search'];
-        } else {
-          params['search'] = debouncedSearch;
-        }
-
-        // reset to page 1
-        params['page'] = '1';
-
-        return params;
-      },
-      { replace: true }
-    );
-    // this is a bug, we should expect setSearchParams to be stable like setState but it isn't
-    // https://github.com/remix-run/react-router/issues/9991
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, state.isInputTouched]);
+    dispatch({
+      page: 1
+    });
+  }, [debouncedSearch, dispatch, state.isInputTouched]);
 
   useEffect(() => {
     (async () => {
       try {
-        dispatch({ isTableLoading: true });
+        dispatch({ isTableLoading: true, isInputTouched: false });
 
         if (abortController.current) {
           abortController.current.abort();
@@ -153,9 +134,9 @@ function AVSOperatorsList({ address, tvl }) {
 
         const response = await avsService.getAVSOperators(
           address,
-          page,
+          state.page,
           debouncedSearch,
-          sort,
+          state.sort,
           abortController.current.signal
         );
 
@@ -163,7 +144,8 @@ function AVSOperatorsList({ address, tvl }) {
           operators: response.results,
           isTableLoading: false,
           totalPages: Math.ceil(response.totalCount / 10),
-          currentRate: response.rate
+          currentRate: response.rate,
+          updateSearchParams: true
         });
       } catch (e) {
         if (e.name !== 'AbortError') {
@@ -171,17 +153,37 @@ function AVSOperatorsList({ address, tvl }) {
             isError: true,
             operators: [],
             totalPages: undefined,
-            isTableLoading: false
+            isTableLoading: false,
+            updateSearchParams: true
           });
         }
       }
     })();
-  }, [address, avsService, debouncedSearch, dispatch, page, sort]);
+  }, [address, avsService, debouncedSearch, dispatch, state.page, state.sort]);
+
+  useEffect(() => {
+    if (!state.updateSearchParams) {
+      return;
+    }
+    const params = new URLSearchParams();
+    params.set('page', state.page);
+    params.set('sort', state.sort);
+    if (state.search) {
+      params.set('search', state.search);
+    }
+    setSearchParams(params);
+    dispatch({ updateSeachParams: false });
+  }, [
+    dispatch,
+    state.updateSearchParams,
+    setSearchParams,
+    state.page,
+    state.search,
+    state.sort
+  ]);
 
   const handleSort = useCallback(
     e => {
-      dispatch({ sortDescriptor: e });
-
       let sort = e.column;
       // share is basically just tvl, backend has no support for share
       if (sort === 'share') {
@@ -191,22 +193,9 @@ function AVSOperatorsList({ address, tvl }) {
       if (e.direction === 'descending') {
         sort = '-' + sort;
       }
-
-      setSearchParams(
-        prev => {
-          const params = Object.fromEntries(prev);
-
-          params['sort'] = sort;
-
-          // reset to page 1
-          params['page'] = '1';
-
-          return params;
-        },
-        { replace: true }
-      );
+      dispatch({ sortDescriptor: e, sort });
     },
-    [dispatch, setSearchParams]
+    [dispatch]
   );
 
   const handleInputChange = useCallback(
@@ -217,21 +206,16 @@ function AVSOperatorsList({ address, tvl }) {
   );
 
   const handlePageClick = useCallback(
-    page => {
-      searchParams.set('page', page);
-      setSearchParams(searchParams, { replace: true });
-    },
-
-    [searchParams, setSearchParams]
+    page => dispatch({ page: page }),
+    [dispatch]
   );
 
   // increment can be both negative and positive
   const handleArrowClick = useCallback(
     (page, increment) => {
-      searchParams.set('page', page + increment);
-      setSearchParams(searchParams, { replace: true });
+      dispatch({ page: page + increment });
     },
-    [searchParams, setSearchParams]
+    [dispatch]
   );
 
   return (
@@ -329,7 +313,7 @@ function AVSOperatorsList({ address, tvl }) {
               >
                 <TableCell className="pl-4">
                   <div className="flex gap-x-2">
-                    <span>{(page - 1) * 10 + i + 1}</span>
+                    <span>{(state.page - 1) * 10 + i + 1}</span>
                     {op.metadata?.logo ? (
                       <img
                         className="size-5 rounded-full bg-foreground-2"
@@ -380,10 +364,10 @@ function AVSOperatorsList({ address, tvl }) {
 
       {state.totalPages !== undefined && state.operators.length > 0 && (
         <Pagination
-          currentPage={page}
-          handleNext={() => handleArrowClick(page, 1)}
-          handlePageClick={handlePageClick}
-          handlePrevious={() => handleArrowClick(page, -1)}
+          currentPage={state.page}
+          handleNext={() => handleArrowClick(state.page, 1)}
+          handlePageClick={page => handlePageClick(page)}
+          handlePrevious={() => handleArrowClick(state.page, -1)}
           totalPages={state.totalPages}
         />
       )}
