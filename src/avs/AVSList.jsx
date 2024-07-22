@@ -101,20 +101,6 @@ export default function AVSList() {
     [avsService, dispatch]
   );
 
-  const handleNext = useCallback(() => {
-    const currentPage = parseInt(searchParams.get('page') || '1');
-    if (currentPage + 1 <= state.totalPages) {
-      setSearchParams({ page: (currentPage + 1).toString() });
-    }
-  }, [searchParams, state.totalPages, setSearchParams]);
-
-  const handlePrevious = useCallback(() => {
-    const currentPage = parseInt(searchParams.get('page') || '1');
-    if (currentPage - 1 >= 1) {
-      setSearchParams({ page: (currentPage - 1).toString() });
-    }
-  }, [searchParams, setSearchParams]);
-
   const handlePageClick = useCallback(
     page => {
       setSearchParams({ page: page.toString() });
@@ -296,8 +282,6 @@ export default function AVSList() {
           <Pagination
             totalPages={state.totalPages}
             currentPage={parseInt(searchParams.get('page') || '1')}
-            handleNext={handleNext}
-            handlePrevious={handlePrevious}
             handlePageClick={handlePageClick}
           />
         )}

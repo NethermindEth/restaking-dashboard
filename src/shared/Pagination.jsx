@@ -1,23 +1,8 @@
-import { Button, Pagination as NextUIPagination } from '@nextui-org/react';
+import { Pagination as NextUIPagination } from '@nextui-org/react';
 
-const Pagination = ({
-  totalPages,
-  currentPage,
-  handleNext,
-  handlePrevious,
-  handlePageClick
-}) => {
+const Pagination = ({ totalPages, currentPage, handlePageClick }) => {
   return (
-    <div className="flex items-center justify-between border-t border-outline p-4">
-      <Button
-        className={`bg-transparent ${currentPage === 1 && 'text-disabled'}`}
-        onPress={handlePrevious}
-        isDisabled={currentPage === 1}
-        isIconOnly
-      >
-        <span className="material-symbols-outlined">arrow_back_ios</span>
-      </Button>
-
+    <div className="flex items-center justify-center border-t border-outline p-4">
       <NextUIPagination
         classNames={{
           item: 'bg-transparent [&[data-hover=true]:not([data-active=true])]:bg-default',
@@ -28,15 +13,6 @@ const Pagination = ({
         page={currentPage}
         onChange={handlePageClick}
       />
-
-      <Button
-        className={`bg-transparent ${currentPage === totalPages && 'text-disabled'}`}
-        onPress={handleNext}
-        isDisabled={currentPage === totalPages}
-        isIconOnly
-      >
-        <span className="material-symbols-outlined">arrow_forward_ios</span>
-      </Button>
     </div>
   );
 };
