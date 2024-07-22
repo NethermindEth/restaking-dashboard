@@ -62,11 +62,7 @@ export default function AVSList() {
       : null
   });
 
-  const debouncedSearchTerm = useDebouncedSearch(
-    state.searchTerm ?? '',
-    300,
-    false
-  );
+  const debouncedSearchTerm = useDebouncedSearch(state.searchTerm ?? '', 300);
 
   const fetchAVS = useCallback(
     async (pageNumber, search, sort) => {
@@ -188,7 +184,7 @@ export default function AVSList() {
             className="lg:w-96"
             variant="bordered"
             endContent={
-              <span className="material-symbols-outlined text-subtitle">
+              <span className="material-symbols-outlined text-foreground-2">
                 search
               </span>
             }

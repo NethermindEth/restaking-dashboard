@@ -5,7 +5,7 @@ const useDebouncedSearch = (value, delay) => {
 
   const validateSearchTerm = query => {
     const minQueryLength = query.startsWith('0x') ? 5 : 3;
-    return query.length === 0 || query.length > minQueryLength;
+    return query.length === 0 || query.length >= minQueryLength;
   };
 
   useEffect(() => {
