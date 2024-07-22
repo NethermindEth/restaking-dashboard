@@ -91,12 +91,21 @@ function AVSOperatorsList({ address, tvl }) {
     isInputTouched: false,
     isTableLoading: true,
     totalPages: undefined,
-    search: searchParams.get('search') || ''
+    search: searchParams.get('search') || '',
+    sortDescriptor: searchParams.get('sort')
+      ? {
+          column: searchParams.get('sort').replace('-', ''),
+          direction: searchParams.get('sort').startsWith('-')
+            ? 'descending'
+            : 'ascending'
+        }
+      : { column: 'tvl', direction: 'descending' }
   });
   const { avsService } = useServices();
   const debouncedSearch = useDebouncedSearch(state.search, 300);
   const compact = !useTailwindBreakpoint('md');
   const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
+  const sort = searchParams.get('sort') || '-tvl';
   const abortController = useRef(null);
 
   useEffect(() => {
@@ -144,6 +153,7 @@ function AVSOperatorsList({ address, tvl }) {
           address,
           page,
           debouncedSearch,
+          sort,
           abortController.current.signal
         );
 
@@ -161,18 +171,48 @@ function AVSOperatorsList({ address, tvl }) {
             totalPages: undefined,
             isTableLoading: false
           });
-        } else {
-          dispatch({
-            isTableLoading: false
-          });
         }
       }
     })();
-  }, [address, avsService, debouncedSearch, dispatch, page]);
+  }, [address, avsService, debouncedSearch, dispatch, page, sort]);
 
-  const handleInputChange = e => {
-    dispatch({ search: e.target.value, isInputTouched: true });
-  };
+  const handleSort = useCallback(
+    e => {
+      dispatch({ sortDescriptor: e });
+
+      let sort = e.column;
+      // share is basically just tvl, backend has no support for share
+      if (sort === 'share') {
+        sort = 'tvl';
+      }
+
+      if (e.direction === 'descending') {
+        sort = '-' + sort;
+      }
+
+      setSearchParams(
+        prev => {
+          const params = Object.fromEntries(prev);
+
+          params['sort'] = sort;
+
+          // reset to page 1
+          params['page'] = '1';
+
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [dispatch, setSearchParams]
+  );
+
+  const handleInputChange = useCallback(
+    e => {
+      dispatch({ search: e.target.value, isInputTouched: true });
+    },
+    [dispatch]
+  );
 
   const handlePageClick = useCallback(
     page => {
@@ -223,36 +263,39 @@ function AVSOperatorsList({ address, tvl }) {
         }}
         layout="fixed"
         removeWrapper
+        sortDescriptor={state.sortDescriptor}
+        onSortChange={handleSort}
       >
         <TableHeader>
           <TableColumn
             allowsSorting
             className="w-64 bg-transparent py-4 text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            key="operator"
           >
             Operators
           </TableColumn>
           <TableColumn
             allowsSorting
             className="w-32 bg-transparent py-4 text-center text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            key="share"
           >
             Share
           </TableColumn>
           <TableColumn
             allowsSorting
             className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            key="tvl"
           >
             TVL
           </TableColumn>
         </TableHeader>
         <TableBody
           emptyContent={
-            !state.isTableLoading && (
-              <div className="flex h-[33rem] flex-col items-center justify-center">
-                <span className="text-lg text-foreground-2">
-                  No result found for {truncate(state.search ?? '')}
-                </span>
-              </div>
-            )
+            <div className="flex h-[33rem] flex-col items-center justify-center">
+              <span className="text-lg text-foreground-2">
+                No result found for {truncate(state.search ?? '')}
+              </span>
+            </div>
           }
         >
           {state.isTableLoading &&
@@ -326,7 +369,7 @@ function AVSOperatorsList({ address, tvl }) {
         </TableBody>
       </Table>
 
-      {state.totalPages !== undefined && (
+      {state.totalPages !== undefined && state.operators.length > 0 && (
         <Pagination
           currentPage={page}
           handleNext={() => handleArrowClick(page, 1)}

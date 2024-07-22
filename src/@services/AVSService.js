@@ -31,12 +31,13 @@ export default class AVSService {
     return await response.json();
   }
 
-  async getAVSOperators(address, pageNumber, search, signal) {
+  async getAVSOperators(address, pageNumber, search, sort, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
     const response = await apiGet(`/avs/${address}/operators`, {
       query: {
         'page-index': pageIndex,
-        search
+        search,
+        sort
       },
       signal
     });
