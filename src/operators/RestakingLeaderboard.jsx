@@ -1,5 +1,5 @@
 import React from 'react';
-import Pagination from '../shared/Pagination';
+import ListPagination from '../shared/ListPagination';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 
@@ -69,7 +69,7 @@ const RestakingLeaderboard = () => {
 
   return (
     <div className="bg-content1 text-sm">
-      <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+      <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
         <div className="min-w-5"></div>
         <span className="basis-full">Restakers address</span>
         <span className="basis-1/4">Share</span>
@@ -79,7 +79,7 @@ const RestakingLeaderboard = () => {
       {data.map((restaker, i) => (
         <div
           key={`operator-item-${i}`}
-          className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default`}
+          className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 hover:bg-default`}
         >
           {' '}
           <div className="min-w-5"></div>
@@ -87,16 +87,14 @@ const RestakingLeaderboard = () => {
           <span className="basis-1/4">{restaker.share}</span>
           <span className="basis-1/3 text-end">
             <div>ETH TODO</div>
-            <div className="text-foreground-1 text-xs">USD TODO</div>
+            <div className="text-xs text-foreground-1">USD TODO</div>
           </span>
         </div>
       ))}
-      <Pagination
-        totalPages={state.totalPages}
-        currentPage={state.currentPage}
-        onNext={onNext}
-        onPrevious={onPrevious}
-        onPageClick={onPageClick}
+      <ListPagination
+        total={state.totalPages}
+        page={state.currentPage}
+        onChange={onPageClick}
       />
     </div>
   );
