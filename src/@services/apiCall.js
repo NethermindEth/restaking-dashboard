@@ -26,7 +26,8 @@ export default async function apiCall(endpoint, options) {
       'Content-Type': `application/json; charset=utf-8`,
       ...options?.headers
     },
-    method: options?.method?.toUpperCase() || 'GET'
+    method: options?.method?.toUpperCase() || 'GET',
+    signal: options?.signal
   };
 
   if (options?.body != null) {

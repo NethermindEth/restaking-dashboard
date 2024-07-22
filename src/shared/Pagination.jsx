@@ -1,56 +1,18 @@
-import React from 'react';
+import { Pagination as NextUIPagination } from '@nextui-org/react';
 
-import { PaginationItemType, usePagination } from '@nextui-org/react';
-
-const Pagination = ({
-  totalPages,
-  currentPage,
-  handleNext,
-  handlePrevious,
-  handlePageClick
-}) => {
-  const { activePage, range } = usePagination({
-    total: totalPages,
-    showControls: true,
-    page: currentPage
-  });
-
+const Pagination = ({ totalPages, currentPage, handlePageClick }) => {
   return (
-    <div className="flex border-t border-outline gap-x-2 justify-between items-center p-4 text-foreground-1 mt-austo">
-      <span
-        className={`cursor-pointer material-symbols-outlined ${activePage === 1 && 'text-disabled'}`}
-        onClick={handlePrevious}
-      >
-        arrow_back_ios
-      </span>
-      <div className="flex gap-x-2">
-        {range
-          .filter(
-            r => r !== PaginationItemType.PREV && r !== PaginationItemType.NEXT
-          )
-          .map((page, i) => {
-            if (page === PaginationItemType.DOTS) {
-              return <span key={`dot-${i}`}>...</span>;
-            }
-
-            return (
-              <span
-                onClick={() => handlePageClick(page)}
-                key={`page-${page}`}
-                aria-label={`page ${page}`}
-                className={`${activePage == page ? 'text-foreground-1' : 'text-slate-500'} cursor-pointer`}
-              >
-                {page}
-              </span>
-            );
-          })}
-      </div>
-      <div
-        className={`cursor-pointer material-symbols-outlined ${activePage === totalPages && 'text-disabled'}`}
-        onClick={handleNext}
-      >
-        arrow_forward_ios
-      </div>
+    <div className="flex items-center justify-center border-t border-outline p-4">
+      <NextUIPagination
+        classNames={{
+          item: 'bg-transparent [&[data-hover=true]:not([data-active=true])]:bg-default',
+          wrapper: 'gap-1'
+        }}
+        total={totalPages}
+        color="default"
+        page={currentPage}
+        onChange={handlePageClick}
+      />
     </div>
   );
 };

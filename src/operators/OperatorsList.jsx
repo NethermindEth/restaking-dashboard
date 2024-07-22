@@ -7,7 +7,7 @@ import Pagination from '../shared/Pagination';
 import { Input, Skeleton } from '@nextui-org/react';
 import { formatNumber } from '../utils';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
-import useDebounce from '../shared/hooks/useDebounce';
+import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 
 const OperatorsList = () => {
   const { operatorService } = useServices();
@@ -19,7 +19,7 @@ const OperatorsList = () => {
     error: null,
     isFetchingOperatorData: true
   });
-  const debouncedSearchTerm = useDebounce(state.searchTerm, 300);
+  const debouncedSearchTerm = useDebouncedSearch(state.searchTerm, 300);
 
   const getOperators = async (pageIndex, search) => {
     try {
