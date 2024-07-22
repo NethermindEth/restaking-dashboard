@@ -22,7 +22,7 @@ const columns = [
   {
     key: 'avs',
     label: 'AVS',
-    className: 'w-64 md:w-2/5'
+    className: 'w-64 md:w-2/5 ps-12'
   },
   {
     key: 'staker',
