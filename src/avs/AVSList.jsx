@@ -60,7 +60,7 @@ export default function AVSList() {
             ? 'descending'
             : 'ascending'
         }
-      : null
+      : { column: 'tvl', direction: 'descending' }
   });
 
   const debouncedSearchTerm = useDebouncedSearch(state.searchTerm ?? '', 300);
@@ -187,7 +187,7 @@ export default function AVSList() {
             {column => (
               <TableColumn
                 allowsSorting
-                className={`bg-transparent py-4 text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 ${column.className}`}
+                className={`text-foreground-active bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 ${column.className}`}
                 key={column.key}
               >
                 {column.label}
