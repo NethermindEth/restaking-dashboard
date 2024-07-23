@@ -198,7 +198,11 @@ export default function AVSList() {
             emptyContent={
               <div className="flex flex-col items-center justify-center">
                 <span className="text-lg text-foreground-2">
-                  No result found for {state.searchTerm?.substring(0, 42)}...
+                  No result found for &quot;
+                  {state.searchTerm?.length > 42
+                    ? `${state.searchTerm?.substring(0, 42)}...`
+                    : state.searchTerm}
+                  &quot;
                 </span>
               </div>
             }
