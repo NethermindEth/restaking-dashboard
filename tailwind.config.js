@@ -41,10 +41,14 @@ export default {
               2: '#7A86A5',
               700: '#cad7F9'
             },
+            error: {
+              200: '#fecdd3',
+              800: '#9f1239'
+            },
             focus: '#34d399',
             foreground: {
               DEFAULT: '#ffffff',
-              active: '#CAD7F9',
+              invert: '#000',
               1: '#cad7F9',
               2: '#7a86a5'
             },
