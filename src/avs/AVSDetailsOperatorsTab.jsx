@@ -12,8 +12,8 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import ListPagination from '../shared/ListPagination';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
-import Pagination from '../shared/Pagination';
 import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../shared/helpers';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
@@ -210,14 +210,6 @@ function AVSOperatorsList({ address, tvl }) {
     [dispatch]
   );
 
-  // increment can be both negative and positive
-  const handleArrowClick = useCallback(
-    (page, increment) => {
-      dispatch({ page: page + increment });
-    },
-    [dispatch]
-  );
-
   return (
     <div className="rounded-lg border border-outline bg-content1 text-sm">
       <div className="flex flex-col justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
@@ -363,12 +355,10 @@ function AVSOperatorsList({ address, tvl }) {
       </Table>
 
       {state.totalPages !== undefined && state.operators.length > 0 && (
-        <Pagination
-          currentPage={state.page}
-          handleNext={() => handleArrowClick(state.page, 1)}
-          handlePageClick={page => handlePageClick(page)}
-          handlePrevious={() => handleArrowClick(state.page, -1)}
-          totalPages={state.totalPages}
+        <ListPagination
+          onChange={handlePageClick}
+          page={state.page}
+          total={state.totalPages}
         />
       )}
     </div>
