@@ -5,7 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { reduceState } from '../shared/helpers';
-import Pagination from '../shared/Pagination';
+import ListPagination from '../shared/ListPagination';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import { formatNumber } from '../utils';
 
@@ -82,13 +82,13 @@ export default function Operators({ avsAddress, totalTVL }) {
   }
 
   return (
-    <div className="w-full flex md:flex-row flex-col items-start justify-between gap-4">
+    <div className="flex w-full flex-col items-start justify-between gap-4 md:flex-row">
       <Card
         radius="md"
-        className="bg-content1 border border-outline w-full space-y-4"
+        className="w-full space-y-4 border border-outline bg-content1"
       >
-        <div className="flex items-center justify-between p-4 ">
-          <div className="font-light text-base text-foreground-1">
+        <div className="flex items-center justify-between p-4">
+          <div className="text-base font-light text-foreground-1">
             All Operators
           </div>
           <div>
@@ -106,7 +106,7 @@ export default function Operators({ avsAddress, totalTVL }) {
         </div>
 
         <div className="text-sm">
-          <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+          <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
             <span className="basis-full">Operators</span>
             <span className="basis-2/3 pl-8">Share</span>
             <span className="basis-1/3 text-end">TVL</span>
@@ -120,13 +120,13 @@ export default function Operators({ avsAddress, totalTVL }) {
                   <Link
                     to={`/operators/${operator.address}`}
                     key={`operator-item-${i}`}
-                    className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 hover:bg-default`}
+                    className={`flex flex-row items-center justify-between gap-x-2 border-t border-outline p-4 hover:bg-default`}
                   >
                     <div className="min-w-5">
                       {(searchParams.get('page') - 1) * 10 + i + 1}
                     </div>
                     {state.isFetchingOperators ? (
-                      <Skeleton className="bg-default dark:bg-default min-w-5 size-5 rounded-full" />
+                      <Skeleton className="size-5 min-w-5 rounded-full bg-default dark:bg-default" />
                     ) : (
                       <img
                         src={operator.metadata.logo}
@@ -144,7 +144,7 @@ export default function Operators({ avsAddress, totalTVL }) {
                       ).toFixed(2)}
                       %
                     </span>
-                    <div className="basis-1/3 text-end min-w-fit">
+                    <div className="min-w-fit basis-1/3 text-end">
                       <div>
                         $
                         {formatNumber(
@@ -165,12 +165,10 @@ export default function Operators({ avsAddress, totalTVL }) {
             </div>
           )}
         </div>
-        <Pagination
-          totalPages={state.totalPages}
-          currentPage={parseInt(searchParams.get('page'))}
-          handleNext={handleNext}
-          handlePrevious={handlePrevious}
-          handlePageClick={handlePageClick}
+        <ListPagination
+          total={state.totalPages}
+          page={parseInt(searchParams.get('page'))}
+          onChange={handlePageClick}
         />
       </Card>
     </div>
@@ -183,18 +181,18 @@ const OperatorsListSkeleton = () => {
       {[...Array(10)].map((item, i) => (
         <div
           key={i}
-          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+          className="flex w-full justify-normal gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
         >
-          <div className="md:w-10/12 w-6/12">
-            <Skeleton className="h-8 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          <div className="w-6/12 md:w-10/12">
+            <Skeleton className="h-8 w-4/5 rounded-md dark:bg-default md:w-2/3" />
           </div>
-          <div className="pl-5 flex justify-between gap-5 w-10/12">
+          <div className="flex w-10/12 justify-between gap-5 pl-5">
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-8 w-full rounded-md bg-default dark:bg-default" />
             </div>
 
             <div className="w-3/12">
-              <Skeleton className="h-8 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-8 w-full rounded-md bg-default dark:bg-default" />
             </div>
           </div>
         </div>

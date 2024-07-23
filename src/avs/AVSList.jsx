@@ -11,7 +11,7 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Pagination from '../shared/Pagination';
+import ListPagination from '../shared/ListPagination';
 import { reduceState } from '../shared/helpers';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
@@ -279,10 +279,10 @@ export default function AVSList() {
           </TableBody>
         </Table>
         {state.avs && state.avs.length !== 0 && (
-          <Pagination
-            totalPages={state.totalPages}
-            currentPage={parseInt(searchParams.get('page') || '1')}
-            handlePageClick={handlePageClick}
+          <ListPagination
+            onChange={handlePageClick}
+            page={parseInt(searchParams.get('page') || '1')}
+            total={state.totalPages}
           />
         )}
       </div>
