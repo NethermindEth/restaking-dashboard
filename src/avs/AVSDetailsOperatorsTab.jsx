@@ -223,7 +223,7 @@ function AVSOperatorsList({ address, tvl }) {
           }}
           endContent={<span className="material-symbols-outlined">search</span>}
           onChange={handleInputChange}
-          placeholder="Search by address/name with 3 characters or more..."
+          placeholder="Search by Operator"
           radius="sm"
           type="text"
           value={state.search ?? ''}
