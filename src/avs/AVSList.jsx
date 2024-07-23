@@ -1,5 +1,6 @@
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import {
+  Image,
   Input,
   Skeleton,
   Table,
@@ -21,7 +22,7 @@ const columns = [
   {
     key: 'avs',
     label: 'AVS',
-    className: 'w-64 md:w-2/5'
+    className: 'w-64 md:w-2/5 ps-12'
   },
   {
     key: 'staker',
@@ -112,10 +113,6 @@ export default function AVSList() {
     dispatch({ searchTerm: e.target.value });
   };
 
-  const truncate = str => {
-    return str.length > 42 ? str.substring(0, 42) + '...' : str;
-  };
-
   useEffect(() => {
     const page = searchParams.get('page') ?? 1;
 
@@ -147,42 +144,42 @@ export default function AVSList() {
   }, [dispatch, debouncedSearchTerm]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-1">
-        <div className="font-display text-3xl font-medium text-foreground-1">
-          AVS
-        </div>
-        <div className="mb-6 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-          <div className="font-display text-base font-medium text-foreground-1">
-            Actively Validated Services
-          </div>
-          <Input
-            classNames={{
-              inputWrapper:
-                'border border-outline data-[hover=true]:border-foreground-1',
-              input: 'placeholder:text-subtitle'
-            }}
-            value={state.searchTerm ?? ''}
-            onChange={handleSearch}
-            type="text"
-            placeholder="Search by AVS"
-            radius="sm"
-            className="lg:w-96"
-            variant="bordered"
-            endContent={
-              <span className="material-symbols-outlined text-foreground-2">
-                search
-              </span>
-            }
-          />
-        </div>
+    <div className="flex h-full flex-col">
+      <div className="font-display text-3xl font-medium text-foreground-1">
+        AVS
       </div>
-      <div className="rounded-lg border border-outline bg-content1 text-sm">
+      <div className="mb-4 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+        <div className="text-foreground-1">Actively Validated Services</div>
+        <Input
+          classNames={{
+            inputWrapper:
+              'border-outline data-[hover=true]:border-foreground-1',
+            input: 'placeholder:text-subtitle'
+          }}
+          value={state.searchTerm ?? ''}
+          onChange={handleSearch}
+          type="text"
+          color="primary"
+          placeholder="Search by AVS"
+          radius="sm"
+          className="lg:w-96"
+          variant="bordered"
+          endContent={
+            <span className="material-symbols-outlined text-foreground-2">
+              search
+            </span>
+          }
+        />
+      </div>
+      <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
         <Table
-          aria-label="Actively validated services list"
+          aria-label="AVS list"
           layout="fixed"
           removeWrapper
-          className="overflow-x-auto"
+          classNames={{
+            base: 'overflow-x-auto h-full',
+            table: 'h-full'
+          }}
           sortDescriptor={state.sortDescriptor}
           onSortChange={e => dispatch({ sortDescriptor: e })}
         >
@@ -199,9 +196,13 @@ export default function AVSList() {
           </TableHeader>
           <TableBody
             emptyContent={
-              <div className="flex h-[41.8rem] flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center">
                 <span className="text-lg text-foreground-2">
-                  No result found for {truncate(state.searchTerm ?? '')}
+                  No result found for &quot;
+                  {state.searchTerm?.length > 42
+                    ? `${state.searchTerm?.substring(0, 42)}...`
+                    : state.searchTerm}
+                  &quot;
                 </span>
               </div>
             }
@@ -209,55 +210,55 @@ export default function AVSList() {
             {state.isFetchingAvsData
               ? [...Array(10)].map((_, i) => (
                   <TableRow key={i} className="border-t border-outline">
-                    <TableCell className="h-[3.82rem] w-2/5">
-                      <Skeleton className="h-5 rounded-md dark:bg-default" />
+                    <TableCell className="w-2/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
                     </TableCell>
-                    <TableCell className="w-1/5">
-                      <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
                     </TableCell>
-                    <TableCell className="w-1/5">
-                      <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
                     </TableCell>
-                    <TableCell className="w-1/5">
-                      <Skeleton className="h-5 rounded-md bg-default dark:bg-default" />
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
                     </TableCell>
                   </TableRow>
                 ))
               : state.avs?.map((avs, i) => (
                   <TableRow
                     onClick={() =>
-                      navigate(`/avs/${avs.address}`, { state: { avs: avs } })
+                      navigate(`/avs/${avs.address}`, { state: { avs } })
                     }
                     key={`avs-item-${i}`}
-                    className="cursor-pointer border-t border-outline hover:bg-default"
+                    className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                   >
-                    <TableCell className="p-5">
-                      <div className="flex gap-x-3">
-                        <span className="size-3">
+                    <TableCell className="p-4">
+                      <div className="flex items-center gap-x-3">
+                        <span className="min-w-5">
                           {(searchParams.get('page') - 1) * 10 + i + 1}
                         </span>
                         {avs.metadata?.logo ? (
-                          <img
-                            className="size-5 rounded-full bg-foreground-2"
+                          <Image
+                            className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
                             src={avs.metadata?.logo}
                           />
                         ) : (
-                          <span className="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
-                            warning
+                          <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
+                            question_mark
                           </span>
                         )}
                         <span className="truncate">
-                          {avs.metadata?.name ?? 'N/A'}
+                          {avs.metadata?.name || avs.address}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="pr-8 text-end">
+                    <TableCell className="pe-8 text-end">
                       {formatNumber(avs.stakers)}
                     </TableCell>
-                    <TableCell className="pr-8 text-end">
+                    <TableCell className="pe-8 text-end">
                       {formatNumber(avs.operators)}
                     </TableCell>
-                    <TableCell className="flex flex-col items-end justify-center pr-8">
+                    <TableCell className="pe-8 text-end">
                       <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
                       <div className="text-xs text-subtitle">
                         {formatETH(avs.strategiesTotal)}
@@ -270,7 +271,7 @@ export default function AVSList() {
               state.avs &&
               [...Array(10 - state.avs.length)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell className="h-[3.82rem] w-2/5"></TableCell>
+                  <TableCell className="h-full w-2/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
