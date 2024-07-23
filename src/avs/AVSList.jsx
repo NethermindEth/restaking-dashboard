@@ -252,13 +252,13 @@ export default function AVSList() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="pr-8 text-end">
+                    <TableCell className="pe-8 text-end">
                       {formatNumber(avs.stakers)}
                     </TableCell>
-                    <TableCell className="pr-8 text-end">
+                    <TableCell className="pe-8 text-end">
                       {formatNumber(avs.operators)}
                     </TableCell>
-                    <TableCell className="pr-8 text-end">
+                    <TableCell className="pe-8 text-end">
                       <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
                       <div className="text-xs text-subtitle">
                         {formatETH(avs.strategiesTotal)}
