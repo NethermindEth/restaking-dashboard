@@ -267,7 +267,7 @@ export default function AVSList() {
               state.avs &&
               [...Array(10 - state.avs.length)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell className="w-2/5 p-5"></TableCell>
+                  <TableCell className="h-full w-2/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
                   <TableCell className="w-1/5"></TableCell>
