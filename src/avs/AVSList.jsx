@@ -228,7 +228,7 @@ export default function AVSList() {
                     key={`avs-item-${i}`}
                     className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                   >
-                    <TableCell className="p-5">
+                    <TableCell className="p-4">
                       <div className="flex items-center gap-x-3">
                         <span className="min-w-5">
                           {(searchParams.get('page') - 1) * 10 + i + 1}
