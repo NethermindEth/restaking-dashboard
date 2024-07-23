@@ -256,7 +256,7 @@ function AVSOperatorsList({ address, tvl }) {
             className="w-32 bg-transparent py-4 text-center text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
             key="share"
           >
-            Share
+            <span className="inline-block">Share</span>
           </TableColumn>
           <TableColumn
             allowsSorting
@@ -322,7 +322,7 @@ function AVSOperatorsList({ address, tvl }) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex justify-center">
+                  <div className="text-center">
                     {((op.strategiesTotal / tvl) * 100).toFixed(2)}%
                   </div>
                 </TableCell>
