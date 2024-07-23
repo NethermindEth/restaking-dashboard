@@ -1,4 +1,5 @@
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import { handleServiceError, reduceState } from '../shared/helpers';
 import {
   Image,
   Input,
@@ -12,8 +13,8 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
-import { reduceState } from '../shared/helpers';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -90,10 +91,10 @@ export default function AVSList() {
         });
 
         abortController.current = null;
-      } catch (error) {
-        if (error.name !== 'AbortError') {
+      } catch (e) {
+        if (e.name !== 'AbortError') {
           dispatch({
-            error: 'Failed to fetch AVS data',
+            error: handleServiceError(e),
             isFetchingAvsData: false
           });
         }
@@ -171,122 +172,131 @@ export default function AVSList() {
           }
         />
       </div>
-      <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
-        <Table
-          aria-label="AVS list"
-          layout="fixed"
-          removeWrapper
-          classNames={{
-            base: 'overflow-x-auto h-full',
-            table: 'h-full'
-          }}
-          sortDescriptor={state.sortDescriptor}
-          onSortChange={e => dispatch({ sortDescriptor: e })}
-        >
-          <TableHeader columns={columns}>
-            {column => (
-              <TableColumn
-                allowsSorting
-                className={`text-foreground-active bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 ${column.className}`}
-                key={column.key}
-              >
-                {column.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            emptyContent={
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-lg text-foreground-2">
-                  No result found for &quot;
-                  {state.searchTerm?.length > 42
-                    ? `${state.searchTerm?.substring(0, 42)}...`
-                    : state.searchTerm}
-                  &quot;
-                </span>
-              </div>
-            }
+
+      {!state.isFetchingAvsData && state.error && (
+        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
+          {state.error.message === 'No AVS found' ? (
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-lg text-foreground-2">
+                No result found for &quot;
+                {state.searchTerm?.length > 42
+                  ? `${state.searchTerm?.substring(0, 42)}...`
+                  : state.searchTerm}
+                &quot;
+              </span>
+            </div>
+          ) : (
+            <ErrorMessage error={state.error} />
+          )}
+        </div>
+      )}
+
+      {!state.error && (
+        <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
+          <Table
+            aria-label="AVS list"
+            layout="fixed"
+            removeWrapper
+            classNames={{
+              base: 'overflow-x-auto h-full',
+              table: 'h-full'
+            }}
+            sortDescriptor={state.sortDescriptor}
+            onSortChange={e => dispatch({ sortDescriptor: e })}
           >
-            {state.isFetchingAvsData
-              ? [...Array(10)].map((_, i) => (
-                  <TableRow key={i} className="border-t border-outline">
-                    <TableCell className="w-2/5 py-6 pe-8 ps-4">
-                      <Skeleton className="h-4 rounded-md bg-default" />
-                    </TableCell>
-                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                      <Skeleton className="h-4 rounded-md bg-default" />
-                    </TableCell>
-                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                      <Skeleton className="h-4 rounded-md bg-default" />
-                    </TableCell>
-                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                      <Skeleton className="h-4 rounded-md bg-default" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : state.avs?.map((avs, i) => (
-                  <TableRow
-                    onClick={() =>
-                      navigate(`/avs/${avs.address}`, { state: { avs } })
-                    }
-                    key={`avs-item-${i}`}
-                    className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                  >
-                    <TableCell className="p-4">
-                      <div className="flex items-center gap-x-3">
-                        <span className="min-w-5">
-                          {(searchParams.get('page') - 1) * 10 + i + 1}
-                        </span>
-                        {avs.metadata?.logo ? (
-                          <Image
-                            className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
-                            src={avs.metadata?.logo}
-                          />
-                        ) : (
-                          <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
-                            question_mark
+            <TableHeader columns={columns}>
+              {column => (
+                <TableColumn
+                  allowsSorting
+                  className={`text-foreground-active bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 ${column.className}`}
+                  key={column.key}
+                >
+                  {column.label}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody>
+              {state.isFetchingAvsData
+                ? [...Array(10)].map((_, i) => (
+                    <TableRow key={i} className="border-t border-outline">
+                      <TableCell className="w-2/5 py-6 pe-8 ps-4">
+                        <Skeleton className="h-4 rounded-md bg-default" />
+                      </TableCell>
+                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                        <Skeleton className="h-4 rounded-md bg-default" />
+                      </TableCell>
+                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                        <Skeleton className="h-4 rounded-md bg-default" />
+                      </TableCell>
+                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                        <Skeleton className="h-4 rounded-md bg-default" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : state.avs?.map((avs, i) => (
+                    <TableRow
+                      onClick={() =>
+                        navigate(`/avs/${avs.address}`, { state: { avs } })
+                      }
+                      key={`avs-item-${i}`}
+                      className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                    >
+                      <TableCell className="p-4">
+                        <div className="flex items-center gap-x-3">
+                          <span className="min-w-5">
+                            {(searchParams.get('page') - 1) * 10 + i + 1}
                           </span>
-                        )}
-                        <span className="truncate">
-                          {avs.metadata?.name || avs.address}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="pe-8 text-end">
-                      {formatNumber(avs.stakers)}
-                    </TableCell>
-                    <TableCell className="pe-8 text-end">
-                      {formatNumber(avs.operators)}
-                    </TableCell>
-                    <TableCell className="pe-8 text-end">
-                      <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
-                      <div className="text-xs text-subtitle">
-                        {formatETH(avs.strategiesTotal)}
-                      </div>
-                    </TableCell>
+                          {avs.metadata?.logo ? (
+                            <Image
+                              className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
+                              src={avs.metadata?.logo}
+                            />
+                          ) : (
+                            <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
+                              question_mark
+                            </span>
+                          )}
+                          <span className="truncate">
+                            {avs.metadata?.name || avs.address}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="pe-8 text-end">
+                        {formatNumber(avs.stakers)}
+                      </TableCell>
+                      <TableCell className="pe-8 text-end">
+                        {formatNumber(avs.operators)}
+                      </TableCell>
+                      <TableCell className="pe-8 text-end">
+                        <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
+                        <div className="text-xs text-subtitle">
+                          {formatETH(avs.strategiesTotal)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
+              {!state.isFetchingAvsData &&
+                state.avs &&
+                [...Array(10 - state.avs.length)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="h-full w-2/5"></TableCell>
+                    <TableCell className="w-1/5"></TableCell>
+                    <TableCell className="w-1/5"></TableCell>
+                    <TableCell className="w-1/5"></TableCell>
                   </TableRow>
                 ))}
-
-            {!state.isFetchingAvsData &&
-              state.avs &&
-              [...Array(10 - state.avs.length)].map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell className="h-full w-2/5"></TableCell>
-                  <TableCell className="w-1/5"></TableCell>
-                  <TableCell className="w-1/5"></TableCell>
-                  <TableCell className="w-1/5"></TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        {state.avs && state.avs.length !== 0 && (
-          <ListPagination
-            onChange={handlePageClick}
-            page={parseInt(searchParams.get('page') || '1')}
-            total={state.totalPages}
-          />
-        )}
-      </div>
+            </TableBody>
+          </Table>
+          {state.avs && state.avs.length !== 0 && (
+            <ListPagination
+              onChange={handlePageClick}
+              page={parseInt(searchParams.get('page') || '1')}
+              total={state.totalPages}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
