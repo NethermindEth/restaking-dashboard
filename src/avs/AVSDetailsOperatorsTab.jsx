@@ -193,7 +193,7 @@ function AVSOperatorsList({ address, tvl }) {
       if (e.direction === 'descending') {
         sort = '-' + sort;
       }
-      dispatch({ sortDescriptor: e, sort });
+      dispatch({ sortDescriptor: e, sort, page: 1 });
     },
     [dispatch]
   );
