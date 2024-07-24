@@ -11,6 +11,7 @@ export default function HBrush({
   trackStyle
 }) {
   const brushRef = useRef(null);
+  const brushCache = useRef(null);
   const brushMoveOffset = useRef(0);
   const brushPivot = useRef(0);
   const lHandleRef = useRef(null);
@@ -79,6 +80,8 @@ export default function HBrush({
     event => {
       event.preventDefault();
 
+      brushCache.current = null;
+
       const brush = brushRef.current;
       const pivot = brushPivot.current;
       const trackRect = trackRef.current.getBoundingClientRect();
@@ -114,6 +117,15 @@ export default function HBrush({
   const handleTrackPointerUp = useCallback(
     event => {
       event.preventDefault();
+
+      // Restore the brush position and width if pointer released without moving
+      if (brushCache.current) {
+        brushRef.current.style.left = brushCache.current.left;
+        brushRef.current.style.right = brushCache.current.right;
+        brushRef.current.style.width = brushCache.current.width;
+        brushRef.current.style.overflow = null;
+      }
+
       document.removeEventListener('pointermove', handleTrackPointerMove);
       document.removeEventListener('pointerup', handleTrackPointerUp);
     },
@@ -129,6 +141,12 @@ export default function HBrush({
 
       const trackRect = trackRef.current.getBoundingClientRect();
 
+      // Cache the brush position and width to restore later if pointer not moved
+      brushCache.current = {
+        left: brushRef.current.style.left,
+        right: brushRef.current.style.right,
+        width: brushRef.current.style.width
+      };
       brushMoveOffset.current = 0;
       brushPivot.current = Math.round(event.clientX - trackRect.left);
       brushRef.current.style.left = `${brushPivot.current}px`;
@@ -249,7 +267,7 @@ const BrushHandle = forwardRef(function BrushHandle(props, ref) {
 
   return (
     <div
-      className="absolute bg-foreground-2 cursor-ew-resize drop-shadow flex items-center justify-center rounded-md"
+      className="absolute flex cursor-ew-resize items-center justify-center rounded-md bg-foreground-2 drop-shadow"
       ref={ref}
       style={{
         height: `${height}px`,
@@ -258,7 +276,7 @@ const BrushHandle = forwardRef(function BrushHandle(props, ref) {
         [left ? 'left' : 'right']: `-${width / 2}px`
       }}
     >
-      <div className="border-background border-x-1 h-2 w-1"></div>
+      <div className="h-2 w-1 border-x-1 border-background"></div>
     </div>
   );
 });
