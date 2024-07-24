@@ -1,5 +1,5 @@
 import { Button, Link } from '@nextui-org/react';
-import { reduceState } from '../shared/helpers';
+import { reduceState, truncateAddress } from '../shared/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useCallback } from 'react';
 import { useMutativeReducer } from 'use-mutative';
@@ -33,7 +33,7 @@ export default function AVSDetailsHeader({ avs }) {
       <div className="flex items-center">
         <ThirdPartyLogo className="size-12 min-w-12" url={avs.metadata?.logo} />
         <div className="ml-2 font-display text-3xl font-medium text-foreground-1">
-          <span>{avs.metadata?.name ?? 'N/A'}</span>
+          <span>{avs.metadata?.name ?? truncateAddress(avs.address)}</span>
 
           {/*TODO: implement ranking when coming from list view & accessing directly avs*/}
           {/* <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1"> */}
@@ -42,7 +42,7 @@ export default function AVSDetailsHeader({ avs }) {
         </div>
       </div>
       <div className="my-4 break-words text-xs text-foreground-1">
-        {avs.metadata?.description ?? 'N/A'}
+        {avs.metadata?.description}
       </div>
 
       {avs.metadata?.website && (
@@ -64,8 +64,7 @@ export default function AVSDetailsHeader({ avs }) {
             rel="noreferrer"
             target="_blank"
           >
-            {avs.address.substr(0, 6)}...
-            {avs.address.substr(-4)}
+            {truncateAddress(avs.address)}
           </Link>
           <Button
             className="ml-1 border-none text-secondary"
