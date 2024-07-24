@@ -179,22 +179,11 @@ export default function AVSList() {
         </div>
       )}
 
-      {!state.isFetchingData && state.avs.length === 0 && (
-        <div className="flex flex-1 items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
-          <span className="text-lg text-foreground-2">
-            No AVS found for &quot;
-            {debouncedSearchTerm?.length > 42
-              ? `${debouncedSearchTerm?.substring(0, 42)}...`
-              : debouncedSearchTerm}
-            &quot;
-          </span>
-        </div>
-      )}
-
-      {!state.error && state.avs.length > 0 && (
+      {!state.error && (
         <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
           <Table
             aria-label="AVS list"
+            hideHeader={!state.isFetchingData && state.avs.length == 0}
             layout="fixed"
             removeWrapper
             classNames={{
@@ -216,7 +205,19 @@ export default function AVSList() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody>
+            <TableBody
+              emptyContent={
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-lg text-foreground-2">
+                    No AVS found for &quot;
+                    {debouncedSearchTerm.length > 42
+                      ? `${debouncedSearchTerm.substring(0, 42)}...`
+                      : debouncedSearchTerm}
+                    &quot;
+                  </span>
+                </div>
+              }
+            >
               {state.isFetchingData
                 ? [...Array(10)].map((_, i) => (
                     <TableRow key={i} className="border-t border-outline">
@@ -278,7 +279,7 @@ export default function AVSList() {
                   ))}
 
               {!state.isFetchingData &&
-                state.avs &&
+                state.avs?.length > 0 &&
                 [...Array(10 - state.avs.length)].map((_, i) => (
                   <TableRow key={i}>
                     <TableCell className="h-full w-2/5"></TableCell>
