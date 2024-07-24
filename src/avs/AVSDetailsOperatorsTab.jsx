@@ -246,21 +246,21 @@ function AVSOperatorsList({ address, tvl }) {
         <TableHeader>
           <TableColumn
             allowsSorting
-            className="w-64 bg-transparent py-4 text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="text-foreground-active w-64 bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
             key="operator"
           >
             Operators
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
             key="share"
           >
             <span className="inline-block">Share</span>
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
             key="tvl"
           >
             TVL

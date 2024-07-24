@@ -253,8 +253,8 @@ export default function LSTDistributionGraph({
 
   return (
     <div>
-      <div className="bg-content1 rounded-lg border border-outline space-y-4 p-4  flex items-start flex-col justify-center">
-        <div className="flex justify-between flex-col sm:flex-row w-full gap-y-4">
+      <div className="flex flex-col items-start justify-center space-y-4 rounded-lg border border-outline bg-content1 p-4">
+        <div className="flex w-full flex-col justify-between gap-y-4 sm:flex-row">
           <RateSelector
             rate={state.currentRate}
             onRateChange={handleRateChange}
@@ -269,7 +269,7 @@ export default function LSTDistributionGraph({
             ref={containerRef}
             height={height}
             width={width}
-            className="touch-pan-y w-full"
+            className="w-full touch-pan-y"
           >
             <Group top={margin.top} left={margin.left}>
               <GridRows
@@ -368,7 +368,7 @@ export default function LSTDistributionGraph({
             </Group>
           </svg>
           <div
-            className="absolute border border-primary-50 dark:border-primary-700/25 bottom-px"
+            className="absolute bottom-px border border-primary-50 dark:border-primary-700/25"
             style={{
               height: brushSize.height,
               width: state.maxX - margin.right
@@ -383,12 +383,12 @@ export default function LSTDistributionGraph({
             />
           </div>
         </div>
-        <ul className="mt-4 pe-8 w-full">
+        <ul className="mt-4 w-full pe-8">
           {state.keys?.map((key, i) => (
-            <li key={key} className="inline-block me-4">
-              <div className="flex flex-row gap-1 items-center text-sm">
+            <li key={key} className="me-4 inline-block">
+              <div className="flex flex-row items-center gap-1 text-sm">
                 <span
-                  className="inline-block h-3 rounded-full w-3"
+                  className="inline-block h-3 w-3 rounded-full"
                   style={{ backgroundColor: graphColors[i] }}
                 ></span>
                 {STRATEGY_ASSET_MAPPING[key]?.compact ?? key}
@@ -402,21 +402,21 @@ export default function LSTDistributionGraph({
         <TooltipInPortal
           key={Math.random()}
           applyPositionStyle={true}
-          className="backdrop-blur bg-white/75 dark:bg-black/75 p-2 rounded min-w-40 shadow-md text-foreground"
+          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="font-bold text-xs mb-2">
+          <div className="mb-2 text-xs font-bold">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
             {state.keys?.map((key, i) => {
               return (
                 <li key={`tt-${key}`}>
-                  <div className="flex flex-row gap-1 items-center">
+                  <div className="flex flex-row items-center gap-1">
                     <span
-                      className="h-3 inline-block rounded-full w-3"
+                      className="inline-block h-3 w-3 rounded-full"
                       style={{ backgroundColor: graphColors[i] }}
                     ></span>
                     <span
@@ -447,13 +447,13 @@ export default function LSTDistributionGraph({
 
 function RateSelector({ rate, onRateChange }) {
   return (
-    <div className="p-0 w-full flex items-center gap-3">
+    <div className="flex w-full items-center gap-3 p-0">
       <span className="text-foreground-2">Volume over time in</span>
-      <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+      <div className="flex w-full items-center gap-3 rounded-lg border border-outline p-2 md:w-fit">
         <div
-          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
             rate === 'usd' &&
-            'bg-default border border-outline text-foreground-active'
+            'text-foreground-active border border-outline bg-default'
           }`}
           onClick={() => onRateChange('usd')}
         >
@@ -461,9 +461,9 @@ function RateSelector({ rate, onRateChange }) {
         </div>
 
         <div
-          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
             rate === 'eth' &&
-            'bg-default border border-outline text-foreground-active'
+            'text-foreground-active border border-outline bg-default'
           }`}
           onClick={() => onRateChange('eth')}
         >

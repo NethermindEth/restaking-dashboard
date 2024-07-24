@@ -32,9 +32,9 @@ const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
 
   return (
     <>
-      <Card radius="md" className="bg-content1 border border-outline p-4 ">
+      <Card radius="md" className="border border-outline bg-content1 p-4">
         <CardHeader className="flex flex-wrap justify-between gap-3">
-          <div className="space-y-2 block">
+          <div className="block space-y-2">
             <div className="font-light">
               <div className="text-lg text-foreground-1">
                 <span>EigenLayer TVL over time</span>
@@ -47,10 +47,10 @@ const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
           />
         </CardHeader>
         <CardBody className="w-full space-y-4">
-          <div className="w-full h-[400px]">
+          <div className="h-[400px] w-full">
             <EigenLayerTVLOvertimeChart data={filteredData} height={400} />
           </div>
-          <div className="text-xs text-foreground-2 pt-10">
+          <div className="pt-10 text-xs text-foreground-2">
             Due to the expanding pool of Liquid Staking Tokens {`(LST)`} and
             Liquid Restaking Tokens {`(LRT)`}, the TVL value on this dashboard
             may not always match the actual TVL of the entire token pool. Refer

@@ -99,8 +99,8 @@ const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
   }, [strategies]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-y-4">
-      <div className="w-full flex flex-col gap-y-3">
+    <div className="flex flex-col gap-y-4 lg:flex-row">
+      <div className="flex w-full flex-col gap-y-3">
         {state.lstDistribution.map((strategy, i) => (
           <LSTShare
             key={`lst-distribution-item-${i}`}
@@ -112,7 +112,7 @@ const LSTDistribution = ({ strategies, operatorTVL, rate }) => {
           />
         ))}
       </div>
-      <div className="w-full lg:w-1/2 flex flex-row items-center justify-center px-4">
+      <div className="flex w-full flex-row items-center justify-center px-4 lg:w-1/2">
         <svg width={width} height={width}>
           <Group top={half} left={half} className="relative">
             <Pie
@@ -200,11 +200,11 @@ const LSTShare = ({ label, value }) => {
     <Progress
       radius="sm"
       classNames={{
-        base: 'w-full lg:w-md',
-        track: 'drop-shadow-md border bg-cinder-1 border-default',
+        base: 'lg:w-md w-full',
+        track: 'border border-default bg-cinder-1 drop-shadow-md',
         indicator: 'bg-cinder-5',
-        label: 'text-foreground-2 text-xs font-normal',
-        value: 'text-white text-xs font-normal'
+        label: 'text-xs font-normal text-foreground-2',
+        value: 'text-xs font-normal text-white'
       }}
       label={label}
       value={value}

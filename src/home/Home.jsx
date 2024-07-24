@@ -91,17 +91,17 @@ export default function Home() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-stretch md:flex-row flex-col gap-4 justify-between w-full">
+      <div className="flex w-full flex-col items-stretch justify-between gap-4 md:flex-row">
         <Card
           radius="md"
-          className="bg-content1 border border-outline flex md:flex-row items-center justify-around w-full p-4 md:space-y-0 space-y-4"
+          className="flex w-full items-center justify-around space-y-4 border border-outline bg-content1 p-4 md:flex-row md:space-y-0"
         >
           <div className="space-y-1 text-center">
-            <div className="font-light text-sm text-foreground-1">
+            <div className="text-sm font-light text-foreground-1">
               EigenLayer TVL
             </div>
             {state.isFetchingEigenTVL ? (
-              <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
+              <Skeleton className="h-8 w-full rounded-md bg-default dark:bg-default" />
             ) : (
               <div>
                 <div className="text-2xl font-normal text-white">
@@ -122,29 +122,29 @@ export default function Home() {
             )}
           </div>
 
-          <Divider orientation="vertical" className="h-12 hidden md:block" />
+          <Divider orientation="vertical" className="hidden h-12 md:block" />
           <Divider orientation="horizontal" className="w-8/12 md:hidden" />
 
           <div className="space-y-1 text-center">
-            <div className="font-light text-sm text-foreground-1">
+            <div className="text-sm font-light text-foreground-1">
               Total AVS
             </div>
             {state.isFetchingTopAVS ? (
-              <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
+              <Skeleton className="h-8 w-full rounded-md bg-default dark:bg-default" />
             ) : (
               <div className="text-2xl font-normal text-white">
                 {state.totalAVSCount}
               </div>
             )}
           </div>
-          <Divider orientation="vertical" className="h-12 hidden md:block" />
+          <Divider orientation="vertical" className="hidden h-12 md:block" />
           <Divider orientation="horizontal" className="w-8/12 md:hidden" />
           <div className="space-y-1 text-center">
-            <div className="font-light text-sm text-foreground-1">
+            <div className="text-sm font-light text-foreground-1">
               Total Operators
             </div>
             {state.isFetchingTopOperators ? (
-              <Skeleton className="w-full rounded-md h-8 bg-default dark:bg-default" />
+              <Skeleton className="h-8 w-full rounded-md bg-default dark:bg-default" />
             ) : (
               <div className="text-2xl font-normal text-white">
                 {state.totalOperatorsCount}
@@ -156,14 +156,14 @@ export default function Home() {
           <CallToActions />
         </div>
       </div>
-      <div className="flex items-stretch md:flex-row flex-col justify-between gap-4">
+      <div className="flex flex-col items-stretch justify-between gap-4 md:flex-row">
         <Card
           radius="md"
-          className="bg-content1 border border-outline space-y-4 p-4 w-full"
+          className="w-full space-y-4 border border-outline bg-content1 p-4"
         >
-          <div className="font-light text-base text-foreground-1">Top AVS</div>
+          <div className="text-base font-light text-foreground-1">Top AVS</div>
           <div className="text-sm">
-            <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+            <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
               <span className="basis-full truncate">AVS</span>
               <span className="basis-1/2">Operators</span>
               <span className="basis-1/3 text-end">TVL</span>
@@ -176,10 +176,10 @@ export default function Home() {
                 <Link
                   href={`/avs/${avs.address}`}
                   key={`avs-item-${i}`}
-                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default text-white text-sm`}
+                  className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 text-sm text-white hover:bg-default`}
                 >
                   <img
-                    className="h-5 rounded-full min-w-5"
+                    className="h-5 min-w-5 rounded-full"
                     src={avs.metadata.logo}
                   />
                   <span className="basis-full truncate">
@@ -188,7 +188,7 @@ export default function Home() {
                   <span className="basis-1/2">
                     {formatNumber(avs.operators, compact)}
                   </span>
-                  <div className="basis-1/3 text-end min-w-fit">
+                  <div className="min-w-fit basis-1/3 text-end">
                     <div>
                       ${formatNumber(avs.strategiesTotal * state.rate, compact)}
                     </div>
@@ -203,13 +203,13 @@ export default function Home() {
         </Card>
         <Card
           radius="md"
-          className="bg-content1 border border-outline space-y-4 p-4 w-full"
+          className="w-full space-y-4 border border-outline bg-content1 p-4"
         >
-          <div className="font-light text-base text-foreground-1">
+          <div className="text-base font-light text-foreground-1">
             Top Operators
           </div>
           <div className="text-sm">
-            <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
+            <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
               <span className="basis-full truncate">Operators</span>
               <span className="basis-1/2">Restakers</span>
               <span className="basis-1/3 text-end">TVL</span>
@@ -222,10 +222,10 @@ export default function Home() {
                 <Link
                   href={`/operators/${op.address}`}
                   key={`avs-item-${i}`}
-                  className={`border-t border-outline flex flex-row gap-x-2 justify-between items-center p-4 cursor-pointer hover:bg-default text-white text-sm`}
+                  className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 text-sm text-white hover:bg-default`}
                 >
                   <img
-                    className="h-5 rounded-full min-w-5"
+                    className="h-5 min-w-5 rounded-full"
                     src={op.metadata.logo}
                   />
                   <span className="basis-full truncate">
@@ -234,7 +234,7 @@ export default function Home() {
                   <span className="basis-1/2">
                     {formatNumber(op.stakerCount, compact)}
                   </span>
-                  <div className="basis-1/3 text-end min-w-fit">
+                  <div className="min-w-fit basis-1/3 text-end">
                     <div>
                       ${formatNumber(op.strategiesTotal * state.rate, compact)}
                     </div>
@@ -266,20 +266,20 @@ const CallToActions = () => {
       >
         <Card
           radius="md"
-          className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group w-full"
+          className="group flex w-full cursor-pointer flex-row items-center justify-normal gap-3 bg-cinder-1 px-4 py-2.5 hover:bg-cinder-4"
         >
           <div>
             <img src="/nethermind.png" />
           </div>
           <div className="space-y-1">
-            <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
+            <div className="text-base font-semibold text-cinder-2 group-hover:text-accent-default">
               Start Restaking
             </div>
-            <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
+            <div className="text-sm font-light text-cinder-3 group-hover:text-accent-default">
               Nethermind Operator
             </div>
           </div>
-          <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
+          <ChevronRightIcon className="ml-2 size-6 text-cinder-3" />
         </Card>
       </Link>
       <Link
@@ -290,20 +290,20 @@ const CallToActions = () => {
       >
         <Card
           radius="md"
-          className="bg-cinder-1 hover:bg-cinder-4 cursor-pointer flex flex-row items-center justify-normal gap-3 px-4 py-2.5 group w-full"
+          className="group flex w-full cursor-pointer flex-row items-center justify-normal gap-3 bg-cinder-1 px-4 py-2.5 hover:bg-cinder-4"
         >
           <div>
             <img src="/nethermind.png" />
           </div>
           <div className="space-y-1">
-            <div className="text-cinder-2 group-hover:text-accent-default font-semibold text-base">
+            <div className="text-base font-semibold text-cinder-2 group-hover:text-accent-default">
               Audit Smart Contract
             </div>
-            <div className="text-cinder-3 group-hover:text-accent-default text-sm font-light">
+            <div className="text-sm font-light text-cinder-3 group-hover:text-accent-default">
               Audit AVS with Nethermind
             </div>
           </div>
-          <ChevronRightIcon className="size-6 ml-2 text-cinder-3" />
+          <ChevronRightIcon className="ml-2 size-6 text-cinder-3" />
         </Card>
       </Link>
     </div>
@@ -316,20 +316,20 @@ const ListSkeleton = () => {
       {[...Array(3)].map((item, i) => (
         <div
           key={i}
-          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
+          className="flex w-full justify-normal gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
         >
-          <div className="md:w-10/12 w-6/12">
-            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          <div className="w-6/12 md:w-10/12">
+            <Skeleton className="h-6 w-4/5 rounded-md dark:bg-default md:w-2/3" />
           </div>
-          <div className="pl-5 flex justify-between gap-5 w-10/12">
+          <div className="flex w-10/12 justify-between gap-5 pl-5">
             <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
             </div>
           </div>
         </div>
