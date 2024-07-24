@@ -49,7 +49,7 @@ export default function AVSList() {
   const abortController = useRef(null);
   const [state, dispatch] = useMutativeReducer(reduceState, {
     avs: [],
-    isFetchingAvsData: false,
+    isFetchingData: false,
     searchTerm: searchParams.get('search'),
     error: null,
     rate: 1,
@@ -69,7 +69,7 @@ export default function AVSList() {
   const fetchAVS = useCallback(
     async (pageNumber, search, sort) => {
       try {
-        dispatch({ isFetchingAvsData: true, error: null });
+        dispatch({ isFetchingData: true, error: null });
 
         if (abortController.current) {
           abortController.current.abort();
@@ -85,7 +85,7 @@ export default function AVSList() {
 
         dispatch({
           avs: response.results,
-          isFetchingAvsData: false,
+          isFetchingData: false,
           rate: response.rate,
           totalPages: Math.ceil(response.totalCount / 10)
         });
@@ -95,7 +95,7 @@ export default function AVSList() {
         if (e.name !== 'AbortError') {
           dispatch({
             error: handleServiceError(e),
-            isFetchingAvsData: false
+            isFetchingData: false
           });
         }
       }
@@ -173,13 +173,25 @@ export default function AVSList() {
         />
       </div>
 
-      {!state.isFetchingAvsData && state.error && (
+      {!state.isFetchingData && state.error && (
         <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
           <ErrorMessage error={state.error} />
         </div>
       )}
 
-      {!state.error && (
+      {!state.isFetchingData && state.avs.length === 0 && (
+        <div className="flex flex-1 items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
+          <span className="text-lg text-foreground-2">
+            No AVS found for &quot;
+            {debouncedSearchTerm?.length > 42
+              ? `${debouncedSearchTerm?.substring(0, 42)}...`
+              : debouncedSearchTerm}
+            &quot;
+          </span>
+        </div>
+      )}
+
+      {!state.error && state.avs.length > 0 && (
         <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
           <Table
             aria-label="AVS list"
@@ -205,7 +217,7 @@ export default function AVSList() {
               )}
             </TableHeader>
             <TableBody>
-              {state.isFetchingAvsData
+              {state.isFetchingData
                 ? [...Array(10)].map((_, i) => (
                     <TableRow key={i} className="border-t border-outline">
                       <TableCell className="w-2/5 py-6 pe-8 ps-4">
@@ -265,7 +277,7 @@ export default function AVSList() {
                     </TableRow>
                   ))}
 
-              {!state.isFetchingAvsData &&
+              {!state.isFetchingData &&
                 state.avs &&
                 [...Array(10 - state.avs.length)].map((_, i) => (
                   <TableRow key={i}>
