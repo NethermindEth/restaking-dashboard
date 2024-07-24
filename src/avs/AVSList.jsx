@@ -175,19 +175,7 @@ export default function AVSList() {
 
       {!state.isFetchingAvsData && state.error && (
         <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
-          {state.error.message === 'No AVS found' ? (
-            <div className="flex flex-col items-center justify-center">
-              <span className="text-lg text-foreground-2">
-                No result found for &quot;
-                {state.searchTerm?.length > 42
-                  ? `${state.searchTerm?.substring(0, 42)}...`
-                  : state.searchTerm}
-                &quot;
-              </span>
-            </div>
-          ) : (
-            <ErrorMessage error={state.error} />
-          )}
+          <ErrorMessage error={state.error} />
         </div>
       )}
 
