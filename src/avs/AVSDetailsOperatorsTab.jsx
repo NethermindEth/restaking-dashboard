@@ -234,7 +234,6 @@ function AVSOperatorsList({ address, tvl }) {
 
       <Table
         aria-label="List of operators registered for AVS"
-        className="overflow-x-scroll"
         classNames={{
           base: 'h-full overflow-x-auto',
           table: 'h-full'
