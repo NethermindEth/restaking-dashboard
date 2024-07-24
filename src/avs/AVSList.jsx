@@ -1,7 +1,6 @@
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import { handleServiceError, reduceState } from '../shared/helpers';
 import {
-  Image,
   Input,
   Skeleton,
   Table,
@@ -15,6 +14,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -248,16 +248,10 @@ export default function AVSList() {
                           <span className="min-w-5">
                             {(searchParams.get('page') - 1) * 10 + i + 1}
                           </span>
-                          {avs.metadata?.logo ? (
-                            <Image
-                              className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
-                              src={avs.metadata?.logo}
-                            />
-                          ) : (
-                            <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
-                              question_mark
-                            </span>
-                          )}
+                          <ThirdPartyLogo
+                            className="size-8 min-w-8"
+                            url={avs.metadata?.logo}
+                          />
                           <span className="truncate">
                             {avs.metadata?.name || avs.address}
                           </span>

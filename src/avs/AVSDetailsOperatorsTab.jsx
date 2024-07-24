@@ -1,6 +1,5 @@
 import { formatETH, formatUSD } from '../shared/formatters';
 import {
-  Image,
   Input,
   Skeleton,
   Spinner,
@@ -17,6 +16,7 @@ import ListPagination from '../shared/ListPagination';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
 import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../shared/helpers';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -306,16 +306,10 @@ function AVSOperatorsList({ address, tvl }) {
                     <span className="min-w-5">
                       {(state.page - 1) * 10 + i + 1}
                     </span>
-                    {op.metadata?.logo ? (
-                      <Image
-                        className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
-                        src={op.metadata?.logo}
-                      />
-                    ) : (
-                      <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
-                        question_mark
-                      </span>
-                    )}{' '}
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={op.metadata?.logo}
+                    />
                     <span className="truncate">
                       {op.metadata?.name || op.address}
                     </span>
