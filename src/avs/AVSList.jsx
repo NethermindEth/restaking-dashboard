@@ -187,7 +187,8 @@ export default function AVSList() {
             removeWrapper
             classNames={{
               base: 'overflow-x-auto h-full',
-              table: 'h-full'
+              table: 'h-full',
+              thead: '[&>tr:last-child]:hidden'
             }}
             sortDescriptor={state.sortDescriptor}
             onSortChange={e => dispatch({ sortDescriptor: e })}
