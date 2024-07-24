@@ -187,7 +187,7 @@ export default function AVSList() {
             layout="fixed"
             removeWrapper
             classNames={{
-              base: 'overflow-x-auto h-full',
+              base: 'h-full overflow-x-auto',
               table: 'h-full',
               thead: '[&>tr:last-child]:hidden'
             }}

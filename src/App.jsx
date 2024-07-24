@@ -5,19 +5,19 @@ import {
   Route,
   RouterProvider
 } from 'react-router-dom';
+import AVSDetails from './avs/AVSDetails';
 import AVSList from './avs/AVSList';
 import Home from './home/Home';
 import Layout from './shared/Layout';
 import log from './shared/logger';
 import LRT from './lrt/LRT';
+import LST from './lst/LST';
 import { NextUIProvider } from '@nextui-org/react';
+import NotFound from './shared/NotFound';
+import OperatorDetails from './operators/OperatorDetails';
+import OperatorsList from './operators/OperatorsList';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
-import AVSDetails from './avs/AVSDetails';
-import OperatorsList from './operators/OperatorsList';
-import OperatorDetails from './operators/OperatorDetails';
-import LST from './lst/LST';
-import NotFound from './shared/NotFound';
 
 export default function App() {
   log.debug('Starting up');

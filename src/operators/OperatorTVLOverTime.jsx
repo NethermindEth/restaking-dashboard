@@ -63,12 +63,12 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
   }, []);
 
   return (
-    <Card radius="md" className="bg-content1 border border-outline p-4 ">
+    <Card radius="md" className="border border-outline bg-content1 p-4">
       <CardHeader className="flex flex-wrap justify-between gap-3">
-        <div className="space-y-2 block">
-          <div className="font-light text-lg text-foreground-active">TVL</div>
+        <div className="block space-y-2">
+          <div className="text-foreground-active text-lg font-light">TVL</div>
           <div className="font-light">
-            <div className="text-base ">
+            <div className="text-base">
               <span>{currentTVL} ETH</span>
             </div>
             <div className="text-xs text-success">
@@ -88,7 +88,7 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
           />
         </div>
       </CardHeader>
-      <CardBody className="w-full h-[400px]">
+      <CardBody className="h-[400px] w-full">
         <ParentSize>
           {({ width, height }) => (
             <OperatorTVLOverTimeChart
@@ -107,12 +107,12 @@ const OperatorTVLOverTime = ({ opAddress, currentTVL }) => {
 
 function RateSelector({ rate, onRateChange }) {
   return (
-    <div className="p-0 w-full flex items-center gap-3">
-      <div className="border border-outline p-2 rounded-lg w-full md:w-fit flex items-center gap-3">
+    <div className="flex w-full items-center gap-3 p-0">
+      <div className="flex w-full items-center gap-3 rounded-lg border border-outline p-2 md:w-fit">
         <div
-          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
             rate === 'usd' &&
-            'bg-default border border-outline text-foreground-active'
+            'text-foreground-active border border-outline bg-default'
           }`}
           onClick={() => onRateChange('usd')}
         >
@@ -120,9 +120,9 @@ function RateSelector({ rate, onRateChange }) {
         </div>
 
         <div
-          className={`text-center text-foreground-2 rounded-md py-1 px-6 min-w-fit w-full md:w-20 cursor-pointer ${
+          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
             rate === 'eth' &&
-            'bg-default border border-outline text-foreground-active'
+            'text-foreground-active border border-outline bg-default'
           }`}
           onClick={() => onRateChange('eth')}
         >

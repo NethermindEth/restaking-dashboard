@@ -139,7 +139,7 @@ const OperatorsList = () => {
                     src={op.metadata?.logo}
                   />
                 ) : (
-                  <span class="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
+                  <span className="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
                     warning
                   </span>
                 )}

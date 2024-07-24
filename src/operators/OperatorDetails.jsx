@@ -52,12 +52,12 @@ const OperatorDetails = () => {
     <div className="w-full space-y-4">
       <Card
         radius="md"
-        className="bg-content1 border border-outline w-full space-y-4"
+        className="w-full space-y-4 border border-outline bg-content1"
       >
         <CardBody className="space-y-4">
-          <div className="flex flex-row gap-x-2 items-center">
+          <div className="flex flex-row items-center gap-x-2">
             <div className="flex items-center gap-3">
-              <span className="text-foreground-2 text-3xl font-medium">
+              <span className="text-3xl font-medium text-foreground-2">
                 {state.operator?.metadata?.name ?? 'Unknown'}
               </span>
             </div>
@@ -65,26 +65,26 @@ const OperatorDetails = () => {
           <div className="py-4 text-sm text-foreground-2">
             {state.operator?.metadata?.description}
           </div>
-          <div className="w-full min-h-20 flex rounded-lg border border-outline px-10 py-4 justify-between">
-            <div className="flex basis-1/4 flex-col gap-y-2 items-center">
-              <span className="text-default-2 text-sm text-center">TVL</span>
+          <div className="flex min-h-20 w-full justify-between rounded-lg border border-outline px-10 py-4">
+            <div className="flex basis-1/4 flex-col items-center gap-y-2">
+              <span className="text-center text-sm text-default-2">TVL</span>
               <span className="text-foreground-active text-center">
                 {state.operator?.strategies &&
                   `${assetFormatter.format(formatEther(state.operatorTVL.toString()))} ETH`}
               </span>
             </div>
-            <Divider orientation="vertical" className="bg-outline min-h-14" />
+            <Divider orientation="vertical" className="min-h-14 bg-outline" />
             <div className="flex basis-1/6 flex-col items-center gap-y-2">
-              <span className="text-default-2 text-sm text-center">
+              <span className="text-center text-sm text-default-2">
                 AVS Subscribed
               </span>
               <span className="text-foreground-active text-center">
                 {state.operator?.avs.length}
               </span>
             </div>
-            <Divider orientation="vertical" className="bg-outline min-h-14" />
-            <div className="flex basis-2/12 flex-col gap-y-2 items-center">
-              <span className="text-default-2 text-sm text-center">
+            <Divider orientation="vertical" className="min-h-14 bg-outline" />
+            <div className="flex basis-2/12 flex-col items-center gap-y-2">
+              <span className="text-center text-sm text-default-2">
                 Restakers
               </span>
               <span className="text-foreground-active text-center">
@@ -102,12 +102,12 @@ const OperatorDetails = () => {
         )}
       />
 
-      <div className="flex flex-col lg:flex-row gap-4 w-full">
-        <div className="w-full flex flex-col gap-y-4">
+      <div className="flex w-full flex-col gap-4 lg:flex-row">
+        <div className="flex w-full flex-col gap-y-4">
           <RestakersTrend opAddress={address} />
           <Card
             radius="md"
-            className="bg-content1 w-full border border-outline p-4"
+            className="w-full border border-outline bg-content1 p-4"
           >
             <CardHeader>
               <span className="text-foreground-2">LST Distribution</span>

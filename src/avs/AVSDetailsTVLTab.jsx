@@ -167,7 +167,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
     <Table
       aria-label="Breakdown of ETH, EIGEN and Liquid Staking Tokens"
       classNames={{
-        wrapper: 'border border-outline rounded-lg',
+        wrapper: 'rounded-lg border border-outline',
         tr: 'border-b border-outline last:border-none'
       }}
       hideHeader
@@ -250,7 +250,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
     <Table
       aria-label="Breakdown of Liquid Staking Tokens"
       classNames={{
-        wrapper: 'border border-outline rounded-lg',
+        wrapper: 'rounded-lg border border-outline',
         tr: 'border-b border-outline last:border-none'
       }}
       hideHeader
