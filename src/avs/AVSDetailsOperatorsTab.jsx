@@ -1,5 +1,6 @@
 import { formatETH, formatUSD } from '../shared/formatters';
 import {
+  Image,
   Input,
   Skeleton,
   Spinner,
@@ -218,7 +219,7 @@ function AVSOperatorsList({ address, tvl }) {
           className="w-full lg:w-[40%]"
           classNames={{
             inputWrapper:
-              'border border-outline data-[hover=true]:border-foreground-1',
+              'border-outline data-[hover=true]:border-foreground-1',
             input: 'placeholder:text-foreground-2'
           }}
           endContent={<span className="material-symbols-outlined">search</span>}
@@ -235,8 +236,8 @@ function AVSOperatorsList({ address, tvl }) {
         aria-label="List of operators registered for AVS"
         className="overflow-x-scroll"
         classNames={{
-          wrapper: 'rounded-lg border border-outline px-0',
-          th: 'bg-transparent px-4 text-sm text-foreground'
+          base: 'h-full overflow-x-auto',
+          table: 'h-full'
         }}
         layout="fixed"
         removeWrapper
@@ -253,7 +254,7 @@ function AVSOperatorsList({ address, tvl }) {
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 bg-transparent py-4 text-center text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
             key="share"
           >
             <span className="inline-block">Share</span>
@@ -268,7 +269,7 @@ function AVSOperatorsList({ address, tvl }) {
         </TableHeader>
         <TableBody
           emptyContent={
-            <div className="flex h-[33rem] flex-col items-center justify-center">
+            <div className="flex h-[40rem] flex-col items-center justify-center">
               <span className="text-lg text-foreground-2">
                 No result found for {truncate(state.search ?? '')}
               </span>
@@ -278,16 +279,14 @@ function AVSOperatorsList({ address, tvl }) {
           {state.isTableLoading &&
             [...new Array(10)].map((_, i) => (
               <TableRow className="border-t border-outline" key={i}>
-                <TableCell>
-                  <Skeleton className="h-4 w-4/5 rounded-md" />
+                <TableCell className="w-1/3 py-4 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md" />
                 </TableCell>
-                <TableCell>
-                  <div className="flex justify-center">
-                    <Skeleton className="h-4 w-full rounded-md" />
-                  </div>
+                <TableCell className="w-1/3 py-4 pe-8 ps-4 text-end">
+                  <Skeleton className="h-4 rounded-md" />
                 </TableCell>
-                <TableCell className="flex justify-end">
-                  <Skeleton className="h-9 w-4/5 rounded-md" />
+                <TableCell className="w-1/3 py-4 pe-8 ps-4">
+                  <Skeleton className="h-8 rounded-md" />
                 </TableCell>
               </TableRow>
             ))}
@@ -295,7 +294,7 @@ function AVSOperatorsList({ address, tvl }) {
           {!state.isTableLoading &&
             state.operators.map((op, i) => (
               <TableRow
-                className="cursor-pointer border-t border-outline hover:bg-default"
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                 key={`avs-operator-${i}`}
                 onClick={() => {
                   navigate(`/operators/${op.address}`, {
@@ -303,40 +302,35 @@ function AVSOperatorsList({ address, tvl }) {
                   });
                 }}
               >
-                <TableCell className="pl-4">
-                  <div className="flex gap-x-2">
-                    <span>{(state.page - 1) * 10 + i + 1}</span>
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <span className="min-w-5">
+                      {(state.page - 1) * 10 + i + 1}
+                    </span>
                     {op.metadata?.logo ? (
-                      <img
-                        className="size-5 rounded-full bg-foreground-2"
+                      <Image
+                        className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
                         src={op.metadata?.logo}
                       />
                     ) : (
-                      <span className="material-symbols-outlined flex h-5 min-w-5 items-center justify-center rounded-full text-lg text-yellow-300">
-                        warning
+                      <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
+                        question_mark
                       </span>
                     )}{' '}
                     <span className="truncate">
-                      {op.metadata?.name ?? 'N/A'}
+                      {op.metadata?.name || op.address}
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="text-center">
-                    {((op.strategiesTotal / tvl) * 100).toFixed(2)}%
-                  </div>
+                <TableCell className="pe-8 text-end">
+                  <div>{((op.strategiesTotal / tvl) * 100).toFixed(2)}%</div>
                 </TableCell>
-                <TableCell className="flex justify-end pr-4">
-                  <div className="flex flex-col text-end">
-                    <span>
-                      {formatUSD(
-                        op.strategiesTotal * state.currentRate,
-                        compact
-                      )}
-                    </span>
-                    <span className="text-xs text-foreground-2">
-                      {formatETH(op.strategiesTotal, compact)}
-                    </span>
+                <TableCell className="pe-8 text-end">
+                  <div>
+                    {formatUSD(op.strategiesTotal * state.currentRate, compact)}
+                  </div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(op.strategiesTotal, compact)}
                   </div>
                 </TableCell>
               </TableRow>
@@ -346,7 +340,7 @@ function AVSOperatorsList({ address, tvl }) {
             state.operators.length > 0 &&
             [...Array(10 - state.operators.length)].map((_, i) => (
               <TableRow className="border-none" key={i}>
-                <TableCell className="h-[3.25rem] w-1/3"></TableCell>
+                <TableCell className="h-[4rem] w-1/3"></TableCell>
                 <TableCell className="w-1/3"></TableCell>
                 <TableCell className="w-1/3"></TableCell>
               </TableRow>
