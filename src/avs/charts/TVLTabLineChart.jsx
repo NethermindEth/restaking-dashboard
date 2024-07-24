@@ -229,8 +229,7 @@ export default function TVLTabLineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            /* TODO: define in tailwind config */
-            className="stroke-dark-blue"
+            className="stroke-chart-9"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
@@ -238,9 +237,8 @@ export default function TVLTabLineChart({ points, height, width }) {
           />
 
           {tooltipOpen && (
-            /* TODO: define in tailwind config */
             <Circle
-              className="cursor-pointer fill-dark-blue stroke-white stroke-2"
+              className="fill-chart-9 cursor-pointer stroke-2 dark:stroke-white"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}
