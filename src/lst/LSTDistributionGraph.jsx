@@ -1,14 +1,14 @@
 import { useTooltip } from '@visx/tooltip';
-import { AxisRight, AxisBottom } from '@visx/axis';
+import { AxisBottom, AxisRight } from '@visx/axis';
 import { curveMonotoneX } from '@visx/curve';
 import { localPoint } from '@visx/event';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
-import { scaleUtc, scaleLinear } from '@visx/scale';
-import { AreaStack, AreaClosed } from '@visx/shape';
+import { scaleLinear, scaleUtc } from '@visx/scale';
+import { AreaClosed, AreaStack } from '@visx/shape';
 import { bisector } from '@visx/vendor/d3-array';
 import { useTooltipInPortal } from '@visx/tooltip';
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import HBrush from '../shared/HBrush';
 import { reduceState } from '../shared/helpers';

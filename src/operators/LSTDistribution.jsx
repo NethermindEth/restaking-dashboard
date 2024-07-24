@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Pie } from '@visx/shape';
 import { Group } from '@visx/group';
 import { Text } from '@visx/text';
