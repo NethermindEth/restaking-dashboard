@@ -46,7 +46,7 @@ export default function AVSDetailsHeader({ avs }) {
       </div>
       <div className="flex items-center gap-1">
         <Link
-          className="text-xs text-secondary"
+          className="truncate text-xs text-secondary"
           href={`https://etherscan.io/address/${avs.address}`}
           rel="noreferrer"
           target="_blank"
