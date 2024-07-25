@@ -1,6 +1,5 @@
 import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { colors, protocols } from './helpers';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
@@ -12,6 +11,7 @@ import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import HBrush from '../shared/HBrush';
 import { localPoint } from '@visx/event';
+import { protocols } from './helpers';
 import { reduceState } from '../shared/helpers';
 import { tabs } from '../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
@@ -278,18 +278,22 @@ export default function LRTDistribution({ data, height }) {
               y1={d => scaleValue(getY1(d)) ?? 0}
             >
               {({ stacks, path }) =>
-                stacks.map((stack, i) => (
-                  <path
-                    key={`stack-${stack.key}`}
-                    d={path(stack) || ''}
-                    fill={colors[i]}
-                    onPointerEnter={e => handleAreaPointerMove(e, stack)}
-                    onPointerLeave={hideTooltip}
-                    onPointerMove={e => handleAreaPointerMove(e, stack)}
-                    stroke={colors[i]}
-                    // opacity={0.75}
-                  />
-                ))
+                stacks.map((stack, i) => {
+                  const color = `hsl(var(--app-chart-${i + 1}))`;
+
+                  return (
+                    <path
+                      key={`stack-${stack.key}`}
+                      d={path(stack) || ''}
+                      fill={color}
+                      onPointerEnter={e => handleAreaPointerMove(e, stack)}
+                      onPointerLeave={hideTooltip}
+                      onPointerMove={e => handleAreaPointerMove(e, stack)}
+                      stroke={color}
+                      // opacity={0.75}
+                    />
+                  );
+                })
               }
             </AreaStack>
             {tooltipOpen && (
@@ -389,8 +393,10 @@ export default function LRTDistribution({ data, height }) {
                     className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
                   >
                     <span
-                      className="inline-block h-3 w-3 rounded-full"
-                      style={{ backgroundColor: colors[i] }}
+                      className={`inline-block h-3 w-3 rounded-full`}
+                      style={{
+                        backgroundColor: `hsl(var(--app-chart-${i + 1}))`
+                      }}
                     ></span>
                     {protocols[key]?.name ?? key}
                     <span className="grow ps-4 text-end">

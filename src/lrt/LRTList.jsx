@@ -1,5 +1,5 @@
-import { colors, protocols } from './helpers';
 import { formatETH, formatUSD } from '../shared/formatters';
+import { protocols } from './helpers';
 
 export default function LRTList({ data }) {
   return (
@@ -18,7 +18,7 @@ export default function LRTList({ data }) {
             <span className="inline-block min-w-4">{i + 1}</span>
             <span
               className="inline-block min-h-3 min-w-3 rounded-full"
-              style={{ backgroundColor: colors[i] }}
+              style={{ backgroundColor: `hsl(var(--app-chart-${i + 1}))` }}
             ></span>
 
             <span className="basis-full text-foreground-1">
