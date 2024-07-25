@@ -149,7 +149,7 @@ export default function TVLTabLineChart({ points, height, width }) {
           <div className="font-display text-xl text-foreground-1">
             TVL over time
           </div>
-          <div className="flex gap-x-2 text-xs text-foreground-2">
+          <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
               className={`${growthPercentage >= 0 ? 'text-success' : 'text-danger'}`}
