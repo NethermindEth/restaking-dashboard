@@ -15,6 +15,10 @@ body {
     'opsz' 20;
 }
 
+.rd-box {
+  @apply rounded-lg border border-outline bg-content1;
+}
+
 @media (prefers-color-scheme: dark) {
 }
 
