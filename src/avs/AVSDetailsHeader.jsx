@@ -44,57 +44,58 @@ export default function AVSDetailsHeader({ avs }) {
       <div className="my-4 break-words text-xs text-foreground-1">
         {avs.metadata?.description}
       </div>
-
-      {avs.metadata?.website && (
+      <div className="flex items-center gap-1">
         <Link
           className="text-xs text-secondary"
-          href={avs.metadata.website}
+          href={`https://etherscan.io/address/${avs.address}`}
           rel="noreferrer"
           target="_blank"
         >
-          {avs.metadata.website}
+          {avs.address}
         </Link>
-      )}
-
-      <div className="flex">
-        <div className="flex items-center">
+        <Button
+          className="border-none text-secondary"
+          isIconOnly
+          onClick={() => handleCopy(avs.address)}
+          size="sm"
+          variant="ghost"
+        >
+          <span className="material-symbols-outlined text-xl text-secondary">
+            {state.isCopied ? 'check' : 'content_copy'}
+          </span>
+        </Button>
+      </div>
+      <div className="flex gap-4">
+        {avs.metadata?.website && (
           <Link
-            className="text-xs text-secondary"
-            href={`https://etherscan.io/address/${avs.address}`}
+            className="flex items-center text-secondary"
+            href={avs.metadata.website}
             rel="noreferrer"
+            size="sm"
             target="_blank"
           >
-            {truncateAddress(avs.address)}
-          </Link>
-          <Button
-            className="ml-1 border-none text-secondary"
-            isIconOnly
-            onClick={() => handleCopy(avs.address)}
-            size="sm"
-            variant="ghost"
-          >
-            <span className="material-symbols-outlined text-2xl text-secondary">
-              {state.isCopied ? 'check' : 'content_copy'}
+            <span className="material-symbols-outlined me-1 text-xl text-secondary">
+              language
             </span>
-          </Button>
-        </div>
-
-        {!!avs.metadata?.twitter && (
+            Website
+          </Link>
+        )}
+        {avs.metadata?.twitter && (
           <Link
-            className="ml-12 border-none text-secondary"
+            className="border-none text-secondary"
             href={avs.metadata.twitter}
             rel="noreferrer"
             size="sm"
             target="_blank"
           >
             <span
-              className="h-4 w-4 bg-secondary"
+              className="me-1 h-4 w-4 bg-secondary"
               style={{
                 mask: 'url(/assets/x.svg) no-repeat',
                 backgroundColor: 'hsl(var(--app-secondary))'
               }}
             ></span>
-            &nbsp;@
+            @
             {avs.metadata.twitter.substring(
               avs.metadata.twitter.lastIndexOf('/') + 1
             )}
