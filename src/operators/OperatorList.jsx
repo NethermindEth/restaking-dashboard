@@ -22,7 +22,7 @@ import { useServices } from '../@services/ServiceContext';
 const columns = [
   {
     key: 'operator',
-    label: 'Operators',
+    label: 'Operator',
     className: 'w-64 md:w-2/5 ps-12'
   },
   {
@@ -59,7 +59,6 @@ export default function OperatorList() {
         }
       : { column: 'tvl', direction: 'descending' }
   });
-
   const debouncedSearchTerm = useDebouncedSearch(state.searchTerm ?? '', 300);
 
   const fetchOperators = useCallback(
@@ -112,8 +111,8 @@ export default function OperatorList() {
 
   useEffect(() => {
     const page = searchParams.get('page') ?? 1;
-
     const params = {};
+
     params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
     if (debouncedSearchTerm) params.search = debouncedSearchTerm;
     if (state.sortDescriptor) {
@@ -145,9 +144,8 @@ export default function OperatorList() {
       <div className="font-display text-3xl font-medium text-foreground-1">
         Operators
       </div>
-
       <div className="mb-4 mt-3 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-        <div className="text-foreground-1 lg:w-2/3">
+        <div className="text-sm text-foreground-1 lg:w-2/3">
           Operators run AVS software built on top of EigenLayer. Operators
           register in EigenLayer and allow restakers to delegate to them, then
           opt in to secure various services (AVSs) built on top of EigenLayer.
@@ -211,7 +209,7 @@ export default function OperatorList() {
               emptyContent={
                 <div className="flex flex-col items-center justify-center">
                   <span className="text-lg text-foreground-2">
-                    No Operators found for &quot;
+                    No operator found for &quot;
                     {debouncedSearchTerm.length > 42
                       ? `${debouncedSearchTerm.substring(0, 42)}...`
                       : debouncedSearchTerm}
@@ -229,7 +227,6 @@ export default function OperatorList() {
                       <TableCell className="w-1/5 py-6 pe-8 ps-4">
                         <Skeleton className="h-4 rounded-md bg-default" />
                       </TableCell>
-
                       <TableCell className="w-2/5 py-6 pe-8 ps-4">
                         <Skeleton className="h-4 rounded-md bg-default" />
                       </TableCell>
@@ -262,7 +259,6 @@ export default function OperatorList() {
                       <TableCell className="pe-8 text-end">
                         {formatNumber(operator.stakerCount)}
                       </TableCell>
-
                       <TableCell className="pe-8 text-end">
                         <div>
                           {formatUSD(operator.strategiesTotal * state.rate)}
