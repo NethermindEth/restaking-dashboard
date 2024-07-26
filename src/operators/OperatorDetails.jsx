@@ -3,8 +3,9 @@ import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY
 } from '../shared/strategies';
-import { Divider, Progress, Skeleton, Spinner } from '@nextui-org/react';
 import { handleServiceError, reduceState } from '../shared/helpers';
+import { Link, Progress, Skeleton, Spinner } from '@nextui-org/react';
+import CopyButton from '../shared/CopyButton';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatETH } from '../shared/formatters';
 import OperatorLSTPieChart from './charts/OperatorLSTPieChart';
@@ -81,80 +82,113 @@ export default function OperatorDetails() {
       )}
 
       {!state.isOperatorLoading && !state.error && (
-        <div className="mb-4 w-full break-words rounded-lg border border-outline bg-content1 p-4">
-          <div className="flex items-center">
-            <ThirdPartyLogo
-              className="size-12 min-w-12"
-              url={state.operator.metadata?.logo}
-            />
-            <div className="ml-2 font-display text-3xl font-medium text-foreground-1">
-              <span>
+        <>
+          <div className="mb-4 flex w-full flex-row flex-wrap items-center gap-2 break-words rounded-lg border border-outline bg-content1 p-4">
+            <div className="flex basis-full items-center gap-4">
+              <ThirdPartyLogo
+                className="size-12 min-w-12"
+                url={state.operator.metadata?.logo}
+              />
+              <span className="font-display text-3xl font-medium text-foreground-1">
                 {state.operator.metadata?.name ??
                   truncateAddress(state.operator.address)}
+                {/*TODO: implement ranking when coming from list view & accessing directly operator*/}
+                {/* <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1"> */}
+                {/*   # 1 */}
+                {/* </span> */}
               </span>
-
-              {/*TODO: implement ranking when coming from list view & accessing directly operator*/}
-              {/* <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1"> */}
-              {/*   # 1 */}
-              {/* </span> */}
             </div>
-          </div>
-          <div className="my-4 break-words text-xs text-foreground-1">
-            {state.operator.metadata?.description}
-          </div>
-
-          <div className="flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-2">
-            <div className="flex basis-1/3 flex-col items-center gap-1">
-              <div className="text-sm text-foreground-2">TVL</div>
-              <div className="text-center">
-                {state.tvl && (
-                  <div className="text-foreground-1">
-                    {formatETH(state.tvl, compact)}
-                  </div>
+            <span className="basis-full break-words pt-4 text-xs text-foreground-1">
+              {state.operator.metadata?.description}
+            </span>
+            <div className="flex basis-full items-center gap-1 lg:me-4 lg:basis-0">
+              <Link
+                className="truncate text-xs text-secondary"
+                href={`https://etherscan.io/address/${state.operator.address}`}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {state.operator.address}
+              </Link>
+              <CopyButton color="secondary" value={state.operator.address} />
+            </div>
+            {state.operator.metadata?.website && (
+              <Link
+                className="me-2 flex basis-0 items-center text-secondary"
+                href={state.operator.metadata.website}
+                rel="noreferrer"
+                size="sm"
+                target="_blank"
+              >
+                <span className="material-symbols-outlined me-1 text-xl text-secondary">
+                  language
+                </span>
+                Website
+              </Link>
+            )}
+            {state.operator.metadata?.twitter && (
+              <Link
+                className="basis-0 border-none text-secondary"
+                href={state.operator.metadata.twitter}
+                rel="noreferrer"
+                size="sm"
+                target="_blank"
+              >
+                <span
+                  className="me-1 h-4 w-4 bg-secondary"
+                  style={{
+                    mask: 'url(/assets/x.svg) no-repeat',
+                    backgroundColor: 'hsl(var(--app-secondary))'
+                  }}
+                ></span>
+                @
+                {state.operator.metadata.twitter.substring(
+                  state.operator.metadata.twitter.lastIndexOf('/') + 1
                 )}
-              </div>
-            </div>
-            <Divider className="min-h-10 bg-outline" orientation="vertical" />
-            <div className="flex h-full basis-1/3 flex-col items-center gap-1">
-              <div className="text-sm text-foreground-2">AVS subscribed</div>
-              <div className="text-foreground-1">
-                {state.operator?.avs?.length}
-              </div>
-            </div>
-            <Divider className="min-h-10 bg-outline" orientation="vertical" />
+              </Link>
+            )}
+          </div>
+          <div className="mb-4 flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-2">
             <div className="flex basis-1/3 flex-col items-center gap-1">
-              <div className="text-sm text-foreground-2">Restakers</div>
-              <div className="text-foreground-1">
+              <span className="text-sm text-foreground-2">TVL</span>
+              <span className="text-center">
+                {state.tvl && (
+                  <span className="text-foreground-1">
+                    {formatETH(state.tvl, compact)}
+                  </span>
+                )}
+              </span>
+            </div>
+            <div className="flex h-full min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline">
+              <span className="text-sm text-foreground-2">AVS subscribed</span>
+              <span className="text-foreground-1">
+                {state.operator?.avs?.length}
+              </span>
+            </div>
+            <div className="flex basis-1/3 flex-col items-center gap-1">
+              <span className="text-sm text-foreground-2">Restakers</span>
+              <span className="text-foreground-1">
                 {state.operator?.stakerCount}
-              </div>
+              </span>
             </div>
           </div>
-        </div>
+        </>
       )}
-
-      <div>
-        <OperatorTVLLineChart
-          currentTVL={state.tvl}
-          ethRate={state.ethRate}
-          isOperatorLoading={state.isOperatorLoading}
-        />
-      </div>
-
-      <div>
-        <OperatorRestakersLineChart
-          isOperatorLoading={state.isOperatorLoading}
-          restakers={state.operator?.stakerCount}
-        />
-      </div>
-
-      <div>
-        <LSTDistribution
-          ethRate={state.ethRate}
-          isOperatorLoading={state.isOperatorLoading}
-          strategies={state.operator?.strategies}
-          tvl={state.tvl}
-        />
-      </div>
+      <OperatorTVLLineChart
+        currentTVL={state.tvl}
+        ethRate={state.ethRate}
+        isOperatorLoading={state.isOperatorLoading}
+      />
+      <OperatorRestakersLineChart
+        isOperatorLoading={state.isOperatorLoading}
+        restakers={state.operator?.stakerCount}
+      />
+      <LSTDistribution
+        ethRate={state.ethRate}
+        isOperatorLoading={state.isOperatorLoading}
+        strategies={state.operator?.strategies}
+        tvl={state.tvl}
+      />
     </>
   );
 }

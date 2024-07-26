@@ -62,7 +62,7 @@ export default function OperatorTVLLineChart({
   );
 
   return (
-    <>
+    <div>
       {isOperatorLoading || state.isChartLoading || state.error ? (
         <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
           {state.error && <ErrorMessage error={state.error} />}
@@ -83,7 +83,7 @@ export default function OperatorTVLLineChart({
           )}
         </ParentSize>
       )}
-    </>
+    </div>
   );
 }
 
