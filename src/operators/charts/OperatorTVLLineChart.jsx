@@ -2,7 +2,7 @@ import { AxisBottom, AxisRight } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
-import { Tab, Tabs } from '@nextui-org/react';
+import { Spinner, Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
@@ -11,12 +11,72 @@ import { getGrowthPercentage } from '../../utils';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
+import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../../shared/helpers';
 import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
+import { useParams } from 'react-router-dom';
+import { useServices } from '../../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
 
-export default function TVLTabLineChart({ points, height, width }) {
+export default function OperatorTVLLineChart({
+  currentTVL,
+  ethRate,
+  isOperatorLoading
+}) {
+  const { address } = useParams();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isChartLoading: true,
+    points: undefined
+  });
+  const { operatorService } = useServices();
+
+  useEffect(() => {
+    dispatch({ isChartLoading: true });
+    (async () => {
+      const response = await operatorService.getOperatorTVL(address);
+
+      dispatch({
+        points: response,
+        isChartLoading: false
+      });
+    })();
+  }, [address, dispatch, operatorService]);
+
+  // our endpoint only returns up to yesterdays data. We need to append today's data point
+  // into the graph
+  const currentPoint = useMemo(
+    () => ({
+      timestamp: new Date(),
+      // use current eth rate as "historical" rate
+      rate: ethRate,
+      tvl: currentTVL
+    }),
+    [ethRate, currentTVL]
+  );
+
+  return (
+    <>
+      {isOperatorLoading || state.isChartLoading ? (
+        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+          <Spinner color="primary" size="lg" />
+        </div>
+      ) : (
+        <ParentSize className="mb-4">
+          {parent => (
+            <LineChart
+              height={288}
+              points={state.points.concat(currentPoint)}
+              width={parent.width}
+            />
+          )}
+        </ParentSize>
+      )}
+    </>
+  );
+}
+
+function LineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
@@ -89,11 +149,11 @@ export default function TVLTabLineChart({ points, height, width }) {
 
   const growthPercentage = useMemo(() => {
     const first = state.filteredPoints[0];
-    const lastest = state.filteredPoints[state.filteredPoints.length - 1];
+    const latest = state.filteredPoints[state.filteredPoints.length - 1];
 
     return getGrowthPercentage(
       state.useRate ? first.tvl * first.rate : first.tvl,
-      state.useRate ? lastest.tvl * lastest.rate : lastest.tvl
+      state.useRate ? latest.tvl * latest.rate : latest.tvl
     );
   }, [state.filteredPoints, state.useRate]);
 
@@ -238,7 +298,7 @@ export default function TVLTabLineChart({ points, height, width }) {
 
           {tooltipOpen && (
             <Circle
-              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-white"
+              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}

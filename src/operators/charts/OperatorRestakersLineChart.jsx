@@ -1,29 +1,85 @@
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
-import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
-import { Tab, Tabs } from '@nextui-org/react';
+import { Spinner, Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
+import { formatNumber } from '../../shared/formatters';
 import { getGrowthPercentage } from '../../utils';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
+import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../../shared/helpers';
 import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
+import { useParams } from 'react-router-dom';
+import { useServices } from '../../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
 
-export default function TVLTabLineChart({ points, height, width }) {
+export default function OperatorRestakersLineChart({
+  isOperatorLoading,
+  restakers
+}) {
+  const { address } = useParams();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isChartLoading: true,
+    points: undefined
+  });
+  const { operatorService } = useServices();
+
+  useEffect(() => {
+    dispatch({ isChartLoading: true });
+    (async () => {
+      const response = await operatorService.getRestakerTrend(address);
+
+      dispatch({
+        points: response,
+        isChartLoading: false
+      });
+    })();
+  }, [address, dispatch, operatorService]);
+
+  // our endpoint only returns up to yesterdays data. We need to append today's data point
+  // into the graph
+  const currentPoint = useMemo(
+    () => ({
+      timestamp: new Date(),
+      restakers
+    }),
+    [restakers]
+  );
+
+  return (
+    <>
+      {isOperatorLoading || state.isChartLoading ? (
+        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+          <Spinner color="primary" size="lg" />
+        </div>
+      ) : (
+        <ParentSize className="mb-4">
+          {parent => (
+            <LineChart
+              height={288}
+              points={state.points.concat(currentPoint)}
+              width={parent.width}
+            />
+          )}
+        </ParentSize>
+      )}
+    </>
+  );
+}
+
+function LineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
     filteredPoints: points,
     maxX: Math.max(width - margin.left - margin.right, 0),
-    maxY: height - margin.top - margin.bottom,
-    useRate: true
+    maxY: height - margin.top - margin.bottom
   });
 
   useEffect(() => {
@@ -53,11 +109,6 @@ export default function TVLTabLineChart({ points, height, width }) {
     tooltipTop
   } = useTooltip();
 
-  const getValue = useCallback(
-    d => (state.useRate ? d.tvl * d.rate : d.tvl),
-    [state.useRate]
-  );
-
   const scaleDate = useMemo(() => {
     return scaleUtc({
       domain: [
@@ -77,25 +128,20 @@ export default function TVLTabLineChart({ points, height, width }) {
       ],
       range: [state.maxY, 0]
     });
-  }, [state.filteredPoints, state.maxY, getValue]);
+  }, [state.filteredPoints, state.maxY]);
 
   const getLatestTotals = useMemo(() => {
     const latest = points[points.length - 1];
 
-    return state.useRate
-      ? formatUSD(latest.tvl * latest.rate, compact)
-      : formatETH(latest.tvl, compact);
-  }, [compact, points, state.useRate]);
+    return latest.restakers;
+  }, [points]);
 
   const growthPercentage = useMemo(() => {
     const first = state.filteredPoints[0];
-    const lastest = state.filteredPoints[state.filteredPoints.length - 1];
+    const latest = state.filteredPoints[state.filteredPoints.length - 1];
 
-    return getGrowthPercentage(
-      state.useRate ? first.tvl * first.rate : first.tvl,
-      state.useRate ? lastest.tvl * lastest.rate : lastest.tvl
-    );
-  }, [state.filteredPoints, state.useRate]);
+    return getGrowthPercentage(first.restakers, latest.restakers);
+  }, [state.filteredPoints]);
 
   const disabledKeys = useMemo(
     () => calculateDisabledTimelines(points.length),
@@ -110,12 +156,6 @@ export default function TVLTabLineChart({ points, height, width }) {
       });
     },
     [points, dispatch]
-  );
-  const handleRateSelectionChange = useCallback(
-    key => {
-      dispatch({ useRate: key === 'usd' });
-    },
-    [dispatch]
   );
   const handlePointerMove = useCallback(
     event => {
@@ -139,7 +179,7 @@ export default function TVLTabLineChart({ points, height, width }) {
         tooltipTop: scaleValue(getValue(d))
       });
     },
-    [getValue, showTooltip, scaleDate, scaleValue, state.filteredPoints]
+    [showTooltip, scaleDate, scaleValue, state.filteredPoints]
   );
 
   return (
@@ -147,9 +187,9 @@ export default function TVLTabLineChart({ points, height, width }) {
       <div className="mb-6 flex justify-between p-4">
         <div className="hidden flex-1 sm:block">
           <div className="font-display text-xl text-foreground-1">
-            TVL over time
+            Restakers over time
           </div>
-          <div className="flex gap-x-2 text-sm text-foreground-2">
+          <div className="flex gap-x-2 text-xs text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
               className={`${growthPercentage >= 0 ? 'text-success' : 'text-danger'}`}
@@ -161,15 +201,6 @@ export default function TVLTabLineChart({ points, height, width }) {
         </div>
 
         <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="usd"
-            onSelectionChange={handleRateSelectionChange}
-            size="sm"
-          >
-            <Tab key="usd" title="USD" />
-            <Tab key="eth" title="ETH" />
-          </Tabs>
           <Tabs
             classNames={tabs}
             defaultSelectedKey="all"
@@ -238,7 +269,7 @@ export default function TVLTabLineChart({ points, height, width }) {
 
           {tooltipOpen && (
             <Circle
-              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-white"
+              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}
@@ -271,9 +302,7 @@ export default function TVLTabLineChart({ points, height, width }) {
             {tooltipDateFormatter.format(new Date(tooltipData.timestamp))}
           </div>
           <div className="px-2 text-base">
-            {state.useRate
-              ? formatUSD(tooltipData.tvl * tooltipData.rate, compact)
-              : formatETH(tooltipData.tvl, compact)}
+            {formatNumber(tooltipData.restakers, compact)}
           </div>
         </TooltipInPortal>
       )}
@@ -318,4 +347,5 @@ const calculateDisabledTimelines = totalPoints => {
   return disabled;
 };
 const getDate = d => new Date(d.timestamp);
+const getValue = d => d.restakers;
 const bisectDate = bisector(getDate).left;
