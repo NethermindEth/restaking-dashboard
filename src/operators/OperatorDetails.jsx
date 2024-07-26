@@ -4,12 +4,13 @@ import {
   EIGEN_STRATEGY
 } from '../shared/strategies';
 import { Divider, Progress, Skeleton, Spinner } from '@nextui-org/react';
-import { formatETH, formatUSD } from '../shared/formatters';
+import ErrorMessage from '../shared/ErrorMessage';
+import { formatETH } from '../shared/formatters';
 import OperatorLSTPieChart from './charts/OperatorLSTPieChart';
 import OperatorRestakersLineChart from './charts/OperatorRestakersLineChart';
 import OperatorTVLLineChart from './charts/OperatorTVLLineChart';
 import { ParentSize } from '@visx/responsive';
-import { reduceState } from '../shared/helpers';
+import { handleServiceError, reduceState } from '../shared/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { truncateAddress } from '../shared/helpers';
 import { useEffect } from 'react';
@@ -21,38 +22,47 @@ import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 export default function OperatorDetails() {
   const { address } = useParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    ethRate: 1,
+    error: undefined,
+    ethRate: undefined,
     operator: undefined,
     isOperatorLoading: true,
-    tvl: 0
+    tvl: undefined
   });
   const { operatorService } = useServices();
   const compact = !useTailwindBreakpoint('lg');
 
   useEffect(() => {
-    dispatch({ isOperatorLoading: true });
+    dispatch({ isOperatorLoading: true, error: undefined });
 
     (async () => {
-      const operator = await operatorService.getOperator(address);
-      const tvl = operator.strategies?.reduce((acc, s) => {
-        if (s.address === EIGEN_STRATEGY) {
-          return acc;
-        }
-        return (acc += BigInt(s.tokens));
-      }, 0n);
+      try {
+        const operator = await operatorService.getOperator(address);
 
-      dispatch({
-        operator,
-        tvl: parseFloat(tvl) / 1e18,
-        ethRate: operator.rate,
-        isOperatorLoading: false
-      });
+        const tvl = operator.strategies?.reduce((acc, s) => {
+          if (s.address === EIGEN_STRATEGY) {
+            return acc;
+          }
+          return (acc += BigInt(s.tokens));
+        }, 0n);
+
+        dispatch({
+          operator,
+          tvl: parseFloat(tvl ?? 0) / 1e18,
+          ethRate: operator.rate,
+          isOperatorLoading: false
+        });
+      } catch (e) {
+        dispatch({
+          isOperatorLoading: false,
+          error: handleServiceError(e)
+        });
+      }
     })();
   }, [address, dispatch, operatorService]);
 
   return (
     <>
-      {state.isOperatorLoading ? (
+      {state.isOperatorLoading && (
         <div className="mb-4 min-h-[180px] w-full rounded-lg border border-outline bg-content1 p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
@@ -62,7 +72,15 @@ export default function OperatorDetails() {
             <Skeleton className="h-16 w-full rounded-md" />
           </div>
         </div>
-      ) : (
+      )}
+
+      {state.error && (
+        <div className="mb-4 flex min-h-[180px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+          <ErrorMessage error={state.error} />
+        </div>
+      )}
+
+      {!state.isOperatorLoading && !state.error && (
         <div className="mb-4 w-full break-words rounded-lg border border-outline bg-content1 p-4">
           <div className="flex items-center">
             <ThirdPartyLogo
@@ -89,9 +107,11 @@ export default function OperatorDetails() {
             <div className="flex basis-1/3 flex-col items-center gap-1">
               <div className="text-sm text-foreground-2">TVL</div>
               <div className="text-center">
-                <div className="text-foreground-1">
-                  {formatETH(state.tvl, compact)}
-                </div>
+                {state.tvl && (
+                  <div className="text-foreground-1">
+                    {formatETH(state.tvl, compact)}
+                  </div>
+                )}
               </div>
             </div>
             <Divider className="min-h-10 bg-outline" orientation="vertical" />
@@ -152,6 +172,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
 
     const filteredStrategies = [];
     let excludeBeaconTVL = 0;
+    let totals = 0n;
 
     for (const s of strategies) {
       if (s.address !== EIGEN_STRATEGY && s.address !== BEACON_STRATEGY) {
@@ -161,6 +182,15 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
       if (s.address === BEACON_STRATEGY) {
         excludeBeaconTVL = parseFloat(s.tokens) / 1e18;
       }
+
+      totals += BigInt(s.tokens);
+    }
+
+    // http://localhost:5173/operators/0x2514f445135d5e51bba6c33dd7f1898f070b8c62
+    // edge case where the operators used to have some stake in strategies, but now all of them are zero
+    // this will cause the pie chart to be empty so we should just display unavailable data
+    if (totals === 0n) {
+      return;
     }
 
     filteredStrategies.sort((a, b) => {
@@ -205,12 +235,21 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
 
   if (isOperatorLoading) {
     return (
-      <div className="mb-4 flex h-[410px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4 lg:h-[410px]">
+      <div className="flex h-[410px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4 lg:h-[410px]">
         <Spinner color="primary" size="lg" />
       </div>
     );
   }
 
+  if (state.lstDistribution.length === 0) {
+    return (
+      <div className="flex h-[410px] items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+        <div>
+          <ErrorMessage message="No strategies available" />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-7 rounded-lg border border-outline bg-content1 p-4">
       <div className="text-foreground-1">LST distribution</div>

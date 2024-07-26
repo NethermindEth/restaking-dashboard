@@ -1,18 +1,19 @@
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
+import { handleServiceError, reduceState } from '../../shared/helpers';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Spinner, Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
+import ErrorMessage from '../../shared/ErrorMessage';
 import { formatNumber } from '../../shared/formatters';
 import { getGrowthPercentage } from '../../utils';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
 import { ParentSize } from '@visx/responsive';
-import { reduceState } from '../../shared/helpers';
 import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
@@ -25,20 +26,28 @@ export default function OperatorRestakersLineChart({
 }) {
   const { address } = useParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    error: undefined,
     isChartLoading: true,
     points: undefined
   });
   const { operatorService } = useServices();
 
   useEffect(() => {
-    dispatch({ isChartLoading: true });
+    dispatch({ isChartLoading: true, error: undefined });
     (async () => {
-      const response = await operatorService.getRestakerTrend(address);
+      try {
+        const response = await operatorService.getRestakerTrend(address);
 
-      dispatch({
-        points: response,
-        isChartLoading: false
-      });
+        dispatch({
+          points: response,
+          isChartLoading: false
+        });
+      } catch (e) {
+        dispatch({
+          error: handleServiceError(e),
+          isChartLoading: false
+        });
+      }
     })();
   }, [address, dispatch, operatorService]);
 
@@ -54,9 +63,10 @@ export default function OperatorRestakersLineChart({
 
   return (
     <>
-      {isOperatorLoading || state.isChartLoading ? (
+      {isOperatorLoading || state.isChartLoading || state.error ? (
         <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
-          <Spinner color="primary" size="lg" />
+          {state.error && <ErrorMessage error={state.error} />}
+          {!state.error && <Spinner color="primary" size="lg" />}
         </div>
       ) : (
         <ParentSize className="mb-4">

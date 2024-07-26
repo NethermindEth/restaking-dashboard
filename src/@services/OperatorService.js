@@ -1,6 +1,7 @@
 import { apiGet } from './apiCall';
+import BaseService from './BaseService';
 
-export default class OperatorService {
+export default class OperatorService extends BaseService {
   async getAll(pageIndex, search) {
     const response = await apiGet(`operators`, {
       query: {
@@ -33,35 +34,33 @@ export default class OperatorService {
   }
 
   async getOperator(address) {
-    const response = await apiGet(`operators/${address}`);
+    const response = await BaseService._get(`operators/${address}`);
 
     if (response.ok) {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 
   async getOperatorTVL(address) {
-    const response = await apiGet(`operators/${address}/tvl`);
+    const response = await BaseService._get(`operators/${address}/tvl`);
 
     if (response.ok) {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 
   async getRestakerTrend(address) {
-    const response = await apiGet(`operators/${address}/restakers`);
+    const response = await BaseService._get(`operators/${address}/restakers`);
 
     if (response.ok) {
       return await response.json();
     }
 
     // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 }
