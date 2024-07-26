@@ -283,22 +283,18 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
   );
 }
 
-const LSTShare = ({ label, logo, value }) => {
+function LSTShare({ label, logo, value }) {
   return (
     <Progress
       classNames={{
-        base: 'lg:w-md w-full',
-        track: 'border border-default bg-cinder-1 drop-shadow-md',
-        indicator: 'bg-cinder-5',
-        label: 'text-xs font-normal text-foreground-1',
-        value: 'text-xs font-normal text-foreground'
+        track: 'border border-default bg-outline',
+        indicator: 'bg-foreground-2',
+        label: 'text-sm font-normal text-foreground-1',
+        value: 'text-sm font-normal text-foreground'
       }}
       label={
-        <div className="flex items-center gap-x-1">
-          <ThirdPartyLogo
-            className="size-3 min-w-3 border-1 text-xs"
-            url={logo}
-          />{' '}
+        <div className="flex items-center gap-x-2">
+          <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
           {label}
         </div>
       }
@@ -307,4 +303,4 @@ const LSTShare = ({ label, logo, value }) => {
       value={value}
     />
   );
-};
+}
