@@ -114,7 +114,9 @@ export default function OperatorList() {
     const params = {};
 
     params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
-    if (debouncedSearchTerm) params.search = debouncedSearchTerm;
+    if (debouncedSearchTerm) {
+      params.search = debouncedSearchTerm;
+    }
     if (state.sortDescriptor) {
       params.sort =
         state.sortDescriptor.direction === 'ascending'
@@ -136,7 +138,9 @@ export default function OperatorList() {
   ]);
 
   useEffect(() => {
-    if (debouncedSearchTerm) dispatch({ searchTriggered: true });
+    if (debouncedSearchTerm) {
+      dispatch({ searchTriggered: true });
+    }
   }, [dispatch, debouncedSearchTerm]);
 
   return (
