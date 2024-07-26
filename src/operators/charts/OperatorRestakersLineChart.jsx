@@ -216,7 +216,7 @@ function LineChart({ points, height, width }) {
         <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
           <Tabs
             classNames={tabs}
-            defaultSelectedKey="all"
+            defaultSelectedKey="3m"
             disabledKeys={disabledKeys}
             onSelectionChange={handleTimelineSelectionChange}
             size="sm"
