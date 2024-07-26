@@ -133,11 +133,18 @@ function AVSOperatorsList({ address, tvl }) {
 
         abortController.current = new AbortController();
 
+        let sort = state.sort;
+
+        // share is basically just tvl, backend has no support for share
+        if (sort.includes('share')) {
+          sort = sort.replace('share', 'tvl');
+        }
+
         const response = await avsService.getAVSOperators(
           address,
           state.page,
           debouncedSearch,
-          state.sort,
+          sort,
           abortController.current.signal
         );
 
@@ -186,10 +193,6 @@ function AVSOperatorsList({ address, tvl }) {
   const handleSort = useCallback(
     e => {
       let sort = e.column;
-      // share is basically just tvl, backend has no support for share
-      if (sort === 'share') {
-        sort = 'tvl';
-      }
 
       if (e.direction === 'descending') {
         sort = '-' + sort;
