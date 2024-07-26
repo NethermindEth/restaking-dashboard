@@ -116,7 +116,7 @@ export default function OperatorDetails() {
             </div>
             <Divider className="min-h-10 bg-outline" orientation="vertical" />
             <div className="flex h-full basis-1/3 flex-col items-center gap-1">
-              <div className="text-sm text-foreground-2">AVS Subscribed</div>
+              <div className="text-sm text-foreground-2">AVS subscribed</div>
               <div className="text-foreground-1">
                 {state.operator?.avs?.length}
               </div>
