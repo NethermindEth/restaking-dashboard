@@ -148,7 +148,7 @@ export default function OperatorList() {
       <div className="font-display text-3xl font-medium text-foreground-1">
         Operators
       </div>
-      <div className="mb-4 mt-3 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+      <div className="mb-4 mt-3 flex w-full flex-col items-end justify-between gap-4 lg:flex-row lg:gap-16">
         <div className="text-sm text-foreground-1 lg:w-2/3">
           Operators run AVS software built on top of EigenLayer. Operators
           register in EigenLayer and allow restakers to delegate to them, then
