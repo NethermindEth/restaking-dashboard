@@ -161,7 +161,7 @@ export default function AVSList() {
           onChange={handleSearch}
           type="text"
           color="primary"
-          placeholder="Search by AVS"
+          placeholder="Search by name/address"
           radius="sm"
           className="lg:w-96"
           variant="bordered"
