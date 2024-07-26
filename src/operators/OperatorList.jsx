@@ -152,7 +152,7 @@ export default function OperatorList() {
         <div className="text-sm text-foreground-1 lg:w-2/3">
           Operators run AVS software built on top of EigenLayer. Operators
           register in EigenLayer and allow restakers to delegate to them, then
-          opt in to secure various services (AVSs) built on top of EigenLayer.
+          opt-in to secure various services (AVS) built on top of EigenLayer.
           Operators may also be Stakers; these are not mutually exclusive.
         </div>
         <Input
