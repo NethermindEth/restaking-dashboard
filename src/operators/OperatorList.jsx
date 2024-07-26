@@ -156,24 +156,24 @@ export default function OperatorList() {
           Operators may also be Stakers; these are not mutually exclusive.
         </div>
         <Input
+          className="lg:w-96"
           classNames={{
             inputWrapper:
               'border-outline data-[hover=true]:border-foreground-1',
             input: 'placeholder:text-subtitle'
           }}
-          value={state.searchTerm ?? ''}
-          onChange={handleSearch}
-          type="text"
           color="primary"
-          placeholder="Search by name/address"
-          radius="sm"
-          className="lg:w-96"
-          variant="bordered"
           endContent={
             <span className="material-symbols-outlined text-foreground-2">
               search
             </span>
           }
+          onChange={handleSearch}
+          placeholder="Search by name/address"
+          radius="sm"
+          type="text"
+          value={state.searchTerm ?? ''}
+          variant="bordered"
         />
       </div>
 
@@ -187,16 +187,16 @@ export default function OperatorList() {
         <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
           <Table
             aria-label="Operator list"
-            hideHeader={!state.isFetchingData && state.operators.length == 0}
-            layout="fixed"
-            removeWrapper
             classNames={{
               base: 'h-full overflow-x-auto',
               table: 'h-full',
               thead: '[&>tr:last-child]:hidden'
             }}
-            sortDescriptor={state.sortDescriptor}
+            hideHeader={!state.isFetchingData && state.operators.length == 0}
+            layout="fixed"
             onSortChange={e => dispatch({ sortDescriptor: e })}
+            removeWrapper
+            sortDescriptor={state.sortDescriptor}
           >
             <TableHeader columns={columns}>
               {column => (
@@ -224,7 +224,7 @@ export default function OperatorList() {
             >
               {state.isFetchingData
                 ? [...Array(10)].map((_, i) => (
-                    <TableRow key={i} className="border-t border-outline">
+                    <TableRow className="border-t border-outline" key={i}>
                       <TableCell className="w-2/5 py-6 pe-8 ps-4">
                         <Skeleton className="h-4 rounded-md bg-default" />
                       </TableCell>
@@ -238,13 +238,13 @@ export default function OperatorList() {
                   ))
                 : state.operators?.map((operator, i) => (
                     <TableRow
+                      className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                      key={`operator-item-${i}`}
                       onClick={() =>
                         navigate(`/operators/${operator.address}`, {
                           state: { operator }
                         })
                       }
-                      key={`operator-item-${i}`}
-                      className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                     >
                       <TableCell className="p-4">
                         <div className="flex items-center gap-x-3">

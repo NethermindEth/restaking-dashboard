@@ -239,9 +239,9 @@ function AVSOperatorsList({ address, tvl }) {
           table: 'h-full'
         }}
         layout="fixed"
+        onSortChange={handleSort}
         removeWrapper
         sortDescriptor={state.sortDescriptor}
-        onSortChange={handleSort}
       >
         <TableHeader>
           <TableColumn

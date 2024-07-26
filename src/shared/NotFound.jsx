@@ -15,7 +15,7 @@ export default function NotFound() {
           for.
         </div>
         <div className="mt-10">
-          <Link href="/" color="secondary">
+          <Link color="secondary" href="/">
             Let's take you to all things restaking
           </Link>
         </div>

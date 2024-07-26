@@ -12,8 +12,8 @@ export default function LRTList({ data }) {
         .sort(sortProtocols)
         .map(([name, value], i) => (
           <div
-            key={name}
             className="flex flex-row items-center gap-x-2 border-t border-outline px-4 py-2"
+            key={name}
           >
             <span className="inline-block min-w-4">{i + 1}</span>
             <span
