@@ -253,8 +253,8 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
   return (
     <div className="flex flex-col gap-7 rounded-lg border border-outline bg-content1 p-4">
       <div className="text-foreground-1">LST distribution</div>
-      <div className="flex flex-col gap-7 lg:flex-row">
-        <div className="flex w-full basis-3/4 flex-col gap-y-3">
+      <div className="flex flex-col gap-16 lg:flex-row">
+        <div className="flex w-full basis-3/4 flex-col gap-y-4">
           {state.lstDistribution.map((strategy, i) => {
             return (
               <LSTShare
