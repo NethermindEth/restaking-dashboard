@@ -152,24 +152,24 @@ export default function AVSList() {
       <div className="mb-4 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
         <div className="text-foreground-1">Actively Validated Services</div>
         <Input
+          className="lg:w-96"
           classNames={{
             inputWrapper:
               'border-outline data-[hover=true]:border-foreground-1',
             input: 'placeholder:text-subtitle'
           }}
-          value={state.searchTerm ?? ''}
-          onChange={handleSearch}
-          type="text"
           color="primary"
-          placeholder="Search by name/address"
-          radius="sm"
-          className="lg:w-96"
-          variant="bordered"
           endContent={
             <span className="material-symbols-outlined text-foreground-2">
               search
             </span>
           }
+          onChange={handleSearch}
+          placeholder="Search by name/address"
+          radius="sm"
+          type="text"
+          value={state.searchTerm ?? ''}
+          variant="bordered"
         />
       </div>
 
@@ -183,16 +183,16 @@ export default function AVSList() {
         <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
           <Table
             aria-label="AVS list"
-            hideHeader={!state.isFetchingData && state.avs.length == 0}
-            layout="fixed"
-            removeWrapper
             classNames={{
               base: 'h-full overflow-x-auto',
               table: 'h-full',
               thead: '[&>tr:last-child]:hidden'
             }}
-            sortDescriptor={state.sortDescriptor}
+            hideHeader={!state.isFetchingData && state.avs.length == 0}
+            layout="fixed"
             onSortChange={e => dispatch({ sortDescriptor: e })}
+            removeWrapper
+            sortDescriptor={state.sortDescriptor}
           >
             <TableHeader columns={columns}>
               {column => (
@@ -220,7 +220,7 @@ export default function AVSList() {
             >
               {state.isFetchingData
                 ? [...Array(10)].map((_, i) => (
-                    <TableRow key={i} className="border-t border-outline">
+                    <TableRow className="border-t border-outline" key={i}>
                       <TableCell className="w-2/5 py-6 pe-8 ps-4">
                         <Skeleton className="h-4 rounded-md bg-default" />
                       </TableCell>
@@ -237,11 +237,11 @@ export default function AVSList() {
                   ))
                 : state.avs?.map((avs, i) => (
                     <TableRow
+                      className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                      key={`avs-item-${i}`}
                       onClick={() =>
                         navigate(`/avs/${avs.address}`, { state: { avs } })
                       }
-                      key={`avs-item-${i}`}
-                      className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                     >
                       <TableCell className="p-4">
                         <div className="flex items-center gap-x-3">

@@ -73,8 +73,8 @@ export default function Header() {
               }
             }
           }}
-          placement="top"
           onOpenChange={onOpenChange}
+          placement="top"
         >
           <ModalContent>
             {() => <Sidebar onOpenChange={onOpenChange} />}

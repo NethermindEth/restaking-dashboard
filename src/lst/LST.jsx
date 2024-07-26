@@ -89,12 +89,12 @@ export default function LST() {
             <span>TVL</span>
             <span>{formatNumber(state.tvl)} ETH</span>
           </div>
-          <Divider orientation="vertical" className="h-16" />
+          <Divider className="h-16" orientation="vertical" />
           <div className="flex basis-1/2 flex-col items-center">
             <span className="text-center">Number of LST Protocols</span>
             <span>{state.rankings.length}</span>
           </div>
-          <Divider orientation="vertical" className="h-16" />
+          <Divider className="h-16" orientation="vertical" />
           <div className="flex basis-1/2 flex-col items-center">
             <span className="text-center">Percentage on EigenLayer TVL</span>
             <span>{state.percentage.toFixed(2)} %</span>
@@ -108,8 +108,8 @@ export default function LST() {
             return (
               <LSTDistributionGraph
                 data={state.lst}
-                rankings={state.rankings}
                 height={512}
+                rankings={state.rankings}
                 width={parent.width}
               />
             );
@@ -120,8 +120,8 @@ export default function LST() {
       <div className="mt-4">
         <LSTList
           data={state.rankings}
-          latestRate={state.latestRate}
           isLoading={state.isLoadingLST}
+          latestRate={state.latestRate}
         />
       </div>
     </div>

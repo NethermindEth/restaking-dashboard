@@ -221,8 +221,8 @@ export default function LRTDistribution({ data, height }) {
 
   return (
     <div
-      ref={rootRef}
       className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
+      ref={rootRef}
     >
       <div className="mb-6 flex gap-2">
         <div className="flex flex-1 justify-between gap-2">
@@ -256,8 +256,8 @@ export default function LRTDistribution({ data, height }) {
         </Tabs>
       </div>
       <div className="relative">
-        <svg ref={containerRef} height={height} className="w-full touch-pan-y">
-          <Group top={margin.top} left={margin.left}>
+        <svg className="w-full touch-pan-y" height={height} ref={containerRef}>
+          <Group left={margin.left} top={margin.top}>
             <GridRows
               className="opacity-25 [&_line]:stroke-outline"
               height={state.maxY}
@@ -283,9 +283,9 @@ export default function LRTDistribution({ data, height }) {
 
                   return (
                     <path
-                      key={`stack-${stack.key}`}
                       d={path(stack) || ''}
                       fill={color}
+                      key={`stack-${stack.key}`}
                       onPointerEnter={e => handleAreaPointerMove(e, stack)}
                       onPointerLeave={hideTooltip}
                       onPointerMove={e => handleAreaPointerMove(e, stack)}
@@ -315,8 +315,8 @@ export default function LRTDistribution({ data, height }) {
               left={state.maxX}
               numTicks={4}
               scale={scaleValue}
-              tickFormat={v => formatNumber(v, true)}
               tickClassName="[&_line]:stroke-foreground-2"
+              tickFormat={v => formatNumber(v, true)}
               tickLabelProps={{
                 className: 'text-xs',
                 fill: 'hsl(var(--app-foreground))',
@@ -374,9 +374,9 @@ export default function LRTDistribution({ data, height }) {
       </div>
       {tooltipOpen && (
         <TooltipInPortal
-          key={Math.random()}
           applyPositionStyle={true}
           className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-background/75"
+          key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
