@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.4.1",
+    "@nextui-org/react": "^2.4.6",
     "@visx/axis": "^3.10.1",
     "@visx/brush": "^3.10.4",
     "@visx/curve": "^3.3.0",
@@ -26,31 +26,31 @@
     "@visx/text": "^3.3.0",
     "@visx/tooltip": "^3.3.0",
     "@visx/vendor": "^3.5.0",
-    "ethers": "^6.13.0",
-    "framer-motion": "^11.2.10",
+    "ethers": "^6.13.1",
+    "framer-motion": "^11.3.17",
     "loglevel": "^1.9.1",
-    "mutative": "^1.0.5",
+    "mutative": "^1.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.1",
-    "use-mutative": "^1.1.3"
+    "react-router-dom": "^6.25.1",
+    "use-mutative": "^1.1.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-react": "^7.34.2",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.7",
-    "globals": "^15.3.0",
-    "postcss": "^8.4.38",
-    "prettier": "^3.3.1",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.8.0",
+    "postcss": "^8.4.40",
+    "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "tailwindcss": "^3.4.4",
-    "vite": "^5.2.12"
+    "tailwindcss": "^3.4.7",
+    "vite": "^5.3.5"
   }
 }
