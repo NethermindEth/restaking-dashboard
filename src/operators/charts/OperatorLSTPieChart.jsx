@@ -14,8 +14,8 @@ export default function OperatorLSTPieChart({
 }) {
   const compact = !useTailwindBreakpoint('lg');
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    active: undefined,
-    activeColor: undefined
+    active: null,
+    activeColor: null
   });
 
   // minimum height of 300 for when we only have 1 or 2 strategies, causing
@@ -39,9 +39,15 @@ export default function OperatorLSTPieChart({
         <Pie
           cornerRadius={0}
           data={lstDistribution}
-          innerRadius={radius - 50}
-          outerRadius={radius}
-          padAngle={0}
+          innerRadius={({ data }) => {
+            const shift = state.active?.symbol === data.symbol ? 46 : 50;
+            return radius - shift;
+          }}
+          outerRadius={({ data }) => {
+            const shift = state.active?.symbol === data.symbol ? 4 : 0;
+            return radius + shift;
+          }}
+          padAngle={0.015}
           pieSortValues={() => 1}
           pieValue={data => data.tokensInETH}
         >
@@ -49,29 +55,28 @@ export default function OperatorLSTPieChart({
             return pie.arcs.map((arc, i) => {
               const color = `hsl(var(--app-chart-${i + 1}))`;
               return (
-                <g
+                <path
+                  className="cursor-pointer"
+                  d={pie.path(arc)}
+                  fill={color}
                   key={arc.data.symbol}
-                  onMouseEnter={() =>
+                  onPointerEnter={() =>
                     dispatch({
                       active: arc.data,
                       activeColor: color
                     })
                   }
-                  onMouseLeave={() =>
+                  onPointerLeave={() =>
                     dispatch({
-                      active: undefined,
-                      activeColor: undefined
+                      active: null,
+                      activeColor: null
                     })
                   }
-                  style={{ cursor: 'pointer' }}
-                >
-                  <path d={pie.path(arc)} fill={color}></path>
-                </g>
+                ></path>
               );
             });
           }}
         </Pie>
-
         {state.active ? (
           <>
             <Text
@@ -81,20 +86,18 @@ export default function OperatorLSTPieChart({
             >
               {formatUSD(state.active.tokensInETH * ethRate, true)}
             </Text>
-
             <Text
-              className="text-xs"
+              className="text-sm"
               dy={10}
-              fill={state.activeColor}
+              fill="hsl(var(--app-foreground-1))"
               textAnchor="middle"
             >
               {formatETH(state.active.tokensInETH, true)}
             </Text>
-
             <Text
               className="text-sm"
               dy={30 + 8}
-              fill="hsl(var(--app-foreground-1))"
+              fill={state.activeColor}
               textAnchor="middle"
             >
               {state.active.symbol}
@@ -105,11 +108,10 @@ export default function OperatorLSTPieChart({
             <Text dy={0} fill="hsl(var(--app-foreground))" textAnchor="middle">
               {formatUSD(lstTVL * ethRate, true)}
             </Text>
-
             <Text
               className="text-sm"
               dy={20}
-              fill="hsl(var(--app-success))"
+              fill="hsl(var(--app-foreground-1))"
               textAnchor="middle"
             >
               {formatETH(lstTVL, true)}
@@ -121,4 +123,4 @@ export default function OperatorLSTPieChart({
   );
 }
 
-const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+const margin = { top: 4, right: 4, bottom: 4, left: 4 };
