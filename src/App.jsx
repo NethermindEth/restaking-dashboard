@@ -15,7 +15,7 @@ import LST from './lst/LST';
 import { NextUIProvider } from '@nextui-org/react';
 import NotFound from './shared/NotFound';
 import OperatorDetails from './operators/OperatorDetails';
-import OperatorsList from './operators/OperatorsList';
+import OperatorList from './operators/OperatorList';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
 
@@ -34,7 +34,7 @@ export default function App() {
                   <Route path="/avs" element={<AVSList />} />
                   <Route path="/avs/:address" element={<AVSDetails />} />
                   <Route path="/lrt" element={<LRT />} />
-                  <Route path="/operators" element={<OperatorsList />} />
+                  <Route path="/operators" element={<OperatorList />} />
                   <Route
                     path="/operators/:address"
                     element={<OperatorDetails />}

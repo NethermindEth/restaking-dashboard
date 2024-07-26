@@ -38,7 +38,7 @@ const columns = [
   }
 ];
 
-const OperatorsList = () => {
+export default function OperatorList() {
   const { operatorService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -296,6 +296,4 @@ const OperatorsList = () => {
       )}
     </div>
   );
-};
-
-export default OperatorsList;
+}
