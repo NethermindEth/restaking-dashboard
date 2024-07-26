@@ -40,11 +40,12 @@ export default function OperatorLSTPieChart({
           cornerRadius={0}
           data={lstDistribution}
           innerRadius={({ data }) => {
-            const shift = state.active?.symbol === data.symbol ? 46 : 50;
+            const shift =
+              state.active?.symbol === data.symbol ? 50 - shiftDelta : 50;
             return radius - shift;
           }}
           outerRadius={({ data }) => {
-            const shift = state.active?.symbol === data.symbol ? 4 : 0;
+            const shift = state.active?.symbol === data.symbol ? shiftDelta : 0;
             return radius + shift;
           }}
           padAngle={0.015}
@@ -123,4 +124,10 @@ export default function OperatorLSTPieChart({
   );
 }
 
-const margin = { top: 4, right: 4, bottom: 4, left: 4 };
+const shiftDelta = 4;
+const margin = {
+  top: shiftDelta,
+  right: shiftDelta,
+  bottom: shiftDelta,
+  left: shiftDelta
+};
