@@ -18,33 +18,29 @@ import OperatorDetails from './operators/OperatorDetails';
 import OperatorsList from './operators/OperatorsList';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Layout />}>
+      <Route index element={<Home />} />
+      <Route path="/avs" element={<AVSList />} />
+      <Route path="/avs/:address/:tab?" element={<AVSDetails />} />
+      <Route path="/lrt" element={<LRT />} />
+      <Route path="/operators" element={<OperatorsList />} />
+      <Route path="/operators/:address" element={<OperatorDetails />} />
+      <Route path="/lst" element={<LST />} />
+      <Route path="*" element={<NotFound />} />
+    </Route>
+  )
+);
 
 export default function App() {
   log.debug('Starting up');
 
   return (
-    <NextUIProvider>
+    <NextUIProvider navigate={router.navigate}>
       <ThemeProvider>
         <ServiceProvider>
-          <RouterProvider
-            router={createBrowserRouter(
-              createRoutesFromElements(
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="/avs" element={<AVSList />} />
-                  <Route path="/avs/:address" element={<AVSDetails />} />
-                  <Route path="/lrt" element={<LRT />} />
-                  <Route path="/operators" element={<OperatorsList />} />
-                  <Route
-                    path="/operators/:address"
-                    element={<OperatorDetails />}
-                  />
-                  <Route path="/lst" element={<LST />} />
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              )
-            )}
-          />
+          <RouterProvider router={router} />
         </ServiceProvider>
       </ThemeProvider>
     </NextUIProvider>

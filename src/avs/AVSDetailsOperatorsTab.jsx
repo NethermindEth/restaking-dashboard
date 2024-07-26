@@ -172,7 +172,7 @@ function AVSOperatorsList({ address, tvl }) {
     if (state.search) {
       params.set('search', state.search);
     }
-    setSearchParams(params);
+    setSearchParams(params, { replace: true });
     dispatch({ updateSeachParams: false });
   }, [
     dispatch,

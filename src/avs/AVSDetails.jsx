@@ -10,9 +10,11 @@ import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { useLocation } from 'react-router-dom';
 
 export default function AVSDetails() {
-  const { address } = useParams();
+  const { address, tab } = useParams();
+  const { pathname } = useLocation();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isAVSLoading: true,
     strategies: undefined,
@@ -88,11 +90,13 @@ export default function AVSDetails() {
           tabList: 'w-full rounded-lg border border-outline bg-content1 p-2'
         }}
         disabledKeys={['restakers']}
+        selectedKey={tab ? pathname : pathname + '/tvl'}
         radius="sm"
         size="lg"
       >
         <Tab
-          key="tvl"
+          href={`/avs/${address}/tvl`}
+          key={`/avs/${address}/tvl`}
           title={
             <div className="flex flex-col">
               <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
@@ -122,7 +126,8 @@ export default function AVSDetails() {
         </Tab>
 
         <Tab
-          key="operators"
+          href={`/avs/${address}/operators`}
+          key={`/avs/${address}/operators`}
           title={
             <div className="flex flex-col">
               <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
