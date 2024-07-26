@@ -296,7 +296,7 @@ function LineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            className="stroke-chart-9"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}

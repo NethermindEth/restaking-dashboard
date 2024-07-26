@@ -209,7 +209,6 @@ function LineChart({ points, height, width }) {
             </span>
           </div>
         </div>
-
         <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
           <Tabs
             classNames={tabs}
@@ -226,7 +225,6 @@ function LineChart({ points, height, width }) {
           </Tabs>
         </div>
       </div>
-
       <svg
         className="w-full touch-pan-y"
         height={height}
@@ -270,13 +268,12 @@ function LineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            className="stroke-chart-9"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
             y={d => scaleValue(getValue(d)) ?? 0}
           />
-
           {tooltipOpen && (
             <Circle
               className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
@@ -285,7 +282,6 @@ function LineChart({ points, height, width }) {
               r={4}
             />
           )}
-
           <rect
             fill="transparent"
             height={state.maxY}
@@ -298,7 +294,6 @@ function LineChart({ points, height, width }) {
           />
         </Group>
       </svg>
-
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
