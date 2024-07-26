@@ -3,17 +3,20 @@ import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY
 } from '../shared/strategies';
-import { Progress, Skeleton, Spinner } from '@nextui-org/react';
+import { Divider, Progress, Skeleton, Spinner } from '@nextui-org/react';
+import { formatETH, formatUSD } from '../shared/formatters';
 import OperatorLSTPieChart from './charts/OperatorLSTPieChart';
 import OperatorRestakersLineChart from './charts/OperatorRestakersLineChart';
 import OperatorTVLLineChart from './charts/OperatorTVLLineChart';
 import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../shared/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
+import { truncateAddress } from '../shared/helpers';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
+import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function OperatorDetails() {
   const { address } = useParams();
@@ -24,13 +27,14 @@ export default function OperatorDetails() {
     tvl: 0
   });
   const { operatorService } = useServices();
+  const compact = !useTailwindBreakpoint('lg');
 
   useEffect(() => {
     dispatch({ isOperatorLoading: true });
 
     (async () => {
       const operator = await operatorService.getOperator(address);
-      const tvl = operator.strategies.reduce((acc, s) => {
+      const tvl = operator.strategies?.reduce((acc, s) => {
         if (s.address === EIGEN_STRATEGY) {
           return acc;
         }
@@ -49,19 +53,63 @@ export default function OperatorDetails() {
   return (
     <>
       {state.isOperatorLoading ? (
-        <>
-          <div className="mb-4 min-h-[180px] w-full rounded-lg border border-outline bg-content1 p-4">
-            <div className="flex max-w-[300px] items-center">
-              <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
-              <Skeleton className="ml-2 h-8 w-full rounded-md" />
-            </div>
-            <div className="my-4">
-              <Skeleton className="h-16 w-full rounded-md" />
+        <div className="mb-4 min-h-[180px] w-full rounded-lg border border-outline bg-content1 p-4">
+          <div className="flex max-w-[300px] items-center">
+            <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
+            <Skeleton className="ml-2 h-8 w-full rounded-md" />
+          </div>
+          <div className="my-4">
+            <Skeleton className="h-16 w-full rounded-md" />
+          </div>
+        </div>
+      ) : (
+        <div className="mb-4 w-full break-words rounded-lg border border-outline bg-content1 p-4">
+          <div className="flex items-center">
+            <ThirdPartyLogo
+              className="size-12 min-w-12"
+              url={state.operator.metadata?.logo}
+            />
+            <div className="ml-2 font-display text-3xl font-medium text-foreground-1">
+              <span>
+                {state.operator.metadata?.name ??
+                  truncateAddress(state.operator.address)}
+              </span>
+
+              {/*TODO: implement ranking when coming from list view & accessing directly operator*/}
+              {/* <span className="ml-2 inline-block translate-y-[-25%] rounded-md bg-foreground-2 p-1 text-xs text-content1"> */}
+              {/*   # 1 */}
+              {/* </span> */}
             </div>
           </div>
-        </>
-      ) : (
-        <></>
+          <div className="my-4 break-words text-xs text-foreground-1">
+            {state.operator.metadata?.description}
+          </div>
+
+          <div className="flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-2">
+            <div className="flex basis-1/3 flex-col items-center gap-1">
+              <div className="text-sm text-foreground-2">TVL</div>
+              <div className="text-center">
+                <div className="text-foreground-1">
+                  {formatETH(state.tvl, compact)}
+                </div>
+              </div>
+            </div>
+            <Divider className="min-h-10 bg-outline" orientation="vertical" />
+            <div className="flex h-full basis-1/3 flex-col items-center gap-1">
+              <div className="text-sm text-foreground-2">AVS Subscribed</div>
+              <div className="text-foreground-1">
+                {state.operator?.avs?.length}
+              </div>
+            </div>
+            <Divider className="min-h-10 bg-outline" orientation="vertical" />
+            <div className="flex basis-1/3 flex-col items-center gap-1">
+              <div className="text-sm text-foreground-2">Restakers</div>
+              <div className="text-foreground-1">
+                {state.operator?.stakerCount}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <div>
