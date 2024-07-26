@@ -152,9 +152,6 @@ export default function Home() {
             )}
           </div>
         </Card>
-        <div className="md:w-2/5">
-          <CallToActions />
-        </div>
       </div>
       <div className="flex flex-col items-stretch justify-between gap-4 md:flex-row">
         <Card

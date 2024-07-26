@@ -38,6 +38,8 @@ export default [
         }
       ],
       'react/jsx-no-target-blank': 'off',
+      'react/jsx-sort-props': 'warn',
+      'react/no-unescaped-entities': 'off',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': 'warn',
       ...reactHooks.configs.recommended.rules
