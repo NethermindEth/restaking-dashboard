@@ -73,7 +73,11 @@ export default function OperatorRestakersLineChart({
           {parent => (
             <LineChart
               height={288}
-              points={state.points.concat(currentPoint)}
+              points={
+                new Date().getUTCHours() < 12 // API returns today's data after 12:00 PM UTC. Check if current time is earlier than 12 pm.
+                  ? state.points.concat(currentPoint)
+                  : state.points
+              }
               width={parent.width}
             />
           )}
