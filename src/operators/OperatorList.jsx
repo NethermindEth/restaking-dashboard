@@ -165,7 +165,7 @@ export default function OperatorList() {
           onChange={handleSearch}
           type="text"
           color="primary"
-          placeholder="Search by Operator"
+          placeholder="Search by name/address"
           radius="sm"
           className="lg:w-96"
           variant="bordered"
