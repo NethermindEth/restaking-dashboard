@@ -172,25 +172,24 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
 
     const filteredStrategies = [];
     let excludeBeaconTVL = 0;
+    let totals = 0n;
 
     for (const s of strategies) {
-      if (
-        s.address !== EIGEN_STRATEGY &&
-        s.address !== BEACON_STRATEGY &&
-        BigInt(s.tokens) !== 0n
-      ) {
+      if (s.address !== EIGEN_STRATEGY && s.address !== BEACON_STRATEGY) {
         filteredStrategies.push(s);
       }
 
       if (s.address === BEACON_STRATEGY) {
         excludeBeaconTVL = parseFloat(s.tokens) / 1e18;
       }
+
+      totals += BigInt(s.tokens);
     }
 
     // http://localhost:5173/operators/0x2514f445135d5e51bba6c33dd7f1898f070b8c62
     // edge case where the operators used to have some stake in strategies, but now all of them are zero
     // this will cause the pie chart to be empty so we should just display unavailable data
-    if (filteredStrategies.length === 0) {
+    if (totals === 0n) {
       return;
     }
 
