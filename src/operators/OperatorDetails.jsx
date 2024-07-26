@@ -83,7 +83,7 @@ export default function OperatorDetails() {
 
       {!state.isOperatorLoading && !state.error && (
         <>
-          <div className="mb-4 flex w-full flex-row flex-wrap items-center gap-2 break-words rounded-lg border border-outline bg-content1 p-4">
+          <div className="mb-4 flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words rounded-lg border border-outline bg-content1 p-4">
             <div className="flex basis-full items-center gap-4">
               <ThirdPartyLogo
                 className="size-12 min-w-12"
@@ -101,7 +101,7 @@ export default function OperatorDetails() {
             <span className="basis-full break-words pt-4 text-xs text-foreground-1">
               {state.operator.metadata?.description}
             </span>
-            <div className="flex basis-full items-center gap-1 lg:me-4 lg:basis-0">
+            <div className="flex basis-full items-center gap-1 lg:basis-0">
               <Link
                 className="truncate text-xs text-secondary"
                 href={`https://etherscan.io/address/${state.operator.address}`}

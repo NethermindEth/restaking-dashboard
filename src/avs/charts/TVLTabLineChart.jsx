@@ -143,12 +143,12 @@ export default function TVLTabLineChart({ points, height, width }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1">
-      <div className="mb-6 flex justify-between p-4">
-        <div className="hidden flex-1 sm:block">
-          <div className="font-display text-xl text-foreground-1">
+    <div className="rounded-lg border border-outline bg-content1 p-4">
+      <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
+        <div className="flex-1">
+          <span className="font-display text-xl text-foreground-1">
             TVL over time
-          </div>
+          </span>
           <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
@@ -159,31 +159,28 @@ export default function TVLTabLineChart({ points, height, width }) {
             </span>
           </div>
         </div>
-
-        <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="usd"
-            onSelectionChange={handleRateSelectionChange}
-            size="sm"
-          >
-            <Tab key="usd" title="USD" />
-            <Tab key="eth" title="ETH" />
-          </Tabs>
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="all"
-            disabledKeys={disabledKeys}
-            onSelectionChange={handleTimelineSelectionChange}
-            size="sm"
-          >
-            <Tab key="1w" title="1W" />
-            <Tab key="1m" title="1M" />
-            <Tab key="3m" title="3M" />
-            <Tab key="1y" title="1Y" />
-            <Tab key="all" title="All" />
-          </Tabs>
-        </div>
+        <Tabs
+          classNames={tabs}
+          defaultSelectedKey="usd"
+          onSelectionChange={handleRateSelectionChange}
+          size="sm"
+        >
+          <Tab key="usd" title="USD" />
+          <Tab key="eth" title="ETH" />
+        </Tabs>
+        <Tabs
+          classNames={tabs}
+          defaultSelectedKey="3m"
+          disabledKeys={disabledKeys}
+          onSelectionChange={handleTimelineSelectionChange}
+          size="sm"
+        >
+          <Tab key="1w" title="1W" />
+          <Tab key="1m" title="1M" />
+          <Tab key="3m" title="3M" />
+          <Tab key="1y" title="1Y" />
+          <Tab key="all" title="All" />
+        </Tabs>
       </div>
 
       <svg
@@ -229,7 +226,7 @@ export default function TVLTabLineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            className="stroke-chart-9"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
@@ -281,7 +278,7 @@ export default function TVLTabLineChart({ points, height, width }) {
   );
 }
 
-const margin = { top: 20, right: 40, bottom: 40, left: 20 };
+const margin = { top: 20, right: 40, bottom: 24, left: 0 };
 const timelines = {
   '1w': 7,
   '1m': 30,
