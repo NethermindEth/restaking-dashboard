@@ -1,22 +1,93 @@
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { Circle, LinePath } from '@visx/shape';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
+import { handleServiceError, reduceState } from '../../shared/helpers';
 import { scaleLinear, scaleUtc } from '@visx/scale';
-import { Tab, Tabs } from '@nextui-org/react';
+import { Spinner, Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
+import ErrorMessage from '../../shared/ErrorMessage';
 import { getGrowthPercentage } from '../../utils';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
-import { reduceState } from '../../shared/helpers';
+import { ParentSize } from '@visx/responsive';
 import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
+import { useParams } from 'react-router-dom';
+import { useServices } from '../../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
 
-export default function TVLTabLineChart({ points, height, width }) {
+export default function OperatorTVLLineChart({
+  currentTVL,
+  ethRate,
+  isOperatorLoading
+}) {
+  const { address } = useParams();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    error: undefined,
+    isChartLoading: true,
+    points: undefined
+  });
+  const { operatorService } = useServices();
+
+  useEffect(() => {
+    dispatch({ isChartLoading: true, error: undefined });
+    (async () => {
+      try {
+        const response = await operatorService.getOperatorTVL(address);
+
+        dispatch({
+          points: response,
+          isChartLoading: false
+        });
+      } catch (e) {
+        dispatch({ isChartLoading: false, error: handleServiceError(e) });
+      }
+    })();
+  }, [address, dispatch, operatorService]);
+
+  // our endpoint only returns up to yesterdays data. We need to append today's data point
+  // into the graph
+  const currentPoint = useMemo(
+    () => ({
+      timestamp: new Date(),
+      // use current eth rate as "historical" rate
+      rate: ethRate,
+      tvl: currentTVL
+    }),
+    [ethRate, currentTVL]
+  );
+
+  return (
+    <div>
+      {isOperatorLoading || state.isChartLoading || state.error ? (
+        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+          {state.error && <ErrorMessage error={state.error} />}
+          {!state.error && <Spinner color="primary" size="lg" />}
+        </div>
+      ) : (
+        <ParentSize className="mb-4">
+          {parent => (
+            <LineChart
+              height={288}
+              points={
+                new Date().getUTCHours() < 12 // API returns today's data after 12:00 PM UTC. Check if current time is earlier than 12 pm.
+                  ? state.points.concat(currentPoint)
+                  : state.points
+              }
+              width={parent.width}
+            />
+          )}
+        </ParentSize>
+      )}
+    </div>
+  );
+}
+
+function LineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
@@ -89,11 +160,11 @@ export default function TVLTabLineChart({ points, height, width }) {
 
   const growthPercentage = useMemo(() => {
     const first = state.filteredPoints[0];
-    const lastest = state.filteredPoints[state.filteredPoints.length - 1];
+    const latest = state.filteredPoints[state.filteredPoints.length - 1];
 
     return getGrowthPercentage(
       state.useRate ? first.tvl * first.rate : first.tvl,
-      state.useRate ? lastest.tvl * lastest.rate : lastest.tvl
+      state.useRate ? latest.tvl * latest.rate : latest.tvl
     );
   }, [state.filteredPoints, state.useRate]);
 
@@ -143,12 +214,12 @@ export default function TVLTabLineChart({ points, height, width }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1">
-      <div className="mb-6 flex justify-between p-4">
-        <div className="hidden flex-1 sm:block">
-          <div className="font-display text-xl text-foreground-1">
+    <div className="rounded-lg border border-outline bg-content1 p-4">
+      <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
+        <div className="flex-1">
+          <span className="font-display text-xl text-foreground-1">
             TVL over time
-          </div>
+          </span>
           <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
@@ -159,31 +230,28 @@ export default function TVLTabLineChart({ points, height, width }) {
             </span>
           </div>
         </div>
-
-        <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="usd"
-            onSelectionChange={handleRateSelectionChange}
-            size="sm"
-          >
-            <Tab key="usd" title="USD" />
-            <Tab key="eth" title="ETH" />
-          </Tabs>
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="all"
-            disabledKeys={disabledKeys}
-            onSelectionChange={handleTimelineSelectionChange}
-            size="sm"
-          >
-            <Tab key="1w" title="1W" />
-            <Tab key="1m" title="1M" />
-            <Tab key="3m" title="3M" />
-            <Tab key="1y" title="1Y" />
-            <Tab key="all" title="All" />
-          </Tabs>
-        </div>
+        <Tabs
+          classNames={tabs}
+          defaultSelectedKey="usd"
+          onSelectionChange={handleRateSelectionChange}
+          size="sm"
+        >
+          <Tab key="usd" title="USD" />
+          <Tab key="eth" title="ETH" />
+        </Tabs>
+        <Tabs
+          classNames={tabs}
+          defaultSelectedKey="3m"
+          disabledKeys={disabledKeys}
+          onSelectionChange={handleTimelineSelectionChange}
+          size="sm"
+        >
+          <Tab key="1w" title="1W" />
+          <Tab key="1m" title="1M" />
+          <Tab key="3m" title="3M" />
+          <Tab key="1y" title="1Y" />
+          <Tab key="all" title="All" />
+        </Tabs>
       </div>
 
       <svg
@@ -229,7 +297,7 @@ export default function TVLTabLineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            className="stroke-chart-9"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
@@ -238,7 +306,7 @@ export default function TVLTabLineChart({ points, height, width }) {
 
           {tooltipOpen && (
             <Circle
-              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-white"
+              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}
@@ -281,7 +349,7 @@ export default function TVLTabLineChart({ points, height, width }) {
   );
 }
 
-const margin = { top: 20, right: 40, bottom: 40, left: 20 };
+const margin = { top: 20, right: 40, bottom: 24, left: 0 };
 const timelines = {
   '1w': 7,
   '1m': 30,
