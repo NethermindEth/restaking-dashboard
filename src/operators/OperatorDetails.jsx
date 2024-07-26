@@ -4,13 +4,13 @@ import {
   EIGEN_STRATEGY
 } from '../shared/strategies';
 import { Divider, Progress, Skeleton, Spinner } from '@nextui-org/react';
+import { handleServiceError, reduceState } from '../shared/helpers';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatETH } from '../shared/formatters';
 import OperatorLSTPieChart from './charts/OperatorLSTPieChart';
 import OperatorRestakersLineChart from './charts/OperatorRestakersLineChart';
 import OperatorTVLLineChart from './charts/OperatorTVLLineChart';
 import { ParentSize } from '@visx/responsive';
-import { handleServiceError, reduceState } from '../shared/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { truncateAddress } from '../shared/helpers';
 import { useEffect } from 'react';
@@ -172,24 +172,25 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
 
     const filteredStrategies = [];
     let excludeBeaconTVL = 0;
-    let totals = 0n;
 
     for (const s of strategies) {
-      if (s.address !== EIGEN_STRATEGY && s.address !== BEACON_STRATEGY) {
+      if (
+        s.address !== EIGEN_STRATEGY &&
+        s.address !== BEACON_STRATEGY &&
+        BigInt(s.tokens) !== 0n
+      ) {
         filteredStrategies.push(s);
       }
 
       if (s.address === BEACON_STRATEGY) {
         excludeBeaconTVL = parseFloat(s.tokens) / 1e18;
       }
-
-      totals += BigInt(s.tokens);
     }
 
     // http://localhost:5173/operators/0x2514f445135d5e51bba6c33dd7f1898f070b8c62
     // edge case where the operators used to have some stake in strategies, but now all of them are zero
     // this will cause the pie chart to be empty so we should just display unavailable data
-    if (totals === 0n) {
+    if (filteredStrategies.length === 0) {
       return;
     }
 
