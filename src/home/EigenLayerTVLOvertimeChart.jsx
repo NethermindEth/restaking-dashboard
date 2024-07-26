@@ -146,7 +146,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
             left={0}
             tickFormat={value => formatNumber(value, true)}
             tickLabelProps={() => ({
-              className: 'fill-foreground-active text-xs',
+              className: 'fill-foreground text-xs',
               fontSize: 11,
               textAnchor: 'end'
             })}
@@ -157,7 +157,7 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
             tickFormat={date => formatDateToVerboseString(date)}
             top={innerHeight}
             tickLabelProps={() => ({
-              className: 'fill-foreground-active text-xs',
+              className: 'fill-foreground text-xs',
               textAnchor: 'middle'
             })}
             tickValues={data
