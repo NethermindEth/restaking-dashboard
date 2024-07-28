@@ -8,6 +8,7 @@ import { formatEther } from 'ethers';
 import LSTList from './LSTList';
 import LSTDistributionGraph from './LSTDistributionGraph';
 import { ParentSize } from '@visx/responsive';
+import SkeletonGraph from '../shared/SkeletonGraph';
 
 export default function LST() {
   const { eigenlayerService } = useServices();
@@ -103,18 +104,22 @@ export default function LST() {
       </div>
 
       <div>
-        <ParentSize>
-          {parent => {
-            return (
-              <LSTDistributionGraph
-                data={state.lst}
-                rankings={state.rankings}
-                height={512}
-                width={parent.width}
-              />
-            );
-          }}
-        </ParentSize>
+        {state.isLoadingLST ? (
+          <SkeletonGraph />
+        ) : (
+          <ParentSize>
+            {parent => {
+              return (
+                <LSTDistributionGraph
+                  data={state.lst}
+                  rankings={state.rankings}
+                  height={512}
+                  width={parent.width}
+                />
+              );
+            }}
+          </ParentSize>
+        )}
       </div>
 
       <div className="mt-4">
