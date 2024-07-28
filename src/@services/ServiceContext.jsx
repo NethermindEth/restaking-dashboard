@@ -6,6 +6,7 @@ import OperatorService from './OperatorService';
 
 export const ServiceContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useServices = () => useContext(ServiceContext);
 
 export function ServiceProvider({ children }) {

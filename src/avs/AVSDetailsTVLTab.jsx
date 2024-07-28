@@ -26,6 +26,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -167,7 +168,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
     <Table
       aria-label="Breakdown of ETH, EIGEN and Liquid Staking Tokens"
       classNames={{
-        wrapper: 'border border-outline rounded-lg',
+        wrapper: 'rounded-lg border border-outline',
         tr: 'border-b border-outline last:border-none'
       }}
       hideHeader
@@ -197,7 +198,10 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
             <TableRow key={key}>
               <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2 truncate">
-                  <Image height={16} src={tokens[key].logo} width={16} />
+                  <ThirdPartyLogo
+                    className="size-5 min-w-5"
+                    url={tokens[key].logo}
+                  />
                   <span className="truncate text-foreground-2">
                     {tokens[key].name}
                   </span>{' '}
@@ -250,7 +254,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
     <Table
       aria-label="Breakdown of Liquid Staking Tokens"
       classNames={{
-        wrapper: 'border border-outline rounded-lg',
+        wrapper: 'rounded-lg border border-outline',
         tr: 'border-b border-outline last:border-none'
       }}
       hideHeader
@@ -280,15 +284,9 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
             <TableRow key={key}>
               <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2">
-                  <Image
-                    classNames={{
-                      // override tailwind's base img styling that doesn't respect specified dimensions
-                      img: 'h-4 w-4 max-w-none object-contain'
-                    }}
-                    fallbackSrc="/eth.png"
-                    height={16}
-                    src={lstStrategyAssetMapping[key].logo}
-                    width={16}
+                  <ThirdPartyLogo
+                    className="size-5 min-w-5"
+                    url={lstStrategyAssetMapping[key].logo}
                   />
                   <span className="truncate text-foreground-2">
                     {lstStrategyAssetMapping[key]?.name}

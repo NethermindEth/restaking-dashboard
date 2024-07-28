@@ -164,33 +164,32 @@ export default function OverviewLRTDistribution({ rate }) {
 
   return (
     <Card
+      className="space-y-4 border border-outline bg-content1 p-4"
       radius="md"
-      className="bg-content1 border border-outline space-y-4 p-4"
     >
-      <div className="font-normal text-lg text-foreground-active px-2">
+      <div className="text-foreground-active px-2 text-lg font-normal">
         LRT Distribution
       </div>
 
-      <div className="w-full flex flex-col gap-10 lg:flex-row flex-wrap items-center justify-center lg:justify-between px-4">
-        <div className="w-full md:max-w-xl space-y-3">
+      <div className="flex w-full flex-col flex-wrap items-center justify-center gap-10 px-4 lg:flex-row lg:justify-between">
+        <div className="w-full space-y-3 md:max-w-xl">
           {Object.entries(mergedLrtData).map(
             ([name, { logo, tvl, percentage }]) => (
               <LRTShare
+                image={logo}
                 key={name}
                 label={name}
-                value={percentage}
-                image={logo}
                 share={tvl}
+                value={percentage}
               />
             )
           )}
         </div>
-        <svg width={width} height={width}>
-          <Group top={half} left={half} className="relative">
+        <svg height={width} width={width}>
+          <Group className="relative" left={half} top={half}>
             <Pie
+              cornerRadius={0}
               data={chartData}
-              pieValue={data => data.amount}
-              outerRadius={half}
               innerRadius={({ data }) => {
                 const size =
                   state.activePieEntry &&
@@ -199,19 +198,20 @@ export default function OverviewLRTDistribution({ rate }) {
                     : 50;
                 return half - size;
               }}
-              cornerRadius={0}
+              outerRadius={half}
               padAngle={0}
+              pieValue={data => data.amount}
             >
               {pie => {
                 return pie.arcs.map(arc => {
                   return (
                     <g
+                      className="cursor-pointer"
                       key={arc.data.label}
                       onMouseEnter={() =>
                         dispatch({ activePieEntry: arc.data })
                       }
                       onMouseLeave={() => dispatch({ activePieEntry: null })}
-                      className="cursor-pointer"
                     >
                       <path d={pie.path(arc)} fill={arc.data.color}></path>
                     </g>
@@ -223,28 +223,28 @@ export default function OverviewLRTDistribution({ rate }) {
             {state.activePieEntry ? (
               <>
                 <Text
-                  textAnchor="middle"
-                  fill="white"
-                  fontWeight={500}
                   className="text-lg"
                   dy={-5}
+                  fill="white"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`$${formatNumber(state.activePieEntry.amount * rate)}`}
                 </Text>
 
                 <Text
-                  textAnchor="middle"
-                  fill="#7CCB69"
-                  fontWeight={500}
                   className="text-xs"
                   dy={15}
+                  fill="#7CCB69"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`${formatNumber(state.activePieEntry.amount)} ETH`}
                 </Text>
 
                 <Text
-                  textAnchor="middle"
                   fill="#CAD7F9"
+                  textAnchor="middle"
                   className="text-sm capitalize"
                   // extra 8 for padding
                   dy={35 + 8}
@@ -255,21 +255,21 @@ export default function OverviewLRTDistribution({ rate }) {
             ) : (
               <>
                 <Text
-                  textAnchor="middle"
-                  fill="white"
-                  fontWeight={500}
                   className="text-lg"
                   dy={5}
+                  fill="white"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`$${formatNumber(totalTVL * rate)}`}
                 </Text>
 
                 <Text
-                  textAnchor="middle"
-                  fill="#7CCB69"
-                  fontWeight={500}
                   className="text-xs"
                   dy={25}
+                  fill="#7CCB69"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`${formatNumber(totalTVL)} ETH`}
                 </Text>
@@ -284,31 +284,31 @@ export default function OverviewLRTDistribution({ rate }) {
 
 const LRTShare = ({ label, value, image, share }) => {
   return (
-    <div className="flex items-end md:flex-row flex-col gap-2">
+    <div className="flex flex-col items-end gap-2 md:flex-row">
       <Progress
-        radius="sm"
         classNames={{
-          base: 'lg:w-5/6 w-full',
-          track: 'drop-shadow-md border bg-cinder-1 border-default',
+          base: 'w-full lg:w-5/6',
+          track: 'border border-default bg-cinder-1 drop-shadow-md',
           indicator: 'bg-cinder-default',
           label: 'text-foreground-active text-sm font-normal capitalize',
-          value: 'text-white text-xs font-normal'
+          value: 'text-xs font-normal text-white'
         }}
-        label={
-          <div className="flex items-center gap-2">
-            {image && <img src={image} className="size-4 rounded-full" />}{' '}
-            <div>{label}</div>
-          </div>
-        }
-        value={value}
-        showValueLabel={true}
         formatOptions={{
           style: 'percent',
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         }}
+        label={
+          <div className="flex items-center gap-2">
+            {image && <img className="size-4 rounded-full" src={image} />}{' '}
+            <div>{label}</div>
+          </div>
+        }
+        radius="sm"
+        showValueLabel={true}
+        value={value}
       />
-      <div className="text-sm text-foreground-2 min-w-fit ml-2">
+      <div className="ml-2 min-w-fit text-sm text-foreground-2">
         {formatNumber(share, true)} ETH
       </div>
     </div>

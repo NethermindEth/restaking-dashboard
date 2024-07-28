@@ -21,34 +21,30 @@ import { useServices } from '../@services/ServiceContext';
 
 const columns = [
   {
-    key: 'avs',
-    label: 'AVS',
+    key: 'operator',
+    label: 'Operator',
     className: 'w-64 md:w-2/5 ps-12'
   },
   {
-    key: 'staker',
+    key: 'restaker',
     label: 'Restakers',
     className: 'text-end w-36 md:w-1/5'
   },
-  {
-    key: 'operator',
-    label: 'Operators',
-    className: 'text-end w-36 md:w-1/5'
-  },
+
   {
     key: 'tvl',
     label: 'TVL',
-    className: 'text-end w-40 md:w-1/5'
+    className: 'text-end w-40 md:w-2/5'
   }
 ];
 
-export default function AVSList() {
-  const { avsService } = useServices();
+export default function OperatorList() {
+  const { operatorService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const abortController = useRef(null);
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    avs: [],
+    operators: [],
     isFetchingData: false,
     searchTerm: searchParams.get('search'),
     error: null,
@@ -63,10 +59,9 @@ export default function AVSList() {
         }
       : { column: 'tvl', direction: 'descending' }
   });
-
   const debouncedSearchTerm = useDebouncedSearch(state.searchTerm ?? '', 300);
 
-  const fetchAVS = useCallback(
+  const fetchOperators = useCallback(
     async (pageNumber, search, sort) => {
       try {
         dispatch({ isFetchingData: true, error: null });
@@ -76,7 +71,7 @@ export default function AVSList() {
         }
         abortController.current = new AbortController();
 
-        const response = await avsService.getAll(
+        const response = await operatorService.getAll(
           pageNumber,
           search,
           sort,
@@ -84,7 +79,7 @@ export default function AVSList() {
         );
 
         dispatch({
-          avs: response.results,
+          operators: response.results,
           isFetchingData: false,
           rate: response.rate,
           totalPages: Math.ceil(response.totalCount / 10)
@@ -100,12 +95,12 @@ export default function AVSList() {
         }
       }
     },
-    [avsService, dispatch]
+    [operatorService, dispatch]
   );
 
   const handlePageClick = useCallback(
     page => {
-      setSearchParams({ page: page.toString() });
+      setSearchParams({ page });
     },
     [setSearchParams]
   );
@@ -116,10 +111,12 @@ export default function AVSList() {
 
   useEffect(() => {
     const page = searchParams.get('page') ?? 1;
-
     const params = {};
+
     params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
-    if (debouncedSearchTerm) params.search = debouncedSearchTerm;
+    if (debouncedSearchTerm) {
+      params.search = debouncedSearchTerm;
+    }
     if (state.sortDescriptor) {
       params.sort =
         state.sortDescriptor.direction === 'ascending'
@@ -128,12 +125,12 @@ export default function AVSList() {
     }
 
     setSearchParams(params, { replace: true });
-    fetchAVS(params.page, params.search, params.sort);
+    fetchOperators(params.page, params.search, params.sort);
     dispatch({ searchTriggered: false });
   }, [
     debouncedSearchTerm,
     dispatch,
-    fetchAVS,
+    fetchOperators,
     searchParams,
     setSearchParams,
     state.searchTriggered,
@@ -141,16 +138,23 @@ export default function AVSList() {
   ]);
 
   useEffect(() => {
-    if (debouncedSearchTerm) dispatch({ searchTriggered: true });
+    if (debouncedSearchTerm) {
+      dispatch({ searchTriggered: true });
+    }
   }, [dispatch, debouncedSearchTerm]);
 
   return (
     <div className="flex h-full flex-col">
       <div className="font-display text-3xl font-medium text-foreground-1">
-        AVS
+        Operators
       </div>
-      <div className="mb-4 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-        <div className="text-foreground-1">Actively Validated Services</div>
+      <div className="mb-4 mt-3 flex w-full flex-col items-end justify-between gap-4 lg:flex-row lg:gap-16">
+        <div className="text-sm text-foreground-1 lg:w-2/3">
+          Operators run AVS software built on top of EigenLayer. Operators
+          register in EigenLayer and allow restakers to delegate to them, then
+          opt-in to secure various services (AVS) built on top of EigenLayer.
+          Operators may also be Stakers; these are not mutually exclusive.
+        </div>
         <Input
           className="lg:w-96"
           classNames={{
@@ -182,13 +186,13 @@ export default function AVSList() {
       {!state.error && (
         <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
           <Table
-            aria-label="AVS list"
+            aria-label="Operator list"
             classNames={{
               base: 'h-full overflow-x-auto',
               table: 'h-full',
               thead: '[&>tr:last-child]:hidden'
             }}
-            hideHeader={!state.isFetchingData && state.avs.length == 0}
+            hideHeader={!state.isFetchingData && state.operators.length == 0}
             layout="fixed"
             onSortChange={e => dispatch({ sortDescriptor: e })}
             removeWrapper
@@ -209,7 +213,7 @@ export default function AVSList() {
               emptyContent={
                 <div className="flex flex-col items-center justify-center">
                   <span className="text-lg text-foreground-2">
-                    No AVS found for &quot;
+                    No operator found for &quot;
                     {debouncedSearchTerm.length > 42
                       ? `${debouncedSearchTerm.substring(0, 42)}...`
                       : debouncedSearchTerm}
@@ -227,20 +231,19 @@ export default function AVSList() {
                       <TableCell className="w-1/5 py-6 pe-8 ps-4">
                         <Skeleton className="h-4 rounded-md bg-default" />
                       </TableCell>
-                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                        <Skeleton className="h-4 rounded-md bg-default" />
-                      </TableCell>
-                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <TableCell className="w-2/5 py-6 pe-8 ps-4">
                         <Skeleton className="h-4 rounded-md bg-default" />
                       </TableCell>
                     </TableRow>
                   ))
-                : state.avs?.map((avs, i) => (
+                : state.operators?.map((operator, i) => (
                     <TableRow
                       className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                      key={`avs-item-${i}`}
+                      key={`operator-item-${i}`}
                       onClick={() =>
-                        navigate(`/avs/${avs.address}`, { state: { avs } })
+                        navigate(`/operators/${operator.address}`, {
+                          state: { operator }
+                        })
                       }
                     >
                       <TableCell className="p-4">
@@ -250,41 +253,39 @@ export default function AVSList() {
                           </span>
                           <ThirdPartyLogo
                             className="size-8 min-w-8"
-                            url={avs.metadata?.logo}
+                            url={operator.metadata?.logo}
                           />
                           <span className="truncate">
-                            {avs.metadata?.name || avs.address}
+                            {operator.metadata?.name || operator.address}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="pe-8 text-end">
-                        {formatNumber(avs.stakers)}
+                        {formatNumber(operator.stakerCount)}
                       </TableCell>
                       <TableCell className="pe-8 text-end">
-                        {formatNumber(avs.operators)}
-                      </TableCell>
-                      <TableCell className="pe-8 text-end">
-                        <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
+                        <div>
+                          {formatUSD(operator.strategiesTotal * state.rate)}
+                        </div>
                         <div className="text-xs text-subtitle">
-                          {formatETH(avs.strategiesTotal)}
+                          {formatETH(operator.strategiesTotal)}
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
 
               {!state.isFetchingData &&
-                state.avs?.length > 0 &&
-                [...Array(10 - state.avs.length)].map((_, i) => (
+                state.operators?.length > 0 &&
+                [...Array(10 - state.operators.length)].map((_, i) => (
                   <TableRow key={i}>
                     <TableCell className="h-full w-2/5"></TableCell>
                     <TableCell className="w-1/5"></TableCell>
-                    <TableCell className="w-1/5"></TableCell>
-                    <TableCell className="w-1/5"></TableCell>
+                    <TableCell className="w-2/5"></TableCell>
                   </TableRow>
                 ))}
             </TableBody>
           </Table>
-          {state.avs && state.avs.length !== 0 && (
+          {state.operators && state.operators.length !== 0 && (
             <ListPagination
               onChange={handlePageClick}
               page={parseInt(searchParams.get('page') || '1')}

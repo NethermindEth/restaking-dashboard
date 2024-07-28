@@ -73,10 +73,10 @@ export default function LST() {
 
   return (
     <div>
-      <div className="font-display font-medium my-4 text-foreground-1 text-3xl">
+      <div className="my-4 font-display text-3xl font-medium text-foreground-1">
         Liquid Staking Tokens
       </div>
-      <div className="font-display font-medium mb-4 text-foreground-1 text-xs">
+      <div className="mb-4 font-display text-xs font-medium text-foreground-1">
         Liquid Staking Tokens (LSTs) restaked on EigenLayer are a form of
         cryptocurrency that represent staked assets in a liquidity pool or
         staking protocol. They allow users to earn rewards from staking while
@@ -84,19 +84,19 @@ export default function LST() {
         in various DeFi applications. LSTs can be restaked on EigenLayer to earn
         restaking rewards, further maximizing yield for restaker
       </div>
-      <div className="bg-content1 border border-outline rounded-lg text-sm my-4 mt-6">
-        <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-foreground-1">
-          <div className="flex flex-col items-center basis-1/2 text-center">
+      <div className="my-4 mt-6 rounded-lg border border-outline bg-content1 text-sm">
+        <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
+          <div className="flex basis-1/2 flex-col items-center text-center">
             <span>TVL</span>
             <span>{formatNumber(state.tvl)} ETH</span>
           </div>
-          <Divider orientation="vertical" className="h-16" />
-          <div className="flex flex-col items-center basis-1/2">
+          <Divider className="h-16" orientation="vertical" />
+          <div className="flex basis-1/2 flex-col items-center">
             <span className="text-center">Number of LST Protocols</span>
             <span>{state.rankings.length}</span>
           </div>
-          <Divider orientation="vertical" className="h-16" />
-          <div className="flex flex-col items-center basis-1/2 ">
+          <Divider className="h-16" orientation="vertical" />
+          <div className="flex basis-1/2 flex-col items-center">
             <span className="text-center">Percentage on EigenLayer TVL</span>
             <span>{state.percentage.toFixed(2)} %</span>
           </div>
@@ -125,8 +125,8 @@ export default function LST() {
       <div className="mt-4">
         <LSTList
           data={state.rankings}
-          latestRate={state.latestRate}
           isLoading={state.isLoadingLST}
+          latestRate={state.latestRate}
         />
       </div>
     </div>

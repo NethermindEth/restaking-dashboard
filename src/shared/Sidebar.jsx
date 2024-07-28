@@ -19,7 +19,7 @@ export default function Sidebar({ onOpenChange }) {
   );
   return (
     <div>
-      <header className="border-l-4 border-transparent flex-none pb-8 pt-6 px-5">
+      <header className="flex-none border-l-4 border-transparent px-5 pb-8 pt-6">
         <img
           alt="Restaking Dashboard"
           className="h-6 lg:h-5"
@@ -35,9 +35,9 @@ export default function Sidebar({ onOpenChange }) {
             : 'border-transparent';
           return (
             <Link
-              key={`nav-item-${i}`}
-              className={`border-l-4 hover:bg-default hover:border-foreground-2 flex gap-x-2 px-5 py-5 text-foreground-2 transition-all ${selected}`}
+              className={`flex gap-x-2 border-l-4 px-5 py-5 text-foreground-2 transition-all hover:border-foreground-2 hover:bg-default ${selected}`}
               href={item.href}
+              key={`nav-item-${i}`}
               onClick={handleNavLinkClick}
             >
               <span className="material-symbols-outlined">{item.icon}</span>

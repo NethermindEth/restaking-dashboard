@@ -11,7 +11,7 @@ export default function Settings() {
   const { applyTheme, theme } = useTheme();
 
   return (
-    <footer className="content-end grow ps-2 pb-1">
+    <footer className="grow content-end pb-1 ps-2">
       <Dropdown className="border border-outline shadow-none">
         <DropdownTrigger>
           <Button color="default" isIconOnly={true} size="sm" variant="light">
@@ -19,10 +19,10 @@ export default function Settings() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu
-          selectedKeys={[theme]}
           aria-label="theme"
-          selectionMode="single"
           onSelectionChange={key => applyTheme(Array.from(key)[0])}
+          selectedKeys={[theme]}
+          selectionMode="single"
         >
           <DropdownItem
             key="system"
@@ -35,7 +35,7 @@ export default function Settings() {
           <DropdownItem
             key="light"
             startContent={
-              <span className="text-foreground material-symbols-outlined">
+              <span className="material-symbols-outlined text-foreground">
                 light_mode
               </span>
             }

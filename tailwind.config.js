@@ -20,45 +20,49 @@ export default {
       prefix: 'app',
       themes: {
         light: {
-          colors: {
-            background: '#ffffff',
-            default: '#e0e7ff',
-            content1: '#eef2ff',
-            focus: '#34d399',
-            foreground: '#000000',
-            'dark-blue': '#009CDD'
-          }
+          colors: {}
         },
         dark: {
           colors: {
             background: '#080a0f',
+            chart: {
+              1: '#a855f7',
+              2: '#d8b4fe',
+              3: '#8b5cf6',
+              4: '#c4b5fd',
+              5: '#f6a550',
+              6: '#faca51',
+              7: '#ec4899',
+              8: '#f9a8d4',
+              9: '#0ea5e9',
+              10: '#7dd3fc'
+            },
             content1: '#0f111a',
             content2: '#191c2c',
             content3: 'yellow',
             content4: 'transparent',
             default: {
               DEFAULT: '#191c2c',
-              2: '#7A86A5',
-              700: '#cad7F9'
+              2: '#7a86a5',
+              700: '#cad7f9'
             },
             error: {
               200: '#fecdd3',
               800: '#9f1239'
             },
-            focus: '#34d399',
+            focus: '#ffa726',
             foreground: {
               DEFAULT: '#ffffff',
               invert: '#000',
-              1: '#cad7F9',
+              1: '#cad7f9',
               2: '#7a86a5'
             },
             outline: '#293041',
             primary: '#cad7F9',
-            secondary: '#FFCC80',
-            subtitle: '#7A86A5',
+            secondary: '#ffcc80',
+            subtitle: '#7a86a5',
             success: '#7CCB69',
-            disabled: '#52525B',
-            fail: '#D24646',
+            // below to be removed
             'dark-blue': '#009CDD',
             cinder: {
               default: '#576AA0',

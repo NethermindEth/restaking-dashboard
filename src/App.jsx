@@ -5,19 +5,19 @@ import {
   Route,
   RouterProvider
 } from 'react-router-dom';
+import AVSDetails from './avs/AVSDetails';
 import AVSList from './avs/AVSList';
 import Home from './home/Home';
 import Layout from './shared/Layout';
 import log from './shared/logger';
 import LRT from './lrt/LRT';
+import LST from './lst/LST';
 import { NextUIProvider } from '@nextui-org/react';
+import NotFound from './shared/NotFound';
+import OperatorDetails from './operators/OperatorDetails';
+import OperatorList from './operators/OperatorList';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
-import AVSDetails from './avs/AVSDetails';
-import OperatorsList from './operators/OperatorsList';
-import OperatorDetails from './operators/OperatorDetails';
-import LST from './lst/LST';
-import NotFound from './shared/NotFound';
 
 export default function App() {
   log.debug('Starting up');
@@ -29,18 +29,18 @@ export default function App() {
           <RouterProvider
             router={createBrowserRouter(
               createRoutesFromElements(
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="/avs" element={<AVSList />} />
-                  <Route path="/avs/:address" element={<AVSDetails />} />
-                  <Route path="/lrt" element={<LRT />} />
-                  <Route path="/operators" element={<OperatorsList />} />
+                <Route element={<Layout />} path="/">
+                  <Route element={<Home />} index />
+                  <Route element={<AVSList />} path="/avs" />
+                  <Route element={<AVSDetails />} path="/avs/:address" />
+                  <Route element={<LRT />} path="/lrt" />
+                  <Route element={<OperatorList />} path="/operators" />
                   <Route
-                    path="/operators/:address"
                     element={<OperatorDetails />}
+                    path="/operators/:address"
                   />
-                  <Route path="/lst" element={<LST />} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route element={<LST />} path="/lst" />
+                  <Route element={<NotFound />} path="*" />
                 </Route>
               )
             )}

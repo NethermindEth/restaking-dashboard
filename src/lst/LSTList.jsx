@@ -6,8 +6,8 @@ import { Skeleton } from '@nextui-org/react';
 export default function LSTList({ data, latestRate, isLoading }) {
   return (
     <div>
-      <div className="bg-content1 border border-outline rounded-lg text-sm mt-4 py-1">
-        <div className="flex flex-row gap-x-2 items-center text-foreground-1 p-4">
+      <div className="mt-4 rounded-lg border border-outline bg-content1 py-1 text-sm">
+        <div className="flex flex-row items-center gap-x-2 p-4 text-foreground-1">
           <div className="min-w-5"></div>
           <span className="basis-full">Protocol</span>
           <span className="basis-1/2">Unbonding period</span>
@@ -19,12 +19,12 @@ export default function LSTList({ data, latestRate, isLoading }) {
             {data.map(([address, tvl], i) => {
               return (
                 <div
+                  className="flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline bg-content1 p-4 hover:bg-default"
                   key={`lst-item-${i}`}
-                  className="border-t border-outline flex flex-row gap-x-2 justify-between items-center cursor-pointer hover:bg-default bg-content1 p-4"
                 >
                   <div className="min-w-5">{i + 1}</div>
                   <div
-                    className="bg-center bg-contain bg-no-repeat h-5 rounded-full min-w-5"
+                    className="h-5 min-w-5 rounded-full bg-contain bg-center bg-no-repeat"
                     style={{
                       backgroundImage: `url('${STRATEGY_ASSET_MAPPING[address].logo}')`
                     }}
@@ -58,21 +58,21 @@ const LSTListSkeleton = () => {
     <div>
       {[...Array(10)].map((_, i) => (
         <div
+          className="flex w-full justify-normal gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
           key={i}
-          className="p-4 flex justify-normal gap-4 md:gap-8 text-foreground-1 border-t border-outline w-full"
         >
-          <div className="md:w-10/12 w-6/12">
-            <Skeleton className="h-6 rounded-md w-4/5 md:w-2/3 dark:bg-default" />
+          <div className="w-6/12 md:w-10/12">
+            <Skeleton className="h-6 w-4/5 rounded-md dark:bg-default md:w-2/3" />
           </div>
-          <div className="pl-5 flex justify-between gap-5 w-10/12">
+          <div className="flex w-10/12 justify-between gap-5 pl-5">
             <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
             </div>
             <div className="w-3/12">
-              <Skeleton className="h-6 rounded-md w-full bg-default dark:bg-default" />
+              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
             </div>
           </div>
         </div>

@@ -128,13 +128,13 @@ export default function OperatorsTabLineChart({ points, height, width }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1">
-      <div className="mb-6 flex justify-between p-4">
-        <div className="hidden flex-1 sm:block">
-          <div className="font-display text-xl text-foreground-1">
+    <div className="rounded-lg border border-outline bg-content1 p-4">
+      <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
+        <div className="flex-1">
+          <span className="font-display text-xl text-foreground-1">
             Operators over time
-          </div>
-          <div className="flex gap-x-2 text-xs text-foreground-2">
+          </span>
+          <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
               className={`${growthPercentage >= 0 ? 'text-success' : 'text-danger'}`}
@@ -144,11 +144,10 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             </span>
           </div>
         </div>
-
-        <div className="flex w-full flex-1 flex-col justify-between gap-x-2 gap-y-2 sm:flex-row sm:justify-end">
+        <div className="flex flex-1 justify-end">
           <Tabs
             classNames={tabs}
-            defaultSelectedKey="all"
+            defaultSelectedKey="3m"
             disabledKeys={disabledKeys}
             onSelectionChange={handleTimelineSelectionChange}
             size="sm"
@@ -161,7 +160,6 @@ export default function OperatorsTabLineChart({ points, height, width }) {
           </Tabs>
         </div>
       </div>
-
       <svg
         className="w-full touch-pan-y"
         height={height}
@@ -205,8 +203,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            /* TODO: define in tailwind config */
-            className="stroke-dark-blue"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
@@ -215,8 +212,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
 
           {tooltipOpen && (
             <Circle
-              /* TODO: define in tailwind config */
-              className="cursor-pointer fill-dark-blue stroke-white stroke-2"
+              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-white"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}
@@ -257,7 +253,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
   );
 }
 
-const margin = { top: 20, right: 40, bottom: 40, left: 20 };
+const margin = { top: 20, right: 40, bottom: 24, left: 0 };
 const timelines = {
   '1w': 7,
   '1m': 30,

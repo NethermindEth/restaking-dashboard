@@ -114,39 +114,39 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
 
   return (
     <div ref={rootRef}>
-      <svg width="100%" height={height} className="overflow-visible">
+      <svg className="overflow-visible" height={height} width="100%">
         <rect
+          className="fill-content1"
+          height={height}
+          rx={14}
+          width={width}
           x={0}
           y={0}
-          width={width}
-          height={height}
-          className="fill-content1"
-          rx={14}
         />
         <Group left={margin.left} top={margin.top}>
           <GridRows
-            scale={tvlScale}
-            width={state.width}
             height={innerHeight}
+            numTicks={getNumberOfTicks(width, 'y')}
+            scale={tvlScale}
             stroke="#7A86A5"
             strokeOpacity={0.2}
-            numTicks={getNumberOfTicks(width, 'y')}
+            width={state.width}
           />
           <GridColumns
-            scale={dateScale}
-            width={state.width}
             height={innerHeight}
+            numTicks={getNumberOfTicks(width, 'x')}
+            scale={dateScale}
             stroke="#7A86A5"
             strokeOpacity={0.2}
-            numTicks={getNumberOfTicks(width, 'x')}
+            width={state.width}
           />
 
           <AxisLeft
-            scale={tvlScale}
             left={0}
+            scale={tvlScale}
             tickFormat={value => formatNumber(value, true)}
             tickLabelProps={() => ({
-              className: 'fill-foreground-active text-xs',
+              className: 'fill-foreground text-xs',
               fontSize: 11,
               textAnchor: 'end'
             })}
@@ -155,9 +155,8 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           <AxisBottom
             scale={dateScale}
             tickFormat={date => formatDateToVerboseString(date)}
-            top={innerHeight}
             tickLabelProps={() => ({
-              className: 'fill-foreground-active text-xs',
+              className: 'fill-foreground text-xs',
               textAnchor: 'middle'
             })}
             tickValues={data
@@ -171,20 +170,21 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
                   0
               )
               .map(d => new Date(d.timestamp))}
+            top={innerHeight}
           />
 
           <LinePath
             className="stroke-purple-500"
-            strokeWidth={2}
             data={data}
+            strokeWidth={2}
             x={d => dateScale(new Date(d.timestamp))}
             y={d => tvlScale(getEthTVL(d))}
           />
 
           <LinePath
             className="stroke-purple-300"
-            strokeWidth={2}
             data={data}
+            strokeWidth={2}
             x={d => dateScale(new Date(d.timestamp))}
             y={d => tvlScale(getLstTVL(d))}
           />
@@ -192,51 +192,51 @@ const EigenLayerTVLOvertimeChart = ({ data, width, height }) => {
           {tooltipData && (
             <>
               <Circle
+                className="fill-purple-500"
                 cx={dateScale(new Date(tooltipData.timestamp))}
                 cy={tvlScale(getEthTVL(tooltipData))}
                 r={4}
-                className="fill-purple-500"
                 stroke="white"
                 strokeWidth={2}
               />
               <Circle
+                className="fill-purple-300"
                 cx={dateScale(new Date(tooltipData.timestamp))}
                 cy={tvlScale(getLstTVL(tooltipData))}
                 r={4}
-                className="fill-purple-300"
                 stroke="white"
                 strokeWidth={2}
               />
             </>
           )}
           <rect
+            fill="transparent"
+            height={innerHeight}
+            onMouseLeave={hideTooltip}
+            onMouseMove={handleTooltip}
+            onTouchMove={handleTooltip}
+            onTouchStart={handleTooltip}
+            width="100%"
             x={0}
             y={0}
-            width="100%"
-            height={innerHeight}
-            fill="transparent"
-            onTouchStart={handleTooltip}
-            onTouchMove={handleTooltip}
-            onMouseMove={handleTooltip}
-            onMouseLeave={hideTooltip}
           />
         </Group>
       </svg>
 
       <div className="mt-4">
         <LegendOrdinal
+          className="text-foreground-active flex w-full items-center justify-between text-sm uppercase"
+          direction="row"
           scale={legendColorScale}
           shape="circle"
-          direction="row"
-          className="flex items-center justify-between w-full text-foreground-active text-sm uppercase"
         />
       </div>
       {tooltipData && (
         <TooltipWithBounds
+          className="z-10 min-w-40 rounded bg-white p-2 text-foreground shadow-md"
           key={Math.random()}
-          top={tooltipTop + 10}
           left={tooltipLeft}
-          className="bg-white p-2 rounded min-w-40 shadow-md text-foreground z-10"
+          top={tooltipTop + 10}
         >
           <div className="text-sm">
             Date: {formatDateToVerboseString(new Date(tooltipData.timestamp))}

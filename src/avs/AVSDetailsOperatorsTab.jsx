@@ -1,6 +1,5 @@
 import { formatETH, formatUSD } from '../shared/formatters';
 import {
-  Image,
   Input,
   Skeleton,
   Spinner,
@@ -17,6 +16,7 @@ import ListPagination from '../shared/ListPagination';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
 import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../shared/helpers';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -224,7 +224,7 @@ function AVSOperatorsList({ address, tvl }) {
           }}
           endContent={<span className="material-symbols-outlined">search</span>}
           onChange={handleInputChange}
-          placeholder="Search by Operator"
+          placeholder="Search by name/address"
           radius="sm"
           type="text"
           value={state.search ?? ''}
@@ -239,28 +239,28 @@ function AVSOperatorsList({ address, tvl }) {
           table: 'h-full'
         }}
         layout="fixed"
+        onSortChange={handleSort}
         removeWrapper
         sortDescriptor={state.sortDescriptor}
-        onSortChange={handleSort}
       >
         <TableHeader>
           <TableColumn
             allowsSorting
-            className="w-64 bg-transparent py-4 text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="text-foreground-active w-64 bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
             key="operator"
           >
             Operators
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
             key="share"
           >
             <span className="inline-block">Share</span>
           </TableColumn>
           <TableColumn
             allowsSorting
-            className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-active data-[hover=true]:text-foreground-2 md:w-1/3"
+            className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
             key="tvl"
           >
             TVL
@@ -306,16 +306,10 @@ function AVSOperatorsList({ address, tvl }) {
                     <span className="min-w-5">
                       {(state.page - 1) * 10 + i + 1}
                     </span>
-                    {op.metadata?.logo ? (
-                      <Image
-                        className="size-8 min-w-8 rounded-full border-2 border-foreground-2 bg-foreground-2"
-                        src={op.metadata?.logo}
-                      />
-                    ) : (
-                      <span className="material-symbols-outlined flex size-8 min-w-8 items-center justify-center rounded-full bg-foreground-2">
-                        question_mark
-                      </span>
-                    )}{' '}
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={op.metadata?.logo}
+                    />
                     <span className="truncate">
                       {op.metadata?.name || op.address}
                     </span>

@@ -1,10 +1,10 @@
-import { colors, protocols } from './helpers';
 import { formatETH, formatUSD } from '../shared/formatters';
+import { protocols } from './helpers';
 
 export default function LRTList({ data }) {
   return (
-    <div className="bg-content1 border border-outline rounded-lg text-sm">
-      <div className="flex flex-row gap-x-2 justify-between items-center p-4 text-xs">
+    <div className="rounded-lg border border-outline bg-content1 text-sm">
+      <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-xs">
         <span className="basis-1/2 ps-6">Protocol</span>
         <span className="basis-1/2 text-end">Total value</span>
       </div>
@@ -12,13 +12,13 @@ export default function LRTList({ data }) {
         .sort(sortProtocols)
         .map(([name, value], i) => (
           <div
+            className="flex flex-row items-center gap-x-2 border-t border-outline px-4 py-2"
             key={name}
-            className="border-t border-outline flex flex-row gap-x-2 items-center px-4 py-2"
           >
             <span className="inline-block min-w-4">{i + 1}</span>
             <span
-              className="min-h-3 inline-block rounded-full min-w-3"
-              style={{ backgroundColor: colors[i] }}
+              className="inline-block min-h-3 min-w-3 rounded-full"
+              style={{ backgroundColor: `hsl(var(--app-chart-${i + 1}))` }}
             ></span>
 
             <span className="basis-full text-foreground-1">
@@ -26,7 +26,7 @@ export default function LRTList({ data }) {
             </span>
             <div className="basis-1/3 ps-9 text-end">
               <div>{formatUSD(value * data.rate)}</div>
-              <div className="text-foreground-1 text-xs">
+              <div className="text-xs text-foreground-1">
                 {formatETH(value)}
               </div>
             </div>
