@@ -100,8 +100,8 @@ export default function LRTTotalValue() {
             </div>
           )}
         </div>
-        <div className="flex basis-1/2 flex-col items-center gap-2">
-          <div className="text-sm text-foreground-2">
+        <div className="flex basis-1/2 flex-col items-center gap-2 ps-2">
+          <div className="text-center text-sm text-foreground-2">
             Percentage on EigenLayer
           </div>
           {(state.isLoadingTVL || state.isLoadingDelegations) && (
