@@ -80,7 +80,7 @@ export default function LRTTotalValue() {
     <>
       <div className="mb-4 flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-4">
         <div className="flex basis-1/2 flex-col items-center gap-2 border-r border-outline">
-          <div className="text-sm text-foreground-2">TVL</div>
+          <div className="text-foreground-2">TVL</div>
           {state.isLoadingDelegations && (
             <Skeleton
               classNames={{ base: 'h-4 w-20 rounded-md border-none' }}
@@ -91,17 +91,17 @@ export default function LRTTotalValue() {
           )}
           {!state.isLoadingDelegations && state.delegations && (
             <div className="text-center">
-              <div className="text-sm text-foreground-1">
+              <div className="text-base text-foreground-1">
                 {formatUSD(state.delegations?.total * state.delegations?.rate)}
               </div>
-              <div className="text-xs text-foreground-2">
+              <div className="text-foreground-2">
                 {formatETH(state.delegations?.total)}
               </div>
             </div>
           )}
         </div>
         <div className="flex basis-1/2 flex-col items-center gap-2 ps-2">
-          <div className="text-center text-sm text-foreground-2">
+          <div className="text-center text-foreground-2">
             Percentage on EigenLayer
           </div>
           {(state.isLoadingTVL || state.isLoadingDelegations) && (
@@ -118,7 +118,7 @@ export default function LRTTotalValue() {
             !state.isLoadingDelegations &&
             state.delegations &&
             state.tvl && (
-              <div className="text-sm text-foreground-1">
+              <div className="text-base text-foreground-1">
                 {Math.round((state.delegations?.total * 100) / state.tvl)}%
               </div>
             )}
