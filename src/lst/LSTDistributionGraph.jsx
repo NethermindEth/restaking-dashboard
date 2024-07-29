@@ -256,22 +256,22 @@ export default function LSTDistributionGraph({
       <div className="flex flex-col items-start justify-center space-y-4 rounded-lg border border-outline bg-content1 p-4">
         <div className="flex w-full flex-col justify-between gap-y-4 sm:flex-row">
           <RateSelector
-            rate={state.currentRate}
             onRateChange={handleRateChange}
+            rate={state.currentRate}
           />
           <GraphTimelineSelector
-            timelineTab={state.currentTimeline}
             onTimelineChange={handleTimelineChange}
+            timelineTab={state.currentTimeline}
           />
         </div>
         <div className="relative">
           <svg
-            ref={containerRef}
-            height={height}
-            width={width}
             className="w-full touch-pan-y"
+            height={height}
+            ref={containerRef}
+            width={width}
           >
-            <Group top={margin.top} left={margin.left}>
+            <Group left={margin.left} top={margin.top}>
               <GridRows
                 className="[&_line]:stroke-primary-50 dark:[&_line]:stroke-primary-900 dark:[&_line]:opacity-10"
                 height={state.maxY}
@@ -294,9 +294,9 @@ export default function LSTDistributionGraph({
                 {({ stacks, path }) =>
                   stacks.map((stack, i) => (
                     <path
-                      key={`stack-${stack.key}`}
                       d={path(stack) || ''}
                       fill={graphColors[i]}
+                      key={`stack-${stack.key}`}
                       onPointerEnter={e => handleAreaPointerMove(e, stack)}
                       onPointerLeave={hideTooltip}
                       onPointerMove={e => handleAreaPointerMove(e, stack)}
@@ -324,8 +324,8 @@ export default function LSTDistributionGraph({
                 left={state.maxX - margin.right}
                 numTicks={4}
                 scale={scaleValue}
-                tickFormat={value => formatNumber(value, true, 0)}
                 tickClassName="[&_line]:stroke-foreground-2"
+                tickFormat={value => formatNumber(value, true, 0)}
                 tickLabelProps={{
                   className: 'text-xs',
                   fill: 'hsl(var(--app-foreground))',
@@ -385,7 +385,7 @@ export default function LSTDistributionGraph({
         </div>
         <ul className="mt-4 w-full pe-8">
           {state.keys?.map((key, i) => (
-            <li key={key} className="me-4 inline-block">
+            <li className="me-4 inline-block" key={key}>
               <div className="flex flex-row items-center gap-1 text-sm">
                 <span
                   className="inline-block h-3 w-3 rounded-full"
@@ -400,9 +400,9 @@ export default function LSTDistributionGraph({
 
       {tooltipOpen && (
         <TooltipInPortal
-          key={Math.random()}
           applyPositionStyle={true}
           className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}

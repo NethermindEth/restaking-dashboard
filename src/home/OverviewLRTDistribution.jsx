@@ -164,8 +164,8 @@ export default function OverviewLRTDistribution({ rate }) {
 
   return (
     <Card
-      radius="md"
       className="space-y-4 border border-outline bg-content1 p-4"
+      radius="md"
     >
       <div className="text-foreground-active px-2 text-lg font-normal">
         LRT Distribution
@@ -176,21 +176,20 @@ export default function OverviewLRTDistribution({ rate }) {
           {Object.entries(mergedLrtData).map(
             ([name, { logo, tvl, percentage }]) => (
               <LRTShare
+                image={logo}
                 key={name}
                 label={name}
-                value={percentage}
-                image={logo}
                 share={tvl}
+                value={percentage}
               />
             )
           )}
         </div>
-        <svg width={width} height={width}>
-          <Group top={half} left={half} className="relative">
+        <svg height={width} width={width}>
+          <Group className="relative" left={half} top={half}>
             <Pie
+              cornerRadius={0}
               data={chartData}
-              pieValue={data => data.amount}
-              outerRadius={half}
               innerRadius={({ data }) => {
                 const size =
                   state.activePieEntry &&
@@ -199,19 +198,20 @@ export default function OverviewLRTDistribution({ rate }) {
                     : 50;
                 return half - size;
               }}
-              cornerRadius={0}
+              outerRadius={half}
               padAngle={0}
+              pieValue={data => data.amount}
             >
               {pie => {
                 return pie.arcs.map(arc => {
                   return (
                     <g
+                      className="cursor-pointer"
                       key={arc.data.label}
                       onMouseEnter={() =>
                         dispatch({ activePieEntry: arc.data })
                       }
                       onMouseLeave={() => dispatch({ activePieEntry: null })}
-                      className="cursor-pointer"
                     >
                       <path d={pie.path(arc)} fill={arc.data.color}></path>
                     </g>
@@ -223,28 +223,28 @@ export default function OverviewLRTDistribution({ rate }) {
             {state.activePieEntry ? (
               <>
                 <Text
-                  textAnchor="middle"
-                  fill="white"
-                  fontWeight={500}
                   className="text-lg"
                   dy={-5}
+                  fill="white"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`$${formatNumber(state.activePieEntry.amount * rate)}`}
                 </Text>
 
                 <Text
-                  textAnchor="middle"
-                  fill="#7CCB69"
-                  fontWeight={500}
                   className="text-xs"
                   dy={15}
+                  fill="#7CCB69"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`${formatNumber(state.activePieEntry.amount)} ETH`}
                 </Text>
 
                 <Text
-                  textAnchor="middle"
                   fill="#CAD7F9"
+                  textAnchor="middle"
                   className="text-sm capitalize"
                   // extra 8 for padding
                   dy={35 + 8}
@@ -255,21 +255,21 @@ export default function OverviewLRTDistribution({ rate }) {
             ) : (
               <>
                 <Text
-                  textAnchor="middle"
-                  fill="white"
-                  fontWeight={500}
                   className="text-lg"
                   dy={5}
+                  fill="white"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`$${formatNumber(totalTVL * rate)}`}
                 </Text>
 
                 <Text
-                  textAnchor="middle"
-                  fill="#7CCB69"
-                  fontWeight={500}
                   className="text-xs"
                   dy={25}
+                  fill="#7CCB69"
+                  fontWeight={500}
+                  textAnchor="middle"
                 >
                   {`${formatNumber(totalTVL)} ETH`}
                 </Text>
@@ -286,7 +286,6 @@ const LRTShare = ({ label, value, image, share }) => {
   return (
     <div className="flex flex-col items-end gap-2 md:flex-row">
       <Progress
-        radius="sm"
         classNames={{
           base: 'w-full lg:w-5/6',
           track: 'border border-default bg-cinder-1 drop-shadow-md',
@@ -294,19 +293,20 @@ const LRTShare = ({ label, value, image, share }) => {
           label: 'text-foreground-active text-sm font-normal capitalize',
           value: 'text-xs font-normal text-white'
         }}
-        label={
-          <div className="flex items-center gap-2">
-            {image && <img src={image} className="size-4 rounded-full" />}{' '}
-            <div>{label}</div>
-          </div>
-        }
-        value={value}
-        showValueLabel={true}
         formatOptions={{
           style: 'percent',
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         }}
+        label={
+          <div className="flex items-center gap-2">
+            {image && <img className="size-4 rounded-full" src={image} />}{' '}
+            <div>{label}</div>
+          </div>
+        }
+        radius="sm"
+        showValueLabel={true}
+        value={value}
       />
       <div className="ml-2 min-w-fit text-sm text-foreground-2">
         {formatNumber(share, true)} ETH

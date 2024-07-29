@@ -35,9 +35,9 @@ export default function Sidebar({ onOpenChange }) {
             : 'border-transparent';
           return (
             <Link
-              key={`nav-item-${i}`}
               className={`flex gap-x-2 border-l-4 px-5 py-5 text-foreground-2 transition-all hover:border-foreground-2 hover:bg-default ${selected}`}
               href={item.href}
+              key={`nav-item-${i}`}
               onClick={handleNavLinkClick}
             >
               <span className="material-symbols-outlined">{item.icon}</span>

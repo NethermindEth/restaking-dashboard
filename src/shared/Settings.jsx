@@ -19,10 +19,10 @@ export default function Settings() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu
-          selectedKeys={[theme]}
           aria-label="theme"
-          selectionMode="single"
           onSelectionChange={key => applyTheme(Array.from(key)[0])}
+          selectedKeys={[theme]}
+          selectionMode="single"
         >
           <DropdownItem
             key="system"

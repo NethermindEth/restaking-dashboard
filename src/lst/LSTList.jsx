@@ -19,8 +19,8 @@ export default function LSTList({ data, latestRate, isLoading }) {
             {data.map(([address, tvl], i) => {
               return (
                 <div
-                  key={`lst-item-${i}`}
                   className="flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline bg-content1 p-4 hover:bg-default"
+                  key={`lst-item-${i}`}
                 >
                   <div className="min-w-5">{i + 1}</div>
                   <div
@@ -58,8 +58,8 @@ const LSTListSkeleton = () => {
     <div>
       {[...Array(10)].map((_, i) => (
         <div
-          key={i}
           className="flex w-full justify-normal gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
+          key={i}
         >
           <div className="w-6/12 md:w-10/12">
             <Skeleton className="h-6 w-4/5 rounded-md dark:bg-default md:w-2/3" />
