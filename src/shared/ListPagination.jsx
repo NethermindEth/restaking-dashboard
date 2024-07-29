@@ -5,7 +5,12 @@ export default function ListPagination({ onChange, page, total }) {
   return (
     <div className="flex items-center justify-center border-t border-outline p-4">
       <Pagination
-        classNames={{ item: styles, next: styles, prev: styles }}
+        classNames={{
+          cursor: 'text-foreground-1',
+          item: styles,
+          next: styles,
+          prev: styles
+        }}
         color="default"
         onChange={onChange}
         page={page}
@@ -17,4 +22,5 @@ export default function ListPagination({ onChange, page, total }) {
   );
 }
 
-const styles = '[&[data-hover=true]:not([data-active=true])]:bg-default';
+const styles =
+  '[&[data-hover=true]:not([data-active=true])]:bg-default text-foreground-2';
