@@ -188,8 +188,8 @@ export default function OperatorList() {
           <Table
             aria-label="Operator list"
             classNames={{
-              base: 'h-full overflow-x-auto',
-              table: 'h-full',
+              base: `${state.operators?.length === 0 ? 'h-full' : ''} overflow-x-auto`,
+              table: state.operators?.length === 0 ? 'h-full' : null,
               thead: '[&>tr:last-child]:hidden'
             }}
             hideHeader={!state.isFetchingData && state.operators.length == 0}
@@ -273,19 +273,9 @@ export default function OperatorList() {
                       </TableCell>
                     </TableRow>
                   ))}
-
-              {!state.isFetchingData &&
-                state.operators?.length > 0 &&
-                [...Array(10 - state.operators.length)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="h-full w-2/5"></TableCell>
-                    <TableCell className="w-1/5"></TableCell>
-                    <TableCell className="w-2/5"></TableCell>
-                  </TableRow>
-                ))}
             </TableBody>
           </Table>
-          {state.operators && state.operators.length !== 0 && (
+          {state.totalPages > 1 && (
             <ListPagination
               onChange={handlePageClick}
               page={parseInt(searchParams.get('page') || '1')}
