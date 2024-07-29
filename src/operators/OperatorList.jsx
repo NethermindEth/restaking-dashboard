@@ -202,7 +202,7 @@ export default function OperatorList() {
               {column => (
                 <TableColumn
                   allowsSorting
-                  className={`text-foreground-active bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 ${column.className}`}
+                  className={`bg-transparent py-4 text-sm font-normal leading-5 text-foreground-1 transition-colors data-[hover=true]:text-foreground-2 ${column.className}`}
                   key={column.key}
                 >
                   {column.label}
