@@ -248,7 +248,7 @@ export default function OperatorList() {
                     >
                       <TableCell className="p-4">
                         <div className="flex items-center gap-x-3">
-                          <span className="min-w-5">
+                          <span className="min-w-5 text-foreground-2">
                             {(searchParams.get('page') - 1) * 10 + i + 1}
                           </span>
                           <ThirdPartyLogo
