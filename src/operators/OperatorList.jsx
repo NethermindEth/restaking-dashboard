@@ -190,7 +190,8 @@ export default function OperatorList() {
             classNames={{
               base: 'h-full overflow-x-auto',
               table: 'h-full',
-              thead: '[&>tr:last-child]:hidden'
+              thead: '[&>tr:last-child]:hidden',
+              emptyWrapper: 'h-[44rem]'
             }}
             hideHeader={!state.isFetchingData && state.operators.length == 0}
             layout="fixed"
@@ -277,8 +278,8 @@ export default function OperatorList() {
               {!state.isFetchingData &&
                 state.operators?.length > 0 &&
                 [...Array(10 - state.operators.length)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="h-full w-2/5"></TableCell>
+                  <TableRow className="h-16" key={i}>
+                    <TableCell className="w-2/5"></TableCell>
                     <TableCell className="w-1/5"></TableCell>
                     <TableCell className="w-2/5"></TableCell>
                   </TableRow>

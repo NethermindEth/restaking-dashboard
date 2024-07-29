@@ -186,7 +186,8 @@ export default function AVSList() {
             classNames={{
               base: 'h-full overflow-x-auto',
               table: 'h-full',
-              thead: '[&>tr:last-child]:hidden'
+              thead: '[&>tr:last-child]:hidden',
+              emptyWrapper: 'h-[44rem]'
             }}
             hideHeader={!state.isFetchingData && state.avs.length == 0}
             layout="fixed"
@@ -275,8 +276,8 @@ export default function AVSList() {
               {!state.isFetchingData &&
                 state.avs?.length > 0 &&
                 [...Array(10 - state.avs.length)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="h-full w-2/5"></TableCell>
+                  <TableRow className="h-16" key={i}>
+                    <TableCell className="w-2/5"></TableCell>
                     <TableCell className="w-1/5"></TableCell>
                     <TableCell className="w-1/5"></TableCell>
                     <TableCell className="w-1/5"></TableCell>
