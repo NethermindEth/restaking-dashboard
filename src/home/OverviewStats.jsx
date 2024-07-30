@@ -9,10 +9,10 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/react';
-import { useCallback, useEffect } from 'react';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatNumber } from '../utils';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
+import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
@@ -45,54 +45,50 @@ export default function OverviewStats({
     return totalEigenLayerTVL / 1e18;
   };
 
-  const fetchOperators = useCallback(async () => {
-    try {
-      dispatch({ isFetchingOperators: true, operatorError: null });
+  useEffect(() => {
+    const fetchOperators = async () => {
+      try {
+        dispatch({ isFetchingOperators: true, operatorError: null });
 
-      const response = await operatorService.getAll(1, 3, null, '-tvl');
+        const response = await operatorService.getAll(1, 3, null, '-tvl');
 
-      dispatch({
-        operators: response.results,
-        isFetchingOperators: false,
-        rate: response.rate,
-        totalOperators: response.totalCount
-      });
-    } catch (e) {
-      if (e.name !== 'AbortError') {
+        dispatch({
+          operators: response.results,
+          isFetchingOperators: false,
+          rate: response.rate,
+          totalOperators: response.totalCount
+        });
+      } catch (e) {
         dispatch({
           operatorError: handleServiceError(e),
           isFetchingOperators: false
         });
       }
-    }
-  }, [operatorService, dispatch]);
+    };
 
-  const fetchAVS = useCallback(async () => {
-    try {
-      dispatch({ isFetchingAVS: true, avsError: null });
+    const fetchAVS = async () => {
+      try {
+        dispatch({ isFetchingAVS: true, avsError: null });
 
-      const response = await avsService.getAll(1, 3, null, '-tvl');
+        const response = await avsService.getAll(1, 3, null, '-tvl');
 
-      dispatch({
-        avs: response.results,
-        isFetchingAVS: false,
-        rate: response.rate,
-        totalAVS: response.totalCount
-      });
-    } catch (e) {
-      if (e.name !== 'AbortError') {
+        dispatch({
+          avs: response.results,
+          isFetchingAVS: false,
+          rate: response.rate,
+          totalAVS: response.totalCount
+        });
+      } catch (e) {
         dispatch({
           avsError: handleServiceError(e),
           isFetchingAVS: false
         });
       }
-    }
-  }, [avsService, dispatch]);
+    };
 
-  useEffect(() => {
     fetchOperators();
     fetchAVS();
-  }, [fetchAVS, fetchOperators]);
+  }, [avsService, dispatch, operatorService]);
 
   return (
     <>
