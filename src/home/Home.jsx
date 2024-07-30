@@ -7,20 +7,20 @@ import { useServices } from '../@services/ServiceContext';
 export default function Home() {
   const { eigenlayerService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    isFetchingEigenlayerTVL: false,
-    eigenlayerTVL: [],
+    isFetchingEigenLayerTVL: false,
+    eigenLayerTVL: [],
     error: null
   });
 
   useEffect(() => {
     async function fetchEigenlayerTVL() {
-      dispatch({ isFetchingEigenlayerTVL: true });
+      dispatch({ isFetchingEigenLayerTVL: true });
 
       try {
         const results = await eigenlayerService.getEigenLayerTVLOvertime();
         dispatch({
-          eigenlayerTVL: results,
-          isFetchingEigenlayerTVL: false
+          eigenLayerTVL: results,
+          isFetchingEigenLayerTVL: false
         });
       } catch (e) {
         dispatch({
@@ -36,9 +36,9 @@ export default function Home() {
   return (
     <div className="flex flex-wrap gap-4">
       <OverviewStats
-        eigenlayerTVL={state.eigenlayerTVL}
-        eigenlayerTVLError={state.error}
-        isFetchingEigenlayerTVL={state.isFetchingEigenlayerTVL}
+        eigenLayerTVL={state.eigenLayerTVL}
+        eigenLayerTVLError={state.error}
+        isFetchingEigenlayerTVL={state.isFetchingEigenLayerTVL}
       />
       <div className="rd-box min-h-44 basis-full"></div>
       <div className="rd-box min-h-44 basis-full"></div>

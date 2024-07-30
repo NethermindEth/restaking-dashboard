@@ -20,8 +20,8 @@ import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function OverviewStats({
   isFetchingEigenlayerTVL,
-  eigenlayerTVL,
-  eigenlayerTVLError
+  eigenLayerTVL,
+  eigenLayerTVLError
 }) {
   const { avsService, operatorService } = useServices();
   const compact = !useTailwindBreakpoint('md');
@@ -37,10 +37,10 @@ export default function OverviewStats({
     totalAVS: 0
   });
 
-  const calculateEigenlayerTVL = () => {
+  const calculateEigenLayerTVL = () => {
     const totalEigenLayerTVL = parseFloat(
-      BigInt(eigenlayerTVL[eigenlayerTVL.length - 1].ethTVL) +
-        BigInt(eigenlayerTVL[eigenlayerTVL.length - 1].lstTVL)
+      BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL) +
+        BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL)
     );
     return totalEigenLayerTVL / 1e18;
   };
@@ -108,29 +108,29 @@ export default function OverviewStats({
             />
           )}
 
-          {!isFetchingEigenlayerTVL && eigenlayerTVLError && (
+          {!isFetchingEigenlayerTVL && eigenLayerTVLError && (
             <ErrorMessage message="Failed loading Eigenlayer TVL" />
           )}
 
-          {!isFetchingEigenlayerTVL && eigenlayerTVL.length > 0 && (
+          {!isFetchingEigenlayerTVL && eigenLayerTVL.length > 0 && (
             <span className="text-center">
-              <span className="text-lg text-white md:text-2xl">
-                {formatETH(calculateEigenlayerTVL(), compact)}
+              <span className="text-lg md:text-2xl">
+                {formatETH(calculateEigenLayerTVL(), compact)}
               </span>
             </span>
           )}
 
           {!isFetchingEigenlayerTVL &&
-            eigenlayerTVL.length > 0 &&
+            eigenLayerTVL.length > 0 &&
             state.rate > 1 && (
               <span className="text-center">
                 <span className="text-sm text-success">
-                  {formatUSD(calculateEigenlayerTVL() * state.rate, compact)}
+                  {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
                 </span>
               </span>
             )}
         </div>
-        <div className="h-fusll flex min-h-10 basis-1/3 flex-col items-center gap-2 border-x border-outline px-2">
+        <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
           <span className="text-center text-xs text-foreground-1 md:text-sm">
             Total AVS
           </span>
@@ -145,7 +145,7 @@ export default function OverviewStats({
           )}
 
           {!state.isFetchingAVS && state.avs.length > 0 && (
-            <span className="text-lg text-white md:text-2xl">
+            <span className="text-lg md:text-2xl">
               {formatNumber(state.totalAVS)}
             </span>
           )}
@@ -165,7 +165,7 @@ export default function OverviewStats({
           )}
 
           {!state.isFetchingOperators && state.operators.length > 0 && (
-            <span className="text-lg text-white md:text-2xl">
+            <span className="text-lg md:text-2xl">
               {formatNumber(state.totalOperators)}
             </span>
           )}
