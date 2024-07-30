@@ -98,7 +98,9 @@ export default function OverviewStats({
     <>
       <div className="rd-box flex min-h-28 basis-full flex-row items-center justify-between py-4">
         <div className="flex basis-1/3 flex-col items-center gap-1">
-          <span className="text-sm text-foreground-1">EigenLayer TVL</span>
+          <span className="text-xs text-foreground-1 md:text-sm">
+            EigenLayer TVL
+          </span>
 
           {isFetchingEigenlayerTVL && (
             <Skeleton
@@ -112,7 +114,7 @@ export default function OverviewStats({
 
           {!isFetchingEigenlayerTVL && eigenlayerTVL.length > 0 && (
             <span className="text-center">
-              <span className="text-2xl text-white">
+              <span className="text-lg text-white md:text-2xl">
                 {formatETH(calculateEigenlayerTVL(), compact)}
               </span>
             </span>
@@ -129,7 +131,7 @@ export default function OverviewStats({
             )}
         </div>
         <div className="h-fusll flex min-h-10 basis-1/3 flex-col items-center gap-2 border-x border-outline px-2">
-          <span className="text-center text-sm text-foreground-1">
+          <span className="text-center text-xs text-foreground-1 md:text-sm">
             Total AVS
           </span>
           {state.isFetchingAVS && (
@@ -143,13 +145,15 @@ export default function OverviewStats({
           )}
 
           {!state.isFetchingAVS && state.avs.length > 0 && (
-            <span className="text-2xl text-white">
+            <span className="text-lg text-white md:text-2xl">
               {formatNumber(state.totalAVS)}
             </span>
           )}
         </div>
         <div className="flex basis-1/3 flex-col items-center gap-1">
-          <span className="text-sm text-foreground-1">Total operators</span>
+          <span className="text-xs text-foreground-1 md:text-sm">
+            Total operators
+          </span>
           {state.isFetchingOperators && (
             <Skeleton
               classNames={{ base: 'h-6 w-28 rounded-md border-none' }}
@@ -161,7 +165,7 @@ export default function OverviewStats({
           )}
 
           {!state.isFetchingOperators && state.operators.length > 0 && (
-            <span className="text-2xl text-white">
+            <span className="text-lg text-white md:text-2xl">
               {formatNumber(state.totalOperators)}
             </span>
           )}
