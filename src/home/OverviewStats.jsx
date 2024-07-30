@@ -109,12 +109,12 @@ export default function OverviewStats({
           )}
 
           {!isFetchingEigenlayerTVL && eigenLayerTVLError && (
-            <ErrorMessage message="Failed loading Eigenlayer TVL" />
+            <ErrorMessage message="Failed loading EigenLayer TVL" />
           )}
 
           {!isFetchingEigenlayerTVL && eigenLayerTVL.length > 0 && (
             <span className="text-center">
-              <span className="text-lg md:text-2xl">
+              <span className="font-display text-lg md:text-2xl">
                 {formatETH(calculateEigenLayerTVL(), compact)}
               </span>
             </span>
@@ -145,7 +145,7 @@ export default function OverviewStats({
           )}
 
           {!state.isFetchingAVS && state.avs.length > 0 && (
-            <span className="text-lg md:text-2xl">
+            <span className="font-display text-lg md:text-2xl">
               {formatNumber(state.totalAVS)}
             </span>
           )}
@@ -165,7 +165,7 @@ export default function OverviewStats({
           )}
 
           {!state.isFetchingOperators && state.operators.length > 0 && (
-            <span className="text-lg md:text-2xl">
+            <span className="font-display text-lg md:text-2xl">
               {formatNumber(state.totalOperators)}
             </span>
           )}
