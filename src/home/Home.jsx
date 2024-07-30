@@ -93,8 +93,8 @@ export default function Home() {
     <div className="space-y-4">
       <div className="flex w-full flex-col items-stretch justify-between gap-4 md:flex-row">
         <Card
-          radius="md"
           className="flex w-full items-center justify-around space-y-4 border border-outline bg-content1 p-4 md:flex-row md:space-y-0"
+          radius="md"
         >
           <div className="space-y-1 text-center">
             <div className="text-sm font-light text-foreground-1">
@@ -122,8 +122,8 @@ export default function Home() {
             )}
           </div>
 
-          <Divider orientation="vertical" className="hidden h-12 md:block" />
-          <Divider orientation="horizontal" className="w-8/12 md:hidden" />
+          <Divider className="hidden h-12 md:block" orientation="vertical" />
+          <Divider className="w-8/12 md:hidden" orientation="horizontal" />
 
           <div className="space-y-1 text-center">
             <div className="text-sm font-light text-foreground-1">
@@ -137,8 +137,8 @@ export default function Home() {
               </div>
             )}
           </div>
-          <Divider orientation="vertical" className="hidden h-12 md:block" />
-          <Divider orientation="horizontal" className="w-8/12 md:hidden" />
+          <Divider className="hidden h-12 md:block" orientation="vertical" />
+          <Divider className="w-8/12 md:hidden" orientation="horizontal" />
           <div className="space-y-1 text-center">
             <div className="text-sm font-light text-foreground-1">
               Total Operators
@@ -152,14 +152,11 @@ export default function Home() {
             )}
           </div>
         </Card>
-        <div className="md:w-2/5">
-          <CallToActions />
-        </div>
       </div>
       <div className="flex flex-col items-stretch justify-between gap-4 md:flex-row">
         <Card
-          radius="md"
           className="w-full space-y-4 border border-outline bg-content1 p-4"
+          radius="md"
         >
           <div className="text-base font-light text-foreground-1">Top AVS</div>
           <div className="text-sm">
@@ -174,9 +171,9 @@ export default function Home() {
               state.topAVS &&
               state.topAVS.map((avs, i) => (
                 <Link
+                  className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 text-sm text-white hover:bg-default`}
                   href={`/avs/${avs.address}`}
                   key={`avs-item-${i}`}
-                  className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 text-sm text-white hover:bg-default`}
                 >
                   <img
                     className="h-5 min-w-5 rounded-full"
@@ -202,8 +199,8 @@ export default function Home() {
           </div>
         </Card>
         <Card
-          radius="md"
           className="w-full space-y-4 border border-outline bg-content1 p-4"
+          radius="md"
         >
           <div className="text-base font-light text-foreground-1">
             Top Operators
@@ -220,9 +217,9 @@ export default function Home() {
               state.topOperators &&
               state.topOperators.map((op, i) => (
                 <Link
+                  className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 text-sm text-white hover:bg-default`}
                   href={`/operators/${op.address}`}
                   key={`avs-item-${i}`}
-                  className={`flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline p-4 text-sm text-white hover:bg-default`}
                 >
                   <img
                     className="h-5 min-w-5 rounded-full"
@@ -259,14 +256,14 @@ const CallToActions = () => {
   return (
     <div className="space-y-2">
       <Link
-        href="https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e"
-        target="_blank"
-        rel="noreferrer"
         className="w-full"
+        href="https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e"
+        rel="noreferrer"
+        target="_blank"
       >
         <Card
-          radius="md"
           className="group flex w-full cursor-pointer flex-row items-center justify-normal gap-3 bg-cinder-1 px-4 py-2.5 hover:bg-cinder-4"
+          radius="md"
         >
           <div>
             <img src="/nethermind.png" />
@@ -283,14 +280,14 @@ const CallToActions = () => {
         </Card>
       </Link>
       <Link
-        href="https://www.nethermind.io/nethermind-security"
-        target="_blank"
-        rel="noreferrer"
         className="w-full"
+        href="https://www.nethermind.io/nethermind-security"
+        rel="noreferrer"
+        target="_blank"
       >
         <Card
-          radius="md"
           className="group flex w-full cursor-pointer flex-row items-center justify-normal gap-3 bg-cinder-1 px-4 py-2.5 hover:bg-cinder-4"
+          radius="md"
         >
           <div>
             <img src="/nethermind.png" />
@@ -315,8 +312,8 @@ const ListSkeleton = () => {
     <div>
       {[...Array(3)].map((item, i) => (
         <div
-          key={i}
           className="flex w-full justify-normal gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
+          key={i}
         >
           <div className="w-6/12 md:w-10/12">
             <Skeleton className="h-6 w-4/5 rounded-md dark:bg-default md:w-2/3" />

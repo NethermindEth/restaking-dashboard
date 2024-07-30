@@ -221,32 +221,28 @@ export default function LRTDistribution({ data, height }) {
 
   return (
     <div
-      ref={rootRef}
       className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
+      ref={rootRef}
     >
-      <div className="mb-6 flex gap-2">
-        <div className="flex flex-1 justify-between gap-2">
-          <div className="hidden sm:block">
-            <div className="text-lg text-foreground-1">Volume trend</div>
-            <div className="text-xs text-foreground-2">{getLatestTotal}</div>
-          </div>
-          <Tabs
-            classNames={tabs}
-            defaultSelectedKey="usd"
-            onSelectionChange={handleRateSelectionChange}
-            size="sm"
-          >
-            <Tab key="usd" title="USD" />
-            <Tab key="eth" title="ETH" />
-          </Tabs>
+      <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
+        <div className="flex-1">
+          <div className="text-base text-foreground-1">Volume trend</div>
+          <div className="text-foreground-2">{getLatestTotal}</div>
         </div>
         <Tabs
           classNames={tabs}
+          defaultSelectedKey="usd"
+          onSelectionChange={handleRateSelectionChange}
+          size="sm"
+        >
+          <Tab key="usd" title="USD" />
+          <Tab key="eth" title="ETH" />
+        </Tabs>
+        <Tabs
+          classNames={tabs}
           defaultSelectedKey="3m"
-          disabledKeys={['1y']}
           onSelectionChange={handleTabSelectionChange}
           size="sm"
-          //variant="bordered"
         >
           <Tab key="1w" title="1W" />
           <Tab key="1m" title="1M" />
@@ -256,8 +252,8 @@ export default function LRTDistribution({ data, height }) {
         </Tabs>
       </div>
       <div className="relative">
-        <svg ref={containerRef} height={height} className="w-full touch-pan-y">
-          <Group top={margin.top} left={margin.left}>
+        <svg className="w-full touch-pan-y" height={height} ref={containerRef}>
+          <Group left={margin.left} top={margin.top}>
             <GridRows
               className="opacity-25 [&_line]:stroke-outline"
               height={state.maxY}
@@ -283,9 +279,9 @@ export default function LRTDistribution({ data, height }) {
 
                   return (
                     <path
-                      key={`stack-${stack.key}`}
                       d={path(stack) || ''}
                       fill={color}
+                      key={`stack-${stack.key}`}
                       onPointerEnter={e => handleAreaPointerMove(e, stack)}
                       onPointerLeave={hideTooltip}
                       onPointerMove={e => handleAreaPointerMove(e, stack)}
@@ -315,8 +311,8 @@ export default function LRTDistribution({ data, height }) {
               left={state.maxX}
               numTicks={4}
               scale={scaleValue}
-              tickFormat={v => formatNumber(v, true)}
               tickClassName="[&_line]:stroke-foreground-2"
+              tickFormat={v => formatNumber(v, true)}
               tickLabelProps={{
                 className: 'text-xs',
                 fill: 'hsl(var(--app-foreground))',
@@ -374,9 +370,9 @@ export default function LRTDistribution({ data, height }) {
       </div>
       {tooltipOpen && (
         <TooltipInPortal
-          key={Math.random()}
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-background/75"
+          className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
+          key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}

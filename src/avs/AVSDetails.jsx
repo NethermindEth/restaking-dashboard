@@ -90,8 +90,8 @@ export default function AVSDetails() {
           tabList: 'w-full rounded-lg border border-outline bg-content1 p-2'
         }}
         disabledKeys={['restakers']}
-        selectedKey={tab ? pathname : pathname + '/tvl'}
         radius="sm"
+        selectedKey={tab ? pathname : pathname + '/tvl'}
         size="lg"
       >
         <Tab

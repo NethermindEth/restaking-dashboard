@@ -227,7 +227,7 @@ function AVSOperatorsList({ address, tvl }) {
           }}
           endContent={<span className="material-symbols-outlined">search</span>}
           onChange={handleInputChange}
-          placeholder="Search by Operator"
+          placeholder="Search by name/address"
           radius="sm"
           type="text"
           value={state.search ?? ''}
@@ -242,9 +242,9 @@ function AVSOperatorsList({ address, tvl }) {
           table: 'h-full'
         }}
         layout="fixed"
+        onSortChange={handleSort}
         removeWrapper
         sortDescriptor={state.sortDescriptor}
-        onSortChange={handleSort}
       >
         <TableHeader>
           <TableColumn

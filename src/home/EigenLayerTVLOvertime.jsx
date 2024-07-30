@@ -32,7 +32,7 @@ const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
 
   return (
     <>
-      <Card radius="md" className="border border-outline bg-content1 p-4">
+      <Card className="border border-outline bg-content1 p-4" radius="md">
         <CardHeader className="flex flex-wrap justify-between gap-3">
           <div className="block space-y-2">
             <div className="font-light">
@@ -42,8 +42,8 @@ const EigenLayerTVLOvertime = ({ eigenTVLData }) => {
             </div>
           </div>
           <GraphTimelineSelector
-            timelineTab={state.timelineTab}
             onTimelineChange={handleTimelineChange}
+            timelineTab={state.timelineTab}
           />
         </CardHeader>
         <CardBody className="w-full space-y-4">

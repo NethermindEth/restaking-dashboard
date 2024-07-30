@@ -52,7 +52,7 @@ export default function LRT() {
         transferred, or used in various DeFi applications.
       </div>
       <LRTTotalValue />
-      <div className="flex flex-col gap-4 xl:flex-row">
+      <div className="flex flex-col gap-4">
         {(state.isLoadingLRTData || state.error) && (
           <div className="flex h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
             {state.isLoadingLRTData && <Spinner color="primary" size="lg" />}

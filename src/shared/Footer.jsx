@@ -16,7 +16,7 @@ export default function Footer() {
       </div>
       <ul className="flex flex-col gap-2 md:flex-row md:gap-8">
         {mainLinks.map((item, i) => (
-          <li key={`footer-main-${i}`} className="flex h-6 items-center">
+          <li className="flex h-6 items-center" key={`footer-main-${i}`}>
             <Link className="text-xs text-foreground-2" href={item.href}>
               {item.title}
               <span className="material-symbols-outlined hidden lg:inline">
@@ -28,7 +28,7 @@ export default function Footer() {
       </ul>
       <ul className="flex flex-col gap-2 md:flex-row md:gap-8">
         {socialLinks.map((item, i) => (
-          <li key={`footer-social-${i}`} className="flex h-6 items-center">
+          <li className="flex h-6 items-center" key={`footer-social-${i}`}>
             <Link
               className={`${item.className} text-xs text-foreground-2`}
               href={item.href}

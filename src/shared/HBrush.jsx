@@ -234,13 +234,13 @@ export default function HBrush({
 
   return (
     <div
-      ref={trackRef}
       className={`cursor-crosshair ${trackClassName ?? ''} touch-pan-y`}
+      ref={trackRef}
       style={trackStyle}
     >
       <div
-        ref={brushRef}
         className={`cursor-move ${brushClassName ?? ''} absolute`}
+        ref={brushRef}
         style={brushStyle}
       >
         {renderHandle && (
@@ -251,8 +251,8 @@ export default function HBrush({
         )}
         {!renderHandle && (
           <>
-            <BrushHandle ref={lHandleRef} left={true} />
-            <BrushHandle ref={rHandleRef} left={false} />
+            <BrushHandle left={true} ref={lHandleRef} />
+            <BrushHandle left={false} ref={rHandleRef} />
           </>
         )}
       </div>

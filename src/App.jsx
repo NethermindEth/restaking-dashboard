@@ -15,20 +15,21 @@ import LST from './lst/LST';
 import { NextUIProvider } from '@nextui-org/react';
 import NotFound from './shared/NotFound';
 import OperatorDetails from './operators/OperatorDetails';
-import OperatorsList from './operators/OperatorsList';
+import OperatorList from './operators/OperatorList';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
+
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route index element={<Home />} />
-      <Route path="/avs" element={<AVSList />} />
-      <Route path="/avs/:address/:tab?" element={<AVSDetails />} />
-      <Route path="/lrt" element={<LRT />} />
-      <Route path="/operators" element={<OperatorsList />} />
-      <Route path="/operators/:address" element={<OperatorDetails />} />
-      <Route path="/lst" element={<LST />} />
-      <Route path="*" element={<NotFound />} />
+    <Route element={<Layout />} path="/">
+      <Route element={<Home />} index />
+      <Route element={<AVSList />} path="/avs" />
+      <Route element={<AVSDetails />} path="/avs/:address/:tab?" />
+      <Route element={<LRT />} path="/lrt" />
+      <Route element={<OperatorList />} path="/operators" />
+      <Route element={<OperatorDetails />} path="/operators/:address" />
+      <Route element={<LST />} path="/lst" />
+      <Route element={<NotFound />} path="*" />
     </Route>
   )
 );
