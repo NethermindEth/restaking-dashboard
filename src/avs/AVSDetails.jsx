@@ -98,7 +98,7 @@ export default function AVSDetails() {
           href={`/avs/${address}/tvl`}
           key={`/avs/${address}/tvl`}
           title={
-            <div className="flex flex-col">
+            <div className="flex flex-col items-center">
               <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
                 Total value
               </div>
@@ -129,7 +129,7 @@ export default function AVSDetails() {
           href={`/avs/${address}/operators`}
           key={`/avs/${address}/operators`}
           title={
-            <div className="flex flex-col">
+            <div className="flex flex-col items-center">
               <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
                 Operators
               </div>
@@ -154,7 +154,7 @@ export default function AVSDetails() {
         <Tab
           key="restakers"
           title={
-            <div className="flex flex-col">
+            <div className="flex flex-col items-center">
               <div className="text-sm">Restakers</div>
               <div>
                 {state.isAVSLoading ? (

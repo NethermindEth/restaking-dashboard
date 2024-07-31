@@ -73,7 +73,7 @@ export default function TVLTabLineChart({ points, height, width }) {
     return scaleLinear({
       domain: [
         Math.min(...state.filteredPoints.map(getValue)),
-        Math.max(...state.filteredPoints.map(getValue))
+        Math.max(...state.filteredPoints.map(getValue)) * 1.1
       ],
       range: [state.maxY, 0]
     });
@@ -146,9 +146,7 @@ export default function TVLTabLineChart({ points, height, width }) {
     <div className="rounded-lg border border-outline bg-content1 p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
         <div className="flex-1">
-          <span className="font-display text-xl text-foreground-1">
-            TVL over time
-          </span>
+          <span className="text-foreground-1">TVL over time</span>
           <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
