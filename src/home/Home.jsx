@@ -1,4 +1,5 @@
 import { handleServiceError, reduceState } from '../shared/helpers';
+import LRTDistribution from './LRTDistribution';
 import OverviewStats from './OverviewStats';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
@@ -41,7 +42,7 @@ export default function Home() {
         isFetchingEigenlayerTVL={state.isFetchingEigenLayerTVL}
       />
       <div className="rd-box min-h-44 basis-full"></div>
-      <div className="rd-box min-h-44 basis-full"></div>
+      <LRTDistribution />
     </div>
   );
 }

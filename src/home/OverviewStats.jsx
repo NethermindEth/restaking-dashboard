@@ -183,22 +183,23 @@ export default function OverviewStats({
 
 function TopAVS({ isLoading, avs, rate, error }) {
   const navigate = useNavigate();
+  const compact = !useTailwindBreakpoint('sm');
   const columns = [
     {
       key: 'avs',
       label: 'AVS',
-      className: 'w-64 md:w-2/5 ps-4'
+      className: 'w-44 md:w-2/5 ps-4'
     },
     {
       key: 'operators',
       label: 'Operators',
-      className: 'text-end w-36 md:w-1/5'
+      className: 'text-end md:w-1/5'
     },
 
     {
       key: 'tvl',
       label: 'TVL',
-      className: 'text-end w-40 md:w-2/5'
+      className: 'text-end md:w-2/5'
     }
   ];
 
@@ -272,12 +273,12 @@ function TopAVS({ isLoading, avs, rate, error }) {
                     </div>
                   </TableCell>
                   <TableCell className="text-end">
-                    {formatNumber(item.operators)}
+                    {formatNumber(item.operators, compact)}
                   </TableCell>
                   <TableCell className="text-end">
-                    <div>{formatUSD(item.strategiesTotal * rate)}</div>
+                    <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
                     <div className="text-xs text-subtitle">
-                      {formatETH(item.strategiesTotal)}
+                      {formatETH(item.strategiesTotal, compact)}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -290,22 +291,23 @@ function TopAVS({ isLoading, avs, rate, error }) {
 
 function TopOperators({ isLoading, operators, rate, error }) {
   const navigate = useNavigate();
+  const compact = !useTailwindBreakpoint('sm');
   const columns = [
     {
       key: 'operator',
       label: 'Operator',
-      className: 'w-64 md:w-2/5 ps-4'
+      className: 'w-44 md:w-2/5 ps-4'
     },
     {
       key: 'restaker',
       label: 'Restakers',
-      className: 'text-end w-36 md:w-1/5'
+      className: 'text-end md:w-1/5'
     },
 
     {
       key: 'tvl',
       label: 'TVL',
-      className: 'text-end w-40 md:w-2/5'
+      className: 'text-end md:w-2/5'
     }
   ];
 
@@ -379,12 +381,14 @@ function TopOperators({ isLoading, operators, rate, error }) {
                     </div>
                   </TableCell>
                   <TableCell className="text-end">
-                    {formatNumber(operator.stakerCount)}
+                    {formatNumber(operator.stakerCount, compact)}
                   </TableCell>
                   <TableCell className="text-end">
-                    <div>{formatUSD(operator.strategiesTotal * rate)}</div>
+                    <div>
+                      {formatUSD(operator.strategiesTotal * rate, compact)}
+                    </div>
                     <div className="text-xs text-subtitle">
-                      {formatETH(operator.strategiesTotal)}
+                      {formatETH(operator.strategiesTotal, compact)}
                     </div>
                   </TableCell>
                 </TableRow>
