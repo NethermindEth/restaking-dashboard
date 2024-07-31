@@ -327,7 +327,7 @@ function LineChart({ points, height, width }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
           key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
