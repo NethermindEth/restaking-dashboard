@@ -93,14 +93,14 @@ export default function OverviewStats({
   return (
     <>
       <div className="rd-box flex min-h-28 basis-full flex-row items-center justify-between py-4">
-        <div className="flex basis-1/3 flex-col items-center gap-1">
+        <div className="flex basis-1/3 flex-col items-center gap-1 px-2">
           <span className="text-xs text-foreground-1 md:text-sm">
             EigenLayer TVL
           </span>
 
           {isFetchingEigenlayerTVL && (
             <Skeleton
-              classNames={{ base: 'h-6 w-28 rounded-md border-none' }}
+              classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
             />
           )}
 
@@ -119,20 +119,18 @@ export default function OverviewStats({
           {!isFetchingEigenlayerTVL &&
             eigenLayerTVL.length > 0 &&
             state.rate > 1 && (
-              <span className="text-center">
-                <span className="text-sm text-success">
-                  {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
-                </span>
+              <span className="text-sm text-success">
+                {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
               </span>
             )}
         </div>
         <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
-          <span className="text-center text-xs text-foreground-1 md:text-sm">
+          <span className="text-xs text-foreground-1 md:text-sm">
             Total AVS
           </span>
           {state.isFetchingAVS && (
             <Skeleton
-              classNames={{ base: 'h-6 w-28 rounded-md border-none' }}
+              classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
             />
           )}
 
@@ -146,13 +144,13 @@ export default function OverviewStats({
             </span>
           )}
         </div>
-        <div className="flex basis-1/3 flex-col items-center gap-1">
+        <div className="flex basis-1/3 flex-col items-center gap-1 px-2">
           <span className="text-xs text-foreground-1 md:text-sm">
             Total operators
           </span>
           {state.isFetchingOperators && (
             <Skeleton
-              classNames={{ base: 'h-6 w-28 rounded-md border-none' }}
+              classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
             />
           )}
 
@@ -189,7 +187,7 @@ function TopAVS({ isLoading, avs, rate, error }) {
     {
       key: 'avs',
       label: 'AVS',
-      className: 'w-64 md:w-2/5 ps-12'
+      className: 'w-64 md:w-2/5 ps-4'
     },
     {
       key: 'operators',
@@ -296,7 +294,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
     {
       key: 'operator',
       label: 'Operator',
-      className: 'w-64 md:w-2/5 ps-12'
+      className: 'w-64 md:w-2/5 ps-4'
     },
     {
       key: 'restaker',
