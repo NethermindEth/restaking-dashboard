@@ -1,15 +1,15 @@
 import { apiGet } from './apiCall';
+import BaseService from './BaseService';
 
-export default class EigenlayerService {
+export default class EigenlayerService extends BaseService {
   async getEigenLayerTVLOvertime() {
-    const response = await apiGet(`/eigenlayer/tvl`);
+    const response = await BaseService._get(`/eigenlayer/tvl`);
 
     if (response.ok) {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 
   async getEigenLayerLSTTotalValue() {

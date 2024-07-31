@@ -2,11 +2,12 @@ import { apiGet } from './apiCall';
 import BaseService from './BaseService';
 
 export default class OperatorService extends BaseService {
-  async getAll(pageNumber, search, sort, signal) {
+  async getAll(pageNumber, pageSize = 10, search, sort, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
     const response = await BaseService._get(`operators`, {
       query: {
         'page-index': pageIndex,
+        'page-size': pageSize,
         search,
         sort
       },

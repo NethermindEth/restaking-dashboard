@@ -78,6 +78,7 @@ export default function AVSList() {
 
         const response = await avsService.getAll(
           pageNumber,
+          10,
           search,
           sort,
           abortController.current.signal
