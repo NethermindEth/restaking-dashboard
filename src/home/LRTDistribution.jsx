@@ -3,8 +3,8 @@ import { Progress, Spinner } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatETH } from '../shared/formatters';
 import LRTDistributionPieChart from './charts/LRTDistributionPieChart';
-import { lrtProtocolsMapping } from '../lrt/helpers';
 import { ParentSize } from '@visx/responsive';
+import { protocols } from '../lrt/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
@@ -31,7 +31,7 @@ export default function LRTDistribution() {
 
         Object.keys(results.protocols).forEach(p => {
           const lrt = {
-            ...lrtProtocolsMapping[p]
+            ...protocols[p]
           };
           lrt.tvl = results.protocols[p];
           lrtTVL += results.protocols[p];
