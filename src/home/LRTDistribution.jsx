@@ -116,11 +116,6 @@ function LRTShare({ label, logo, tvl, value }) {
         label: 'text-sm font-normal text-foreground-1',
         value: 'text-sm font-normal text-foreground'
       }}
-      formatOptions={{
-        style: 'percent',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }}
       label={
         <div className="flex items-center gap-x-2">
           <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
