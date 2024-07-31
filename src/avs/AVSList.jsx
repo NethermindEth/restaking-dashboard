@@ -185,8 +185,8 @@ export default function AVSList() {
           <Table
             aria-label="AVS list"
             classNames={{
-              base: 'h-full overflow-x-auto',
-              table: 'h-full',
+              base: `${state.avs?.length === 0 ? 'h-full' : ''} overflow-x-auto`,
+              table: state.avs?.length === 0 ? 'h-full' : null,
               thead: '[&>tr:last-child]:hidden'
             }}
             hideHeader={!state.isFetchingData && state.avs.length == 0}
@@ -272,20 +272,9 @@ export default function AVSList() {
                       </TableCell>
                     </TableRow>
                   ))}
-
-              {!state.isFetchingData &&
-                state.avs?.length > 0 &&
-                [...Array(10 - state.avs.length)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="h-full w-2/5"></TableCell>
-                    <TableCell className="w-1/5"></TableCell>
-                    <TableCell className="w-1/5"></TableCell>
-                    <TableCell className="w-1/5"></TableCell>
-                  </TableRow>
-                ))}
             </TableBody>
           </Table>
-          {state.avs && state.avs.length !== 0 && (
+          {state.totalPages > 1 && (
             <ListPagination
               onChange={handlePageClick}
               page={parseInt(searchParams.get('page') || '1')}
