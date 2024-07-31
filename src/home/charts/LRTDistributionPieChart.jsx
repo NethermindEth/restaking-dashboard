@@ -84,7 +84,7 @@ export default function LRTDistributionPieChart({
               fill="hsl(var(--app-foreground))"
               textAnchor="middle"
             >
-              {formatUSD(state.active.tvl * ethRate, true)}
+              {formatUSD(state.active.tvl * ethRate)}
             </Text>
             <Text
               className="text-sm"
@@ -92,7 +92,7 @@ export default function LRTDistributionPieChart({
               fill="hsl(var(--app-foreground-1))"
               textAnchor="middle"
             >
-              {formatETH(state.active.tvl, true)}
+              {formatETH(state.active.tvl)}
             </Text>
             <Text
               className="text-sm"
@@ -106,7 +106,7 @@ export default function LRTDistributionPieChart({
         ) : (
           <>
             <Text dy={0} fill="hsl(var(--app-foreground))" textAnchor="middle">
-              {formatUSD(lrtTVL * ethRate, true)}
+              {formatUSD(lrtTVL * ethRate)}
             </Text>
             <Text
               className="text-sm"
@@ -114,7 +114,7 @@ export default function LRTDistributionPieChart({
               fill="hsl(var(--app-foreground-1))"
               textAnchor="middle"
             >
-              {formatETH(lrtTVL, true)}
+              {formatETH(lrtTVL)}
             </Text>
           </>
         )}
