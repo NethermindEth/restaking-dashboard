@@ -10,3 +10,46 @@ export const protocols = {
   renzo: { index: 2, name: 'Renzo' },
   swell: { index: 5, name: 'Swell' }
 };
+
+export const lrtProtocolsMapping = {
+  bedrock: {
+    name: 'Bedrock',
+    logo: '/bedrock.jpg'
+  },
+  eigenpie: {
+    name: 'Eigenpie',
+    logo: '/eigenpie.jpg'
+  },
+  etherfi: {
+    name: 'Ether.fi',
+    logo: '/etherfi.jpg'
+  },
+  renzo: {
+    name: 'Renzo',
+    logo: '/renzo.svg'
+  },
+  euclid: {
+    name: 'Euclid',
+    logo: '/euclid.jpg'
+  },
+  inception: {
+    name: 'Inception',
+    logo: '/inception.png'
+  },
+  kelp: {
+    name: 'Kelp',
+    logo: '/kelp.jpg'
+  },
+  prime: {
+    name: 'Prime',
+    logo: '/prime.png'
+  },
+  puffer: {
+    name: 'Puffer',
+    logo: '/puffer.jpg'
+  },
+  swell: {
+    name: 'Swell',
+    logo: '/swell.jpg'
+  }
+};

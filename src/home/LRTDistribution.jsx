@@ -3,6 +3,7 @@ import { Progress, Spinner } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatETH } from '../shared/formatters';
 import LRTDistributionPieChart from './charts/LRTDistributionPieChart';
+import { lrtProtocolsMapping } from '../lrt/helpers';
 import { ParentSize } from '@visx/responsive';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useEffect } from 'react';
@@ -30,7 +31,7 @@ export default function LRTDistribution() {
 
         Object.keys(results.protocols).forEach(p => {
           const lrt = {
-            ...lrtMapping[p]
+            ...lrtProtocolsMapping[p]
           };
           lrt.tvl = results.protocols[p];
           lrtTVL += results.protocols[p];
@@ -138,46 +139,3 @@ function LRTShare({ label, logo, tvl, value }) {
     />
   );
 }
-
-const lrtMapping = {
-  bedrock: {
-    name: 'Bedrock',
-    logo: new URL('/bedrock.jpg', import.meta.url).href
-  },
-  eigenpie: {
-    name: 'Eigenpie',
-    logo: new URL('/eigenpie.jpg', import.meta.url).href
-  },
-  etherfi: {
-    name: 'Ether.fi',
-    logo: new URL('/etherfi.jpg', import.meta.url).href
-  },
-  renzo: {
-    name: 'Renzo',
-    logo: new URL('/renzo.svg', import.meta.url).href
-  },
-  euclid: {
-    name: 'Euclid',
-    logo: new URL('/euclid.jpg', import.meta.url).href
-  },
-  inception: {
-    name: 'Inception',
-    logo: new URL('/inception.png', import.meta.url).href
-  },
-  kelp: {
-    name: 'Kelp',
-    logo: new URL('/kelp.jpg', import.meta.url).href
-  },
-  prime: {
-    name: 'Prime',
-    logo: new URL('/prime.png', import.meta.url).href
-  },
-  puffer: {
-    name: 'Puffer',
-    logo: new URL('/puffer.jpg', import.meta.url).href
-  },
-  swell: {
-    name: 'Swell',
-    logo: new URL('/swell.jpg', import.meta.url).href
-  }
-};
