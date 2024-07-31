@@ -1,7 +1,7 @@
 import { handleServiceError, reduceState } from '../shared/helpers';
 import { Progress, Spinner } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
-import { formatNumber } from '../shared/formatters';
+import { formatETH } from '../shared/formatters';
 import LRTDistributionPieChart from './charts/LRTDistributionPieChart';
 import { ParentSize } from '@visx/responsive';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
@@ -108,34 +108,34 @@ export default function LRTDistribution() {
 
 function LRTShare({ label, logo, tvl, value }) {
   return (
-    <div className="flex flex-col items-end gap-2 lg:flex-row">
-      <Progress
-        classNames={{
-          base: 'w-full lg:w-5/6',
-          track: 'border border-default bg-outline',
-          indicator: 'bg-foreground-2',
-          label: 'text-sm font-normal text-foreground-1',
-          value: 'text-sm font-normal text-foreground'
-        }}
-        formatOptions={{
-          style: 'percent',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }}
-        label={
-          <div className="flex items-center gap-x-2">
-            <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
-            {label}
-          </div>
-        }
-        radius="sm"
-        showValueLabel={true}
-        value={value}
-      />
-      <div className="ml-2 min-w-fit text-sm text-foreground-2">
-        {formatNumber(tvl, true)} ETH
-      </div>
-    </div>
+    <Progress
+      classNames={{
+        track: 'border border-default bg-outline',
+        indicator: 'bg-foreground-2',
+        label: 'text-sm font-normal text-foreground-1',
+        value: 'text-sm font-normal text-foreground'
+      }}
+      formatOptions={{
+        style: 'percent',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }}
+      label={
+        <div className="flex items-center gap-x-2">
+          <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
+          {label}
+        </div>
+      }
+      radius="sm"
+      showValueLabel={true}
+      value={value}
+      valueLabel={
+        <div className="flex items-center gap-x-2">
+          <span>{value.toFixed(1)}%</span>
+          <span className="text-foreground-1">{formatETH(tvl)}</span>
+        </div>
+      }
+    />
   );
 }
 
