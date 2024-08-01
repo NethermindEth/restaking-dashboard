@@ -1,13 +1,12 @@
 import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { formatETH, formatUSD } from '../../shared/formatters';
+import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
-import { formatNumber } from '../../utils';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import HBrush from '../../shared/HBrush';
