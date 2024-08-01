@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from '@nextui-org/react';
 import { useCallback } from 'react';
+import RestakingLogo from './ResatkingLogo';
 
 export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
@@ -20,11 +21,7 @@ export default function Sidebar({ onOpenChange }) {
   return (
     <div>
       <header className="flex-none border-l-4 border-transparent px-5 pb-8 pt-6">
-        <img
-          alt="Restaking Dashboard"
-          className="h-6 lg:h-5"
-          src="/assets/logo-h.svg"
-        />
+        <RestakingLogo />
       </header>
       <nav className="flex-none">
         {navItems.map((item, i) => {
