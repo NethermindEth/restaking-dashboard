@@ -43,9 +43,9 @@ export default function Home() {
         isFetchingEigenlayerTVL={state.isFetchingEigenLayerTVL}
       />
       <EigenLayerTVL
-        eigenLayerTVL={state.eigenLayerTVL}
-        eigenLayerTVLError={state.error}
-        isFetchingEigenLayerTVL={state.isFetchingEigenLayerTVL}
+        error={state.error}
+        isFetching={state.isFetchingEigenLayerTVL}
+        tvl={state.eigenLayerTVL}
       />
       <LRTDistribution />
     </div>
