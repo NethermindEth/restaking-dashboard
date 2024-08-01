@@ -118,7 +118,7 @@ function LRTShare({ label, logo, tvl, value }) {
       }}
       label={
         <div className="flex items-center gap-x-2">
-          <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
+          <ThirdPartyLogo className="size-6 min-w-6" url={logo} />
           {label}
         </div>
       }
