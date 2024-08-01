@@ -61,9 +61,6 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
             ...eigenLayerTVL.map(d => {
               let value = 0;
 
-              //   for (let k in d.protocols) {
-              //     value += d.protocols[k];
-              //   }
               value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
               value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
@@ -98,11 +95,6 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
             ...state.filteredData.map(d => {
               let value = 0;
 
-              //   for (let k in d.protocols) {
-              //     value += d.protocols[k];
-              //   }
-              //   console.log(d.ethTVL);
-
               value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
               value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
@@ -115,6 +107,16 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
       }),
     [state.useRate, state.filteredData, state.maxY]
   );
+
+  const getLatestTotal = useMemo(() => {
+    const last = eigenLayerTVL[eigenLayerTVL.length - 1];
+    let total = 0;
+
+    total += parseFloat(BigInt(last.ethTVL) / BigInt(1e18));
+    total += parseFloat(BigInt(last.lstTVL) / BigInt(1e18));
+
+    return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
+  }, [eigenLayerTVL, state.useRate]);
 
   const getValue = useCallback(
     (d, k) =>
@@ -210,11 +212,6 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
     dispatch({
       brushData: eigenLayerTVL?.map(d => {
         let value = 0;
-
-        // for (let k in d.protocols) {
-        //   value += d.protocols[k];
-        // }
-
         value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
         value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
@@ -222,9 +219,13 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
       }),
       brushPosition: {
         start: scaleBrushDate(
-          eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
+          new Date(
+            eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
+          ).getTime()
         ),
-        end: scaleBrushDate(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp)
+        end: scaleBrushDate(
+          new Date(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp).getTime()
+        )
       },
       filteredData: eigenLayerTVL.slice(-90)
     });
@@ -233,10 +234,14 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
   return (
     <div className="rd-box min-h-44 basis-full p-4" ref={rootRef}>
       <div className="mb-6 flex flex-wrap items-start justify-end gap-2 md:items-center">
-        <div className="flex-1 text-foreground-1">TVL over time</div>
+        <div className="flex-1">
+          <div className="text-base text-foreground-1">TVL over time</div>
+          <div className="text-sm text-foreground-2">{getLatestTotal}</div>
+        </div>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="usd"
+          defaultSelectedKey="eth"
+          disabledKeys={['usd']}
           onSelectionChange={handleRateSelectionChange}
           size="sm"
         >
@@ -291,7 +296,6 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                       onPointerLeave={hideTooltip}
                       onPointerMove={e => handleAreaPointerMove(e, stack)}
                       stroke={color}
-                      // opacity={0.75}
                     />
                   );
                 })
@@ -329,7 +333,6 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
               axisLineClassName="stroke-foreground-2"
               innerRef={dateAxisRef}
               numTicks={Math.round(state.maxX / 120)}
-              // rangePadding={margin.right}
               scale={scaleDate}
               tickClassName="[&_line]:stroke-foreground-2"
               tickFormat={formatDate}
@@ -412,7 +415,6 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 </span>
               </div>
             </li>
-
             <li>
               <div
                 className={`${'lstTVL' === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
@@ -420,7 +422,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 <span
                   className={`inline-block h-3 w-3 rounded-full`}
                   style={{
-                    backgroundColor: `hsl(var(--app-chart-1))`
+                    backgroundColor: `hsl(var(--app-chart-2))`
                   }}
                 ></span>
                 LST
