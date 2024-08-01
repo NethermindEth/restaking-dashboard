@@ -1,5 +1,6 @@
 import { Button, Modal, ModalContent, useDisclosure } from '@nextui-org/react';
 import Sidebar from './Sidebar';
+import RestakingLogo from './ResatkingLogo';
 
 export default function Header() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -16,11 +17,7 @@ export default function Header() {
         >
           <span className="material-symbols-outlined">menu</span>
         </Button>
-        <img
-          alt="Restaking Dashboard"
-          className="h-6 lg:h-5"
-          src="/assets/logo-h.svg"
-        />
+        <RestakingLogo />
         <Modal
           classNames={{
             base: 'm-0 h-full w-full rounded-none p-0 sm:m-0',

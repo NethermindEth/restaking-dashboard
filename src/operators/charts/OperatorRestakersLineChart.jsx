@@ -138,7 +138,7 @@ function LineChart({ points, height, width }) {
     return scaleLinear({
       domain: [
         Math.min(...state.filteredPoints.map(getValue)),
-        Math.max(...state.filteredPoints.map(getValue))
+        Math.max(...state.filteredPoints.map(getValue)) * 1.1
       ],
       range: [state.maxY, 0]
     });
@@ -200,9 +200,7 @@ function LineChart({ points, height, width }) {
     <div className="rounded-lg border border-outline bg-content1 p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
         <div className="flex-1">
-          <span className="font-display text-xl text-foreground-1">
-            Restakers over time
-          </span>
+          <span className="text-foreground-1">Restakers over time</span>
           <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
@@ -301,7 +299,7 @@ function LineChart({ points, height, width }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
           key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
