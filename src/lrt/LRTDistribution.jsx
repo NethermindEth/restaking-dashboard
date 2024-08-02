@@ -315,7 +315,7 @@ export default function LRTDistribution({ data, height }) {
               tickFormat={v => formatNumber(v, true)}
               tickLabelProps={{
                 className: 'text-xs',
-                fill: 'hsl(var(--app-foreground))',
+                fill: 'hsl(var(--app-foreground-1))',
                 fontFamily: null,
                 fontSize: null
               }}
@@ -330,7 +330,7 @@ export default function LRTDistribution({ data, height }) {
               tickFormat={formatDate}
               tickLabelProps={{
                 className: 'text-xs',
-                fill: 'hsl(var(--app-foreground))',
+                fill: 'hsl(var(--app-foreground-1))',
                 fontFamily: null,
                 fontSize: null
               }}

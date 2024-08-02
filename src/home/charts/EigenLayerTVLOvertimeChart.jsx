@@ -346,7 +346,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
               tickFormat={v => formatNumber(v, true)}
               tickLabelProps={{
                 className: 'text-xs',
-                fill: 'hsl(var(--app-foreground))',
+                fill: 'hsl(var(--app-foreground-1))',
                 fontFamily: null,
                 fontSize: null
               }}
@@ -360,7 +360,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
               tickFormat={formatDate}
               tickLabelProps={{
                 className: 'text-xs',
-                fill: 'hsl(var(--app-foreground))',
+                fill: 'hsl(var(--app-foreground-1))',
                 fontFamily: null,
                 fontSize: null
               }}
@@ -398,6 +398,28 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           />
         </div>
       </div>
+      <div className="mt-4">
+        <ul className="w-full text-foreground-1">
+          <li className="me-4 inline-block">
+            <div className="flex flex-row items-center gap-1 text-sm">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: 'hsl(var(--app-chart-1))' }}
+              ></span>
+              ETH
+            </div>
+          </li>
+          <li className="me-4 inline-block">
+            <div className="flex flex-row items-center gap-1 text-sm">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: 'hsl(var(--app-chart-2))' }}
+              ></span>
+              LST
+            </div>
+          </li>
+        </ul>
+      </div>
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
@@ -416,9 +438,9 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 className={`${'ethTVL' === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
               >
                 <span
-                  className={`inline-block h-3 w-3 rounded-full`}
+                  className="inline-block h-3 w-3 rounded-full"
                   style={{
-                    backgroundColor: `hsl(var(--app-chart-1))`
+                    backgroundColor: 'hsl(var(--app-chart-1))'
                   }}
                 ></span>
                 ETH
@@ -442,9 +464,9 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 className={`${'lstTVL' === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
               >
                 <span
-                  className={`inline-block h-3 w-3 rounded-full`}
+                  className="inline-block h-3 w-3 rounded-full"
                   style={{
-                    backgroundColor: `hsl(var(--app-chart-2))`
+                    backgroundColor: 'hsl(var(--app-chart-2))'
                   }}
                 ></span>
                 LST
