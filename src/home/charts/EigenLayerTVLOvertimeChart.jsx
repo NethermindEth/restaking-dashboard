@@ -21,7 +21,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
     keys: ['ethTVL', 'lstTVL'],
     maxX: 0,
     maxY: 0,
-    useRate: false
+    useRate: true
   });
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -233,8 +233,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
         </div>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="eth"
-          disabledKeys={['usd']}
+          defaultSelectedKey="usd"
           onSelectionChange={handleRateSelectionChange}
           size="sm"
         >
