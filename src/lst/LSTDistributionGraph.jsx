@@ -1,58 +1,45 @@
-import { useTooltip } from '@visx/tooltip';
+import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
+import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import { scaleLinear, scaleUtc } from '@visx/scale';
+import { Tab, Tabs } from '@nextui-org/react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { allStrategyAssetMapping } from '../shared/strategies';
+import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
-import { localPoint } from '@visx/event';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
-import { scaleLinear, scaleUtc } from '@visx/scale';
-import { AreaClosed, AreaStack } from '@visx/shape';
-import { bisector } from '@visx/vendor/d3-array';
-import { useTooltipInPortal } from '@visx/tooltip';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useMutativeReducer } from 'use-mutative';
 import HBrush from '../shared/HBrush';
+import { localPoint } from '@visx/event';
 import { reduceState } from '../shared/helpers';
-import { graphColors, STRATEGY_ASSET_MAPPING } from './helpers';
-import { formatNumber } from '../utils';
-import GraphTimelineSelector from '../shared/GraphTimelineSelector';
+import { tabs } from '../shared/slots';
+import { useMutativeReducer } from 'use-mutative';
+import { useTooltip } from '@visx/tooltip';
+import { useTooltipInPortal } from '@visx/tooltip';
 
 const brushSize = { height: 50, marginTop: 20 };
 const margin = { top: 8, right: 40, bottom: 35, left: 1 };
 
-const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
-  day: 'numeric',
-  month: 'short'
-});
-const bisectDate = bisector(i => i.data.timestamp).left;
-const formatDate = date => {
-  if (date.getMonth() == 0 && date.getDate() == 1) {
-    return date.getFullYear();
-  }
-
-  return axisDateFormatter.format(date);
-};
 const getDate = d => new Date(d.timestamp);
+const bisectDate = bisector(stack => stack.data.timestamp).left;
 
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
-const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium'
-});
 
 export default function LSTDistributionGraph({
-  data,
   rankings,
   height,
-  width
+  width,
+  points
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    currentTimeline: 'all',
-    currentRate: 'usd',
-    filteredData: [],
+    error: undefined,
+    filteredPoints: points,
     keys: [],
     maxX: 0,
-    maxY: 0
+    maxY: 0,
+    useRate: true
   });
 
   useEffect(() => {
@@ -60,7 +47,7 @@ export default function LSTDistributionGraph({
       maxX: width - margin.left - margin.right,
       maxY: height - margin.top - margin.bottom
     });
-  }, [height, width]);
+  }, [dispatch, height, width]);
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -74,24 +61,22 @@ export default function LSTDistributionGraph({
     tooltipOpen,
     tooltipTop
   } = useTooltip();
-  const scaleBrushDate = useMemo(
-    () =>
-      scaleUtc({
-        domain: [
-          Math.min(...data.map(getDate)),
-          Math.max(...data.map(getDate))
-        ],
-        range: [0, state.maxX - margin.right - 2] // y-axis and 2 for brush borders
-      }),
-    [data, state.maxX]
-  );
+  const scaleBrushDate = useMemo(() => {
+    return scaleUtc({
+      domain: [
+        Math.min(...points.map(getDate)),
+        Math.max(...points.map(getDate))
+      ],
+      range: [0, state.maxX - margin.right - 2] // y-axis and 2 for brush borders
+    });
+  }, [points, state.maxX]);
   const scaleBrushValue = useMemo(
     () =>
       scaleLinear({
         domain: [
           0,
           Math.max(
-            ...data.map(d => {
+            ...state.filteredPoints.map(d => {
               let value = 0;
 
               for (let strategy in d.tvl) {
@@ -105,18 +90,18 @@ export default function LSTDistributionGraph({
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    [data]
+    [state.filteredPoints]
   );
   const scaleDate = useMemo(
     () =>
       scaleUtc({
         domain: [
-          Math.min(...state.filteredData.map(getDate)),
-          Math.max(...state.filteredData.map(getDate))
+          Math.min(...state.filteredPoints.map(getDate)),
+          Math.max(...state.filteredPoints.map(getDate))
         ],
         range: [0, state.maxX - margin.right]
       }),
-    [state.filteredData, state.maxX]
+    [state.filteredPoints, state.maxX]
   );
   const scaleValue = useMemo(
     () =>
@@ -124,40 +109,40 @@ export default function LSTDistributionGraph({
         domain: [
           0,
           Math.max(
-            ...state.filteredData.map(d => {
+            ...state.filteredPoints.map(d => {
               let value = 0;
 
               for (let strategy in d.tvl) {
                 value += d.tvl[strategy];
               }
 
-              return value * (state.currentRate === 'usd' ? d.rate : 1);
+              return value * (state.useRate ? d.rate : 1);
             })
           ) * 1.2 // 20% padding
         ],
         nice: true,
         range: [state.maxY - brushSize.marginTop - margin.bottom, 0]
       }),
-    [state.currentRate, state.filteredData, state.maxY]
+    [state.useRate, state.filteredPoints, state.maxY]
   );
 
   const getValue = useCallback(
     (d, strategy) => {
-      return d.tvl[strategy] * (state.currentRate === 'usd' ? d.rate : 1);
+      return d.tvl[strategy] * (state.useRate ? d.rate : 1);
     },
-    [state.currentRate]
+    [state.useRate]
   );
 
   const handleBrushChange = useCallback(
     domain => {
       const { x0, x1 } = domain;
-      const filtered = data.filter(s => {
+      const filtered = points.filter(s => {
         return s.timestamp >= x0 && s.timestamp <= x1;
       });
 
-      dispatch({ brushPosition: null, filteredData: filtered });
+      dispatch({ brushPosition: null, filteredPoints: filtered });
     },
-    [data, dispatch]
+    [dispatch, points]
   );
   const handleAreaPointerMove = useCallback(
     (event, stack) => {
@@ -179,7 +164,7 @@ export default function LSTDistributionGraph({
 
   useEffect(() => {
     dispatch({
-      brushData: data?.map(d => {
+      brushData: points?.map(d => {
         let value = 0;
 
         for (let strategy in d.tvl) {
@@ -189,80 +174,75 @@ export default function LSTDistributionGraph({
         return { timestamp: d.timestamp, value };
       }),
       brushPosition: {
-        start: scaleBrushDate(data[0]?.timestamp),
-        end: scaleBrushDate(data[data.length - 1]?.timestamp)
+        start: scaleBrushDate(points[points.length - 1 - 90].timestamp),
+        end: scaleBrushDate(points[points.length - 1].timestamp)
       },
+      filterPoints: points.slice(-90),
       keys: rankings.map(ranking => ranking[0])
     });
-  }, [data, dispatch, scaleBrushDate]);
+  }, [dispatch, points, rankings, scaleBrushDate]);
 
-  useEffect(() => {
-    switch (state.currentTimeline) {
-      case '7days':
-        {
-          const filteredData = data.slice(-7);
-          dispatch({
-            filteredData,
-            brushPosition: {
-              start: scaleBrushDate(filteredData[0].timestamp),
-              end: scaleBrushDate(
-                filteredData[filteredData.length - 1].timestamp
-              )
-            }
-          });
-        }
-        break;
-      case '30days':
-        {
-          const filteredData = data.slice(-30);
-          dispatch({
-            filteredData,
-            brushPosition: {
-              start: scaleBrushDate(filteredData[0].timestamp),
-              end: scaleBrushDate(
-                filteredData[filteredData.length - 1].timestamp
-              )
-            }
-          });
-        }
-        break;
-      default:
-        dispatch({
-          filteredData: data,
-          brushPosition: {
-            start: scaleBrushDate(data[0]?.timestamp),
-            end: scaleBrushDate(data[data.length - 1]?.timestamp)
-          }
-        });
+  const getLatestTotal = useMemo(() => {
+    const latest = points[points.length - 1];
+
+    let total = 0;
+
+    for (const strategy in latest.tvl) {
+      total += latest.tvl[strategy];
     }
-  }, [data, state.currentTimeline]);
 
-  const handleTimelineChange = useCallback(
-    timeline => {
-      dispatch({ currentTimeline: timeline });
+    return state.useRate ? formatUSD(total * latest.rate) : formatETH(total);
+  }, [points, state.useRate]);
+
+  const handleTimelineSelectionChange = useCallback(
+    key => {
+      const start = Math.max(0, points.length - 1 - timelines[key]);
+      dispatch({
+        filteredPoints: points.slice(start),
+        brushPosition: {
+          start: scaleBrushDate(points[start].timestamp),
+          end: scaleBrushDate(points[points.length - 1].timestamp)
+        }
+      });
     },
-    [dispatch]
+    [dispatch, points, scaleBrushDate]
   );
-
-  const handleRateChange = useCallback(
-    rate => {
-      dispatch({ currentRate: rate });
+  const handleRateSelectionChange = useCallback(
+    key => {
+      dispatch({ useRate: key === 'usd' });
     },
     [dispatch]
   );
 
   return (
     <div>
-      <div className="flex flex-col items-start justify-center space-y-4 rounded-lg border border-outline bg-content1 p-4">
-        <div className="flex w-full flex-col justify-between gap-y-4 sm:flex-row">
-          <RateSelector
-            onRateChange={handleRateChange}
-            rate={state.currentRate}
-          />
-          <GraphTimelineSelector
-            onTimelineChange={handleTimelineChange}
-            timelineTab={state.currentTimeline}
-          />
+      <div className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm">
+        <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
+          <div className="flex-1">
+            <div className="text-base text-foreground-1">Volume trend</div>
+            <div className="text-foreground-2">{getLatestTotal}</div>
+          </div>
+          <Tabs
+            classNames={tabs}
+            defaultSelectedKey="usd"
+            onSelectionChange={handleRateSelectionChange}
+            size="sm"
+          >
+            <Tab key="usd" title="USD" />
+            <Tab key="eth" title="ETH" />
+          </Tabs>
+          <Tabs
+            classNames={tabs}
+            defaultSelectedKey="3m"
+            onSelectionChange={handleTimelineSelectionChange}
+            size="sm"
+          >
+            <Tab key="1w" title="1W" />
+            <Tab key="1m" title="1M" />
+            <Tab key="3m" title="3M" />
+            <Tab key="1y" title="1Y" />
+            <Tab key="all" title="All" />
+          </Tabs>
         </div>
         <div className="relative">
           <svg
@@ -283,7 +263,7 @@ export default function LSTDistributionGraph({
               />
               <AreaStack
                 curve={curveMonotoneX}
-                data={state.filteredData}
+                data={state.filteredPoints}
                 defined={isDefined}
                 keys={state.keys}
                 value={getValue}
@@ -292,24 +272,28 @@ export default function LSTDistributionGraph({
                 y1={d => scaleValue(getY1(d)) ?? 0}
               >
                 {({ stacks, path }) =>
-                  stacks.map((stack, i) => (
-                    <path
-                      d={path(stack) || ''}
-                      fill={graphColors[i]}
-                      key={`stack-${stack.key}`}
-                      onPointerEnter={e => handleAreaPointerMove(e, stack)}
-                      onPointerLeave={hideTooltip}
-                      onPointerMove={e => handleAreaPointerMove(e, stack)}
-                      stroke={graphColors[i]}
-                    />
-                  ))
+                  stacks.map((stack, i) => {
+                    const color = `hsl(var(--app-chart-${i + 1}))`;
+
+                    return (
+                      <path
+                        d={path(stack) || ''}
+                        fill={color}
+                        key={`stack-${stack.key}`}
+                        onPointerEnter={e => handleAreaPointerMove(e, stack)}
+                        onPointerLeave={hideTooltip}
+                        onPointerMove={e => handleAreaPointerMove(e, stack)}
+                        stroke={color}
+                      />
+                    );
+                  })
                 }
               </AreaStack>
               {tooltipOpen && (
                 <line
                   opacity="0.8"
                   pointerEvents="none"
-                  stroke="hsl(var(--app-primary-600))"
+                  stroke="hsl(var(--app-foreground))"
                   strokeDasharray="2,2"
                   strokeWidth="1"
                   x1={tooltipLeft - margin.left}
@@ -325,7 +309,7 @@ export default function LSTDistributionGraph({
                 numTicks={4}
                 scale={scaleValue}
                 tickClassName="[&_line]:stroke-foreground-2"
-                tickFormat={value => formatNumber(value, true, 0)}
+                tickFormat={value => formatNumber(value, true)}
                 tickLabelProps={{
                   className: 'text-xs',
                   fill: 'hsl(var(--app-foreground))',
@@ -336,9 +320,9 @@ export default function LSTDistributionGraph({
               <AxisBottom
                 axisLineClassName="stroke-foreground-2"
                 numTicks={
-                  state.filteredData.length > 10
+                  state.filteredPoints.length > 10
                     ? Math.round(state.maxX / 120)
-                    : state.filteredData.length
+                    : state.filteredPoints.length
                 }
                 scale={scaleDate}
                 tickClassName="[&_line]:stroke-foreground-2"
@@ -383,25 +367,12 @@ export default function LSTDistributionGraph({
             />
           </div>
         </div>
-        <ul className="mt-4 w-full pe-8">
-          {state.keys?.map((key, i) => (
-            <li className="me-4 inline-block" key={key}>
-              <div className="flex flex-row items-center gap-1 text-sm">
-                <span
-                  className="inline-block h-3 w-3 rounded-full"
-                  style={{ backgroundColor: graphColors[i] }}
-                ></span>
-                {STRATEGY_ASSET_MAPPING[key]?.compact ?? key}
-              </div>
-            </li>
-          ))}
-        </ul>
       </div>
 
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
           key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
@@ -411,28 +382,27 @@ export default function LSTDistributionGraph({
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
-            {state.keys?.map((key, i) => {
+            {state.keys.map((key, i) => {
               return (
                 <li key={`tt-${key}`}>
-                  <div className="flex flex-row items-center gap-1">
+                  <div
+                    className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
+                  >
                     <span
-                      className="inline-block h-3 w-3 rounded-full"
-                      style={{ backgroundColor: graphColors[i] }}
+                      className={`inline-block h-3 w-3 rounded-full`}
+                      style={{
+                        backgroundColor: `hsl(var(--app-chart-${i + 1}))`
+                      }}
                     ></span>
-                    <span
-                      className={key === tooltipData.key ? 'font-bold' : ''}
-                    >
-                      {STRATEGY_ASSET_MAPPING[key]?.compact ?? key}
-                    </span>
-                    <span
-                      className={`${key === tooltipData.key ? 'font-bold' : ''} grow ps-2 text-end`}
-                    >
-                      {formatNumber(
-                        tooltipData.data.tvl[key] *
-                          (state.currentRate === 'usd'
-                            ? tooltipData.data.rate
-                            : 1)
-                      )}
+                    {allStrategyAssetMapping[key]?.symbol ?? key}
+                    <span className="grow ps-4 text-end">
+                      {state.useRate
+                        ? formatUSD(
+                            Number(
+                              tooltipData.data.tvl[key] * tooltipData.data.rate
+                            )
+                          )
+                        : formatETH(Number(tooltipData.data.tvl[key]))}
                     </span>
                   </div>
                 </li>
@@ -445,31 +415,29 @@ export default function LSTDistributionGraph({
   );
 }
 
-function RateSelector({ rate, onRateChange }) {
-  return (
-    <div className="flex w-full items-center gap-3 p-0">
-      <span className="text-foreground-2">Volume over time in</span>
-      <div className="flex w-full items-center gap-3 rounded-lg border border-outline p-2 md:w-fit">
-        <div
-          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
-            rate === 'usd' &&
-            'text-foreground-active border border-outline bg-default'
-          }`}
-          onClick={() => onRateChange('usd')}
-        >
-          USD
-        </div>
+const timelines = {
+  '1w': 7,
+  '1m': 30,
+  '3m': 90,
+  '1y': 365,
+  all: Number.MAX_SAFE_INTEGER
+};
 
-        <div
-          className={`w-full min-w-fit cursor-pointer rounded-md px-6 py-1 text-center text-foreground-2 md:w-20 ${
-            rate === 'eth' &&
-            'text-foreground-active border border-outline bg-default'
-          }`}
-          onClick={() => onRateChange('eth')}
-        >
-          ETH
-        </div>
-      </div>
-    </div>
-  );
-}
+// eslint-disable-next-line no-undef
+const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
+  day: 'numeric',
+  month: 'short'
+});
+
+// eslint-disable-next-line no-undef
+const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium'
+});
+
+const formatDate = date => {
+  if (date.getMonth() == 0 && date.getDate() == 1) {
+    return date.getFullYear();
+  }
+
+  return axisDateFormatter.format(date);
+};

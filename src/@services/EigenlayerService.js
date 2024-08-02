@@ -19,7 +19,6 @@ export default class EigenlayerService extends BaseService {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 }
