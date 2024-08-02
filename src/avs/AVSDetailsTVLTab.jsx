@@ -27,6 +27,7 @@ import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
+import { tooltip } from '../shared/slots';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -313,31 +314,28 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
 }
 
 function EigenDisclaimer() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
 
   return (
     <div className="inline-flex items-center gap-x-1">
       N/A
       <Tooltip
+        classNames={tooltip}
         content={
-          <div className="max-w-[250px] break-words p-4">
-            <div className="text-sm">
-              EIGEN is currently not listed on any exchanges so we are unable to
-              get its USD value. Information will be updated when the token is
-              available on centralized/decentralized exchanges.
-            </div>
-          </div>
+          <>
+            EIGEN is currently not listed on any exchanges so we are unable to
+            get its USD value. Information will be updated when the token is
+            available on centralized/decentralized exchanges.
+          </>
         }
         isOpen={isOpen}
+        onOpenChange={open => setOpen(open)}
         placement="top"
         showArrow={true}
       >
         <span
           className="material-symbols-outlined cursor-pointer text-sm"
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
-          // to make tooltip work on mobile
-          onPointerDown={() => setIsOpen(!isOpen)}
+          onPointerDown={() => setOpen(!isOpen)}
           style={{
             fontVariationSettings: `'FILL' 0`
           }}
