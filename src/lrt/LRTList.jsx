@@ -1,4 +1,5 @@
 import { formatETH, formatUSD } from '../shared/formatters';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { protocols } from './helpers';
 
 export default function LRTList({ data }) {
@@ -18,11 +19,10 @@ export default function LRTList({ data }) {
             <span className="inline-block min-w-4 text-foreground-2">
               {i + 1}
             </span>
-            <span
-              className="inline-block min-h-3 min-w-3 rounded-full"
-              style={{ backgroundColor: `hsl(var(--app-chart-${i + 1}))` }}
-            ></span>
-
+            <ThirdPartyLogo
+              className="size-6 min-w-6"
+              url={protocols[name].logo}
+            />
             <span className="text-foreground-2">{protocols[name].name}</span>
             <span className="basis-full text-foreground-1">
               {protocols[name].symbol}

@@ -250,7 +250,7 @@ function LineChart({ points, height, width }) {
             tickFormat={v => formatNumber(v, true)}
             tickLabelProps={{
               className: 'text-xs',
-              fill: 'hsl(var(--app-foreground))',
+              fill: 'hsl(var(--app-foreground-1))',
               fontFamily: undefined,
               fontSize: undefined
             }}
@@ -263,7 +263,7 @@ function LineChart({ points, height, width }) {
             tickFormat={formatDate}
             tickLabelProps={{
               className: 'text-xs',
-              fill: 'hsl(var(--app-foreground))',
+              fill: 'hsl(var(--app-foreground-1))',
               fontFamily: undefined,
               fontSize: undefined
             }}

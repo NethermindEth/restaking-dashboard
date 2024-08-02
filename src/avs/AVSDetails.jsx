@@ -68,7 +68,7 @@ export default function AVSDetails() {
   return (
     <>
       {state.isAVSLoading ? (
-        <div className="min-h-[128px] w-full rounded-lg border border-outline bg-content1 p-4">
+        <div className="min-h-[128px] w-full overflow-hidden rounded-lg border border-outline bg-content1 p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
             <Skeleton className="ml-2 h-8 w-full rounded-md" />

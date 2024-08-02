@@ -73,6 +73,7 @@ export default function OperatorList() {
 
         const response = await operatorService.getAll(
           pageNumber,
+          10,
           search,
           sort,
           abortController.current.signal

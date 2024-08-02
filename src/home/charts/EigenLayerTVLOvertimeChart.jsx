@@ -1,25 +1,24 @@
 import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
-import { Tab, Tabs } from '@nextui-org/react';
+import { Tab, Tabs, Tooltip } from '@nextui-org/react';
+import { tabs, tooltip } from '../../shared/slots';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
-import HBrush from '../shared/HBrush';
+import HBrush from '../../shared/HBrush';
 import { localPoint } from '@visx/event';
-import { protocols } from './helpers';
-import { reduceState } from '../shared/helpers';
-import { tabs } from '../shared/slots';
+import { reduceState } from '../../shared/helpers';
 import { useMutativeReducer } from 'use-mutative';
 
-export default function LRTDistribution({ data, height }) {
+export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     filteredData: [],
-    keys: [],
+    keys: ['ethTVL', 'lstTVL'],
     maxX: 0,
     maxY: 0,
     useRate: true
@@ -39,29 +38,30 @@ export default function LRTDistribution({ data, height }) {
   const dateAxisRef = useRef(null);
 
   const rootRef = useRef(null);
+
   const scaleBrushDate = useMemo(
     () =>
       scaleUtc({
         domain: [
-          Math.min(...data.map(getDate)),
-          Math.max(...data.map(getDate))
+          Math.min(...eigenLayerTVL.map(getDate)),
+          Math.max(...eigenLayerTVL.map(getDate))
         ],
         range: [0, state.maxX - 2] // 2 for brush borders
       }),
-    [data, state.maxX]
+    [eigenLayerTVL, state.maxX]
   );
+
   const scaleBrushValue = useMemo(
     () =>
       scaleLinear({
         domain: [
           0,
           Math.max(
-            ...data.map(d => {
+            ...eigenLayerTVL.map(d => {
               let value = 0;
 
-              for (let k in d.protocols) {
-                value += d.protocols[k];
-              }
+              value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
+              value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
               return value;
             })
@@ -70,8 +70,9 @@ export default function LRTDistribution({ data, height }) {
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    [data]
+    [eigenLayerTVL]
   );
+
   const scaleDate = useMemo(
     () =>
       scaleUtc({
@@ -83,6 +84,7 @@ export default function LRTDistribution({ data, height }) {
       }),
     [state.filteredData, state.maxX]
   );
+
   const scaleValue = useMemo(
     () =>
       scaleLinear({
@@ -92,9 +94,8 @@ export default function LRTDistribution({ data, height }) {
             ...state.filteredData.map(d => {
               let value = 0;
 
-              for (let k in d.protocols) {
-                value += d.protocols[k];
-              }
+              value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
+              value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
               return value * (state.useRate ? d.rate : 1);
             })
@@ -105,30 +106,35 @@ export default function LRTDistribution({ data, height }) {
       }),
     [state.useRate, state.filteredData, state.maxY]
   );
-  const getLatestTotal = useMemo(() => {
-    const last = data[data.length - 1];
 
+  const getLatestTotal = useMemo(() => {
+    const last = eigenLayerTVL[eigenLayerTVL.length - 1];
     let total = 0;
 
-    for (let p in last.protocols) {
-      total += last.protocols[p];
-    }
+    total += parseFloat(BigInt(last.ethTVL) / BigInt(1e18));
+    total += parseFloat(BigInt(last.lstTVL) / BigInt(1e18));
 
     return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
-  }, [data, state.useRate]);
+  }, [eigenLayerTVL, state.useRate]);
+
   const getValue = useCallback(
-    (d, k) => d.protocols[k] * (state.useRate ? d.rate : 1),
+    (d, k) =>
+      parseFloat(BigInt(d[k]) / BigInt(1e18)) * (state.useRate ? d.rate : 1),
     [state.useRate]
   );
+
   const handleBrushChange = useCallback(
     domain => {
       const { x0, x1 } = domain;
-      const filtered = data.filter(s => s.timestamp >= x0 && s.timestamp <= x1);
+      const filtered = eigenLayerTVL.filter(
+        s => s.timestamp >= x0 && s.timestamp <= x1
+      );
 
       dispatch({ brushPosition: null, filteredData: filtered });
     },
-    [data, dispatch]
+    [eigenLayerTVL, dispatch]
   );
+
   const handleAreaPointerMove = useCallback(
     (event, stack) => {
       const point = localPoint(event.target.ownerSVGElement, event);
@@ -146,20 +152,22 @@ export default function LRTDistribution({ data, height }) {
     },
     [showTooltip, scaleDate]
   );
+
   const handleTabSelectionChange = useCallback(
     key => {
-      const start = Math.max(0, data.length - 1 - tabMap[key]);
+      const start = Math.max(0, eigenLayerTVL.length - 1 - tabMap[key]);
 
       dispatch({
         brushPosition: {
-          start: scaleBrushDate(data[start].timestamp),
-          end: scaleBrushDate(data[data.length - 1].timestamp)
+          start: scaleBrushDate(eigenLayerTVL[start].timestamp),
+          end: scaleBrushDate(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp)
         },
-        filteredData: data.slice(start)
+        filteredData: eigenLayerTVL.slice(start)
       });
     },
-    [data, dispatch, scaleBrushDate]
+    [eigenLayerTVL, dispatch, scaleBrushDate]
   );
+
   const handleRateSelectionChange = useCallback(
     key => dispatch({ useRate: key === 'usd' }),
     [dispatch]
@@ -199,35 +207,59 @@ export default function LRTDistribution({ data, height }) {
 
   useEffect(() => {
     dispatch({
-      brushData: data?.map(d => {
+      brushData: eigenLayerTVL?.map(d => {
         let value = 0;
-
-        for (let k in d.protocols) {
-          value += d.protocols[k];
-        }
+        value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
+        value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
         return { timestamp: d.timestamp, value };
       }),
       brushPosition: {
-        start: scaleBrushDate(data[data.length - 1 - 90].timestamp),
-        end: scaleBrushDate(data[data.length - 1].timestamp)
+        start: scaleBrushDate(
+          eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
+        ),
+        end: scaleBrushDate(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp)
       },
-      filteredData: data.slice(-90),
-      keys: Object.entries(data?.[data.length - 1].protocols)
-        .sort(sortProtocols)
-        .map(([k]) => k)
+      filteredData: eigenLayerTVL.slice(-90)
     });
-  }, [data, dispatch, scaleBrushDate]);
+  }, [eigenLayerTVL, dispatch, scaleBrushDate]);
 
   return (
-    <div
-      className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
-      ref={rootRef}
-    >
-      <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
+    <div className="rd-box min-h-44 basis-full p-4" ref={rootRef}>
+      <div className="mb-6 flex flex-wrap items-start justify-end gap-2 md:items-center">
         <div className="flex-1">
-          <div className="text-base text-foreground-1">Volume trend</div>
-          <div className="text-foreground-2">{getLatestTotal}</div>
+          <div className="flex content-center text-base text-foreground-1">
+            TVL over time
+            <Tooltip
+              classNames={tooltip}
+              content={
+                <>
+                  Due to the expanding pool of Liquid Staking Tokens (LST) and
+                  Liquid Restaking Tokens (LRT), the TVL value on this dashboard
+                  may not always match the actual TVL of the entire token pool.
+                  Refer to the dashboard token list for the current LST and LRT
+                  data included in the TVL calculation.
+                </>
+              }
+              isOpen={state.showTVLTooltip}
+              onOpenChange={open => dispatch({ showTVLTooltip: open })}
+              placement="bottom"
+              showArrow="true"
+            >
+              <span
+                className="material-symbols-outlined ms-2 cursor-pointer text-base"
+                onPointerDown={() =>
+                  dispatch({ showTVLTooltip: !state.showTVLTooltip })
+                }
+                style={{
+                  fontVariationSettings: `'FILL' 0`
+                }}
+              >
+                info
+              </span>
+            </Tooltip>
+          </div>
+          <div className="text-sm text-foreground-2">{getLatestTotal}</div>
         </div>
         <Tabs
           classNames={tabs}
@@ -286,7 +318,6 @@ export default function LRTDistribution({ data, height }) {
                       onPointerLeave={hideTooltip}
                       onPointerMove={e => handleAreaPointerMove(e, stack)}
                       stroke={color}
-                      // opacity={0.75}
                     />
                   );
                 })
@@ -324,7 +355,6 @@ export default function LRTDistribution({ data, height }) {
               axisLineClassName="stroke-foreground-2"
               innerRef={dateAxisRef}
               numTicks={Math.round(state.maxX / 120)}
-              // rangePadding={margin.right}
               scale={scaleDate}
               tickClassName="[&_line]:stroke-foreground-2"
               tickFormat={formatDate}
@@ -368,6 +398,28 @@ export default function LRTDistribution({ data, height }) {
           />
         </div>
       </div>
+      <div className="mt-4">
+        <ul className="w-full text-foreground-1">
+          <li className="me-4 inline-block">
+            <div className="flex flex-row items-center gap-1 text-sm">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: 'hsl(var(--app-chart-1))' }}
+              ></span>
+              ETH
+            </div>
+          </li>
+          <li className="me-4 inline-block">
+            <div className="flex flex-row items-center gap-1 text-sm">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: 'hsl(var(--app-chart-2))' }}
+              ></span>
+              LST
+            </div>
+          </li>
+        </ul>
+      </div>
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
@@ -381,33 +433,58 @@ export default function LRTDistribution({ data, height }) {
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
-            {Object.entries(tooltipData.data.protocols)
-              .sort(sortProtocols)
-              .map(([key], i) => (
-                <li key={`tt-${key}`}>
-                  <div
-                    className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
-                  >
-                    <span
-                      className={`inline-block h-3 w-3 rounded-full`}
-                      style={{
-                        backgroundColor: `hsl(var(--app-chart-${i + 1}))`
-                      }}
-                    ></span>
-                    {protocols[key]?.name ?? key}
-                    <span className="grow ps-4 text-end">
-                      {state.useRate
-                        ? formatUSD(
-                            Number(
-                              tooltipData.data.protocols[key] *
-                                tooltipData.data.rate
-                            )
-                          )
-                        : formatETH(Number(tooltipData.data.protocols[key]))}
-                    </span>
-                  </div>
-                </li>
-              ))}
+            <li>
+              <div
+                className={`${'ethTVL' === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
+              >
+                <span
+                  className="inline-block h-3 w-3 rounded-full"
+                  style={{
+                    backgroundColor: 'hsl(var(--app-chart-1))'
+                  }}
+                ></span>
+                ETH
+                <span className="grow ps-4 text-end">
+                  {state.useRate
+                    ? formatUSD(
+                        parseFloat(
+                          BigInt(tooltipData.data.ethTVL) / BigInt(1e18)
+                        ) * tooltipData.data.rate
+                      )
+                    : formatETH(
+                        parseFloat(
+                          BigInt(tooltipData.data.ethTVL) / BigInt(1e18)
+                        )
+                      )}
+                </span>
+              </div>
+            </li>
+            <li>
+              <div
+                className={`${'lstTVL' === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
+              >
+                <span
+                  className="inline-block h-3 w-3 rounded-full"
+                  style={{
+                    backgroundColor: 'hsl(var(--app-chart-2))'
+                  }}
+                ></span>
+                LST
+                <span className="grow ps-4 text-end">
+                  {state.useRate
+                    ? formatUSD(
+                        parseFloat(
+                          BigInt(tooltipData.data.lstTVL) / BigInt(1e18)
+                        ) * tooltipData.data.rate
+                      )
+                    : formatETH(
+                        parseFloat(
+                          BigInt(tooltipData.data.lstTVL) / BigInt(1e18)
+                        )
+                      )}
+                </span>
+              </div>
+            </li>
           </ul>
         </TooltipInPortal>
       )}
@@ -436,20 +513,6 @@ const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
 
-const sortProtocols = ([, p1], [, p2]) => {
-  const i1 = p1; //protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
-  const i2 = p2; //protocols[p2]?.index ?? Number.MAX_SAFE_INTEGER;
-
-  if (i1 < i2) {
-    return 1;
-  }
-
-  if (i1 > i2) {
-    return -1;
-  }
-
-  return 0;
-};
 const tabMap = {
   '1w': 7,
   '1m': 30,
