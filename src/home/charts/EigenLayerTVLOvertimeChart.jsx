@@ -127,9 +127,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
     domain => {
       const { x0, x1 } = domain;
       const filtered = eigenLayerTVL.filter(
-        s =>
-          new Date(s.timestamp).getTime() >= x0 &&
-          new Date(s.timestamp).getTime() <= x1
+        s => s.timestamp >= x0 && s.timestamp <= x1
       );
 
       dispatch({ brushPosition: null, filteredData: filtered });
@@ -142,8 +140,8 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
       const point = localPoint(event.target.ownerSVGElement, event);
       const x = scaleDate.invert(point.x - margin.left).getTime();
       const index = bisectDate(stack, x, 1);
-      const x0 = new Date(stack[index - 1].data.timestamp).getTime();
-      const x1 = new Date(stack[index].data.timestamp).getTime();
+      const x0 = stack[index - 1].data.timestamp;
+      const x1 = stack[index].data.timestamp;
       const i = x - x0 > x1 - x ? index : index - 1;
 
       showTooltip({
@@ -214,17 +212,13 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
         value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
         value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
 
-        return { timestamp: new Date(d.timestamp).getTime(), value };
+        return { timestamp: d.timestamp, value };
       }),
       brushPosition: {
         start: scaleBrushDate(
-          new Date(
-            eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
-          ).getTime()
+          eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
         ),
-        end: scaleBrushDate(
-          new Date(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp).getTime()
-        )
+        end: scaleBrushDate(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp)
       },
       filteredData: eigenLayerTVL.slice(-90)
     });
@@ -452,7 +446,7 @@ const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'short'
 });
-const bisectDate = bisector(i => new Date(i.data.timestamp).getTime()).left;
+const bisectDate = bisector(i => i.data.timestamp).left;
 
 const brushSize = { height: 50, marginTop: 20 };
 const formatDate = date => {
