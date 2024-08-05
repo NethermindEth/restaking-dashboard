@@ -378,7 +378,7 @@ export default function LSTDistributionGraph({
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 text-xs font-bold">
+          <div className="mb-2 px-2 text-xs font-bold">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
           <ul className="text-sm">
