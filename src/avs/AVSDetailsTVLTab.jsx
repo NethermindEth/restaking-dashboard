@@ -199,7 +199,7 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
               <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2 truncate">
                   <ThirdPartyLogo
-                    className="size-5 min-w-5"
+                    className="size-6 min-w-6"
                     url={tokens[key].logo}
                   />
                   <span className="truncate text-foreground-2">
@@ -285,7 +285,7 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
               <TableCell className="pl-0 text-sm">
                 <div className="flex items-center gap-x-2">
                   <ThirdPartyLogo
-                    className="size-5 min-w-5"
+                    className="size-6 min-w-6"
                     url={lstStrategyAssetMapping[key].logo}
                   />
                   <span className="truncate text-foreground-2">

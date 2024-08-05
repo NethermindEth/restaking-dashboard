@@ -257,7 +257,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
         lstDistribution[i].logo = allStrategyAssetMapping[address].logo;
       } else {
         lstDistribution[i].symbol = 'Others';
-        lstDistribution[i].logo = allStrategyAssetMapping[BEACON_STRATEGY].logo;
+        lstDistribution[i].logo = '/images/eth-multicolor.png';
       }
       lstDistribution[i].tokensInETH =
         parseFloat(lstDistribution[i].tokens) / 1e18;
@@ -330,7 +330,7 @@ function LSTShare({ label, logo, value }) {
       }}
       label={
         <div className="flex items-center gap-x-2">
-          <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
+          <ThirdPartyLogo className="size-6 min-w-6" url={logo} />
           {label}
         </div>
       }
