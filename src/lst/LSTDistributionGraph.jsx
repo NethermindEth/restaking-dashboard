@@ -76,7 +76,7 @@ export default function LSTDistributionGraph({
         domain: [
           0,
           Math.max(
-            ...state.filteredPoints.map(d => {
+            ...points.map(d => {
               let value = 0;
 
               for (let strategy in d.tvl) {
@@ -90,7 +90,7 @@ export default function LSTDistributionGraph({
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    [state.filteredPoints]
+    [points]
   );
   const scaleDate = useMemo(
     () =>
