@@ -24,7 +24,7 @@ export default function LSTList({ data, latestRate }) {
         removeWrapper
       >
         <TableHeader>
-          <TableColumn className="w-64 bg-transparent py-4 ps-6 text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
+          <TableColumn className="w-64 bg-transparent py-4 ps-9 text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
             Protocol
           </TableColumn>
           <TableColumn className="w-48 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
