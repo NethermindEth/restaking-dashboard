@@ -383,7 +383,7 @@ export default function LRTDistribution({ data, height }) {
           <ul className="text-sm">
             {Object.entries(tooltipData.data.protocols)
               .sort(sortProtocols)
-              .map(([key], i) => (
+              .map(([key]) => (
                 <li key={`tt-${key}`}>
                   <div
                     className={`${key === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
@@ -391,7 +391,7 @@ export default function LRTDistribution({ data, height }) {
                     <span
                       className={`inline-block h-3 w-3 rounded-full`}
                       style={{
-                        backgroundColor: `hsl(var(--app-chart-${i + 1}))`
+                        backgroundColor: `hsl(var(--app-chart-${state.keys.indexOf(key) + 1}))`
                       }}
                     ></span>
                     {protocols[key]?.name ?? key}
