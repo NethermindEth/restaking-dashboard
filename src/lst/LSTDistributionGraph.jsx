@@ -299,7 +299,7 @@ export default function LSTDistributionGraph({
                   x1={tooltipLeft - margin.left}
                   x2={tooltipLeft - margin.left}
                   y1="0"
-                  y2={state.maxY}
+                  y2={state.maxY - margin.bottom - brushSize.marginTop}
                 />
               )}
               <AxisRight
