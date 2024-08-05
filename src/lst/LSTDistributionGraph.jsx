@@ -352,14 +352,14 @@ export default function LSTDistributionGraph({
             </Group>
           </svg>
           <div
-            className="absolute bottom-px border border-primary-50 dark:border-primary-700/25"
+            className="absolute bottom-px border border-outline"
             style={{
               height: brushSize.height,
               width: state.maxX - margin.right
             }}
           >
             <HBrush
-              brushClassName="bg-secondary-100/35 h-full"
+              brushClassName="bg-foreground-2/35 h-full"
               brushPosition={state.brushPosition}
               onChange={handleBrushChange}
               scale={scaleBrushDate}
