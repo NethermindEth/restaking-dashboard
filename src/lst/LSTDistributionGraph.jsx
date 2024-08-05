@@ -253,11 +253,11 @@ export default function LSTDistributionGraph({
           >
             <Group left={margin.left} top={margin.top}>
               <GridRows
-                className="[&_line]:stroke-primary-50 dark:[&_line]:stroke-primary-900 dark:[&_line]:opacity-10"
-                height={state.maxY}
+                className="opacity-25 [&_line]:stroke-outline"
+                height={state.maxY - margin.bottom - brushSize.marginTop}
                 numTicks={4}
                 scale={scaleValue}
-                width={state.maxX}
+                width={state.maxX - margin.right}
                 x="0"
                 y="0"
               />
