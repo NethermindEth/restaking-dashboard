@@ -3,13 +3,13 @@ export const protocols = {
     index: 0,
     name: 'Bedrock',
     symbol: 'uniETH',
-    logo: '/images/bedrock.png'
+    logo: '/images/unieth.svg'
   },
   eigenpie: {
     index: 6,
     name: 'Eigenpie',
     symbol: 'egETH m*ETH',
-    logo: '/images/eigenpie.png'
+    logo: '/images/egeth.png'
   },
   etherfi: {
     index: 1,
@@ -27,31 +27,31 @@ export const protocols = {
     index: 4,
     name: 'Inception',
     symbol: 'in*ETH',
-    logo: '/images/inception.png'
+    logo: '/images/ineth.png'
   },
-  kelp: { index: 3, name: 'Kelp', symbol: 'rsETH', logo: '/images/kelp.png' },
+  kelp: { index: 3, name: 'Kelp', symbol: 'rsETH', logo: '/images/rseth.png' },
   prime: {
     index: 8,
     name: 'Prime',
     symbol: 'primeETH',
-    logo: '/images/prime.svg'
+    logo: '/images/primeeth.svg'
   },
   puffer: {
     index: 7,
     name: 'Puffer',
     symbol: 'pufETH',
-    logo: '/images/puffer.svg'
+    logo: '/images/pufeth.png'
   },
   renzo: {
     index: 2,
     name: 'Renzo',
     symbol: 'ezETH',
-    logo: '/images/renzo.png'
+    logo: '/images/ezeth.png'
   },
   swell: {
     index: 5,
     name: 'Swell',
     symbol: 'rswETH',
-    logo: '/images/swell.svg'
+    logo: '/images/rsweth.png'
   }
 };
