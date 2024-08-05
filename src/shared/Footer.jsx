@@ -9,7 +9,7 @@ export default function Footer() {
           <img
             alt="Powered by Nethermind"
             className="max-h-[61px]"
-            srcSet="/assets/powered-by.png 1x, /assets/powered-by.png 2x"
+            srcSet="/images/powered-by.png 1x, /images/powered-by.png 2x"
           />
         </Link>
         <div className="text-xs">&copy;2024 Nethermind</div>

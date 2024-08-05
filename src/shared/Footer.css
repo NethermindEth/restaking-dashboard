@@ -15,8 +15,8 @@
 
 .footer-x .icon {
   @apply footer-social;
-  mask: url(/assets/x.svg) no-repeat;
-  -webkit-mask: url(/assets/x.svg) no-repeat;
+  mask: url(/images/x.svg) no-repeat;
+  -webkit-mask: url(/images/x.svg) no-repeat;
 }
 
 .dark .footer-x .icon {

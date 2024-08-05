@@ -55,7 +55,7 @@ export default function AVSDetailsHeader({ avs }) {
           <span
             className="me-1 h-4 w-4 bg-secondary"
             style={{
-              mask: 'url(/assets/x.svg) no-repeat',
+              mask: 'url(/images/x.svg) no-repeat',
               backgroundColor: 'hsl(var(--app-secondary))'
             }}
           ></span>
