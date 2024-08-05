@@ -35,7 +35,9 @@ export default {
               7: '#ec4899',
               8: '#f9a8d4',
               9: '#0ea5e9',
-              10: '#7dd3fc'
+              10: '#7dd3fc',
+              11: '#22c55e',
+              12: '#86efac'
             },
             content1: '#0f111a',
             content2: '#191c2c',

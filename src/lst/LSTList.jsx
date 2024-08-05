@@ -1,82 +1,76 @@
-import React from 'react';
-import { formatNumber } from '../utils';
-import { STRATEGY_ASSET_MAPPING } from './helpers';
-import { Skeleton } from '@nextui-org/react';
+import { formatETH, formatUSD } from '../shared/formatters';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow
+} from '@nextui-org/react';
+import { lstStrategyAssetMapping } from '../shared/strategies';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 
-export default function LSTList({ data, latestRate, isLoading }) {
+export default function LSTList({ data, latestRate }) {
   return (
-    <div>
-      <div className="mt-4 rounded-lg border border-outline bg-content1 py-1 text-sm">
-        <div className="flex flex-row items-center gap-x-2 p-4 text-foreground-1">
-          <div className="min-w-5"></div>
-          <span className="basis-full">Protocol</span>
-          <span className="basis-1/2">Unbonding period</span>
-          <span className="basis-1/2 text-end">Total value</span>
-        </div>
-        {isLoading && <LSTListSkeleton />}
-        {!isLoading && (
-          <div>
-            {data.map(([address, tvl], i) => {
-              return (
-                <div
-                  className="flex cursor-pointer flex-row items-center justify-between gap-x-2 border-t border-outline bg-content1 p-4 hover:bg-default"
-                  key={`lst-item-${i}`}
-                >
-                  <div className="min-w-5">{i + 1}</div>
-                  <div
-                    className="h-5 min-w-5 rounded-full bg-contain bg-center bg-no-repeat"
-                    style={{
-                      backgroundImage: `url('${STRATEGY_ASSET_MAPPING[address].logo}')`
-                    }}
-                  ></div>
-                  <div className="basis-full truncate">
-                    <span className="text-subtitle">
-                      {STRATEGY_ASSET_MAPPING[address].name}
+    <div className="rounded-lg border border-outline bg-content1 text-sm">
+      <Table
+        aria-label="List of LST sorted by TVL"
+        classNames={{
+          base: 'overflow-x-auto',
+          table: 'h-full',
+          thead: '[&>tr:last-child]:hidden'
+        }}
+        layout="fixed"
+        removeWrapper
+      >
+        <TableHeader>
+          <TableColumn className="w-64 bg-transparent py-4 ps-9 text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
+            Protocol
+          </TableColumn>
+          <TableColumn className="w-48 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
+            Unbonding period
+          </TableColumn>
+          <TableColumn className="w-48 bg-transparent py-4 pe-8 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
+            Total value
+          </TableColumn>
+        </TableHeader>
+        <TableBody>
+          {data.map(([address, tvl], i) => {
+            return (
+              <TableRow
+                className="border-t border-outline"
+                key={`lst-item-${i}`}
+              >
+                <TableCell>
+                  <div className="flex items-center gap-x-2">
+                    <span className="inline-block min-w-4 text-foreground-2">
+                      {i + 1}
                     </span>
-                    <span className="mx-1" />
-                    {STRATEGY_ASSET_MAPPING[address].compact}
+                    <ThirdPartyLogo
+                      className="size-6 min-w-6"
+                      url={lstStrategyAssetMapping[address].logo}
+                    />
+                    <span className="truncate text-foreground-2">
+                      {lstStrategyAssetMapping[address].name}
+                    </span>
+
+                    <span className="mx-1 text-foreground-1">
+                      {lstStrategyAssetMapping[address].symbol}
+                    </span>
                   </div>
-                  <div className="basis-1/2">7 days</div>
-                  <div className="basis-1/2 text-end">
-                    <div>${formatNumber(tvl * latestRate)}</div>
-                    <div className="text-xs text-subtitle">
-                      {formatNumber(tvl)} ETH
-                    </div>
+                </TableCell>
+                <TableCell className="text-end">7 days</TableCell>
+                <TableCell className="pe-8 text-end">
+                  <div>{formatUSD(tvl * latestRate)}</div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(tvl)}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 }
-
-const LSTListSkeleton = () => {
-  return (
-    <div>
-      {[...Array(10)].map((_, i) => (
-        <div
-          className="flex w-full justify-normal gap-4 border-t border-outline p-4 text-foreground-1 md:gap-8"
-          key={i}
-        >
-          <div className="w-6/12 md:w-10/12">
-            <Skeleton className="h-6 w-4/5 rounded-md dark:bg-default md:w-2/3" />
-          </div>
-          <div className="flex w-10/12 justify-between gap-5 pl-5">
-            <div className="w-3/12">
-              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
-            </div>
-            <div className="w-3/12">
-              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
-            </div>
-            <div className="w-3/12">
-              <Skeleton className="h-6 w-full rounded-md bg-default dark:bg-default" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};

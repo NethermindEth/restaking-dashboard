@@ -2,10 +2,9 @@ import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
   lstStrategyAssetMapping
-} from './helpers';
+} from '../shared/strategies';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import {
-  Image,
   Skeleton,
   Spacer,
   Spinner,
@@ -20,14 +19,14 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { ParentSize } from '@visx/responsive';
 import { reduceState } from '../shared/helpers';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
+import { tooltip } from '../shared/slots';
 import TVLTabLineChart from './charts/TVLTabLineChart';
 import TVLTabTreemap from './charts/TVLTabTreemap';
 import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
-import ThirdPartyLogo from '../shared/ThirdPartyLogo';
-import { tooltip } from '../shared/slots';
 
 export default function AVSDetailsTVLTab({
   totalTokens,
@@ -136,17 +135,17 @@ const tokens = {
   eth: {
     name: 'Beacon',
     symbol: 'ETH',
-    logo: '/eth.png'
+    logo: '/images/eth.png'
   },
   lst: {
     name: 'Liquid Staking Tokens',
     symbol: 'ETH',
-    logo: '/eth.png'
+    logo: '/images/eth-multicolor.png'
   },
   eigen: {
     name: 'Eigen',
     symbol: 'EIGEN',
-    logo: '/eigen.webp'
+    logo: '/images/eigen.png'
   }
 };
 
