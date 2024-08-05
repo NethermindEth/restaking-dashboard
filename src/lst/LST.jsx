@@ -60,10 +60,10 @@ export default function LST() {
   return (
     <div>
       <div className="mb-4 font-display text-3xl font-medium text-foreground-1">
-        Liquid Staking Tokens
+        Liquid staking tokens
       </div>
       <div className="mb-4 text-xs text-foreground-1">
-        Liquid Staking Tokens (LSTs) restaked on EigenLayer are a form of
+        Liquid staking tokens (LSTs) restaked on EigenLayer are a form of
         cryptocurrency that represent staked assets in a liquidity pool or
         staking protocol. They allow users to earn rewards from staking while
         maintaining liquidity, as the tokens can be traded, transferred, or used
