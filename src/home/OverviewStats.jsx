@@ -111,7 +111,7 @@ export default function OverviewStats({
           {!isFetchingEigenlayerTVL && eigenLayerTVL.length > 0 && (
             <span className="text-center">
               <span className="font-display text-lg md:text-2xl">
-                {formatETH(calculateEigenLayerTVL(), compact)}
+                {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
               </span>
             </span>
           )}
@@ -120,7 +120,7 @@ export default function OverviewStats({
             eigenLayerTVL.length > 0 &&
             state.rate > 1 && (
               <span className="text-sm text-success">
-                {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
+                {formatETH(calculateEigenLayerTVL(), compact)}
               </span>
             )}
         </div>
