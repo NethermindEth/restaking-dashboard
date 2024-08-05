@@ -201,7 +201,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            className="stroke-chart-10 stroke-2"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
@@ -210,7 +210,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
 
           {tooltipOpen && (
             <Circle
-              className="cursor-pointer fill-chart-10 stroke-2 dark:stroke-white"
+              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-white"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}

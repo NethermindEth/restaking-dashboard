@@ -295,7 +295,7 @@ function LineChart({ points, height, width }) {
             top={state.maxY}
           />
           <LinePath
-            className="stroke-chart-10 stroke-2"
+            className="stroke-chart-9 stroke-2"
             curve={curveMonotoneX}
             data={state.filteredPoints}
             x={d => scaleDate(getDate(d)) ?? 0}
@@ -304,7 +304,7 @@ function LineChart({ points, height, width }) {
 
           {tooltipOpen && (
             <Circle
-              className="cursor-pointer fill-chart-10 stroke-2 dark:stroke-foreground"
+              className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
               cx={tooltipLeft}
               cy={tooltipTop}
               r={4}
