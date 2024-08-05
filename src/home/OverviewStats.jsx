@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function OverviewStats({
   isFetchingEigenlayerTVL,

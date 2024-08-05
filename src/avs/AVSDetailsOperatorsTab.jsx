@@ -20,7 +20,7 @@ import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
   const { address } = useParams();

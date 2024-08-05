@@ -21,7 +21,7 @@ import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../../@services/ServiceContext';
-import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../../shared/hooks/useTailwindBreakpoint';
 
 export default function OperatorTVLLineChart({
   currentTVL,

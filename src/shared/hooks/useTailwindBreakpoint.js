@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import resolveConfig from 'tailwindcss/resolveConfig';
-import twConfig from '../../tailwind.config';
+import twConfig from '../../../tailwind.config';
 
 export function useTailwindBreakpoint(bp) {
   const [isMatch, setMatch] = useState(false);

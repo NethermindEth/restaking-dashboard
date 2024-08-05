@@ -15,7 +15,7 @@ import { scaleLinear } from '@visx/scale';
 import { tabs } from '../../shared/slots';
 import { Text } from '@visx/text';
 import { useMutativeReducer } from 'use-mutative';
-import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../../shared/hooks/useTailwindBreakpoint';
 
 export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   const compact = !useTailwindBreakpoint('sm');

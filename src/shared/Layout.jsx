@@ -2,7 +2,7 @@ import Footer from './Footer';
 import Header from './Header';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { useTailwindBreakpoint } from './useTailwindBreakpoint';
+import { useTailwindBreakpoint } from './hooks/useTailwindBreakpoint';
 
 export default function Layout() {
   const showSidebar = useTailwindBreakpoint('lg');

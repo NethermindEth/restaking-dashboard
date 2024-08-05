@@ -13,7 +13,7 @@ import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
 import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
-import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../../shared/hooks/useTailwindBreakpoint';
 
 export default function TVLTabLineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
