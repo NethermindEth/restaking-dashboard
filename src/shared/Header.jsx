@@ -1,6 +1,6 @@
 import { Button, Modal, ModalContent, useDisclosure } from '@nextui-org/react';
-import Sidebar from './Sidebar';
 import RestakingLogo from './ResatkingLogo';
+import Sidebar from './Sidebar';
 
 export default function Header() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

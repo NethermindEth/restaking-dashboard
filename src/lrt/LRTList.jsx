@@ -1,6 +1,6 @@
 import { formatETH, formatUSD } from '../shared/formatters';
-import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { protocols } from './helpers';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 
 export default function LRTList({ data }) {
   return (
