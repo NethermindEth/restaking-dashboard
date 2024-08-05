@@ -9,17 +9,14 @@ import {
 } from '@nextui-org/react';
 import { lstStrategyAssetMapping } from '../shared/strategies';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function LSTList({ data, latestRate }) {
-  const compact = !useTailwindBreakpoint('md');
-
   return (
     <div className="rounded-lg border border-outline bg-content1 text-sm">
       <Table
         aria-label="List of LST sorted by TVL"
         classNames={{
-          base: 'h-full overflow-x-auto',
+          base: 'overflow-x-auto',
           table: 'h-full',
           thead: '[&>tr:last-child]:hidden'
         }}
@@ -30,10 +27,10 @@ export default function LSTList({ data, latestRate }) {
           <TableColumn className="w-64 bg-transparent py-4 ps-6 text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
             Protocol
           </TableColumn>
-          <TableColumn className="w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
+          <TableColumn className="w-48 bg-transparent py-4 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
             Unbonding period
           </TableColumn>
-          <TableColumn className="w-32 bg-transparent py-4 pe-8 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
+          <TableColumn className="w-48 bg-transparent py-4 pe-8 text-end text-sm font-normal leading-5 text-foreground-1 data-[hover=true]:text-foreground-2 md:w-1/3">
             Total value
           </TableColumn>
         </TableHeader>
@@ -64,9 +61,9 @@ export default function LSTList({ data, latestRate }) {
                 </TableCell>
                 <TableCell className="text-end">7 days</TableCell>
                 <TableCell className="pe-8 text-end">
-                  <div>{formatUSD(tvl * latestRate, compact)}</div>
+                  <div>{formatUSD(tvl * latestRate)}</div>
                   <div className="text-xs text-foreground-2">
-                    {formatETH(tvl, compact)}
+                    {formatETH(tvl)}
                   </div>
                 </TableCell>
               </TableRow>
