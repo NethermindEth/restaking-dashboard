@@ -312,7 +312,7 @@ export default function LSTDistributionGraph({
                 tickFormat={value => formatNumber(value, true)}
                 tickLabelProps={{
                   className: 'text-xs',
-                  fill: 'hsl(var(--app-foreground))',
+                  fill: 'hsl(var(--app-foreground-1))',
                   fontFamily: undefined,
                   fontSize: undefined
                 }}
@@ -329,7 +329,7 @@ export default function LSTDistributionGraph({
                 tickFormat={formatDate}
                 tickLabelProps={{
                   className: 'text-xs',
-                  fill: 'hsl(var(--app-foreground))',
+                  fill: 'hsl(var(--app-foreground-1))',
                   fontFamily: undefined,
                   fontSize: undefined
                 }}
