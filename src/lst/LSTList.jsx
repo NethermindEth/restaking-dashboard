@@ -8,6 +8,7 @@ import {
   TableRow
 } from '@nextui-org/react';
 import { lstStrategyAssetMapping } from '../shared/strategies';
+import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
 
 export default function LSTList({ data, latestRate }) {
@@ -48,12 +49,10 @@ export default function LSTList({ data, latestRate }) {
                     <span className="inline-block min-w-4 text-foreground-2">
                       {i + 1}
                     </span>
-                    <span
-                      className="inline-block min-h-3 min-w-3 rounded-full"
-                      style={{
-                        backgroundColor: `hsl(var(--app-chart-${i + 1}))`
-                      }}
-                    ></span>
+                    <ThirdPartyLogo
+                      className="size-6 min-w-6"
+                      url={lstStrategyAssetMapping[address].logo}
+                    />
                     <span className="truncate text-foreground-2">
                       {lstStrategyAssetMapping[address].name}
                     </span>
