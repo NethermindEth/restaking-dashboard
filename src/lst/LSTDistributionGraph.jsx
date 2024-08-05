@@ -177,7 +177,7 @@ export default function LSTDistributionGraph({
         start: scaleBrushDate(points[points.length - 1 - 90].timestamp),
         end: scaleBrushDate(points[points.length - 1].timestamp)
       },
-      filterPoints: points.slice(-90),
+      filteredPoints: points.slice(-90),
       keys: rankings.map(ranking => ranking[0])
     });
   }, [dispatch, points, rankings, scaleBrushDate]);
