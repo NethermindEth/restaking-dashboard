@@ -10,7 +10,7 @@ import {
   TableRow
 } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
-import { formatNumber } from '../utils';
+import { formatNumber } from '../shared/formatters';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
