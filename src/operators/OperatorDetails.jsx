@@ -251,16 +251,21 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
     }
 
     for (let i = 0; i < lstDistribution.length; i++) {
-      if (lstDistribution[i].address) {
-        const { address } = lstDistribution[i];
-        lstDistribution[i].symbol = allStrategyAssetMapping[address].symbol;
-        lstDistribution[i].logo = allStrategyAssetMapping[address].logo;
+      const lst = lstDistribution[i];
+
+      if (lst.address) {
+        const mapping = allStrategyAssetMapping[lst.address];
+
+        lst.logo = mapping.logo;
+        lst.name = mapping.name;
+        lst.symbol = mapping.symbol;
       } else {
-        lstDistribution[i].symbol = 'Others';
-        lstDistribution[i].logo = '/images/eth-multicolor.png';
+        lst.logo = '/images/eth-multicolor.png';
+        lst.name = 'Others';
+        lst.symbol = ''; // needed as chart key
       }
-      lstDistribution[i].tokensInETH =
-        parseFloat(lstDistribution[i].tokens) / 1e18;
+
+      lst.tokensInETH = parseFloat(lst.tokens) / 1e18;
     }
 
     dispatch({
@@ -295,8 +300,9 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
             return (
               <LSTShare
                 key={`lst-distribution-item-${i}`}
-                label={strategy.symbol}
+                label={strategy.name}
                 logo={strategy.logo}
+                symbol={strategy.symbol}
                 value={(strategy.tokensInETH / state.lstTVL) * 100}
               />
             );
@@ -319,7 +325,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
   );
 }
 
-function LSTShare({ label, logo, value }) {
+function LSTShare({ label, logo, symbol, value }) {
   return (
     <Progress
       classNames={{
@@ -331,7 +337,8 @@ function LSTShare({ label, logo, value }) {
       label={
         <div className="flex items-center gap-x-2">
           <ThirdPartyLogo className="size-6 min-w-6" url={logo} />
-          {label}
+          <span className="text-foreground-2">{label}</span>
+          <span className="text-foreground-1">{symbol}</span>
         </div>
       }
       radius="sm"

@@ -55,6 +55,7 @@ export default function OperatorLSTPieChart({
           {pie => {
             return pie.arcs.map((arc, i) => {
               const color = `hsl(var(--app-chart-${i + 1}))`;
+
               return (
                 <path
                   className="cursor-pointer"
@@ -73,7 +74,7 @@ export default function OperatorLSTPieChart({
                       activeColor: null
                     })
                   }
-                ></path>
+                />
               );
             });
           }}
