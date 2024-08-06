@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
-import { useTailwindBreakpoint } from '../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function OperatorDetails() {
   const { address } = useParams();
@@ -137,7 +137,7 @@ export default function OperatorDetails() {
                 <span
                   className="me-1 h-4 w-4 bg-secondary"
                   style={{
-                    mask: 'url(/assets/x.svg) no-repeat',
+                    mask: 'url(/images/x.svg) no-repeat',
                     backgroundColor: 'hsl(var(--app-secondary))'
                   }}
                 ></span>
@@ -251,16 +251,21 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
     }
 
     for (let i = 0; i < lstDistribution.length; i++) {
-      if (lstDistribution[i].address) {
-        const { address } = lstDistribution[i];
-        lstDistribution[i].symbol = allStrategyAssetMapping[address].symbol;
-        lstDistribution[i].logo = allStrategyAssetMapping[address].logo;
+      const lst = lstDistribution[i];
+
+      if (lst.address) {
+        const mapping = allStrategyAssetMapping[lst.address];
+
+        lst.logo = mapping.logo;
+        lst.name = mapping.name;
+        lst.symbol = mapping.symbol;
       } else {
-        lstDistribution[i].symbol = 'Others';
-        lstDistribution[i].logo = allStrategyAssetMapping[BEACON_STRATEGY].logo;
+        lst.logo = '/images/eth-multicolor.png';
+        lst.name = 'Others';
+        lst.symbol = ''; // needed as chart key
       }
-      lstDistribution[i].tokensInETH =
-        parseFloat(lstDistribution[i].tokens) / 1e18;
+
+      lst.tokensInETH = parseFloat(lst.tokens) / 1e18;
     }
 
     dispatch({
@@ -295,8 +300,9 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
             return (
               <LSTShare
                 key={`lst-distribution-item-${i}`}
-                label={strategy.symbol}
+                label={strategy.name}
                 logo={strategy.logo}
+                symbol={strategy.symbol}
                 value={(strategy.tokensInETH / state.lstTVL) * 100}
               />
             );
@@ -319,7 +325,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
   );
 }
 
-function LSTShare({ label, logo, value }) {
+function LSTShare({ label, logo, symbol, value }) {
   return (
     <Progress
       classNames={{
@@ -330,8 +336,9 @@ function LSTShare({ label, logo, value }) {
       }}
       label={
         <div className="flex items-center gap-x-2">
-          <ThirdPartyLogo className="size-5 min-w-5" url={logo} />
-          {label}
+          <ThirdPartyLogo className="size-6 min-w-6" url={logo} />
+          <span className="text-foreground-2">{label}</span>
+          <span className="text-foreground-1">{symbol}</span>
         </div>
       }
       radius="sm"

@@ -4,7 +4,7 @@ import { Pie } from '@visx/shape';
 import { reduceState } from '../../shared/helpers';
 import { Text } from '@visx/text';
 import { useMutativeReducer } from 'use-mutative';
-import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../../shared/hooks/useTailwindBreakpoint';
 
 export default function OperatorLSTPieChart({
   ethRate,
@@ -55,6 +55,7 @@ export default function OperatorLSTPieChart({
           {pie => {
             return pie.arcs.map((arc, i) => {
               const color = `hsl(var(--app-chart-${i + 1}))`;
+
               return (
                 <path
                   className="cursor-pointer"
@@ -73,7 +74,7 @@ export default function OperatorLSTPieChart({
                       activeColor: null
                     })
                   }
-                ></path>
+                />
               );
             });
           }}

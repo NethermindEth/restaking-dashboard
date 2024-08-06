@@ -4,7 +4,7 @@ import { Pie } from '@visx/shape';
 import { reduceState } from '../../shared/helpers';
 import { Text } from '@visx/text';
 import { useMutativeReducer } from 'use-mutative';
-import { useTailwindBreakpoint } from '../../shared/useTailwindBreakpoint';
+import { useTailwindBreakpoint } from '../../shared/hooks/useTailwindBreakpoint';
 
 export default function LRTDistributionPieChart({
   lrtDistribution,

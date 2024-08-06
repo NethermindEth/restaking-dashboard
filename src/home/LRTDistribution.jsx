@@ -84,6 +84,7 @@ export default function LRTDistribution() {
                 key={`lrt-distribution-item-${i}`}
                 label={lrt.name}
                 logo={lrt.logo}
+                symbol={lrt.symbol}
                 tvl={lrt.tvl}
                 value={(lrt.tvl / state.lrtTVL) * 100}
               />
@@ -107,7 +108,7 @@ export default function LRTDistribution() {
   );
 }
 
-function LRTShare({ label, logo, tvl, value }) {
+function LRTShare({ label, logo, symbol, tvl, value }) {
   return (
     <Progress
       classNames={{
@@ -119,7 +120,8 @@ function LRTShare({ label, logo, tvl, value }) {
       label={
         <div className="flex items-center gap-x-2">
           <ThirdPartyLogo className="size-6 min-w-6" url={logo} />
-          {label}
+          <span className="text-foreground-2">{label}</span>
+          <span className="text-foreground-1">{symbol}</span>
         </div>
       }
       radius="sm"

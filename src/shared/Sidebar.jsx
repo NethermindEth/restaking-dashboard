@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from '@nextui-org/react';
-import { useCallback } from 'react';
 import RestakingLogo from './ResatkingLogo';
+import { useCallback } from 'react';
 
 export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
