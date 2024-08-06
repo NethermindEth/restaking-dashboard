@@ -32,7 +32,7 @@ export default function Sidebar({ onOpenChange }) {
             : 'border-transparent';
           return (
             <Link
-              className={`flex gap-x-2 border-l-4 px-5 py-5 text-foreground-2 transition-all hover:border-foreground-2 hover:bg-default ${selected}`}
+              className={`flex gap-x-2 border-l-4 px-5 py-5 text-foreground-2 transition-all hover:border-foreground-2 hover:bg-default/50 hover:text-foreground-1 hover:opacity-100 ${selected}`}
               href={item.href}
               key={`nav-item-${i}`}
               onClick={handleNavLinkClick}
