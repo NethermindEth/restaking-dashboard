@@ -43,7 +43,7 @@ export default function LRT() {
       <div className="mb-4 font-display text-3xl font-medium text-foreground-1">
         Liquid restaking tokens
       </div>
-      <div className="mb-4 text-xs text-foreground-1">
+      <div className="mb-4 text-sm text-foreground-1">
         Liquid Restaking Tokens (LRTs) are similar to Liquid Staking Tokens
         except they not only capture the rewards from staking, but also the
         rewards generated from restaking liquid staked assets (such as LSTs or
