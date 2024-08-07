@@ -26,7 +26,7 @@ export default function Home() {
         });
       } catch (e) {
         dispatch({
-          isFetchingEigenlayerTVL: false,
+          isFetchingEigenLayerTVL: false,
           error: handleServiceError(e)
         });
       }
