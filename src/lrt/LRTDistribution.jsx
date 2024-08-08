@@ -1,7 +1,7 @@
-import { AreaClosed, AreaStack } from '@visx/shape';
+import { AreaClosed, AreaStack, BarStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
-import { scaleLinear, scaleUtc } from '@visx/scale';
+import { scaleBand, scaleLinear, scaleOrdinal, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
@@ -17,6 +17,11 @@ import { tabs } from '../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
 
 export default function LRTDistribution({ data, height }) {
+  for (let i = 0; i < data.length; i++) {
+    for (let k in data[i].protocols) {
+      data[i][k] = data[i].protocols[k];
+    }
+  }
   const [state, dispatch] = useMutativeReducer(reduceState, {
     filteredData: [],
     keys: [],
@@ -39,6 +44,18 @@ export default function LRTDistribution({ data, height }) {
   const dateAxisRef = useRef(null);
 
   const rootRef = useRef(null);
+  const colorScale = scaleOrdinal({
+    domain: state.keys,
+    range: [
+      'hsl(var(--app-chart-1))',
+      'hsl(var(--app-chart-2))',
+      'hsl(var(--app-chart-3))',
+      'hsl(var(--app-chart-4))',
+      'hsl(var(--app-chart-5))',
+      'hsl(var(--app-chart-6))',
+      'hsl(var(--app-chart-7))'
+    ]
+  });
   const scaleBrushDate = useMemo(
     () =>
       scaleUtc({
@@ -72,39 +89,33 @@ export default function LRTDistribution({ data, height }) {
       }),
     [data]
   );
-  const scaleDate = useMemo(
-    () =>
-      scaleUtc({
-        domain: [
-          Math.min(...state.filteredData.map(getDate)),
-          Math.max(...state.filteredData.map(getDate))
-        ],
-        range: [0, state.maxX]
-      }),
-    [state.filteredData, state.maxX]
-  );
-  const scaleValue = useMemo(
-    () =>
-      scaleLinear({
-        domain: [
-          0,
-          Math.max(
-            ...state.filteredData.map(d => {
-              let value = 0;
+  const scaleDate = useMemo(() => {
+    return scaleBand({
+      domain: state.filteredData.map(getDate),
+      padding: 0.5
+      //range: [0, state.maxX]
+    });
+  }, [state.filteredData, state.maxX]);
+  const scaleValue = useMemo(() => {
+    return scaleLinear({
+      domain: [
+        0,
+        Math.max(
+          ...state.filteredData.map(d => {
+            let value = 0;
 
-              for (let k in d.protocols) {
-                value += d.protocols[k];
-              }
+            for (let k in d.protocols) {
+              value += d.protocols[k];
+            }
 
-              return value * (state.useRate ? d.rate : 1);
-            })
-          ) * 1.1 // 10% padding
-        ],
-        nice: true,
-        range: [state.maxY, 0]
-      }),
-    [state.useRate, state.filteredData, state.maxY]
-  );
+            return value * (state.useRate ? d.rate : 1);
+          })
+        ) * 1.1 // 10% padding
+      ],
+      nice: true
+      //range: [state.maxY, 0]
+    });
+  }, [state.useRate, state.filteredData, state.maxY]);
   const getLatestTotal = useMemo(() => {
     const last = data[data.length - 1];
 
@@ -116,10 +127,7 @@ export default function LRTDistribution({ data, height }) {
 
     return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
   }, [data, state.useRate]);
-  const getValue = useCallback(
-    (d, k) => d.protocols[k] * (state.useRate ? d.rate : 1),
-    [state.useRate]
-  );
+  const getValue = useCallback((d, k) => d.timestamp, [state.useRate]);
   const handleBrushChange = useCallback(
     domain => {
       const { x0, x1 } = domain;
@@ -219,6 +227,9 @@ export default function LRTDistribution({ data, height }) {
     });
   }, [data, dispatch, scaleBrushDate]);
 
+  scaleDate.rangeRound([0, state.maxX]);
+  scaleValue.range([state.maxY, 0]);
+
   return (
     <div
       className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
@@ -263,35 +274,44 @@ export default function LRTDistribution({ data, height }) {
               x="0"
               y="0"
             />
-            <AreaStack
-              curve={curveMonotoneX}
+            <BarStack
+              //curve={curveMonotoneX}
               data={state.filteredData}
-              defined={isDefined}
+              //defined={isDefined}
               keys={state.keys}
-              value={getValue}
-              x={d => scaleDate(getDate(d.data)) ?? 0}
-              y0={d => scaleValue(getY0(d)) ?? 0}
-              y1={d => scaleValue(getY1(d)) ?? 0}
+              x={getValue}
+              xScale={scaleDate}
+              color={colorScale}
+              yScale={scaleValue}
+              //x={d => scaleDate(getDate(d.data)) ?? 0}
+              // y0={(d, e) => console.log(d, e)}
+              // y1={(d, e) => console.log('sss', d, e)}
             >
-              {({ stacks, path }) =>
-                stacks.map((stack, i) => {
-                  const color = `hsl(var(--app-chart-${i + 1}))`;
+              {stacks =>
+                stacks.map(stack =>
+                  stack.bars.map(bar => {
+                    const color = `hsl(var(--app-chart-${bar.index + 1}))`;
 
-                  return (
-                    <path
-                      d={path(stack) || ''}
-                      fill={color}
-                      key={`stack-${stack.key}`}
-                      onPointerEnter={e => handleAreaPointerMove(e, stack)}
-                      onPointerLeave={hideTooltip}
-                      onPointerMove={e => handleAreaPointerMove(e, stack)}
-                      stroke={color}
-                      // opacity={0.75}
-                    />
-                  );
-                })
+                    return (
+                      <rect
+                        x={bar.x}
+                        y={bar.y}
+                        height={bar.height}
+                        width={bar.width}
+                        //d={path(stack) || ''}
+                        fill={bar.color}
+                        key={`stack-${stack.index}-${bar.index}`}
+                        // onPointerEnter={e => handleAreaPointerMove(e, stack)}
+                        // onPointerLeave={hideTooltip}
+                        // onPointerMove={e => handleAreaPointerMove(e, stack)}
+                        //stroke={color}
+                        // opacity={0.75}
+                      />
+                    );
+                  })
+                )
               }
-            </AreaStack>
+            </BarStack>
             {tooltipOpen && (
               <line
                 opacity="0.8"
@@ -424,13 +444,15 @@ const bisectDate = bisector(i => i.data.timestamp).left;
 
 const brushSize = { height: 50, marginTop: 20 };
 const formatDate = date => {
+  date = new Date(date);
+  // console.log(date);
   if (date.getMonth() == 0 && date.getDate() == 1) {
     return date.getFullYear();
   }
 
   return axisDateFormatter.format(date);
 };
-const getDate = d => new Date(d.timestamp);
+const getDate = d => d.timestamp;
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
