@@ -17,16 +17,6 @@ import { useMutativeReducer } from 'use-mutative';
 import { useTooltip } from '@visx/tooltip';
 import { useTooltipInPortal } from '@visx/tooltip';
 
-const brushSize = { height: 50, marginTop: 20 };
-const margin = { top: 8, right: 40, bottom: 35, left: 1 };
-
-const getDate = d => new Date(d.timestamp);
-const bisectDate = bisector(stack => stack.data.timestamp).left;
-
-const getY0 = d => d[0];
-const getY1 = d => d[1];
-const isDefined = d => !!d[1];
-
 export default function LSTDistributionGraph({
   rankings,
   height,
@@ -34,6 +24,7 @@ export default function LSTDistributionGraph({
   points
 }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    brushData: [],
     error: undefined,
     filteredPoints: points,
     keys: [],
@@ -76,21 +67,15 @@ export default function LSTDistributionGraph({
         domain: [
           0,
           Math.max(
-            ...points.map(d => {
-              let value = 0;
-
-              for (let strategy in d.tvl) {
-                value += d.tvl[strategy];
-              }
-
-              return value;
+            ...state.brushData.map(d => {
+              return d.value * (state.useRate ? d.rate : 1);
             })
           )
         ],
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    [points]
+    [state.brushData, state.useRate]
   );
   const scaleDate = useMemo(
     () =>
@@ -171,7 +156,7 @@ export default function LSTDistributionGraph({
           value += d.tvl[strategy];
         }
 
-        return { timestamp: d.timestamp, value };
+        return { timestamp: d.timestamp, value, rate: d.rate };
       }),
       brushPosition: {
         start: scaleBrushDate(points[points.length - 1 - 90].timestamp),
@@ -346,7 +331,9 @@ export default function LSTDistributionGraph({
                 data={state.brushData}
                 key="value"
                 x={d => scaleBrushDate(getDate(d)) ?? 0}
-                y={d => scaleBrushValue(d.value) ?? 0}
+                y={d =>
+                  scaleBrushValue(d.value * (state.useRate ? d.rate : 1)) ?? 0
+                }
                 yScale={scaleBrushValue}
               />
             </Group>
@@ -415,25 +402,13 @@ export default function LSTDistributionGraph({
   );
 }
 
-const timelines = {
-  '1w': 7,
-  '1m': 30,
-  '3m': 90,
-  '1y': 365,
-  all: Number.MAX_SAFE_INTEGER
-};
-
 // eslint-disable-next-line no-undef
 const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'short'
 });
-
-// eslint-disable-next-line no-undef
-const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium'
-});
-
+const bisectDate = bisector(stack => stack.data.timestamp).left;
+const brushSize = { height: 50, marginTop: 20 };
 const formatDate = date => {
   if (date.getMonth() == 0 && date.getDate() == 1) {
     return date.getFullYear();
@@ -441,3 +416,19 @@ const formatDate = date => {
 
   return axisDateFormatter.format(date);
 };
+const getDate = d => new Date(d.timestamp);
+const getY0 = d => d[0];
+const getY1 = d => d[1];
+const isDefined = d => !!d[1];
+const margin = { top: 8, right: 40, bottom: 35, left: 1 };
+const timelines = {
+  '1w': 7,
+  '1m': 30,
+  '3m': 90,
+  '1y': 365,
+  all: Number.MAX_SAFE_INTEGER
+};
+// eslint-disable-next-line no-undef
+const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium'
+});

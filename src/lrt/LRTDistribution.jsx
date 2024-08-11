@@ -18,6 +18,7 @@ import { useMutativeReducer } from 'use-mutative';
 
 export default function LRTDistribution({ data, height }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    brushData: [],
     filteredData: [],
     keys: [],
     maxX: 0,
@@ -56,21 +57,15 @@ export default function LRTDistribution({ data, height }) {
         domain: [
           0,
           Math.max(
-            ...data.map(d => {
-              let value = 0;
-
-              for (let k in d.protocols) {
-                value += d.protocols[k];
-              }
-
-              return value;
+            ...state.brushData.map(d => {
+              return d.value * (state.useRate ? d.rate : 1);
             })
           )
         ],
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    [data]
+    [state.brushData, state.useRate]
   );
   const scaleDate = useMemo(
     () =>
@@ -206,7 +201,7 @@ export default function LRTDistribution({ data, height }) {
           value += d.protocols[k];
         }
 
-        return { timestamp: d.timestamp, value };
+        return { timestamp: d.timestamp, value, rate: d.rate };
       }),
       brushPosition: {
         start: scaleBrushDate(data[data.length - 1 - 90].timestamp),
@@ -347,7 +342,9 @@ export default function LRTDistribution({ data, height }) {
               data={state.brushData}
               key="value"
               x={d => scaleBrushDate(getDate(d)) ?? 0}
-              y={d => scaleBrushValue(d.value) ?? 0}
+              y={d =>
+                scaleBrushValue(d.value * (state.useRate ? d.rate : 1)) ?? 0
+              }
               yScale={scaleBrushValue}
             />
           </Group>
