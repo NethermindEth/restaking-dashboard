@@ -151,7 +151,9 @@ export default function AVSList() {
         AVS
       </div>
       <div className="mb-4 flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-        <div className="text-foreground-1">Actively Validated Services</div>
+        <div className="text-sm text-foreground-1">
+          Actively Validated Services
+        </div>
         <Input
           className="lg:w-96"
           classNames={{
