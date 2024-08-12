@@ -1,6 +1,6 @@
+import { Kbd, Link } from '@nextui-org/react';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Link } from '@nextui-org/react';
 import RestakingLogo from './ResatkingLogo';
 
 export default function Sidebar({ onOpenChange }) {
@@ -39,6 +39,16 @@ export default function Sidebar({ onOpenChange }) {
       <header className="flex-none border-l-4 border-transparent px-5 pb-8 pt-6">
         <RestakingLogo />
       </header>
+      <div className="mb-1 hidden justify-end gap-1 pr-1 lg:flex">
+        <Kbd
+          className="rounded-none bg-default/40 text-foreground-1/60"
+          keys={['space']}
+        ></Kbd>
+        <Kbd
+          className="rounded-none bg-default/40 text-foreground-1/60"
+          keys={['enter']}
+        ></Kbd>
+      </div>
       <nav className="flex-none">
         {navItems.map((item, i) => {
           const selected = new RegExp(`(^|/)${item.href}(/|$)`).test(
