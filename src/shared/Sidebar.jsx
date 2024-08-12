@@ -9,30 +9,45 @@ export default function Sidebar({ onOpenChange }) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const linkRefs = useRef([]);
 
+  /**
+   * Handles keydown events for the sidebar navigation.
+   *
+   * @param {Event} event - The keydown event object.
+   * @param {number} index - The index of the navigation item.
+   * @return {void}
+   */
   const handleKeyDown = (event, index) => {
     switch (event.key) {
       case ' ':
         event.preventDefault();
         setFocusedIndex(prevIndex =>
-          prevIndex >= navItems.length - 1 ? 0 : prevIndex + 1
+          prevIndex === navItems.length - 1 ? 0 : prevIndex + 1
         );
         break;
       case 'Enter':
+        event.preventDefault();
         navigate(navItems[index].href);
-        if (onOpenChange) {
-          onOpenChange(false);
-        }
+        onOpenChange && onOpenChange(false);
         break;
       default:
         break;
     }
   };
 
+  // setting focus to the focused link
   useEffect(() => {
     if (linkRefs.current[focusedIndex]) {
       linkRefs.current[focusedIndex].focus();
     }
   }, [focusedIndex]);
+
+  // setting focused index to be the current location
+  useEffect(() => {
+    const currentIndex = navItems.findIndex(item =>
+      new RegExp(`(^|/)${item.href}(/|$)`).test(location.pathname)
+    );
+    setFocusedIndex(currentIndex !== -1 ? currentIndex : 0);
+  }, [location.pathname]);
 
   return (
     <div onKeyDown={handleKeyDown} tabIndex={0}>
