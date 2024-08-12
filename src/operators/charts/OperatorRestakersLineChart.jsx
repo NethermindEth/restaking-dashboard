@@ -25,6 +25,7 @@ import { useTailwindBreakpoint } from '../../shared/hooks/useTailwindBreakpoint'
 
 export default function OperatorRestakersLineChart({
   isOperatorLoading,
+  operatorError,
   restakers
 }) {
   const { address } = useParams();
@@ -66,10 +67,16 @@ export default function OperatorRestakersLineChart({
 
   return (
     <div>
-      {isOperatorLoading || state.isChartLoading || state.error ? (
+      {isOperatorLoading ||
+      state.isChartLoading ||
+      state.error ||
+      operatorError ? (
         <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
-          {state.error && <ErrorMessage error={state.error} />}
-          {!state.error && <Spinner color="primary" size="lg" />}
+          {operatorError || state.error ? (
+            <ErrorMessage error={operatorError ?? state.error} />
+          ) : (
+            <Spinner color="primary" size="lg" />
+          )}
         </div>
       ) : (
         <ParentSize className="mb-4">

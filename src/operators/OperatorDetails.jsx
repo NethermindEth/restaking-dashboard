@@ -180,9 +180,11 @@ export default function OperatorDetails() {
         currentTVL={state.tvl}
         ethRate={state.ethRate}
         isOperatorLoading={state.isOperatorLoading}
+        operatorError={state.error}
       />
       <OperatorRestakersLineChart
         isOperatorLoading={state.isOperatorLoading}
+        operatorError={state.error}
         restakers={state.operator?.stakerCount}
       />
       <LSTDistribution
