@@ -1,4 +1,5 @@
 import { formatETH, formatUSD } from '../shared/formatters';
+import { handleServiceError, reduceState } from '../shared/helpers';
 import {
   Input,
   Skeleton,
@@ -12,19 +13,25 @@ import {
 } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
 import { ParentSize } from '@visx/responsive';
-import { reduceState } from '../shared/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
-export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
+export default function AVSDetailsOperatorsTab({
+  avsError,
+  isAVSLoading,
+  operators,
+  totalTokens
+}) {
   const { address } = useParams();
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    error: undefined,
     points: undefined,
     isChartLoading: true
   });
@@ -33,10 +40,16 @@ export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
 
   useEffect(() => {
     (async () => {
-      dispatch({ isChartLoading: true });
-
-      const response = await avsService.getAVSOperatorsOvertime(address);
-      dispatch({ points: response, isChartLoading: false });
+      dispatch({ isChartLoading: true, error: undefined });
+      try {
+        const response = await avsService.getAVSOperatorsOvertime(address);
+        dispatch({ points: response, isChartLoading: false });
+      } catch (e) {
+        dispatch({
+          error: handleServiceError(e),
+          isChartLoading: false
+        });
+      }
     })();
   }, [address, avsService, dispatch]);
 
@@ -53,9 +66,13 @@ export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
   return (
     <>
       {/*line chart*/}
-      {state.isChartLoading ? (
+      {isAVSLoading || state.isChartLoading || state.error || avsError ? (
         <div className="flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
-          <Spinner color="primary" size="lg" />
+          {avsError || state.error ? (
+            <ErrorMessage error={avsError ?? state.error} />
+          ) : (
+            <Spinner color="primary" size="lg" />
+          )}
         </div>
       ) : (
         <ParentSize>
@@ -74,6 +91,8 @@ export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
         <div className="mt-4 w-full">
           <AVSOperatorsList
             address={address}
+            avsError={avsError}
+            isAVSLoading={isAVSLoading}
             tvl={totalTokens.lst + totalTokens.eth}
           />
         </div>
@@ -82,14 +101,14 @@ export default function AVSDetailsOperatorsTab({ operators, totalTokens }) {
   );
 }
 
-function AVSOperatorsList({ address, tvl }) {
+function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
     currentRate: 1,
+    error: undefined,
     operators: [],
-    isError: true,
     isInputTouched: false,
     isTableLoading: true,
     totalPages: undefined,
@@ -158,7 +177,7 @@ function AVSOperatorsList({ address, tvl }) {
       } catch (e) {
         if (e.name !== 'AbortError') {
           dispatch({
-            isError: true,
+            error: handleServiceError(e),
             operators: [],
             totalPages: undefined,
             isTableLoading: false,
@@ -235,122 +254,138 @@ function AVSOperatorsList({ address, tvl }) {
         />
       </div>
 
-      <Table
-        aria-label="List of operators registered for AVS"
-        classNames={{
-          base: 'h-full overflow-x-auto',
-          table: 'h-full'
-        }}
-        layout="fixed"
-        onSortChange={handleSort}
-        removeWrapper
-        sortDescriptor={state.sortDescriptor}
-      >
-        <TableHeader>
-          <TableColumn
-            allowsSorting
-            className="text-foreground-active w-64 bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
-            key="operator"
-          >
-            Operators
-          </TableColumn>
-          <TableColumn
-            allowsSorting
-            className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
-            key="share"
-          >
-            <span className="inline-block">Share</span>
-          </TableColumn>
-          <TableColumn
-            allowsSorting
-            className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
-            key="tvl"
-          >
-            TVL
-          </TableColumn>
-        </TableHeader>
-        <TableBody
-          emptyContent={
-            <div className="flex h-[40rem] flex-col items-center justify-center">
-              <span className="text-lg text-foreground-2">
-                No result found for {truncate(state.search ?? '')}
-              </span>
-            </div>
-          }
-        >
-          {state.isTableLoading &&
-            [...new Array(10)].map((_, i) => (
-              <TableRow className="border-t border-outline" key={i}>
-                <TableCell className="w-1/3 py-4 pe-8 ps-4">
-                  <Skeleton className="h-4 rounded-md" />
-                </TableCell>
-                <TableCell className="w-1/3 py-4 pe-8 ps-4 text-end">
-                  <Skeleton className="h-4 rounded-md" />
-                </TableCell>
-                <TableCell className="w-1/3 py-4 pe-8 ps-4">
-                  <Skeleton className="h-8 rounded-md" />
-                </TableCell>
-              </TableRow>
-            ))}
-
-          {!state.isTableLoading &&
-            state.operators.map((op, i) => (
-              <TableRow
-                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                key={`avs-operator-${i}`}
-                onClick={() => {
-                  navigate(`/operators/${op.address}`, {
-                    state: { operator: op }
-                  });
-                }}
-              >
-                <TableCell className="p-4">
-                  <div className="flex items-center gap-x-3">
-                    <span className="min-w-5">
-                      {(state.page - 1) * 10 + i + 1}
-                    </span>
-                    <ThirdPartyLogo
-                      className="size-8 min-w-8"
-                      url={op.metadata?.logo}
-                    />
-                    <span className="truncate">
-                      {op.metadata?.name || op.address}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="pe-8 text-end">
-                  <div>{((op.strategiesTotal / tvl) * 100).toFixed(2)}%</div>
-                </TableCell>
-                <TableCell className="pe-8 text-end">
-                  <div>
-                    {formatUSD(op.strategiesTotal * state.currentRate, compact)}
-                  </div>
-                  <div className="text-xs text-foreground-2">
-                    {formatETH(op.strategiesTotal, compact)}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-
-          {!state.isTableLoading &&
-            state.operators.length > 0 &&
-            [...Array(10 - state.operators.length)].map((_, i) => (
-              <TableRow className="border-none" key={i}>
-                <TableCell className="h-[4rem] w-1/3"></TableCell>
-                <TableCell className="w-1/3"></TableCell>
-                <TableCell className="w-1/3"></TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-
-      {state.totalPages !== undefined && state.operators.length > 0 && (
-        <ListPagination
-          onChange={handlePageClick}
-          page={state.page}
-          total={state.totalPages}
-        />
+      {(state.error || avsError) && (
+        <div className="flex h-48 flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
+          <ErrorMessage error={state.error ?? avsError} />
+        </div>
       )}
+
+      {!avsError && !state.error && (
+        <Table
+          aria-label="List of operators registered for AVS"
+          classNames={{
+            base: 'h-full overflow-x-auto',
+            table: 'h-full'
+          }}
+          layout="fixed"
+          onSortChange={handleSort}
+          removeWrapper
+          sortDescriptor={state.sortDescriptor}
+        >
+          <TableHeader>
+            <TableColumn
+              allowsSorting
+              className="text-foreground-active w-64 bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
+              key="operator"
+            >
+              Operators
+            </TableColumn>
+            <TableColumn
+              allowsSorting
+              className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
+              key="share"
+            >
+              <span className="inline-block">Share</span>
+            </TableColumn>
+            <TableColumn
+              allowsSorting
+              className="text-foreground-active w-32 bg-transparent py-4 text-end text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3"
+              key="tvl"
+            >
+              TVL
+            </TableColumn>
+          </TableHeader>
+          <TableBody
+            emptyContent={
+              <div className="flex h-[40rem] flex-col items-center justify-center">
+                <span className="text-lg text-foreground-2">
+                  No result found for {truncate(state.search ?? '')}
+                </span>
+              </div>
+            }
+          >
+            {(state.isTableLoading || isAVSLoading) &&
+              [...new Array(10)].map((_, i) => (
+                <TableRow className="border-t border-outline" key={i}>
+                  <TableCell className="w-1/3 py-4 pe-8 ps-4">
+                    <Skeleton className="h-4 rounded-md" />
+                  </TableCell>
+                  <TableCell className="w-1/3 py-4 pe-8 ps-4 text-end">
+                    <Skeleton className="h-4 rounded-md" />
+                  </TableCell>
+                  <TableCell className="w-1/3 py-4 pe-8 ps-4">
+                    <Skeleton className="h-8 rounded-md" />
+                  </TableCell>
+                </TableRow>
+              ))}
+
+            {!state.isTableLoading &&
+              !isAVSLoading &&
+              state.operators.map((op, i) => (
+                <TableRow
+                  className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                  key={`avs-operator-${i}`}
+                  onClick={() => {
+                    navigate(`/operators/${op.address}`, {
+                      state: { operator: op }
+                    });
+                  }}
+                >
+                  <TableCell className="p-4">
+                    <div className="flex items-center gap-x-3">
+                      <span className="min-w-5">
+                        {(state.page - 1) * 10 + i + 1}
+                      </span>
+                      <ThirdPartyLogo
+                        className="size-8 min-w-8"
+                        url={op.metadata?.logo}
+                      />
+                      <span className="truncate">
+                        {op.metadata?.name || op.address}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="pe-8 text-end">
+                    <div>{((op.strategiesTotal / tvl) * 100).toFixed(2)}%</div>
+                  </TableCell>
+                  <TableCell className="pe-8 text-end">
+                    <div>
+                      {formatUSD(
+                        op.strategiesTotal * state.currentRate,
+                        compact
+                      )}
+                    </div>
+                    <div className="text-xs text-foreground-2">
+                      {formatETH(op.strategiesTotal, compact)}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+
+            {!state.isTableLoading &&
+              !isAVSLoading &&
+              state.operators.length > 0 &&
+              [...Array(10 - state.operators.length)].map((_, i) => (
+                <TableRow className="border-none" key={i}>
+                  <TableCell className="h-[4rem] w-1/3"></TableCell>
+                  <TableCell className="w-1/3"></TableCell>
+                  <TableCell className="w-1/3"></TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      )}
+
+      {!avsError &&
+        !state.error &&
+        state.totalPages !== undefined &&
+        state.operators.length > 0 && (
+          <ListPagination
+            onChange={handlePageClick}
+            page={state.page}
+            total={state.totalPages}
+          />
+        )}
     </div>
   );
 }

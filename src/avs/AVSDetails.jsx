@@ -1,10 +1,11 @@
 import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
 import { formatETH, formatNumber } from '../shared/formatters';
+import { handleServiceError, reduceState } from '../shared/helpers';
 import { Skeleton, Tab, Tabs } from '@nextui-org/react';
 import AVSDetailsHeader from './AVSDetailsHeader';
 import AVSDetailsOperatorsTab from './AVSDetailsOperatorsTab';
 import AVSDetailsTVLTab from './AVSDetailsTVLTab';
-import { reduceState } from '../shared/helpers';
+import ErrorMessage from '../shared/ErrorMessage';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
@@ -16,58 +17,67 @@ export default function AVSDetails() {
   const { address, tab } = useParams();
   const { pathname } = useLocation();
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    avs: undefined,
+    error: undefined,
+    ethRate: 1,
     isAVSLoading: true,
     strategies: undefined,
-    avs: undefined,
     totalTokens: {
       lst: 0,
       eth: 0,
       eigen: 0
-    },
-    ethRate: 1
+    }
   });
   const { avsService } = useServices();
   const compact = !useTailwindBreakpoint('lg');
 
   useEffect(() => {
-    dispatch({ isAVSLoading: true });
+    dispatch({ error: undefined, isAVSLoading: true });
+
     (async () => {
-      const avs = await avsService.getAVSDetails(address);
+      try {
+        const avs = await avsService.getAVSDetails(address);
 
-      const strategies = avs.strategies.reduce((acc, strategy) => {
-        acc[strategy.address] = BigInt(strategy.tokens) / BigInt(1e18);
-        return acc;
-      }, Object.create(null));
+        const strategies = avs.strategies.reduce((acc, strategy) => {
+          acc[strategy.address] = BigInt(strategy.tokens) / BigInt(1e18);
+          return acc;
+        }, Object.create(null));
 
-      const totals = { lst: 0n, eth: 0n, eigen: 0n };
+        const totals = { lst: 0n, eth: 0n, eigen: 0n };
 
-      for (const strategy in strategies) {
-        if (strategy === EIGEN_STRATEGY) {
-          totals.eigen += strategies[strategy];
-        } else if (strategy === BEACON_STRATEGY) {
-          totals.eth += strategies[strategy];
-        } else {
-          totals.lst += strategies[strategy];
+        for (const strategy in strategies) {
+          if (strategy === EIGEN_STRATEGY) {
+            totals.eigen += strategies[strategy];
+          } else if (strategy === BEACON_STRATEGY) {
+            totals.eth += strategies[strategy];
+          } else {
+            totals.lst += strategies[strategy];
+          }
         }
+
+        totals.eigen = Number(totals.eigen);
+        totals.eth = Number(totals.eth);
+        totals.lst = Number(totals.lst);
+
+        dispatch({
+          avs,
+          ethRate: avs.rate,
+          isAVSLoading: false,
+          strategies,
+          totalTokens: totals
+        });
+      } catch (e) {
+        dispatch({
+          error: handleServiceError(e),
+          isAVSLoading: false
+        });
       }
-
-      totals.eigen = Number(totals.eigen);
-      totals.eth = Number(totals.eth);
-      totals.lst = Number(totals.lst);
-
-      dispatch({
-        avs,
-        ethRate: avs.rate,
-        strategies,
-        totalTokens: totals,
-        isAVSLoading: false
-      });
     })();
   }, [address, avsService, dispatch]);
 
   return (
     <>
-      {state.isAVSLoading ? (
+      {state.isAVSLoading && (
         <div className="min-h-[128px] w-full overflow-hidden rounded-lg border border-outline bg-content1 p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
@@ -77,7 +87,15 @@ export default function AVSDetails() {
             <Skeleton className="h-16 w-full rounded-md" />
           </div>
         </div>
-      ) : (
+      )}
+
+      {state.error && (
+        <div className="flex min-h-[128px] w-full items-center justify-center overflow-hidden rounded-lg border border-outline bg-content1 p-4">
+          <ErrorMessage error={state.error} />
+        </div>
+      )}
+
+      {!state.isAVSLoading && !state.error && (
         <AVSDetailsHeader avs={state.avs} />
       )}
 
@@ -103,9 +121,13 @@ export default function AVSDetails() {
                 Total value
               </div>
               <div>
-                {state.isAVSLoading ? (
+                {state.isAVSLoading && (
                   <Skeleton className="mt-2 h-4 w-full rounded-md" />
-                ) : (
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isAVSLoading && !state.error && (
                   <span className="text-foreground-1 group-aria-selected:text-foreground">
                     {formatETH(
                       state.totalTokens.lst + state.totalTokens.eth,
@@ -118,6 +140,7 @@ export default function AVSDetails() {
           }
         >
           <AVSDetailsTVLTab
+            avsError={state.error}
             ethRate={state.ethRate}
             isAVSLoading={state.isAVSLoading}
             lst={state.strategies}
@@ -134,9 +157,13 @@ export default function AVSDetails() {
                 Operators
               </div>
               <div>
-                {state.isAVSLoading ? (
+                {state.isAVSLoading && (
                   <Skeleton className="my-1 h-4 w-full rounded-md" />
-                ) : (
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isAVSLoading && !state.error && (
                   <span className="text-foreground-1 group-aria-selected:text-foreground">
                     {formatNumber(state.avs.operators)}
                   </span>
@@ -146,6 +173,8 @@ export default function AVSDetails() {
           }
         >
           <AVSDetailsOperatorsTab
+            avsError={state.error}
+            isAVSLoading={state.isAVSLoading}
             operators={state.avs?.operators}
             totalTokens={state.totalTokens}
           />
@@ -157,9 +186,13 @@ export default function AVSDetails() {
             <div className="flex flex-col items-center">
               <div className="text-sm">Restakers</div>
               <div>
-                {state.isAVSLoading ? (
+                {state.isAVSLoading && (
                   <Skeleton className="my-1 h-4 w-full rounded-md" />
-                ) : (
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isAVSLoading && !state.error && (
                   <span>{formatNumber(state.avs.stakers)}</span>
                 )}
               </div>
