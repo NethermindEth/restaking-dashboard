@@ -61,7 +61,13 @@ export default function Sidebar({ onOpenChange }) {
               className={`flex gap-x-2 border-l-4 px-5 py-5 text-foreground-2 transition-all hover:border-foreground-2 hover:bg-default/50 hover:text-foreground-1 hover:opacity-100 focus:border-foreground-1 focus:bg-default focus:text-foreground-1 focus:outline-none focus:ring-0 ${selected}`}
               href={item.href}
               key={`nav-item-${i}`}
-              onPress={() => {
+              onPress={e => {
+                if (e.ctrlKey || e.metaKey || e.button === 1) {
+                  return;
+                  // this checks if the user is holding Ctrl, Cmd, or is middle - clicking and would open a new tab
+                }
+                // for normal single click
+                e.preventDefault();
                 navigate(item.href);
                 if (onOpenChange) {
                   onOpenChange(false);
