@@ -97,8 +97,8 @@ export default function LSTDistributionGraph({
             ...state.filteredPoints.map(d => {
               let value = 0;
 
-              for (let strategy in d.tvl) {
-                value += d.tvl[strategy];
+              for (let strategy of d.strategies) {
+                value += strategy.value;
               }
 
               return value * (state.useRate ? d.rate : 1);
@@ -113,7 +113,8 @@ export default function LSTDistributionGraph({
 
   const getValue = useCallback(
     (d, strategy) => {
-      return d.tvl[strategy] * (state.useRate ? d.rate : 1);
+      const found = d.strategies.find(s => s.address === strategy)?.value ?? 0;
+      return found * (state.useRate ? d.rate : 1);
     },
     [state.useRate]
   );
@@ -152,8 +153,8 @@ export default function LSTDistributionGraph({
       brushData: points?.map(d => {
         let value = 0;
 
-        for (let strategy in d.tvl) {
-          value += d.tvl[strategy];
+        for (let strategy of d.strategies) {
+          value += strategy.value;
         }
 
         return { timestamp: d.timestamp, value, rate: d.rate };
@@ -163,7 +164,7 @@ export default function LSTDistributionGraph({
         end: scaleBrushDate(points[points.length - 1].timestamp)
       },
       filteredPoints: points.slice(-90),
-      keys: rankings.map(ranking => ranking[0])
+      keys: rankings.map(ranking => ranking.address)
     });
   }, [dispatch, points, rankings, scaleBrushDate]);
 
@@ -172,8 +173,8 @@ export default function LSTDistributionGraph({
 
     let total = 0;
 
-    for (const strategy in latest.tvl) {
-      total += latest.tvl[strategy];
+    for (const strategy of latest.strategies) {
+      total += strategy.value;
     }
 
     return state.useRate ? formatUSD(total * latest.rate) : formatETH(total);
@@ -384,12 +385,8 @@ export default function LSTDistributionGraph({
                     {allStrategyAssetMapping[key]?.symbol ?? key}
                     <span className="grow ps-4 text-end">
                       {state.useRate
-                        ? formatUSD(
-                            Number(
-                              tooltipData.data.tvl[key] * tooltipData.data.rate
-                            )
-                          )
-                        : formatETH(Number(tooltipData.data.tvl[key]))}
+                        ? formatUSD(getValue(tooltipData.data, key))
+                        : formatETH(getValue(tooltipData.data, key))}
                     </span>
                   </div>
                 </li>

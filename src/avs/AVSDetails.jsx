@@ -102,7 +102,7 @@ export default function AVSDetails() {
               <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
                 Total value
               </div>
-              <div>
+              <div className="flex w-full justify-center">
                 {state.isAVSLoading ? (
                   <Skeleton className="mt-2 h-4 w-full rounded-md" />
                 ) : (
@@ -133,9 +133,9 @@ export default function AVSDetails() {
               <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
                 Operators
               </div>
-              <div>
+              <div className="flex w-full justify-center">
                 {state.isAVSLoading ? (
-                  <Skeleton className="my-1 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
                 ) : (
                   <span className="text-foreground-1 group-aria-selected:text-foreground">
                     {formatNumber(state.avs.operators)}
@@ -156,9 +156,9 @@ export default function AVSDetails() {
           title={
             <div className="flex flex-col items-center">
               <div className="text-sm">Restakers</div>
-              <div>
+              <div className="flex w-full justify-center">
                 {state.isAVSLoading ? (
-                  <Skeleton className="my-1 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
                 ) : (
                   <span>{formatNumber(state.avs.stakers)}</span>
                 )}
