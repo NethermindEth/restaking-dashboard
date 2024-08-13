@@ -55,3 +55,11 @@ export const protocols = {
     logo: '/images/rsweth.png'
   }
 };
+
+export const transformProtocols = data => {
+  data.protocols = data.protocols.reduce((acc, p) => {
+    acc[p.id] = p.tvl;
+
+    return acc;
+  }, Object.create(null));
+};
