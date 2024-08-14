@@ -4,7 +4,7 @@ import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 
 export default function LRTList({ data }) {
   return (
-    <div className="rounded-lg border border-outline bg-content1 text-sm">
+    <div className="rd-box text-sm">
       <div className="flex flex-row items-center justify-between gap-x-2 p-4 text-foreground-1">
         <span className="basis-1/2 ps-6">Protocol</span>
         <span className="basis-1/2 text-end">Total value</span>
