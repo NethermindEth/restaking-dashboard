@@ -59,8 +59,7 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   );
 
   const isEmpty = useMemo(
-    () =>
-      root.children.reduce((acc, child) => (acc += child.data.value), 0) === 0,
+    () => root.children.reduce((acc, child) => acc + child.data.value, 0) === 0,
     [root]
   );
 
@@ -117,20 +116,24 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     <div className="h-full w-full rounded-lg border border-outline bg-content1 p-4">
       <div className="mb-4 flex justify-between">
         <div className="text-medium text-foreground-1">LST distribution</div>
-        <Tabs
-          classNames={tabs}
-          defaultSelectedKey="usd"
-          onSelectionChange={handleTabChange}
-          size="sm"
-        >
-          <Tab key="all" title="All assets" />
-          <Tab key="lst" title="LST" />
-        </Tabs>
+        {!isEmpty && (
+          <Tabs
+            classNames={tabs}
+            defaultSelectedKey="usd"
+            onSelectionChange={handleTabChange}
+            size="sm"
+          >
+            <Tab key="all" title="All assets" />
+            <Tab key="lst" title="LST" />
+          </Tabs>
+        )}
       </div>
 
       {isEmpty && (
         <div className="flex h-full items-center justify-center">
-          <ErrorMessage message="No distribution to display" />
+          <span className="text-lg text-foreground-2">
+            No distribution to display
+          </span>
         </div>
       )}
 
