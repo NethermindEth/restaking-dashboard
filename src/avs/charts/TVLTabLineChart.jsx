@@ -19,24 +19,17 @@ export default function TVLTabLineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    filteredPoints: points,
-    maxX: Math.max(width - margin.left - margin.right, 0),
-    maxY: height - margin.top - margin.bottom,
+    filteredPoints: [],
+    maxX: 0,
+    maxY: 0,
     useRate: true
   });
 
-  useEffect(() => {
-    dispatch({
-      filteredPoints: points
-    });
-  }, [dispatch, points]);
-
-  useEffect(() => {
-    dispatch({
-      maxX: Math.max(width - margin.left - margin.right, 0),
-      maxY: height - margin.top - margin.bottom
-    });
-  }, [dispatch, width, height]);
+  // useEffect(() => {
+  //   dispatch({
+  //     filteredPoints: points
+  //   });
+  // }, [dispatch, points]);
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -87,6 +80,10 @@ export default function TVLTabLineChart({ points, height, width }) {
   }, [compact, points, state.useRate]);
 
   const growthPercentage = useMemo(() => {
+    if (!state.filteredPoints.length) {
+      return null;
+    }
+
     const first = state.filteredPoints[0];
     const lastest = state.filteredPoints[state.filteredPoints.length - 1];
 
@@ -110,12 +107,7 @@ export default function TVLTabLineChart({ points, height, width }) {
     },
     [points, dispatch]
   );
-  const handleRateSelectionChange = useCallback(
-    key => {
-      dispatch({ useRate: key === 'usd' });
-    },
-    [dispatch]
-  );
+
   const handlePointerMove = useCallback(
     event => {
       const point = localPoint(event.target.ownerSVGElement, event);
@@ -124,6 +116,7 @@ export default function TVLTabLineChart({ points, height, width }) {
       const d0 = state.filteredPoints[index - 1];
       const d1 = state.filteredPoints[index];
       let d = d0;
+
       if (d1) {
         d =
           x.getTime() - getDate(d0).getTime() >
@@ -140,6 +133,19 @@ export default function TVLTabLineChart({ points, height, width }) {
     },
     [getValue, showTooltip, scaleDate, scaleValue, state.filteredPoints]
   );
+
+  useEffect(() => {
+    dispatch({
+      maxX: Math.max(width - margin.left - margin.right, 0),
+      maxY: height - margin.top - margin.bottom
+    });
+  }, [dispatch, width, height]);
+
+  useEffect(() => {
+    if (state.maxX > 0 && !state.filteredPoints.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredPoints, state.maxX]);
 
   return (
     <div className="rounded-lg border border-outline bg-content1 p-4">
@@ -159,7 +165,7 @@ export default function TVLTabLineChart({ points, height, width }) {
         <Tabs
           classNames={tabs}
           defaultSelectedKey="usd"
-          onSelectionChange={handleRateSelectionChange}
+          onSelectionChange={key => dispatch({ useRate: key === 'usd' })}
           size="sm"
         >
           <Tab key="usd" title="USD" />
@@ -167,7 +173,7 @@ export default function TVLTabLineChart({ points, height, width }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="all"
+          defaultSelectedKey={TIMELINE_DEFAULT}
           disabledKeys={disabledKeys}
           onSelectionChange={handleTimelineSelectionChange}
           size="sm"
@@ -276,6 +282,7 @@ export default function TVLTabLineChart({ points, height, width }) {
 }
 
 const margin = { top: 20, right: 40, bottom: 24, left: 0 };
+const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
   '1m': 30,
