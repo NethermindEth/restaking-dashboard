@@ -1,6 +1,6 @@
 import BaseService from './BaseService';
 
-export default class EigenlayerService extends BaseService {
+export default class EigenLayerService extends BaseService {
   async getEigenLayerTVLOvertime() {
     const response = await BaseService._get(`/eigenlayer/tvl`);
 
