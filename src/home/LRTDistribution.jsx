@@ -75,7 +75,7 @@ export default function LRTDistribution() {
 
   return (
     <div className="rd-box flex min-h-44 basis-full flex-col gap-y-4 p-4">
-      <div className="text-foreground-1">LRT Distribution</div>
+      <div className="text-foreground-1">LRT distribution</div>
       <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
         <div className="flex w-full basis-3/4 flex-col gap-y-4">
           {state.lrtDistribution.map((lrt, i) => {
