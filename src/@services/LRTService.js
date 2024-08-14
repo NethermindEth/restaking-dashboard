@@ -21,8 +21,8 @@ export default class LRTService extends BaseService {
     throw await this._createError(response);
   }
 
-  async getLRTDistribution() {
-    const response = await BaseService._get('/lrt');
+  async getLatest() {
+    const response = await BaseService._get('/lrt/latest');
 
     if (response.ok) {
       return await response.json();

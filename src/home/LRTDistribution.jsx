@@ -24,17 +24,17 @@ export default function LRTDistribution() {
     const fetchLRTData = async () => {
       try {
         dispatch({ isFetchingData: true });
-        const results = await lrtService.getLRTDistribution();
+        const result = await lrtService.getLatest();
 
         const lrtDistribution = [];
         let lrtTVL = 0;
 
-        Object.keys(results.protocols).forEach(p => {
+        result.protocols.forEach(p => {
           const lrt = {
-            ...protocols[p]
+            ...protocols[p.id]
           };
-          lrt.tvl = results.protocols[p];
-          lrtTVL += results.protocols[p];
+          lrt.tvl = p.tvl;
+          lrtTVL += p.tvl;
           lrtDistribution.push(lrt);
         });
 
@@ -43,7 +43,7 @@ export default function LRTDistribution() {
             .sort((a, b) => b.tvl - a.tvl)
             .filter(lrt => (lrt.tvl / lrtTVL) * 100 > 1), // Filter and display only LRTs that have more than 1% share
           lrtTVL,
-          rate: results.rate,
+          rate: result.rate,
           isFetchingData: false
         });
       } catch (e) {
