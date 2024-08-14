@@ -17,12 +17,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useTooltip } from '@visx/tooltip';
 import { useTooltipInPortal } from '@visx/tooltip';
 
-export default function LSTDistributionGraph({
-  rankings,
-  height,
-  width,
-  points
-}) {
+export default function LSTDistribution({ rankings, height, width, points }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     brushData: [],
     error: undefined,

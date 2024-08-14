@@ -1,6 +1,6 @@
 import { handleServiceError, reduceState } from '../shared/helpers';
 import ErrorMessage from '../shared/ErrorMessage';
-import LSTDistributionGraph from './LSTDistributionGraph';
+import LSTDistribution from './LSTDistribution';
 import LSTList from './LSTList';
 import LSTTotalValue from './LSTTotalValue';
 import { ParentSize } from '@visx/responsive';
@@ -83,7 +83,7 @@ export default function LST() {
             <ParentSize>
               {parent => {
                 return (
-                  <LSTDistributionGraph
+                  <LSTDistribution
                     height={512}
                     points={state.lst}
                     rankings={state.rankings}
