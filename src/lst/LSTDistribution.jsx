@@ -112,10 +112,9 @@ export default function LSTDistributionGraph({
   );
 
   const getValue = useCallback(
-    (d, strategy) => {
-      const found = d.strategies.find(s => s.address === strategy)?.value ?? 0;
-      return found * (state.useRate ? d.rate : 1);
-    },
+    (d, strategy) =>
+      (d.strategies.find(s => s.address === strategy)?.value ?? 0) *
+      (state.useRate ? d.rate : 1),
     [state.useRate]
   );
 
@@ -356,7 +355,6 @@ export default function LSTDistributionGraph({
           </div>
         </div>
       </div>
-
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
@@ -393,6 +391,12 @@ export default function LSTDistributionGraph({
               );
             })}
           </ul>
+          <div className="mt-2 flex flex-row px-2 text-sm">
+            <span>Total</span>
+            <span className="grow text-end">
+              {calculateTotal(tooltipData.data, state.useRate)}
+            </span>
+          </div>
         </TooltipInPortal>
       )}
     </div>
@@ -406,6 +410,11 @@ const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
 });
 const bisectDate = bisector(stack => stack.data.timestamp).left;
 const brushSize = { height: 50, marginTop: 20 };
+const calculateTotal = (data, useRate) => {
+  const total = data.strategies.reduce((acc, s) => acc + s.value, 0);
+
+  return useRate ? formatUSD(total * data.rate) : formatETH(total);
+};
 const formatDate = date => {
   if (date.getMonth() == 0 && date.getDate() == 1) {
     return date.getFullYear();
