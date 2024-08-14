@@ -224,7 +224,7 @@ function LineChart({ points, height, width }) {
         <div className="flex flex-1 justify-end">
           <Tabs
             classNames={tabs}
-            defaultSelectedKey="3m"
+            defaultSelectedKey="all"
             disabledKeys={disabledKeys}
             onSelectionChange={handleTimelineSelectionChange}
             size="sm"

@@ -19,7 +19,7 @@ import { useMutativeReducer } from 'use-mutative';
 export default function LRTDistribution({ data, height }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     brushData: [],
-    filteredData: [],
+    filteredData: data,
     keys: [],
     maxX: 0,
     maxY: 0,
@@ -204,10 +204,9 @@ export default function LRTDistribution({ data, height }) {
         return { timestamp: d.timestamp, value, rate: d.rate };
       }),
       brushPosition: {
-        start: scaleBrushDate(data[data.length - 1 - 90].timestamp),
+        start: scaleBrushDate(data[0].timestamp),
         end: scaleBrushDate(data[data.length - 1].timestamp)
       },
-      filteredData: data.slice(-90),
       keys: Object.entries(data?.[data.length - 1].protocols)
         .sort(sortProtocols)
         .map(([k]) => k)
@@ -235,7 +234,7 @@ export default function LRTDistribution({ data, height }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="3m"
+          defaultSelectedKey="all"
           onSelectionChange={handleTabSelectionChange}
           size="sm"
         >

@@ -249,7 +249,7 @@ function LineChart({ points, height, width }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="3m"
+          defaultSelectedKey="all"
           disabledKeys={disabledKeys}
           onSelectionChange={handleTimelineSelectionChange}
           size="sm"

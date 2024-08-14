@@ -272,7 +272,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="3m"
+          defaultSelectedKey="all"
           onSelectionChange={handleTabSelectionChange}
           size="sm"
         >

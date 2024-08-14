@@ -160,10 +160,9 @@ export default function LSTDistributionGraph({
         return { timestamp: d.timestamp, value, rate: d.rate };
       }),
       brushPosition: {
-        start: scaleBrushDate(points[points.length - 1 - 90].timestamp),
+        start: scaleBrushDate(points[0].timestamp),
         end: scaleBrushDate(points[points.length - 1].timestamp)
       },
-      filteredPoints: points.slice(-90),
       keys: rankings.map(ranking => ranking.address)
     });
   }, [dispatch, points, rankings, scaleBrushDate]);
@@ -219,7 +218,7 @@ export default function LSTDistributionGraph({
           </Tabs>
           <Tabs
             classNames={tabs}
-            defaultSelectedKey="3m"
+            defaultSelectedKey="all"
             onSelectionChange={handleTimelineSelectionChange}
             size="sm"
           >
