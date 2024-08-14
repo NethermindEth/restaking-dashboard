@@ -1,4 +1,3 @@
-import { apiGet } from './apiCall';
 import BaseService from './BaseService';
 
 export default class EigenlayerService extends BaseService {
@@ -13,7 +12,7 @@ export default class EigenlayerService extends BaseService {
   }
 
   async getEigenLayerLSTTotalValue() {
-    const response = await apiGet(`/eigenlayer/tvl/lst`);
+    const response = await BaseService._get(`/eigenlayer/tvl/lst`);
 
     if (response.ok) {
       return await response.json();
