@@ -1,4 +1,3 @@
-import { apiGet } from './apiCall';
 import BaseService from './BaseService';
 
 export default class OperatorService extends BaseService {
@@ -19,21 +18,6 @@ export default class OperatorService extends BaseService {
     }
 
     throw await this._createError(response);
-  }
-
-  async getTopOperators() {
-    const response = await apiGet(`/operators/`, {
-      query: {
-        'page-size': 3
-      }
-    });
-
-    if (response.ok) {
-      return await response.json();
-    }
-
-    // TODO: Handle error
-    return await response.json();
   }
 
   async getOperator(address) {

@@ -23,8 +23,7 @@ export default class AVSService extends BaseService {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 
   async getAVSOperators(address, pageNumber, search, sort, signal) {
@@ -40,9 +39,9 @@ export default class AVSService extends BaseService {
 
     if (response.ok) {
       return await response.json();
-    } else {
-      throw new Error(await response.json());
     }
+
+    throw await this._createError(response);
   }
 
   async getAVSTotalValue(address) {
@@ -52,8 +51,7 @@ export default class AVSService extends BaseService {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 
   async getAVSOperatorsOvertime(address) {
@@ -63,22 +61,6 @@ export default class AVSService extends BaseService {
       return await response.json();
     }
 
-    // TODO: Handle error
-    return await response.json();
-  }
-
-  async getTopAVS() {
-    const response = await apiGet(`/avs/`, {
-      query: {
-        'page-size': 3
-      }
-    });
-
-    if (response.ok) {
-      return await response.json();
-    }
-
-    // TODO: Handle error
-    return await response.json();
+    throw await this._createError(response);
   }
 }

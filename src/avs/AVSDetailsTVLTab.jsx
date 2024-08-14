@@ -4,9 +4,9 @@ import {
   lstStrategyAssetMapping
 } from '../shared/strategies';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import { handleServiceError, reduceState } from '../shared/helpers';
 import {
   Skeleton,
-  Spacer,
   Spinner,
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import {
   Tooltip
 } from '@nextui-org/react';
 import { useEffect, useMemo, useState } from 'react';
+import ErrorMessage from '../shared/ErrorMessage';
 import { ParentSize } from '@visx/responsive';
-import { reduceState } from '../shared/helpers';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { tooltip } from '../shared/slots';
 import TVLTabLineChart from './charts/TVLTabLineChart';
@@ -29,6 +29,7 @@ import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function AVSDetailsTVLTab({
+  avsError,
   totalTokens,
   lst,
   ethRate,
@@ -37,19 +38,27 @@ export default function AVSDetailsTVLTab({
   const { address } = useParams();
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    points: undefined,
-    isChartLoading: true
+    error: undefined,
+    isChartLoading: true,
+    points: undefined
   });
   const { avsService } = useServices();
 
   useEffect(() => {
     (async () => {
-      dispatch({ isChartLoading: true });
-      const response = await avsService.getAVSTotalValue(address);
-      dispatch({
-        isChartLoading: false,
-        points: response
-      });
+      dispatch({ error: undefined, isChartLoading: true });
+      try {
+        const response = await avsService.getAVSTotalValue(address);
+        dispatch({
+          isChartLoading: false,
+          points: response
+        });
+      } catch (e) {
+        dispatch({
+          error: handleServiceError(e),
+          isChartLoading: false
+        });
+      }
     })();
   }, [address, avsService, dispatch]);
 
@@ -68,9 +77,13 @@ export default function AVSDetailsTVLTab({
   return (
     <>
       {/* line chart */}
-      {isAVSLoading || state.isChartLoading ? (
+      {isAVSLoading || state.isChartLoading || state.error || avsError ? (
         <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
-          <Spinner color="primary" size="lg" />
+          {avsError || state.error ? (
+            <ErrorMessage error={avsError ?? state.error} />
+          ) : (
+            <Spinner color="primary" size="lg" />
+          )}
         </div>
       ) : (
         <ParentSize className="mb-4">
@@ -86,27 +99,31 @@ export default function AVSDetailsTVLTab({
 
       {/*layout*/}
       <div className="flex h-min w-full flex-col gap-4 md:flex-row">
-        <div className="w-full basis-1/2 md:w-1/2">
+        <div className="flex w-full basis-1/2 flex-col gap-y-4 md:w-1/2">
           <TokensBreakdownList
+            avsError={avsError}
             ethRate={ethRate}
             isAVSLoading={isAVSLoading}
             totalTokens={totalTokens}
           />
-          <Spacer y={4} />
           <LSTBreakdownList
+            avsError={avsError}
             ethRate={ethRate}
             isAVSLoading={isAVSLoading}
             lst={lst}
           />
         </div>
         {/* treemap */}
-        {isAVSLoading ? (
+        {(isAVSLoading || avsError) && (
           <div className="basis-1/2">
             <div className="flex h-full min-h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
-              <Spinner color="primary" size="lg" />
+              {isAVSLoading && <Spinner color="primary" size="lg" />}
+              {avsError && <ErrorMessage error={avsError} />}
             </div>
           </div>
-        ) : (
+        )}
+
+        {!isAVSLoading && !avsError && (
           <>
             <div className="w-full basis-1/2 md:w-1/2">
               <ParentSize className="h-full">
@@ -149,7 +166,7 @@ const tokens = {
   }
 };
 
-function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
+function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
   const sortedTotalTokens = useMemo(() => {
     const arr = Object.entries(totalTokens);
     arr.sort((a, b) => b[1] - a[1]);
@@ -163,6 +180,14 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
   );
 
   const compact = !useTailwindBreakpoint('md');
+
+  if (avsError) {
+    return (
+      <div className="rd-box flex w-full flex-1 flex-col items-center justify-center">
+        <ErrorMessage error={avsError} />
+      </div>
+    );
+  }
 
   return (
     <Table
@@ -235,9 +260,9 @@ function TokensBreakdownList({ totalTokens, isAVSLoading, ethRate }) {
   );
 }
 
-function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
+function LSTBreakdownList({ avsError, lst, ethRate, isAVSLoading }) {
   const sortedTokens = useMemo(() => {
-    if (isAVSLoading) {
+    if (isAVSLoading || avsError) {
       return [];
     }
 
@@ -246,9 +271,17 @@ function LSTBreakdownList({ lst, ethRate, isAVSLoading }) {
     const arr = Object.entries(lst);
     arr.sort((a, b) => Number(b[1]) - Number(a[1]));
     return arr.filter(([strategy]) => !exclude.has(strategy));
-  }, [lst, isAVSLoading]);
+  }, [avsError, lst, isAVSLoading]);
 
   const compact = !useTailwindBreakpoint('md');
+
+  if (avsError) {
+    return (
+      <div className="rd-box flex w-full flex-1 flex-col items-center justify-center">
+        <ErrorMessage error={avsError} />
+      </div>
+    );
+  }
 
   return (
     <Table
