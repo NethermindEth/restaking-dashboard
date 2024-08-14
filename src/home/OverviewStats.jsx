@@ -322,7 +322,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
   return (
     <div className="rd-box min-h-44 max-w-full basis-full lg:grow lg:basis-0">
       <div className="w-full p-4">
-        <span className="text-foreground-1">Top Operators</span>
+        <span className="text-foreground-1">Top operators</span>
       </div>
       <Table
         aria-label="Operator list"
