@@ -26,13 +26,13 @@ export default function LST() {
         const data = await eigenlayerService.getEigenLayerLSTTotalValue();
         if (data.length > 0) {
           const current = data[data.length - 1];
-          const rankings = Object.entries(current.tvl);
+          const rankings = current.strategies;
           rankings.sort((a, b) => {
-            if (a[1] < b[1]) {
+            if (a.value < b.value) {
               return 1;
             }
 
-            if (a[1] > b[1]) {
+            if (a.value > b.value) {
               return -1;
             }
 

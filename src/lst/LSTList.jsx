@@ -35,7 +35,7 @@ export default function LSTList({ data, latestRate }) {
           </TableColumn>
         </TableHeader>
         <TableBody>
-          {data.map(([address, tvl], i) => {
+          {data.map(({ address, value }, i) => {
             return (
               <TableRow
                 className="border-t border-outline"
@@ -61,9 +61,9 @@ export default function LSTList({ data, latestRate }) {
                 </TableCell>
                 <TableCell className="text-end">7 days</TableCell>
                 <TableCell className="pe-8 text-end">
-                  <div>{formatUSD(tvl * latestRate)}</div>
+                  <div>{formatUSD(value * latestRate)}</div>
                   <div className="text-xs text-foreground-2">
-                    {formatETH(tvl)}
+                    {formatETH(value)}
                   </div>
                 </TableCell>
               </TableRow>
