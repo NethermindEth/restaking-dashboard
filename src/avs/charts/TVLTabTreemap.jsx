@@ -8,6 +8,7 @@ import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import ErrorMessage from '../../shared/ErrorMessage';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
 import { reduceState } from '../../shared/helpers';
@@ -55,6 +56,12 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
         .sum(d => d.value)
         .sort((a, b) => a.value - b.value),
     [children]
+  );
+
+  const isEmpty = useMemo(
+    () =>
+      root.children.reduce((acc, child) => (acc += child.data.value), 0) === 0,
+    [root]
   );
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
@@ -120,56 +127,65 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
           <Tab key="lst" title="LST" />
         </Tabs>
       </div>
-      <svg height={height} ref={containerRef} width={width}>
-        <Treemap
-          paddingInner={1}
-          root={root}
-          round
-          size={[state.maxX, state.maxY]}
-          tile={treemapBinary}
-          top={margin.top}
-        >
-          {treemap => (
-            <Group>
-              {treemap.descendants().map((node, i) => {
-                const nodeWidth = node.x1 - node.x0;
-                const nodeHeight = node.y1 - node.y0;
-                return (
-                  <Group
-                    key={`node-${i}`}
-                    left={node.x0 + margin.left}
-                    top={node.y0 + margin.top}
-                  >
-                    {node.depth > 0 && (
-                      <rect
-                        /* TODO: define in tailwind config */
-                        className="fill-[#465e99]"
-                        height={nodeHeight}
-                        onPointerEnter={e => handlePointerMove(e, node)}
-                        onPointerLeave={hideTooltip}
-                        onPointerMove={e => handlePointerMove(e, node)}
-                        opacity={scaleOpacity(i)}
-                        width={nodeWidth}
-                      />
-                    )}
 
-                    {nodeWidth > 55 && nodeHeight > 20 && (
-                      <Text
-                        className="fill-white text-xs"
-                        dx={8}
-                        dy={16}
-                        width={nodeWidth}
-                      >
-                        {node.data.symbol}
-                      </Text>
-                    )}
-                  </Group>
-                );
-              })}
-            </Group>
-          )}
-        </Treemap>
-      </svg>
+      {isEmpty && (
+        <div className="flex h-full items-center justify-center">
+          <ErrorMessage message="No distribution to display" />
+        </div>
+      )}
+
+      {!isEmpty && (
+        <svg height={height} ref={containerRef} width={width}>
+          <Treemap
+            paddingInner={1}
+            root={root}
+            round
+            size={[state.maxX, state.maxY]}
+            tile={treemapBinary}
+            top={margin.top}
+          >
+            {treemap => (
+              <Group>
+                {treemap.descendants().map((node, i) => {
+                  const nodeWidth = node.x1 - node.x0;
+                  const nodeHeight = node.y1 - node.y0;
+                  return (
+                    <Group
+                      key={`node-${i}`}
+                      left={node.x0 + margin.left}
+                      top={node.y0 + margin.top}
+                    >
+                      {node.depth > 0 && (
+                        <rect
+                          /* TODO: define in tailwind config */
+                          className="fill-[#465e99]"
+                          height={nodeHeight}
+                          onPointerEnter={e => handlePointerMove(e, node)}
+                          onPointerLeave={hideTooltip}
+                          onPointerMove={e => handlePointerMove(e, node)}
+                          opacity={scaleOpacity(i)}
+                          width={nodeWidth}
+                        />
+                      )}
+
+                      {nodeWidth > 55 && nodeHeight > 20 && (
+                        <Text
+                          className="fill-white text-xs"
+                          dx={8}
+                          dy={16}
+                          width={nodeWidth}
+                        >
+                          {node.data.symbol}
+                        </Text>
+                      )}
+                    </Group>
+                  );
+                })}
+              </Group>
+            )}
+          </Treemap>
+        </svg>
+      )}
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
