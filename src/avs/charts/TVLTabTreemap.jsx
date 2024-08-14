@@ -8,7 +8,6 @@ import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
-import ErrorMessage from '../../shared/ErrorMessage';
 import { Group } from '@visx/group';
 import { localPoint } from '@visx/event';
 import { reduceState } from '../../shared/helpers';
