@@ -249,7 +249,7 @@ function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
                   <div className="text-xs text-foreground-2">
                     {key !== 'eigen'
                       ? formatETH(total, compact)
-                      : `EIGEN ${formatNumber(total, compact)}`}
+                      : `${formatNumber(total, compact)} EIGEN`}
                   </div>
                 </div>
               </TableCell>

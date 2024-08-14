@@ -255,16 +255,16 @@ export default function TVLTabLineChart({ points, height, width }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
+          className="rd-tooltip px-2"
           key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-sm font-bold">
+          <div className="rd-tooltip-title">
             {tooltipDateFormatter.format(new Date(tooltipData.timestamp))}
           </div>
-          <div className="px-2 text-base">
+          <div>
             {state.useRate
               ? formatUSD(tooltipData.tvl * tooltipData.rate, compact)
               : formatETH(tooltipData.tvl, compact)}

@@ -172,26 +172,24 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          className="rd-tooltip px-2"
           key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-sm font-bold">
+          <div className="rd-tooltip-title">
             {`${tooltipData.name} (${tooltipData.symbol})`}
           </div>
-          <div className="px-2 text-base">
+          <div>
             <div>
-              {' '}
-              {tooltipData.symbol !== 'EIGEN'
-                ? formatUSD(tooltipData.value * ethRate, compact)
-                : 'N/A'}
+              {tooltipData.symbol !== 'EIGEN' &&
+                formatUSD(tooltipData.value * ethRate, compact)}
             </div>
-            <div>
+            <div className="text-xs text-foreground-1">
               {tooltipData.symbol !== 'EIGEN'
                 ? formatETH(tooltipData.value, compact)
-                : `EIGEN ${formatNumber(tooltipData.value, compact)}`}
+                : `${formatNumber(tooltipData.value, compact)} EIGEN`}
             </div>
           </div>
         </TooltipInPortal>
