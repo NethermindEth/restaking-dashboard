@@ -161,7 +161,7 @@ export default function OperatorList() {
           classNames={{
             inputWrapper:
               'border-outline data-[hover=true]:border-foreground-1',
-            input: 'placeholder:text-subtitle'
+            input: 'placeholder:text-foreground-2'
           }}
           color="primary"
           endContent={
@@ -268,7 +268,7 @@ export default function OperatorList() {
                         <div>
                           {formatUSD(operator.strategiesTotal * state.rate)}
                         </div>
-                        <div className="text-xs text-subtitle">
+                        <div className="text-xs text-foreground-2">
                           {formatETH(operator.strategiesTotal)}
                         </div>
                       </TableCell>

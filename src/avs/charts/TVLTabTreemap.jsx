@@ -142,8 +142,7 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
                   >
                     {node.depth > 0 && (
                       <rect
-                        /* TODO: define in tailwind config */
-                        className="fill-[#465e99]"
+                        className="fill-content3"
                         height={nodeHeight}
                         onPointerEnter={e => handlePointerMove(e, node)}
                         onPointerLeave={hideTooltip}

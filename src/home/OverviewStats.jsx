@@ -277,7 +277,7 @@ function TopAVS({ isLoading, avs, rate, error }) {
                   </TableCell>
                   <TableCell className="text-end">
                     <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
-                    <div className="text-xs text-subtitle">
+                    <div className="text-xs text-foreground-2">
                       {formatETH(item.strategiesTotal, compact)}
                     </div>
                   </TableCell>
@@ -387,7 +387,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
                     <div>
                       {formatUSD(operator.strategiesTotal * rate, compact)}
                     </div>
-                    <div className="text-xs text-subtitle">
+                    <div className="text-xs text-foreground-2">
                       {formatETH(operator.strategiesTotal, compact)}
                     </div>
                   </TableCell>
