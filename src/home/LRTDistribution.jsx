@@ -24,17 +24,17 @@ export default function LRTDistribution() {
     const fetchLRTData = async () => {
       try {
         dispatch({ isFetchingData: true });
-        const results = await lrtService.getLRTDistribution();
+        const result = await lrtService.getLatest();
 
         const lrtDistribution = [];
         let lrtTVL = 0;
 
-        Object.keys(results.protocols).forEach(p => {
+        result.protocols.forEach(p => {
           const lrt = {
-            ...protocols[p]
+            ...protocols[p.id]
           };
-          lrt.tvl = results.protocols[p];
-          lrtTVL += results.protocols[p];
+          lrt.tvl = p.tvl;
+          lrtTVL += p.tvl;
           lrtDistribution.push(lrt);
         });
 
@@ -43,7 +43,7 @@ export default function LRTDistribution() {
             .sort((a, b) => b.tvl - a.tvl)
             .filter(lrt => (lrt.tvl / lrtTVL) * 100 > 1), // Filter and display only LRTs that have more than 1% share
           lrtTVL,
-          rate: results.rate,
+          rate: result.rate,
           isFetchingData: false
         });
       } catch (e) {
@@ -75,7 +75,7 @@ export default function LRTDistribution() {
 
   return (
     <div className="rd-box flex min-h-44 basis-full flex-col gap-y-4 p-4">
-      <div className="text-foreground-1">LRT Distribution</div>
+      <div className="text-foreground-1">LRT distribution</div>
       <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
         <div className="flex w-full basis-3/4 flex-col gap-y-4">
           {state.lrtDistribution.map((lrt, i) => {
