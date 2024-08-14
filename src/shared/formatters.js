@@ -5,7 +5,7 @@
  * @returns {string} The formatted value.
  */
 export const formatETH = (value, compact) =>
-  (compact ? ethCompactFormatter : ethIntFormatter).format(value);
+  `${(compact ? numCompactFormatter : numIntFormatter).format(value)} ETH`;
 
 /**
  * Formats the given value as a rounded integer.
@@ -24,24 +24,6 @@ export const formatNumber = (value, compact) =>
  */
 export const formatUSD = (value, compact) =>
   (compact ? usdCompactFormatter : usdIntFormatter).format(value);
-
-// eslint-disable-next-line no-undef
-const ethCompactFormatter = new Intl.NumberFormat('en-us', {
-  currency: 'ETH',
-  currencyDisplay: 'code',
-  maximumFractionDigits: 1,
-  minimumFractionDigits: 0,
-  style: 'currency',
-  notation: 'compact'
-});
-
-// eslint-disable-next-line no-undef
-const ethIntFormatter = new Intl.NumberFormat('en-us', {
-  currency: 'ETH',
-  currencyDisplay: 'code',
-  maximumFractionDigits: 0,
-  style: 'currency'
-});
 
 // eslint-disable-next-line no-undef
 const numCompactFormatter = new Intl.NumberFormat('en-us', {
