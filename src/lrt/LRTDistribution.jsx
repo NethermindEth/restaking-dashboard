@@ -215,10 +215,7 @@ export default function LRTDistribution({ data, height }) {
   }, [data, dispatch, scaleBrushDate]);
 
   return (
-    <div
-      className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
-      ref={rootRef}
-    >
+    <div className="rd-box basis-full p-4 text-sm" ref={rootRef}>
       <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
         <div className="flex-1">
           <div className="text-base text-foreground-1">Volume trend</div>

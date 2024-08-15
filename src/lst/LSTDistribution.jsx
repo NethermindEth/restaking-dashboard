@@ -196,7 +196,7 @@ export default function LSTDistribution({ rankings, height, width, points }) {
 
   return (
     <div>
-      <div className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm">
+      <div className="rd-box basis-full p-4 text-sm">
         <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
           <div className="flex-1">
             <div className="text-base text-foreground-1">Volume trend</div>

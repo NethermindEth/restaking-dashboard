@@ -68,7 +68,7 @@ export default function AVSDetailsOperatorsTab({
     <>
       {/*line chart*/}
       {isAVSLoading || state.isChartLoading || state.error || avsError ? (
-        <div className="flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box flex h-[390px] w-full items-center justify-center p-4">
           {avsError || state.error ? (
             <ErrorMessage error={avsError ?? state.error} />
           ) : (
@@ -235,7 +235,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1 text-sm">
+    <div className="rd-box text-sm">
       <div className="flex flex-col justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
         <div className="text-medium text-foreground-1">All operators</div>
         <Input
@@ -261,7 +261,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
       </div>
 
       {(state.error || avsError) && (
-        <div className="flex h-48 flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
+        <div className="rd-box flex h-48 flex-1 flex-col items-center justify-center text-sm">
           <ErrorMessage error={state.error ?? avsError} />
         </div>
       )}
