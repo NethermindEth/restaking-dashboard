@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
+import { formatEther } from 'ethers';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import HBrush from '../../shared/HBrush';
@@ -58,19 +59,18 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           0,
           Math.max(
             ...eigenLayerTVL.map(d => {
-              let value = 0;
+              const value = Number(
+                formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL))
+              );
 
-              value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
-              value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
-
-              return value;
+              return value * (state.useRate ? d.rate : 1);
             })
           )
         ],
         nice: true,
         range: [brushSize.height - 2, 0] // 2 for brush borders
       }),
-    [eigenLayerTVL]
+    [eigenLayerTVL, state.useRate]
   );
 
   const scaleDate = useMemo(
@@ -92,10 +92,9 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           0,
           Math.max(
             ...state.filteredData.map(d => {
-              let value = 0;
-
-              value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
-              value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
+              const value = Number(
+                formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL))
+              );
 
               return value * (state.useRate ? d.rate : 1);
             })
@@ -109,17 +108,15 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
 
   const getLatestTotal = useMemo(() => {
     const last = eigenLayerTVL[eigenLayerTVL.length - 1];
-    let total = 0;
-
-    total += parseFloat(BigInt(last.ethTVL) / BigInt(1e18));
-    total += parseFloat(BigInt(last.lstTVL) / BigInt(1e18));
+    const total = Number(
+      formatEther(BigInt(last.ethTVL) + BigInt(last.lstTVL))
+    );
 
     return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
   }, [eigenLayerTVL, state.useRate]);
 
   const getValue = useCallback(
-    (d, k) =>
-      parseFloat(BigInt(d[k]) / BigInt(1e18)) * (state.useRate ? d.rate : 1),
+    (d, k) => Number(formatEther(d[k])) * (state.useRate ? d.rate : 1),
     [state.useRate]
   );
 
@@ -153,9 +150,9 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
     [showTooltip, scaleDate]
   );
 
-  const handleTabSelectionChange = useCallback(
+  const handleTimelineSelectionChange = useCallback(
     key => {
-      const start = Math.max(0, eigenLayerTVL.length - 1 - tabMap[key]);
+      const start = Math.max(0, eigenLayerTVL.length - 1 - timelines[key]);
 
       dispatch({
         brushPosition: {
@@ -208,11 +205,9 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
   useEffect(() => {
     dispatch({
       brushData: eigenLayerTVL?.map(d => {
-        let value = 0;
-        value += parseFloat(BigInt(d.ethTVL) / BigInt(1e18));
-        value += parseFloat(BigInt(d.lstTVL) / BigInt(1e18));
+        const value = Number(formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL)));
 
-        return { timestamp: d.timestamp, value };
+        return { timestamp: d.timestamp, value, rate: d.rate };
       }),
       brushPosition: {
         start: scaleBrushDate(
@@ -273,7 +268,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
         <Tabs
           classNames={tabs}
           defaultSelectedKey="3m"
-          onSelectionChange={handleTabSelectionChange}
+          onSelectionChange={handleTimelineSelectionChange}
           size="sm"
         >
           <Tab key="1w" title="1W" />
@@ -377,7 +372,9 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
               data={state.brushData}
               key="value"
               x={d => scaleBrushDate(getDate(d)) ?? 0}
-              y={d => scaleBrushValue(d.value) ?? 0}
+              y={d =>
+                scaleBrushValue(d.value * (state.useRate ? d.rate : 1)) ?? 0
+              }
               yScale={scaleBrushValue}
             />
           </Group>
@@ -445,17 +442,11 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 ></span>
                 ETH
                 <span className="grow ps-4 text-end">
-                  {state.useRate
-                    ? formatUSD(
-                        parseFloat(
-                          BigInt(tooltipData.data.ethTVL) / BigInt(1e18)
-                        ) * tooltipData.data.rate
-                      )
-                    : formatETH(
-                        parseFloat(
-                          BigInt(tooltipData.data.ethTVL) / BigInt(1e18)
-                        )
-                      )}
+                  {formatTooltipValue(
+                    BigInt(tooltipData.data.ethTVL),
+                    tooltipData.data.rate,
+                    state.useRate
+                  )}
                 </span>
               </div>
             </li>
@@ -471,21 +462,26 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 ></span>
                 LST
                 <span className="grow ps-4 text-end">
-                  {state.useRate
-                    ? formatUSD(
-                        parseFloat(
-                          BigInt(tooltipData.data.lstTVL) / BigInt(1e18)
-                        ) * tooltipData.data.rate
-                      )
-                    : formatETH(
-                        parseFloat(
-                          BigInt(tooltipData.data.lstTVL) / BigInt(1e18)
-                        )
-                      )}
+                  {formatTooltipValue(
+                    BigInt(tooltipData.data.lstTVL),
+                    tooltipData.data.rate,
+                    state.useRate
+                  )}
                 </span>
               </div>
             </li>
           </ul>
+          <div className="mt-2 flex flex-row px-2">
+            <span>Total</span>
+            <span className="grow text-end">
+              {formatTooltipValue(
+                BigInt(tooltipData.data.ethTVL) +
+                  BigInt(tooltipData.data.lstTVL),
+                tooltipData.data.rate,
+                state.useRate
+              )}
+            </span>
+          </div>
         </TooltipInPortal>
       )}
     </div>
@@ -498,7 +494,6 @@ const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short'
 });
 const bisectDate = bisector(i => i.data.timestamp).left;
-
 const brushSize = { height: 50, marginTop: 20 };
 const formatDate = date => {
   if (date.getMonth() == 0 && date.getDate() == 1) {
@@ -507,13 +502,17 @@ const formatDate = date => {
 
   return axisDateFormatter.format(date);
 };
+const formatTooltipValue = (value, rate, useRate) =>
+  useRate
+    ? formatUSD(Number(formatEther(value)) * rate)
+    : formatETH(Number(formatEther(value)));
+
 const getDate = d => new Date(d.timestamp);
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
-
-const tabMap = {
+const timelines = {
   '1w': 7,
   '1m': 30,
   '3m': 90,
