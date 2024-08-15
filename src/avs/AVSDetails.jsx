@@ -1,4 +1,4 @@
-import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
+import { BEACON_STRATEGY, EIGEN_STRATEGY } from '../shared/strategies';
 import { formatETH, formatNumber } from '../shared/formatters';
 import { handleServiceError, reduceState } from '../shared/helpers';
 import { Skeleton, Tab, Tabs } from '@nextui-org/react';
@@ -78,7 +78,7 @@ export default function AVSDetails() {
   return (
     <>
       {state.isAVSLoading && (
-        <div className="min-h-[128px] w-full overflow-hidden rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box min-h-[128px] w-full p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
             <Skeleton className="ml-2 h-8 w-full rounded-md" />
@@ -90,7 +90,7 @@ export default function AVSDetails() {
       )}
 
       {state.error && (
-        <div className="flex min-h-[128px] w-full items-center justify-center overflow-hidden rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box flex min-h-[128px] w-full items-center justify-center p-4">
           <ErrorMessage error={state.error} />
         </div>
       )}
@@ -105,7 +105,7 @@ export default function AVSDetails() {
           cursor: 'rounded border border-outline shadow-none',
           panel: 'p-0',
           tab: 'h-fit p-2',
-          tabList: 'w-full rounded-lg border border-outline bg-content1 p-2'
+          tabList: 'rd-box w-full p-2'
         }}
         disabledKeys={['restakers']}
         radius="sm"

@@ -19,7 +19,7 @@ import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function OverviewStats({
-  isFetchingEigenlayerTVL,
+  isFetchingEigenLayerTVL,
   eigenLayerTVL,
   eigenLayerTVLError
 }) {
@@ -98,17 +98,17 @@ export default function OverviewStats({
             EigenLayer TVL
           </span>
 
-          {isFetchingEigenlayerTVL && (
+          {isFetchingEigenLayerTVL && (
             <Skeleton
               classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
             />
           )}
 
-          {!isFetchingEigenlayerTVL && eigenLayerTVLError && (
+          {!isFetchingEigenLayerTVL && eigenLayerTVLError && (
             <ErrorMessage message="Failed loading EigenLayer TVL" />
           )}
 
-          {!isFetchingEigenlayerTVL && eigenLayerTVL.length > 0 && (
+          {!isFetchingEigenLayerTVL && eigenLayerTVL.length > 0 && (
             <span className="text-center">
               <span className="font-display text-lg md:text-2xl">
                 {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
@@ -116,7 +116,7 @@ export default function OverviewStats({
             </span>
           )}
 
-          {!isFetchingEigenlayerTVL &&
+          {!isFetchingEigenLayerTVL &&
             eigenLayerTVL.length > 0 &&
             state.rate > 1 && (
               <span className="text-sm text-success">

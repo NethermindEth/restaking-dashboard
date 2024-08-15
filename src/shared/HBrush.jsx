@@ -56,6 +56,8 @@ export default function HBrush({
     event => {
       event.preventDefault();
 
+      brushRef.current.style.cursor = 'grab';
+
       document.removeEventListener('pointermove', handleBrushPointerMove);
       document.removeEventListener('pointerup', handleBrushPointerUp);
     },
@@ -70,6 +72,7 @@ export default function HBrush({
       document.addEventListener('pointermove', handleBrushPointerMove);
       document.addEventListener('pointerup', handleBrushPointerUp);
 
+      brushRef.current.style.cursor = 'grabbing';
       brushMoveOffset.current =
         event.clientX - brushRef.current.getBoundingClientRect().left;
     },
@@ -239,7 +242,7 @@ export default function HBrush({
       style={trackStyle}
     >
       <div
-        className={`cursor-move ${brushClassName ?? ''} absolute`}
+        className={`cursor-grab ${brushClassName ?? ''} absolute`}
         ref={brushRef}
         style={brushStyle}
       >

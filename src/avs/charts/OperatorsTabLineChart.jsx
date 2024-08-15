@@ -127,7 +127,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
         <div className="flex-1">
           <span className="text-foreground-1">Operators over time</span>
