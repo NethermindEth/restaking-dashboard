@@ -107,7 +107,7 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   }
 
   return (
-    <div className="h-full w-full rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box h-full w-full p-4">
       <div className="mb-4 flex justify-between">
         <div className="text-medium text-foreground-1">LST distribution</div>
         <Tabs

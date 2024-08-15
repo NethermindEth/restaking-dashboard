@@ -64,7 +64,7 @@ export default function OperatorDetails() {
   return (
     <>
       {state.isOperatorLoading && (
-        <div className="mb-4 min-h-[180px] w-full rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box mb-4 min-h-[180px] w-full p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
             <Skeleton className="ml-2 h-8 w-full rounded-md" />
@@ -76,14 +76,14 @@ export default function OperatorDetails() {
       )}
 
       {state.error && (
-        <div className="mb-4 flex min-h-[180px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box mb-4 flex min-h-[180px] w-full items-center justify-center p-4">
           <ErrorMessage error={state.error} />
         </div>
       )}
 
       {!state.isOperatorLoading && !state.error && (
         <>
-          <div className="mb-4 flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words rounded-lg border border-outline bg-content1 p-4">
+          <div className="rd-box mb-4 flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words p-4">
             <div className="flex basis-full items-center gap-4">
               <ThirdPartyLogo
                 className="size-12 min-w-12"
@@ -148,7 +148,7 @@ export default function OperatorDetails() {
               </Link>
             )}
           </div>
-          <div className="mb-4 flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-2">
+          <div className="rd-box mb-4 flex flex-row items-center justify-between p-2">
             <div className="flex basis-1/3 flex-col items-center gap-1">
               <span className="text-sm text-foreground-2">TVL</span>
               <span className="text-center">
@@ -278,7 +278,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
 
   if (isOperatorLoading) {
     return (
-      <div className="flex h-[410px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4 lg:h-[410px]">
+      <div className="rd-box flex h-[410px] w-full items-center justify-center p-4 lg:h-[410px]">
         <Spinner color="primary" size="lg" />
       </div>
     );
@@ -286,7 +286,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
 
   if (state.lstDistribution.length === 0) {
     return (
-      <div className="flex h-[410px] items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+      <div className="rd-box flex h-[410px] items-center justify-center p-4">
         <div>
           <ErrorMessage message="No strategies available" />
         </div>
@@ -294,7 +294,7 @@ function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
     );
   }
   return (
-    <div className="flex flex-col gap-7 rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box flex flex-col gap-7 p-4">
       <div className="text-foreground-1">LST distribution</div>
       <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
         <div className="flex w-full basis-3/4 flex-col gap-y-4">

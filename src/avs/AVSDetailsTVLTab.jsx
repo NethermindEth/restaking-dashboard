@@ -78,7 +78,7 @@ export default function AVSDetailsTVLTab({
     <>
       {/* line chart */}
       {isAVSLoading || state.isChartLoading || state.error || avsError ? (
-        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box mb-4 flex h-[390px] w-full items-center justify-center p-4">
           {avsError || state.error ? (
             <ErrorMessage error={avsError ?? state.error} />
           ) : (
@@ -116,7 +116,7 @@ export default function AVSDetailsTVLTab({
         {/* treemap */}
         {(isAVSLoading || avsError) && (
           <div className="basis-1/2">
-            <div className="flex h-full min-h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+            <div className="rd-box flex h-full min-h-[512px] w-full items-center justify-center p-4">
               {isAVSLoading && <Spinner color="primary" size="lg" />}
               {avsError && <ErrorMessage error={avsError} />}
             </div>

@@ -177,13 +177,13 @@ export default function AVSList() {
       </div>
 
       {!state.isFetchingData && state.error && (
-        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
+        <div className="rd-box flex flex-1 flex-col items-center justify-center text-sm">
           <ErrorMessage error={state.error} />
         </div>
       )}
 
       {!state.error && (
-        <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
+        <div className="rd-box flex flex-1 flex-col text-sm">
           <Table
             aria-label="AVS list"
             classNames={{

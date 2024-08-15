@@ -5,7 +5,7 @@ import { truncateAddress } from '../shared/helpers';
 
 export default function AVSDetailsHeader({ avs }) {
   return (
-    <div className="flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words p-4">
       <div className="flex basis-full items-center gap-4">
         <ThirdPartyLogo className="size-12 min-w-12" url={avs.metadata?.logo} />
         <span className="font-display text-3xl font-medium text-foreground-1">
