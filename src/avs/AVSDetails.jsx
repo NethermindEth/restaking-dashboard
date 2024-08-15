@@ -1,4 +1,4 @@
-import { BEACON_STRATEGY, EIGEN_STRATEGY } from './helpers';
+import { BEACON_STRATEGY, EIGEN_STRATEGY } from '../shared/strategies';
 import { formatETH, formatNumber } from '../shared/formatters';
 import { handleServiceError, reduceState } from '../shared/helpers';
 import { Skeleton, Tab, Tabs } from '@nextui-org/react';

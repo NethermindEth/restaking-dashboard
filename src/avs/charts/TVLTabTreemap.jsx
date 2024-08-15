@@ -2,7 +2,7 @@ import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
   lstStrategyAssetMapping
-} from '../helpers';
+} from '../../shared/strategies';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
 import { Tab, Tabs } from '@nextui-org/react';

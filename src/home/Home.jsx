@@ -15,7 +15,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    async function fetchEigenlayerTVL() {
+    async function fetchEigenLayerTVL() {
       dispatch({ isFetchingEigenLayerTVL: true });
 
       try {
@@ -32,7 +32,7 @@ export default function Home() {
       }
     }
 
-    fetchEigenlayerTVL();
+    fetchEigenLayerTVL();
   }, [dispatch, eigenlayerService]);
 
   return (
@@ -40,7 +40,7 @@ export default function Home() {
       <OverviewStats
         eigenLayerTVL={state.eigenLayerTVL}
         eigenLayerTVLError={state.error}
-        isFetchingEigenlayerTVL={state.isFetchingEigenLayerTVL}
+        isFetchingEigenLayerTVL={state.isFetchingEigenLayerTVL}
       />
       <EigenLayerTVL
         error={state.error}
