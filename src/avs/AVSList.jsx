@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
+import SearchTooltip from '../shared/SearchTooltip';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
@@ -170,6 +171,7 @@ export default function AVSList() {
           onChange={handleSearch}
           placeholder="Search by name/address"
           radius="sm"
+          startContent={<SearchTooltip />}
           type="text"
           value={state.searchTerm ?? ''}
           variant="bordered"
