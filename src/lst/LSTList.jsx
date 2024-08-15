@@ -12,7 +12,7 @@ import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 
 export default function LSTList({ data, latestRate }) {
   return (
-    <div className="rounded-lg border border-outline bg-content1 text-sm">
+    <div className="rd-box text-sm">
       <Table
         aria-label="List of LST sorted by TVL"
         classNames={{

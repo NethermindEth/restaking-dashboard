@@ -3,7 +3,7 @@ import { Link } from '@nextui-org/react';
 export default function NotFound() {
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 rounded-lg border border-outline bg-content1 px-4 pb-36 pt-20 text-center">
+      <div className="rd-box flex-1 px-4 pb-36 pt-20 text-center">
         <span className="material-symbols-outlined text-[12rem] text-outline">
           &#xe811;
         </span>

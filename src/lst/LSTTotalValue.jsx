@@ -48,7 +48,7 @@ export default function LSTTotalValue({ ethRate }) {
 
   return (
     <>
-      <div className="mb-4 flex flex-row items-center justify-between rounded-lg border border-outline bg-content1 p-4">
+      <div className="rd-box mb-4 flex flex-row items-center justify-between p-4">
         <div className="flex basis-1/2 flex-col items-center gap-2 border-r border-outline">
           <div className="text-foreground-2">TVL</div>
           {state.isLoadingTVL && (
