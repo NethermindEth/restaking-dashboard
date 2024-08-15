@@ -160,7 +160,7 @@ export default function AVSList() {
           classNames={{
             inputWrapper:
               'border-outline data-[hover=true]:border-foreground-1',
-            input: 'placeholder:text-subtitle'
+            input: 'placeholder:text-foreground-2'
           }}
           color="primary"
           endContent={
@@ -270,7 +270,7 @@ export default function AVSList() {
                       </TableCell>
                       <TableCell className="pe-8 text-end">
                         <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
-                        <div className="text-xs text-subtitle">
+                        <div className="text-xs text-foreground-2">
                           {formatETH(avs.strategiesTotal)}
                         </div>
                       </TableCell>

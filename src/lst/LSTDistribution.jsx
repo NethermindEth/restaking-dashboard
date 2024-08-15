@@ -353,16 +353,16 @@ export default function LSTDistribution({ rankings, height, width, points }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
+          className="rd-tooltip"
           key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-xs font-bold">
+          <div className="rd-tooltip-title px-2">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
-          <ul className="text-sm">
+          <ul>
             {state.keys.map((key, i) => {
               return (
                 <li key={`tt-${key}`}>
@@ -386,7 +386,7 @@ export default function LSTDistribution({ rankings, height, width, points }) {
               );
             })}
           </ul>
-          <div className="mt-2 flex flex-row px-2 text-sm">
+          <div className="mt-2 flex flex-row px-2">
             <span>Total</span>
             <span className="grow text-end">
               {calculateTotal(tooltipData.data, state.useRate)}

@@ -10,6 +10,7 @@ import {
   TableRow
 } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
+import { formatEther } from 'ethers';
 import { formatNumber } from '../shared/formatters';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useEffect } from 'react';
@@ -37,13 +38,13 @@ export default function OverviewStats({
     totalAVS: 0
   });
 
-  const calculateEigenLayerTVL = () => {
-    const totalEigenLayerTVL = parseFloat(
-      BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL) +
-        BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL)
+  const calculateEigenLayerTVL = () =>
+    Number(
+      formatEther(
+        BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL) +
+          BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL)
+      )
     );
-    return totalEigenLayerTVL / 1e18;
-  };
 
   useEffect(() => {
     const fetchOperators = async () => {
@@ -277,7 +278,7 @@ function TopAVS({ isLoading, avs, rate, error }) {
                   </TableCell>
                   <TableCell className="text-end">
                     <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
-                    <div className="text-xs text-subtitle">
+                    <div className="text-xs text-foreground-2">
                       {formatETH(item.strategiesTotal, compact)}
                     </div>
                   </TableCell>
@@ -387,7 +388,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
                     <div>
                       {formatUSD(operator.strategiesTotal * rate, compact)}
                     </div>
-                    <div className="text-xs text-subtitle">
+                    <div className="text-xs text-foreground-2">
                       {formatETH(operator.strategiesTotal, compact)}
                     </div>
                   </TableCell>
