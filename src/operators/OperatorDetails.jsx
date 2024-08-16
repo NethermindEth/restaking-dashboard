@@ -436,7 +436,7 @@ function SecuredAVSList({ avsList, avsError, isOperatorLoading }) {
 
   if (avsError) {
     return (
-      <div className="rd-box flex h-full w-full flex-1 flex-col items-center justify-center">
+      <div className="rd-box flex h-[390px] w-full flex-1 flex-col items-center justify-center">
         <ErrorMessage error={avsError} />
       </div>
     );
