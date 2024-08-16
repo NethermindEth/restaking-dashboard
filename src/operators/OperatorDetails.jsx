@@ -161,7 +161,7 @@ export default function OperatorDetails() {
             </div>
             <div className="flex h-full min-h-10 basis-1/3 flex-col items-center gap-2 border-x border-outline px-2">
               <span className="text-center text-sm text-foreground-2">
-                AVS subscribed
+                AVS secured
               </span>
               <span className="text-foreground-1">
                 {state.operator?.avs?.length}
