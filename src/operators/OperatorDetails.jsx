@@ -188,7 +188,7 @@ export default function OperatorDetails() {
               </div>
               <div className="flex w-full justify-center">
                 {state.isOperatorLoading && (
-                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
 
                 {state.error && <ErrorMessage error={state.error} />}
@@ -226,7 +226,7 @@ export default function OperatorDetails() {
               </div>
               <div className="flex w-full justify-center">
                 {state.isOperatorLoading && (
-                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
 
                 {state.error && <ErrorMessage error={state.error} />}
@@ -255,7 +255,7 @@ export default function OperatorDetails() {
               <div className="text-sm">Restakers</div>
               <div className="flex w-full justify-center">
                 {state.isOperatorLoading && (
-                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
 
                 {state.error && <ErrorMessage error={state.error} />}
