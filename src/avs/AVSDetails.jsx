@@ -105,7 +105,7 @@ export default function AVSDetails() {
           cursor: 'rounded border border-outline shadow-none',
           panel: 'p-0',
           tab: 'h-fit p-2',
-          tabList: 'rd-box w-full p-2'
+          tabList: 'rd-box w-full !overflow-x-scroll p-2'
         }}
         disabledKeys={['restakers']}
         radius="sm"
