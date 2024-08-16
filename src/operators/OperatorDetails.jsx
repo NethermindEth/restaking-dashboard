@@ -433,6 +433,7 @@ function LSTShare({ label, logo, symbol, value }) {
 
 function SecuredAVSList({ avsList, avsError, isOperatorLoading }) {
   const navigate = useNavigate();
+
   if (avsError) {
     return (
       <div className="rd-box flex h-full w-full flex-1 flex-col items-center justify-center">
@@ -462,7 +463,15 @@ function SecuredAVSList({ avsList, avsError, isOperatorLoading }) {
             AVS
           </TableColumn>
         </TableHeader>
-        <TableBody>
+        <TableBody
+          emptyContent={
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-lg text-foreground-2">
+                No AVS is currently being secured
+              </span>
+            </div>
+          }
+        >
           {isOperatorLoading &&
             [...new Array(10)].map((_, i) => (
               <TableRow className="border-t border-outline" key={i}>
