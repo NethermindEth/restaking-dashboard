@@ -175,7 +175,7 @@ export default function OperatorDetails() {
           tabList: 'rd-box w-full !overflow-x-scroll p-2'
         }}
         radius="sm"
-        selectedKey={tab ? pathname : pathname + '/tvl'}
+        selectedKey={tab ? pathname : `${pathname}/tvl`}
         size="lg"
       >
         <Tab
@@ -240,10 +240,10 @@ export default function OperatorDetails() {
             </div>
           }
         >
-          <SecuredAVSList
-            avsError={state.error}
-            avsList={state.operator?.avs}
-            isOperatorLoading={state.isOperatorLoading}
+          <AVSList
+            error={state.error}
+            isLoading={state.isOperatorLoading}
+            list={state.operator?.avs}
           />
         </Tab>
 
@@ -431,13 +431,13 @@ function LSTShare({ label, logo, symbol, value }) {
   );
 }
 
-function SecuredAVSList({ avsList, avsError, isOperatorLoading }) {
+function AVSList({ list, error, isLoading }) {
   const navigate = useNavigate();
 
-  if (avsError) {
+  if (error) {
     return (
       <div className="rd-box flex h-[390px] w-full flex-1 flex-col items-center justify-center">
-        <ErrorMessage error={avsError} />
+        <ErrorMessage error={error} />
       </div>
     );
   }
@@ -472,7 +472,7 @@ function SecuredAVSList({ avsList, avsError, isOperatorLoading }) {
             </div>
           }
         >
-          {isOperatorLoading &&
+          {isLoading &&
             [...new Array(10)].map((_, i) => (
               <TableRow className="border-t border-outline" key={i}>
                 <TableCell className="w-full p-4">
@@ -481,8 +481,8 @@ function SecuredAVSList({ avsList, avsError, isOperatorLoading }) {
               </TableRow>
             ))}
 
-          {!isOperatorLoading &&
-            avsList.map(avs => (
+          {!isLoading &&
+            list.map(avs => (
               <TableRow
                 className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                 key={avs.address}
