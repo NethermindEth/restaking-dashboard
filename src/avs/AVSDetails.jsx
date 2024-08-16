@@ -105,7 +105,7 @@ export default function AVSDetails() {
           cursor: 'rounded border border-outline shadow-none',
           panel: 'p-0',
           tab: 'h-fit p-2',
-          tabList: 'rd-box w-full p-2'
+          tabList: 'rd-box w-full !overflow-x-scroll p-2'
         }}
         disabledKeys={['restakers']}
         radius="sm"
@@ -122,7 +122,7 @@ export default function AVSDetails() {
               </div>
               <div className="flex w-full justify-center">
                 {state.isAVSLoading && (
-                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
 
                 {state.error && <ErrorMessage error={state.error} />}
@@ -158,7 +158,7 @@ export default function AVSDetails() {
               </div>
               <div className="flex w-full justify-center">
                 {state.isAVSLoading && (
-                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
 
                 {state.error && <ErrorMessage error={state.error} />}
@@ -187,7 +187,7 @@ export default function AVSDetails() {
               <div className="text-sm">Restakers</div>
               <div className="flex w-full justify-center">
                 {state.isAVSLoading && (
-                  <Skeleton className="mt-2 h-4 w-full rounded-md" />
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
 
                 {state.error && <ErrorMessage error={state.error} />}
