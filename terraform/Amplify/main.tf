@@ -50,7 +50,7 @@ resource "aws_amplify_domain_association" "main" {
     prefix      = "stage"
   }
 
-  # https://dev.restaking.info
+  # https://prod.restaking.info
   sub_domain {
     branch_name = aws_amplify_branch.main.branch_name
     prefix      = "prod"
