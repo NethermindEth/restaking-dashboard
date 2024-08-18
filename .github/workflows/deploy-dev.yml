@@ -1,0 +1,21 @@
+name: Deploy to Amplify Stage
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: Git ref
+        default: dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: deploy
+      run: |
+          URL="${{ secrets.AMPLIFY_WEBHOOK_DEV }}"
+          curl -X POST -d {} "$URL" -H "Content-Type: application/json"

@@ -20,10 +20,22 @@ resource "aws_amplify_app" "main" {
 
 resource "aws_amplify_branch" "main" {
   app_id      = aws_amplify_app.main.id
-  branch_name = "main"
+  branch_name = var.main_branch
   stage       = "PRODUCTION"
 
   enable_auto_build = false
+}
+
+resource "aws_amplify_branch" "dev" {
+  app_id = aws_amplify_app.main.id
+  branch_name = var.dev_branch
+  stage       = "DEVELOPMENT"
+
+  environment_variables = {
+    NODE_ENV = "development"
+  }
+
+  enable_auto_build = true
 }
 
 resource "aws_amplify_domain_association" "main" {
@@ -37,8 +49,19 @@ resource "aws_amplify_domain_association" "main" {
     branch_name = aws_amplify_branch.main.branch_name
     prefix      = "stage"
   }
-}
 
+  # https://dev.restaking.info
+  sub_domain {
+    branch_name = aws_amplify_branch.main.branch_name
+    prefix      = "prod"
+  }
+
+  # https://dev.restaking.info
+  sub_domain {
+    branch_name = aws_amplify_branch.dev.branch_name
+    prefix      = "dev"
+  }
+}
 
 resource "aws_amplify_webhook" "stage" {
   app_id      = aws_amplify_app.main.id
@@ -46,3 +69,27 @@ resource "aws_amplify_webhook" "stage" {
   description = "stage"
 }
 
+resource "aws_amplify_webhook" "dev" {
+  app_id      = aws_amplify_app.main.id
+  branch_name = aws_amplify_branch.dev.branch_name
+  description = "development"
+}
+
+
+
+output "amplify_app_id" {
+  value = aws_amplify_app.main.id
+}
+
+output "amplify_app_url" {
+  value = aws_amplify_domain_association.main.sub_domain
+}
+
+output "aws_amplify_webhook_stage" {
+  value = aws_amplify_webhook.stage
+}
+
+
+output "aws_amplify_webhook_dev" {
+  value = aws_amplify_webhook.dev
+}
