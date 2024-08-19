@@ -5,5 +5,5 @@ export const tabs = Object.freeze({
 export const tooltip = Object.freeze({
   base: ['before:bg-outline/75'],
   content:
-    'max-w-96 break-words bg-outline/75 p-3 text-xs shadow-md backdrop-blur'
+    'max-w-md break-words bg-outline/75 p-3 text-xs shadow-md backdrop-blur'
 });

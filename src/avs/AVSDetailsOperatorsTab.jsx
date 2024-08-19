@@ -17,6 +17,7 @@ import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
 import OperatorsTabLineChart from './charts/OperatorsTabLineChart';
 import { ParentSize } from '@visx/responsive';
+import SearchTooltip from '../shared/SearchTooltip';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
@@ -244,10 +245,15 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
               'border-outline data-[hover=true]:border-foreground-1',
             input: 'placeholder:text-foreground-2'
           }}
-          endContent={<span className="material-symbols-outlined">search</span>}
+          endContent={
+            <span className="material-symbols-outlined text-foreground-2">
+              search
+            </span>
+          }
           onChange={handleInputChange}
           placeholder="Search by name/address"
           radius="sm"
+          startContent={<SearchTooltip />}
           type="text"
           value={state.search ?? ''}
           variant="bordered"

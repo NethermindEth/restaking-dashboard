@@ -4,7 +4,21 @@ import {
   EIGEN_STRATEGY
 } from '../shared/strategies';
 import { handleServiceError, reduceState } from '../shared/helpers';
-import { Link, Progress, Skeleton, Spinner } from '@nextui-org/react';
+import {
+  Link,
+  Progress,
+  Skeleton,
+  Spinner,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Tabs
+} from '@nextui-org/react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import CopyButton from '../shared/CopyButton';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatETH } from '../shared/formatters';
@@ -16,12 +30,13 @@ import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { truncateAddress } from '../shared/helpers';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
-import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function OperatorDetails() {
-  const { address } = useParams();
+  const { address, tab } = useParams();
+  const { pathname } = useLocation();
+
   const [state, dispatch] = useMutativeReducer(reduceState, {
     error: undefined,
     ethRate: undefined,
@@ -64,7 +79,7 @@ export default function OperatorDetails() {
   return (
     <>
       {state.isOperatorLoading && (
-        <div className="rd-box mb-4 min-h-[180px] w-full p-4">
+        <div className="rd-box min-h-[180px] w-full p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
             <Skeleton className="ml-2 h-8 w-full rounded-md" />
@@ -76,14 +91,14 @@ export default function OperatorDetails() {
       )}
 
       {state.error && (
-        <div className="rd-box mb-4 flex min-h-[180px] w-full items-center justify-center p-4">
+        <div className="rd-box flex min-h-[180px] w-full items-center justify-center p-4">
           <ErrorMessage error={state.error} />
         </div>
       )}
 
       {!state.isOperatorLoading && !state.error && (
         <>
-          <div className="rd-box mb-4 flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words p-4">
+          <div className="rd-box flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words p-4">
             <div className="flex basis-full items-center gap-4">
               <ThirdPartyLogo
                 className="size-12 min-w-12"
@@ -148,51 +163,117 @@ export default function OperatorDetails() {
               </Link>
             )}
           </div>
-          <div className="rd-box mb-4 flex flex-row items-center justify-between p-2">
-            <div className="flex basis-1/3 flex-col items-center gap-1">
-              <span className="text-sm text-foreground-2">TVL</span>
-              <span className="text-center">
-                {state.tvl && (
-                  <span className="text-foreground-1">
+        </>
+      )}
+
+      <Tabs
+        className="my-4 w-full"
+        classNames={{
+          cursor: 'rounded border border-outline shadow-none',
+          panel: 'p-0',
+          tab: 'h-fit p-2',
+          tabList: 'rd-box w-full !overflow-x-scroll p-2'
+        }}
+        radius="sm"
+        selectedKey={tab ? pathname : `${pathname}/tvl`}
+        size="lg"
+      >
+        <Tab
+          href={`/operators/${address}/tvl`}
+          key={`/operators/${address}/tvl`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+                TVL
+              </div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span className="text-foreground-1 group-aria-selected:text-foreground">
                     {formatETH(state.tvl, compact)}
                   </span>
                 )}
-              </span>
+              </div>
             </div>
-            <div className="flex h-full min-h-10 basis-1/3 flex-col items-center gap-2 border-x border-outline px-2">
-              <span className="text-center text-sm text-foreground-2">
-                AVS subscribed
-              </span>
-              <span className="text-foreground-1">
-                {state.operator?.avs?.length}
-              </span>
+          }
+        >
+          <OperatorTVLLineChart
+            currentTVL={state.tvl}
+            ethRate={state.ethRate}
+            isOperatorLoading={state.isOperatorLoading}
+            operatorError={state.error}
+          />
+          <LSTDistribution
+            ethRate={state.ethRate}
+            isOperatorLoading={state.isOperatorLoading}
+            strategies={state.operator?.strategies}
+            tvl={state.tvl}
+          />
+        </Tab>
+
+        <Tab
+          href={`/operators/${address}/avs`}
+          key={`/operators/${address}/avs`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+                AVS secured
+              </div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span className="text-foreground-1 group-aria-selected:text-foreground">
+                    {state.operator?.avs?.length}
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex basis-1/3 flex-col items-center gap-1">
-              <span className="text-sm text-foreground-2">Restakers</span>
-              <span className="text-foreground-1">
-                {state.operator?.stakerCount}
-              </span>
+          }
+        >
+          <AVSList
+            error={state.error}
+            isLoading={state.isOperatorLoading}
+            list={state.operator?.avs}
+          />
+        </Tab>
+
+        <Tab
+          href={`/operators/${address}/restakers`}
+          key={`/operators/${address}/restakers`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm">Restakers</div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span>{state.operator?.stakerCount}</span>
+                )}
+              </div>
             </div>
-          </div>
-        </>
-      )}
-      <OperatorTVLLineChart
-        currentTVL={state.tvl}
-        ethRate={state.ethRate}
-        isOperatorLoading={state.isOperatorLoading}
-        operatorError={state.error}
-      />
-      <OperatorRestakersLineChart
-        isOperatorLoading={state.isOperatorLoading}
-        operatorError={state.error}
-        restakers={state.operator?.stakerCount}
-      />
-      <LSTDistribution
-        ethRate={state.ethRate}
-        isOperatorLoading={state.isOperatorLoading}
-        strategies={state.operator?.strategies}
-        tvl={state.tvl}
-      />
+          }
+        >
+          <OperatorRestakersLineChart
+            isOperatorLoading={state.isOperatorLoading}
+            operatorError={state.error}
+            restakers={state.operator?.stakerCount}
+          />
+        </Tab>
+      </Tabs>
     </>
   );
 }
@@ -347,5 +428,81 @@ function LSTShare({ label, logo, symbol, value }) {
       showValueLabel={true}
       value={value}
     />
+  );
+}
+
+function AVSList({ list, error, isLoading }) {
+  const navigate = useNavigate();
+
+  if (error) {
+    return (
+      <div className="rd-box flex h-[390px] w-full flex-1 flex-col items-center justify-center">
+        <ErrorMessage error={error} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rd-box text-sm">
+      <div className="flex flex-col justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
+        <div className="text-medium text-foreground-1">All AVS</div>
+      </div>
+
+      <Table
+        aria-label="List of AVS secured by operator"
+        classNames={{
+          base: 'h-full overflow-x-auto',
+          table: 'h-full'
+        }}
+        hideHeader
+        layout="fixed"
+        removeWrapper
+      >
+        <TableHeader>
+          <TableColumn className="text-foreground-active bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3">
+            AVS
+          </TableColumn>
+        </TableHeader>
+        <TableBody
+          emptyContent={
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-lg text-foreground-2">
+                No AVS is currently being secured
+              </span>
+            </div>
+          }
+        >
+          {isLoading &&
+            [...new Array(10)].map((_, i) => (
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-full p-4">
+                  <Skeleton className="h-4 rounded-md" />
+                </TableCell>
+              </TableRow>
+            ))}
+
+          {!isLoading &&
+            list.map(avs => (
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={avs.address}
+                onClick={() => navigate(`/avs/${avs.address}`)}
+              >
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={avs.metadata?.logo}
+                    />
+                    <span className="truncate">
+                      {avs.metadata?.name || avs.address}
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

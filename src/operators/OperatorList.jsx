@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
+import SearchTooltip from '../shared/SearchTooltip';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
@@ -161,7 +162,7 @@ export default function OperatorList() {
           classNames={{
             inputWrapper:
               'border-outline data-[hover=true]:border-foreground-1',
-            input: 'placeholder:text-subtitle'
+            input: 'placeholder:text-foreground-2'
           }}
           color="primary"
           endContent={
@@ -172,6 +173,7 @@ export default function OperatorList() {
           onChange={handleSearch}
           placeholder="Search by name/address"
           radius="sm"
+          startContent={<SearchTooltip />}
           type="text"
           value={state.searchTerm ?? ''}
           variant="bordered"
@@ -268,7 +270,7 @@ export default function OperatorList() {
                         <div>
                           {formatUSD(operator.strategiesTotal * state.rate)}
                         </div>
-                        <div className="text-xs text-subtitle">
+                        <div className="text-xs text-foreground-2">
                           {formatETH(operator.strategiesTotal)}
                         </div>
                       </TableCell>
