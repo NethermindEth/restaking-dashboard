@@ -156,6 +156,12 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
                 {treemap.descendants().map((node, i) => {
                   const nodeWidth = node.x1 - node.x0;
                   const nodeHeight = node.y1 - node.y0;
+
+                  // if the node's value is 0, there is no valid box dimension
+                  if (Number.isNaN(nodeWidth) || Number.isNaN(nodeHeight)) {
+                    return;
+                  }
+
                   return (
                     <Group
                       key={`node-${i}`}
