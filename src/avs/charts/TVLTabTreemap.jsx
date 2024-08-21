@@ -57,10 +57,15 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     [children]
   );
 
-  const isEmpty = useMemo(
-    () => root.children.reduce((acc, child) => acc + child.data.value, 0) === 0,
-    [root]
-  );
+  const isEmpty = useMemo(() => {
+    if (root && root.children) {
+      return (
+        root.children.reduce((acc, child) => acc + child.data.value, 0) === 0
+      );
+    }
+
+    return true;
+  }, [root]);
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
