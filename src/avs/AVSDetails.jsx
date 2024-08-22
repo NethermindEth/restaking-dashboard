@@ -39,11 +39,11 @@ export default function AVSDetails() {
         const avs = await avsService.getAVSDetails(address);
 
         const strategies = avs.strategies.reduce((acc, strategy) => {
-          acc[strategy.address] = BigInt(strategy.tokens) / BigInt(1e18);
+          acc[strategy.address] = strategy.tokens;
           return acc;
         }, Object.create(null));
 
-        const totals = { lst: 0n, eth: 0n, eigen: 0n };
+        const totals = { lst: 0, eth: 0, eigen: 0 };
 
         for (const strategy in strategies) {
           if (strategy === EIGEN_STRATEGY) {
