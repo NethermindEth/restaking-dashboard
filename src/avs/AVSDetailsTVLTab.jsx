@@ -233,9 +233,11 @@ function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
                   <span className="text-foreground-1">
                     {key !== 'lst' && tokens[key].symbol}
                   </span>
-                  <span className="text-foreground-1">
-                    {((total / sum) * 100).toFixed(2)}%
-                  </span>
+                  {sum > 0 && (
+                    <span className="text-foreground-1">
+                      {((total / sum) * 100).toFixed(2)}%
+                    </span>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="flex justify-end text-sm">

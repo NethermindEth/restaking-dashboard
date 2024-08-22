@@ -57,6 +57,16 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     [children]
   );
 
+  const isEmpty = useMemo(() => {
+    if (root && root.children) {
+      return (
+        root.children.reduce((acc, child) => acc + child.data.value, 0) === 0
+      );
+    }
+
+    return true;
+  }, [root]);
+
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
     scroll: true
@@ -110,65 +120,85 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     <div className="rd-box h-full w-full p-4">
       <div className="mb-4 flex justify-between">
         <div className="text-medium text-foreground-1">LST distribution</div>
-        <Tabs
-          classNames={tabs}
-          defaultSelectedKey="usd"
-          onSelectionChange={handleTabChange}
-          size="sm"
-        >
-          <Tab key="all" title="All assets" />
-          <Tab key="lst" title="LST" />
-        </Tabs>
+        {!isEmpty && (
+          <Tabs
+            classNames={tabs}
+            defaultSelectedKey="usd"
+            onSelectionChange={handleTabChange}
+            size="sm"
+          >
+            <Tab key="all" title="All assets" />
+            <Tab key="lst" title="LST" />
+          </Tabs>
+        )}
       </div>
-      <svg height={height} ref={containerRef} width={width}>
-        <Treemap
-          paddingInner={1}
-          root={root}
-          round
-          size={[state.maxX, state.maxY]}
-          tile={treemapBinary}
-          top={margin.top}
-        >
-          {treemap => (
-            <Group>
-              {treemap.descendants().map((node, i) => {
-                const nodeWidth = node.x1 - node.x0;
-                const nodeHeight = node.y1 - node.y0;
-                return (
-                  <Group
-                    key={`node-${i}`}
-                    left={node.x0 + margin.left}
-                    top={node.y0 + margin.top}
-                  >
-                    {node.depth > 0 && (
-                      <rect
-                        className="fill-content3"
-                        height={nodeHeight}
-                        onPointerEnter={e => handlePointerMove(e, node)}
-                        onPointerLeave={hideTooltip}
-                        onPointerMove={e => handlePointerMove(e, node)}
-                        opacity={scaleOpacity(i)}
-                        width={nodeWidth}
-                      />
-                    )}
 
-                    {nodeWidth > 55 && nodeHeight > 20 && (
-                      <Text
-                        className="fill-white text-xs"
-                        dx={8}
-                        dy={16}
-                        width={nodeWidth}
-                      >
-                        {node.data.symbol}
-                      </Text>
-                    )}
-                  </Group>
-                );
-              })}
-            </Group>
-          )}
-        </Treemap>
-      </svg>
+      {isEmpty && (
+        <div className="flex h-full items-center justify-center">
+          <span className="text-lg text-foreground-2">
+            No distribution to display
+          </span>
+        </div>
+      )}
+
+      {!isEmpty && (
+        <svg height={height} ref={containerRef} width={width}>
+          <Treemap
+            paddingInner={1}
+            root={root}
+            round
+            size={[state.maxX, state.maxY]}
+            tile={treemapBinary}
+            top={margin.top}
+          >
+            {treemap => (
+              <Group>
+                {treemap.descendants().map((node, i) => {
+                  const nodeWidth = node.x1 - node.x0;
+                  const nodeHeight = node.y1 - node.y0;
+
+                  // if the node's value is 0, there is no valid box dimension
+                  if (Number.isNaN(nodeWidth) || Number.isNaN(nodeHeight)) {
+                    return;
+                  }
+
+                  return (
+                    <Group
+                      key={`node-${i}`}
+                      left={node.x0 + margin.left}
+                      top={node.y0 + margin.top}
+                    >
+                      {node.depth > 0 && (
+                        <rect
+                          className="fill-content3"
+                          height={nodeHeight}
+                          onPointerEnter={e => handlePointerMove(e, node)}
+                          onPointerLeave={hideTooltip}
+                          onPointerMove={e => handlePointerMove(e, node)}
+                          opacity={scaleOpacity(i)}
+                          width={nodeWidth}
+                        />
+                      )}
+
+                      {nodeWidth > 55 && nodeHeight > 20 && (
+                        <Text
+                          className="fill-white text-xs"
+                          dx={8}
+                          dy={16}
+                          width={nodeWidth}
+                        >
+                          {node.data.symbol}
+                        </Text>
+                      )}
+                    </Group>
+                  );
+                })}
+              </Group>
+            )}
+          </Treemap>
+        </svg>
+      )}
+
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}

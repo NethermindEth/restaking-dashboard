@@ -352,7 +352,11 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
                     </div>
                   </TableCell>
                   <TableCell className="pe-8 text-end">
-                    <div>{((op.strategiesTotal / tvl) * 100).toFixed(2)}%</div>
+                    <div>
+                      {tvl === 0
+                        ? 'N/A'
+                        : `${((op.strategiesTotal / tvl) * 100).toFixed(2)}%`}
+                    </div>
                   </TableCell>
                   <TableCell className="pe-8 text-end">
                     <div>
