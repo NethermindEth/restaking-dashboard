@@ -60,9 +60,7 @@ export default function LRTTotalValue() {
 
         const latest = results[results.length - 1];
 
-        tvl = Number(
-          (BigInt(latest.ethTVL) + BigInt(latest.lstTVL)) / BigInt(1e18)
-        );
+        tvl = latest.ethTVL + latest.lstTVL;
       } catch (e) {
         log.error('Failed fetching LRT delegations', e);
 
