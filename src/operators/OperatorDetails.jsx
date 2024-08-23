@@ -30,7 +30,7 @@ import { ParentSize } from '@visx/responsive';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { tooltip } from '../shared/slots';
 import { truncateAddress } from '../shared/helpers';
-import TVLTabTreemap from './charts/TVLTabTreemap';
+import TVLTabTreemap from '../avs/charts/TVLTabTreemap';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
