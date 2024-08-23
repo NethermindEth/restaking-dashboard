@@ -268,7 +268,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
   );
 }
 
-const margin = { top: 20, right: 40, bottom: 30, left: 20 };
+const margin = { top: 20, right: 40, bottom: 30, left: 0 };
 const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
