@@ -1,6 +1,6 @@
 import { handleServiceError, reduceState } from '../shared/helpers';
 import ErrorMessage from '../shared/ErrorMessage';
-import LSTDistributionGraph from './LSTDistributionGraph';
+import LSTDistribution from './LSTDistribution';
 import LSTList from './LSTList';
 import LSTTotalValue from './LSTTotalValue';
 import { ParentSize } from '@visx/responsive';
@@ -73,7 +73,7 @@ export default function LST() {
       <LSTTotalValue ethRate={state.ethRate} />
       <div className="flex flex-col gap-4">
         {(state.isLoadingLST || state.error) && (
-          <div className="flex h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+          <div className="rd-box flex h-[512px] w-full items-center justify-center p-4">
             {state.isLoadingLST && <Spinner color="primary" size="lg" />}
             {state.error && <ErrorMessage error={state.error} />}
           </div>
@@ -83,7 +83,7 @@ export default function LST() {
             <ParentSize>
               {parent => {
                 return (
-                  <LSTDistributionGraph
+                  <LSTDistribution
                     height={512}
                     points={state.lst}
                     rankings={state.rankings}

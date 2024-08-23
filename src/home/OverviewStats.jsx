@@ -10,6 +10,7 @@ import {
   TableRow
 } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
+import { formatEther } from 'ethers';
 import { formatNumber } from '../shared/formatters';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useEffect } from 'react';
@@ -19,7 +20,7 @@ import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function OverviewStats({
-  isFetchingEigenlayerTVL,
+  isFetchingEigenLayerTVL,
   eigenLayerTVL,
   eigenLayerTVLError
 }) {
@@ -37,13 +38,13 @@ export default function OverviewStats({
     totalAVS: 0
   });
 
-  const calculateEigenLayerTVL = () => {
-    const totalEigenLayerTVL = parseFloat(
-      BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL) +
-        BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL)
+  const calculateEigenLayerTVL = () =>
+    Number(
+      formatEther(
+        BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL) +
+          BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL)
+      )
     );
-    return totalEigenLayerTVL / 1e18;
-  };
 
   useEffect(() => {
     const fetchOperators = async () => {
@@ -98,17 +99,17 @@ export default function OverviewStats({
             EigenLayer TVL
           </span>
 
-          {isFetchingEigenlayerTVL && (
+          {isFetchingEigenLayerTVL && (
             <Skeleton
               classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
             />
           )}
 
-          {!isFetchingEigenlayerTVL && eigenLayerTVLError && (
+          {!isFetchingEigenLayerTVL && eigenLayerTVLError && (
             <ErrorMessage message="Failed loading EigenLayer TVL" />
           )}
 
-          {!isFetchingEigenlayerTVL && eigenLayerTVL.length > 0 && (
+          {!isFetchingEigenLayerTVL && eigenLayerTVL.length > 0 && (
             <span className="text-center">
               <span className="font-display text-lg md:text-2xl">
                 {formatUSD(calculateEigenLayerTVL() * state.rate, compact)}
@@ -116,7 +117,7 @@ export default function OverviewStats({
             </span>
           )}
 
-          {!isFetchingEigenlayerTVL &&
+          {!isFetchingEigenLayerTVL &&
             eigenLayerTVL.length > 0 &&
             state.rate > 1 && (
               <span className="text-sm text-success">
@@ -277,7 +278,7 @@ function TopAVS({ isLoading, avs, rate, error }) {
                   </TableCell>
                   <TableCell className="text-end">
                     <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
-                    <div className="text-xs text-subtitle">
+                    <div className="text-xs text-foreground-2">
                       {formatETH(item.strategiesTotal, compact)}
                     </div>
                   </TableCell>
@@ -322,7 +323,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
   return (
     <div className="rd-box min-h-44 max-w-full basis-full lg:grow lg:basis-0">
       <div className="w-full p-4">
-        <span className="text-foreground-1">Top Operators</span>
+        <span className="text-foreground-1">Top operators</span>
       </div>
       <Table
         aria-label="Operator list"
@@ -387,7 +388,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
                     <div>
                       {formatUSD(operator.strategiesTotal * rate, compact)}
                     </div>
-                    <div className="text-xs text-subtitle">
+                    <div className="text-xs text-foreground-2">
                       {formatETH(operator.strategiesTotal, compact)}
                     </div>
                   </TableCell>

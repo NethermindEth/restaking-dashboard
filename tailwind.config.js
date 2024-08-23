@@ -40,9 +40,9 @@ export default {
               12: '#86efac'
             },
             content1: '#0f111a',
-            content2: '#191c2c',
-            content3: 'yellow',
-            content4: 'transparent',
+            content2: '#191c2c', // Used in skeleton
+            content3: '#465e99',
+            content4: 'transparent', // Used in skeleton
             default: {
               DEFAULT: '#191c2c',
               2: '#7a86a5',
@@ -60,23 +60,9 @@ export default {
               2: '#7a86a5'
             },
             outline: '#293041',
-            primary: '#cad7F9',
+            primary: '#cad7f9',
             secondary: '#ffcc80',
-            subtitle: '#7a86a5',
-            success: '#7CCB69',
-            // below to be removed
-            'dark-blue': '#009CDD',
-            cinder: {
-              default: '#576AA0',
-              1: '#2D344D',
-              2: '#D0D5E7',
-              3: '#A7B2D2',
-              4: '#37446C',
-              5: '#7889B8'
-            },
-            accent: {
-              default: '#FFCC80'
-            }
+            success: '#7ccb69'
           }
         }
       }

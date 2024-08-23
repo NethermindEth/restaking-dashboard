@@ -5,6 +5,7 @@ import LRTDistribution from './LRTDistribution';
 import LRTList from './LRTList';
 import LRTTotalValue from './LRTTotalValue';
 import { Spinner } from '@nextui-org/react';
+import { transformProtocols } from './helpers';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
@@ -26,6 +27,8 @@ export default function LRT() {
         results = await lrtService.getAll();
 
         log.debug('Fetched LRT data:', results.length);
+
+        results.forEach(transformProtocols);
       } catch (e) {
         log.error('Failed fetching LRT data', e);
 
@@ -54,7 +57,7 @@ export default function LRT() {
       <LRTTotalValue />
       <div className="flex flex-col gap-4">
         {(state.isLoadingLRTData || state.error) && (
-          <div className="flex h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+          <div className="rd-box flex h-[512px] w-full items-center justify-center p-4">
             {state.isLoadingLRTData && <Spinner color="primary" size="lg" />}
             {!state.isLoadingLRTData && state.error && (
               <ErrorMessage error={state.error} />

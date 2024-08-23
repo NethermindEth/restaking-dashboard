@@ -78,7 +78,7 @@ export default function AVSDetailsTVLTab({
     <>
       {/* line chart */}
       {isAVSLoading || state.isChartLoading || state.error || avsError ? (
-        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box mb-4 flex h-[390px] w-full items-center justify-center p-4">
           {avsError || state.error ? (
             <ErrorMessage error={avsError ?? state.error} />
           ) : (
@@ -116,7 +116,7 @@ export default function AVSDetailsTVLTab({
         {/* treemap */}
         {(isAVSLoading || avsError) && (
           <div className="basis-1/2">
-            <div className="flex h-full min-h-[512px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+            <div className="rd-box flex h-full min-h-[512px] w-full items-center justify-center p-4">
               {isAVSLoading && <Spinner color="primary" size="lg" />}
               {avsError && <ErrorMessage error={avsError} />}
             </div>
@@ -233,9 +233,11 @@ function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
                   <span className="text-foreground-1">
                     {key !== 'lst' && tokens[key].symbol}
                   </span>
-                  <span className="text-foreground-1">
-                    {((total / sum) * 100).toFixed(2)}%
-                  </span>
+                  {sum > 0 && (
+                    <span className="text-foreground-1">
+                      {((total / sum) * 100).toFixed(2)}%
+                    </span>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="flex justify-end text-sm">
@@ -249,7 +251,7 @@ function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
                   <div className="text-xs text-foreground-2">
                     {key !== 'eigen'
                       ? formatETH(total, compact)
-                      : `EIGEN ${formatNumber(total, compact)}`}
+                      : `${formatNumber(total, compact)} EIGEN`}
                   </div>
                 </div>
               </TableCell>

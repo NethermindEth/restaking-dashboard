@@ -216,10 +216,7 @@ export default function LRTDistribution({ data, height }) {
   }, [handleTimelineSelectionChange, state.filteredData, state.maxX]);
 
   return (
-    <div
-      className="basis-full rounded-lg border border-outline bg-content1 p-4 text-sm"
-      ref={rootRef}
-    >
+    <div className="rd-box basis-full p-4 text-sm" ref={rootRef}>
       <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
         <div className="flex-1">
           <div className="text-base text-foreground-1">Volume trend</div>
@@ -369,16 +366,16 @@ export default function LRTDistribution({ data, height }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 py-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
+          className="rd-tooltip"
           key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-xs font-bold">
+          <div className="rd-tooltip-title px-2">
             {tooltipDateFormatter.format(new Date(tooltipData.x))}
           </div>
-          <ul className="text-sm">
+          <ul>
             {Object.entries(tooltipData.data.protocols)
               .sort(sortProtocols)
               .map(([key]) => (
@@ -396,17 +393,21 @@ export default function LRTDistribution({ data, height }) {
                     <span className="grow ps-4 text-end">
                       {state.useRate
                         ? formatUSD(
-                            Number(
-                              tooltipData.data.protocols[key] *
-                                tooltipData.data.rate
-                            )
+                            tooltipData.data.protocols[key] *
+                              tooltipData.data.rate
                           )
-                        : formatETH(Number(tooltipData.data.protocols[key]))}
+                        : formatETH(tooltipData.data.protocols[key])}
                     </span>
                   </div>
                 </li>
               ))}
           </ul>
+          <div className="mt-2 flex flex-row px-2">
+            <span>Total</span>
+            <span className="grow text-end">
+              {calculateTotal(tooltipData.data, state.useRate)}
+            </span>
+          </div>
         </TooltipInPortal>
       )}
     </div>
@@ -419,8 +420,12 @@ const axisDateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short'
 });
 const bisectDate = bisector(i => i.data.timestamp).left;
-
 const brushSize = { height: 50, marginTop: 20 };
+const calculateTotal = (data, useRate) => {
+  const total = Object.values(data.protocols).reduce((acc, v) => acc + v, 0);
+
+  return useRate ? formatUSD(total * data.rate) : formatETH(total);
+};
 const formatDate = date => {
   if (date.getMonth() == 0 && date.getDate() == 1) {
     return date.getFullYear();
@@ -433,7 +438,6 @@ const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
-
 const sortProtocols = ([, p1], [, p2]) => {
   const i1 = p1; //protocols[p1]?.index ?? Number.MAX_SAFE_INTEGER;
   const i2 = p2; //protocols[p2]?.index ?? Number.MAX_SAFE_INTEGER;

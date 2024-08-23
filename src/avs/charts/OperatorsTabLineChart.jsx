@@ -1,5 +1,5 @@
+import { AreaClosed, Circle, LinePath } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { Circle, LinePath } from '@visx/shape';
 import { getGrowthPercentage, reduceState } from '../../shared/helpers';
 import { scaleLinear, scaleUtc } from '@visx/scale';
 import { Tab, Tabs } from '@nextui-org/react';
@@ -10,6 +10,7 @@ import { curveMonotoneX } from '@visx/curve';
 import { formatNumber } from '../../shared/formatters';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
+import { LinearGradient } from '@visx/gradient';
 import { localPoint } from '@visx/event';
 import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
@@ -127,7 +128,7 @@ export default function OperatorsTabLineChart({ points, height, width }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
         <div className="flex-1">
           <span className="text-foreground-1">Operators over time</span>
@@ -163,6 +164,13 @@ export default function OperatorsTabLineChart({ points, height, width }) {
         ref={containerRef}
         width={width}
       >
+        <LinearGradient
+          from="hsl(var(--app-chart-9))"
+          fromOpacity={0.5}
+          id="area-gradient"
+          to="hsl(var(--app-chart-9))"
+          toOpacity={0}
+        />
         <Group left={margin.left} top={margin.top}>
           <GridRows
             className="opacity-25 [&_line]:stroke-foreground-2"
@@ -170,6 +178,22 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             numTicks={4}
             scale={scaleValue}
             width={state.maxX - margin.right}
+          />
+          <AreaClosed
+            curve={curveMonotoneX}
+            data={state.filteredPoints}
+            fill="url(#area-gradient)"
+            x={d => scaleDate(getDate(d)) ?? 0}
+            y={d => scaleValue(getValue(d)) ?? 0}
+            yScale={scaleValue}
+          />
+          <LinePath
+            className="stroke-chart-9 stroke-2"
+            curve={curveMonotoneX}
+            data={state.filteredPoints}
+            strokeLinecap="butt"
+            x={d => scaleDate(getDate(d)) ?? 0}
+            y={d => scaleValue(getValue(d)) ?? 0}
           />
           <AxisRight
             axisLineClassName="stroke-foreground-2"
@@ -199,14 +223,6 @@ export default function OperatorsTabLineChart({ points, height, width }) {
             }}
             top={state.maxY}
           />
-          <LinePath
-            className="stroke-chart-9 stroke-2"
-            curve={curveMonotoneX}
-            data={state.filteredPoints}
-            x={d => scaleDate(getDate(d)) ?? 0}
-            y={d => scaleValue(getValue(d)) ?? 0}
-          />
-
           {tooltipOpen && (
             <Circle
               className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-white"
@@ -232,18 +248,16 @@ export default function OperatorsTabLineChart({ points, height, width }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
+          className="rd-tooltip px-2"
           key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-sm font-bold">
+          <div className="rd-tooltip-title">
             {tooltipDateFormatter.format(new Date(tooltipData.timestamp))}
           </div>
-          <div className="px-2 text-base">
-            {formatNumber(tooltipData.operators, compact)}
-          </div>
+          <div>{formatNumber(tooltipData.operators, compact)}</div>
         </TooltipInPortal>
       )}
     </div>

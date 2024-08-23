@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
+import SearchTooltip from '../shared/SearchTooltip';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
 import { useMutativeReducer } from 'use-mutative';
@@ -159,7 +160,7 @@ export default function AVSList() {
           classNames={{
             inputWrapper:
               'border-outline data-[hover=true]:border-foreground-1',
-            input: 'placeholder:text-subtitle'
+            input: 'placeholder:text-foreground-2'
           }}
           color="primary"
           endContent={
@@ -170,6 +171,7 @@ export default function AVSList() {
           onChange={handleSearch}
           placeholder="Search by name/address"
           radius="sm"
+          startContent={<SearchTooltip />}
           type="text"
           value={state.searchTerm ?? ''}
           variant="bordered"
@@ -177,13 +179,13 @@ export default function AVSList() {
       </div>
 
       {!state.isFetchingData && state.error && (
-        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-outline bg-content1 text-sm">
+        <div className="rd-box flex flex-1 flex-col items-center justify-center text-sm">
           <ErrorMessage error={state.error} />
         </div>
       )}
 
       {!state.error && (
-        <div className="flex flex-1 flex-col rounded-lg border border-outline bg-content1 text-sm">
+        <div className="rd-box flex flex-1 flex-col text-sm">
           <Table
             aria-label="AVS list"
             classNames={{
@@ -268,7 +270,7 @@ export default function AVSList() {
                       </TableCell>
                       <TableCell className="pe-8 text-end">
                         <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
-                        <div className="text-xs text-subtitle">
+                        <div className="text-xs text-foreground-2">
                           {formatETH(avs.strategiesTotal)}
                         </div>
                       </TableCell>

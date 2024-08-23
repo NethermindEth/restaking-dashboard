@@ -27,7 +27,7 @@ const router = createBrowserRouter(
       <Route element={<AVSDetails />} path="/avs/:address/:tab?" />
       <Route element={<LRT />} path="/lrt" />
       <Route element={<OperatorList />} path="/operators" />
-      <Route element={<OperatorDetails />} path="/operators/:address" />
+      <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<LST />} path="/lst" />
       <Route element={<NotFound />} path="*" />
     </Route>

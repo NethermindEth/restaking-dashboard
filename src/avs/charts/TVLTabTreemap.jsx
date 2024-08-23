@@ -2,7 +2,7 @@ import {
   BEACON_STRATEGY,
   EIGEN_STRATEGY,
   lstStrategyAssetMapping
-} from '../helpers';
+} from '../../shared/strategies';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
 import { Tab, Tabs } from '@nextui-org/react';
@@ -57,6 +57,16 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     [children]
   );
 
+  const isEmpty = useMemo(() => {
+    if (root && root.children) {
+      return (
+        root.children.reduce((acc, child) => acc + child.data.value, 0) === 0
+      );
+    }
+
+    return true;
+  }, [root]);
+
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
     scroll: true
@@ -107,92 +117,109 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
   }
 
   return (
-    <div className="h-full w-full rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box h-full w-full p-4">
       <div className="mb-4 flex justify-between">
         <div className="text-medium text-foreground-1">LST distribution</div>
-        <Tabs
-          classNames={tabs}
-          defaultSelectedKey="usd"
-          onSelectionChange={handleTabChange}
-          size="sm"
-        >
-          <Tab key="all" title="All assets" />
-          <Tab key="lst" title="LST" />
-        </Tabs>
+        {!isEmpty && (
+          <Tabs
+            classNames={tabs}
+            defaultSelectedKey="usd"
+            onSelectionChange={handleTabChange}
+            size="sm"
+          >
+            <Tab key="all" title="All assets" />
+            <Tab key="lst" title="LST" />
+          </Tabs>
+        )}
       </div>
-      <svg height={height} ref={containerRef} width={width}>
-        <Treemap
-          paddingInner={1}
-          root={root}
-          round
-          size={[state.maxX, state.maxY]}
-          tile={treemapBinary}
-          top={margin.top}
-        >
-          {treemap => (
-            <Group>
-              {treemap.descendants().map((node, i) => {
-                const nodeWidth = node.x1 - node.x0;
-                const nodeHeight = node.y1 - node.y0;
-                return (
-                  <Group
-                    key={`node-${i}`}
-                    left={node.x0 + margin.left}
-                    top={node.y0 + margin.top}
-                  >
-                    {node.depth > 0 && (
-                      <rect
-                        /* TODO: define in tailwind config */
-                        className="fill-[#465e99]"
-                        height={nodeHeight}
-                        onPointerEnter={e => handlePointerMove(e, node)}
-                        onPointerLeave={hideTooltip}
-                        onPointerMove={e => handlePointerMove(e, node)}
-                        opacity={scaleOpacity(i)}
-                        width={nodeWidth}
-                      />
-                    )}
 
-                    {nodeWidth > 55 && nodeHeight > 20 && (
-                      <Text
-                        className="fill-white text-xs"
-                        dx={8}
-                        dy={16}
-                        width={nodeWidth}
-                      >
-                        {node.data.symbol}
-                      </Text>
-                    )}
-                  </Group>
-                );
-              })}
-            </Group>
-          )}
-        </Treemap>
-      </svg>
+      {isEmpty && (
+        <div className="flex h-full items-center justify-center">
+          <span className="text-lg text-foreground-2">
+            No distribution to display
+          </span>
+        </div>
+      )}
+
+      {!isEmpty && (
+        <svg height={height} ref={containerRef} width={width}>
+          <Treemap
+            paddingInner={1}
+            root={root}
+            round
+            size={[state.maxX, state.maxY]}
+            tile={treemapBinary}
+            top={margin.top}
+          >
+            {treemap => (
+              <Group>
+                {treemap.descendants().map((node, i) => {
+                  const nodeWidth = node.x1 - node.x0;
+                  const nodeHeight = node.y1 - node.y0;
+
+                  // if the node's value is 0, there is no valid box dimension
+                  if (Number.isNaN(nodeWidth) || Number.isNaN(nodeHeight)) {
+                    return;
+                  }
+
+                  return (
+                    <Group
+                      key={`node-${i}`}
+                      left={node.x0 + margin.left}
+                      top={node.y0 + margin.top}
+                    >
+                      {node.depth > 0 && (
+                        <rect
+                          className="fill-content3"
+                          height={nodeHeight}
+                          onPointerEnter={e => handlePointerMove(e, node)}
+                          onPointerLeave={hideTooltip}
+                          onPointerMove={e => handlePointerMove(e, node)}
+                          opacity={scaleOpacity(i)}
+                          width={nodeWidth}
+                        />
+                      )}
+
+                      {nodeWidth > 55 && nodeHeight > 20 && (
+                        <Text
+                          className="fill-white text-xs"
+                          dx={8}
+                          dy={16}
+                          width={nodeWidth}
+                        >
+                          {node.data.symbol}
+                        </Text>
+                      )}
+                    </Group>
+                  );
+                })}
+              </Group>
+            )}
+          </Treemap>
+        </svg>
+      )}
+
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-black/75"
+          className="rd-tooltip px-2"
           key={Math.random()}
           left={tooltipLeft}
           top={tooltipTop}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-sm font-bold">
+          <div className="rd-tooltip-title">
             {`${tooltipData.name} (${tooltipData.symbol})`}
           </div>
-          <div className="px-2 text-base">
+          <div>
             <div>
-              {' '}
-              {tooltipData.symbol !== 'EIGEN'
-                ? formatUSD(tooltipData.value * ethRate, compact)
-                : 'N/A'}
+              {tooltipData.symbol !== 'EIGEN' &&
+                formatUSD(tooltipData.value * ethRate, compact)}
             </div>
-            <div>
+            <div className="text-xs text-foreground-1">
               {tooltipData.symbol !== 'EIGEN'
                 ? formatETH(tooltipData.value, compact)
-                : `EIGEN ${formatNumber(tooltipData.value, compact)}`}
+                : `${formatNumber(tooltipData.value, compact)} EIGEN`}
             </div>
           </div>
         </TooltipInPortal>

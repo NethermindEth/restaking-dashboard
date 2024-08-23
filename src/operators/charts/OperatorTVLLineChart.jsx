@@ -1,5 +1,5 @@
+import { AreaClosed, Circle, LinePath } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { Circle, LinePath } from '@visx/shape';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import {
   getGrowthPercentage,
@@ -15,6 +15,7 @@ import { curveMonotoneX } from '@visx/curve';
 import ErrorMessage from '../../shared/ErrorMessage';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
+import { LinearGradient } from '@visx/gradient';
 import { localPoint } from '@visx/event';
 import { ParentSize } from '@visx/responsive';
 import { tabs } from '../../shared/slots';
@@ -71,7 +72,7 @@ export default function OperatorTVLLineChart({
       state.isChartLoading ||
       state.error ||
       operatorError ? (
-        <div className="mb-4 flex h-[390px] w-full items-center justify-center rounded-lg border border-outline bg-content1 p-4">
+        <div className="rd-box mb-4 flex h-[390px] w-full items-center justify-center p-4">
           {operatorError || state.error ? (
             <ErrorMessage error={operatorError ?? state.error} />
           ) : (
@@ -224,7 +225,7 @@ function LineChart({ points, height, width }) {
   );
 
   return (
-    <div className="rounded-lg border border-outline bg-content1 p-4">
+    <div className="rd-box p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
         <div className="flex-1">
           <span className="text-foreground-1">TVL over time</span>
@@ -268,6 +269,13 @@ function LineChart({ points, height, width }) {
         ref={containerRef}
         width={width}
       >
+        <LinearGradient
+          from="hsl(var(--app-chart-9))"
+          fromOpacity={0.5}
+          id="area-gradient"
+          to="hsl(var(--app-chart-9))"
+          toOpacity={0}
+        />
         <Group left={margin.left} top={margin.top}>
           <GridRows
             className="opacity-25 [&_line]:stroke-foreground-2"
@@ -275,6 +283,22 @@ function LineChart({ points, height, width }) {
             numTicks={4}
             scale={scaleValue}
             width={state.maxX - margin.right}
+          />
+          <AreaClosed
+            curve={curveMonotoneX}
+            data={state.filteredPoints}
+            fill="url(#area-gradient)"
+            x={d => scaleDate(getDate(d)) ?? 0}
+            y={d => scaleValue(getValue(d)) ?? 0}
+            yScale={scaleValue}
+          />
+          <LinePath
+            className="stroke-chart-9 stroke-2"
+            curve={curveMonotoneX}
+            data={state.filteredPoints}
+            strokeLinecap="butt"
+            x={d => scaleDate(getDate(d)) ?? 0}
+            y={d => scaleValue(getValue(d)) ?? 0}
           />
           <AxisRight
             axisLineClassName="stroke-foreground-2"
@@ -304,14 +328,6 @@ function LineChart({ points, height, width }) {
             }}
             top={state.maxY}
           />
-          <LinePath
-            className="stroke-chart-9 stroke-2"
-            curve={curveMonotoneX}
-            data={state.filteredPoints}
-            x={d => scaleDate(getDate(d)) ?? 0}
-            y={d => scaleValue(getValue(d)) ?? 0}
-          />
-
           {tooltipOpen && (
             <Circle
               className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
@@ -337,16 +353,16 @@ function LineChart({ points, height, width }) {
       {tooltipOpen && (
         <TooltipInPortal
           applyPositionStyle={true}
-          className="min-w-40 rounded bg-white/75 p-2 text-foreground shadow-md backdrop-blur dark:bg-outline/75"
+          className="rd-tooltip px-2"
           key={Math.random()}
           left={tooltipLeft + 25}
           top={tooltipTop + 15}
           unstyled={true}
         >
-          <div className="mb-2 px-2 text-sm font-bold">
+          <div className="rd-tooltip-title">
             {tooltipDateFormatter.format(new Date(tooltipData.timestamp))}
           </div>
-          <div className="px-2 text-base">
+          <div>
             {state.useRate
               ? formatUSD(tooltipData.tvl * tooltipData.rate, compact)
               : formatETH(tooltipData.tvl, compact)}
