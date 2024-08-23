@@ -208,16 +208,15 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
         const value = Number(formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL)));
 
         return { timestamp: d.timestamp, value, rate: d.rate };
-      }),
-      brushPosition: {
-        start: scaleBrushDate(
-          eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
-        ),
-        end: scaleBrushDate(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp)
-      },
-      filteredData: eigenLayerTVL.slice(-90)
+      })
     });
   }, [eigenLayerTVL, dispatch, scaleBrushDate]);
+
+  useEffect(() => {
+    if (state.maxX && !state.filteredData.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredData, state.maxX]);
 
   return (
     <div className="rd-box min-h-44 basis-full p-4" ref={rootRef}>
@@ -512,6 +511,7 @@ const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
+const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
   '1m': 30,

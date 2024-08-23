@@ -102,24 +102,11 @@ function LineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    filteredPoints: points,
-    maxX: Math.max(width - margin.left - margin.right, 0),
-    maxY: height - margin.top - margin.bottom,
+    filteredPoints: [],
+    maxX: 0,
+    maxY: 0,
     useRate: true
   });
-
-  useEffect(() => {
-    dispatch({
-      filteredPoints: points
-    });
-  }, [dispatch, points]);
-
-  useEffect(() => {
-    dispatch({
-      maxX: Math.max(width - margin.left - margin.right, 0),
-      maxY: height - margin.top - margin.bottom
-    });
-  }, [dispatch, width, height]);
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -170,6 +157,10 @@ function LineChart({ points, height, width }) {
   }, [compact, points, state.useRate]);
 
   const growthPercentage = useMemo(() => {
+    if (!state.filteredPoints.length) {
+      return null;
+    }
+
     const first = state.filteredPoints[0];
     const latest = state.filteredPoints[state.filteredPoints.length - 1];
 
@@ -224,6 +215,19 @@ function LineChart({ points, height, width }) {
     [getValue, showTooltip, scaleDate, scaleValue, state.filteredPoints]
   );
 
+  useEffect(() => {
+    dispatch({
+      maxX: Math.max(width - margin.left - margin.right, 0),
+      maxY: height - margin.top - margin.bottom
+    });
+  }, [dispatch, width, height]);
+
+  useEffect(() => {
+    if (state.maxX > 0 && !state.filteredPoints.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredPoints, state.maxX]);
+
   return (
     <div className="rd-box p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
@@ -250,7 +254,7 @@ function LineChart({ points, height, width }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="all"
+          defaultSelectedKey={TIMELINE_DEFAULT}
           disabledKeys={disabledKeys}
           onSelectionChange={handleTimelineSelectionChange}
           size="sm"
@@ -373,7 +377,8 @@ function LineChart({ points, height, width }) {
   );
 }
 
-const margin = { top: 20, right: 40, bottom: 24, left: 0 };
+const margin = { top: 20, right: 40, bottom: 30, left: 20 };
+const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
   '1m': 30,
