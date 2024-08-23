@@ -55,6 +55,10 @@ const mainLinks = [
   {
     title: 'Legal',
     href: 'https://nethermind.io/legal'
+  },
+  {
+    title: 'API Docs',
+    href: `${import.meta.env.VITE_API_BASE_URL}/swagger`
   }
 ];
 
