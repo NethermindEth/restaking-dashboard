@@ -28,10 +28,9 @@ export default function LSTTotalValue({ ethRate }) {
           const latest = data[data.length - 1];
           dispatch({
             isLoadingTVL: false,
-            lstTVL: parseFloat(latest.lstTVL) / 1e18,
+            lstTVL: latest.lstTVL,
             percentage: Math.round(
-              parseFloat(latest.lstTVL * 100) /
-                (parseFloat(latest.lstTVL) + parseFloat(latest.ethTVL))
+              (latest.lstTVL * 100) / (latest.lstTVL + latest.ethTVL)
             )
           });
         }

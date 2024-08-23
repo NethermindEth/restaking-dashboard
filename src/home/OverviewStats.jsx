@@ -10,7 +10,6 @@ import {
   TableRow
 } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
-import { formatEther } from 'ethers';
 import { formatNumber } from '../shared/formatters';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useEffect } from 'react';
@@ -39,12 +38,8 @@ export default function OverviewStats({
   });
 
   const calculateEigenLayerTVL = () =>
-    Number(
-      formatEther(
-        BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL) +
-          BigInt(eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL)
-      )
-    );
+    eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL +
+    eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL;
 
   useEffect(() => {
     const fetchOperators = async () => {
