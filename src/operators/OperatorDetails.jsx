@@ -489,7 +489,7 @@ function LSTBreakdownList({ operatorError, lst, ethRate, isOperatorLoading }) {
     return (
       <div className="rd-box flex min-h-40 w-full flex-1 flex-col items-center justify-center">
         <span className="text-lg text-foreground-2">
-          No distribution to display
+          No strategies to display
         </span>
       </div>
     );

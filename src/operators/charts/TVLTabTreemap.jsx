@@ -116,6 +116,16 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     return;
   }
 
+  if (isEmpty) {
+    return (
+      <div className="rd-box flex h-full items-center justify-center">
+        <span className="text-lg text-foreground-2">
+          No distribution to display
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="rd-box h-full w-full p-4">
       <div className="mb-4 flex justify-between">
@@ -133,13 +143,13 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
         )}
       </div>
 
-      {isEmpty && (
+      {/* {isEmpty && (
         <div className="flex h-full items-center justify-center">
           <span className="text-lg text-foreground-2">
             No distribution to display
           </span>
         </div>
-      )}
+      )} */}
 
       {!isEmpty && (
         <svg height={height} ref={containerRef} width={width}>
