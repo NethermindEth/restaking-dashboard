@@ -76,14 +76,13 @@ export default function LRT() {
 }
 
 const getNumberOfLRT = data => {
-  console.log('har', data);
   if (!data || data.length === 0) {
     return 0;
   }
 
-  const latest = data.length - 1;
+  const latest = data[data.length - 1];
 
-  if (!data[latest].protocols) {
+  if (!latest.protocols) {
     return 0;
   }
 
