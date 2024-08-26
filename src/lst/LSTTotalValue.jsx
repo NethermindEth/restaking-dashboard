@@ -86,7 +86,7 @@ export default function LSTTotalValue({ ethRate, totalLST }) {
             </div>
           )}
         </div>
-        <div className="basis-1/j flex flex-col items-center gap-2 ps-2">
+        <div className="flex basis-1/3 flex-col items-center gap-2 ps-2">
           <div className="text-center text-foreground-2">
             Percentage on EigenLayer
           </div>

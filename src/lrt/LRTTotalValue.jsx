@@ -80,7 +80,7 @@ export default function LRTTotalValue({ totalLRT }) {
   return (
     <>
       <div className="rd-box mb-4 flex flex-row items-center justify-between p-4">
-        <div className="flex basis-1/2 flex-col items-center gap-2 border-outline">
+        <div className="flex basis-1/3 flex-col items-center gap-2 border-outline">
           <div className="text-foreground-2">TVL</div>
           {state.isLoadingDelegations && (
             <Skeleton
@@ -120,7 +120,7 @@ export default function LRTTotalValue({ totalLRT }) {
             </div>
           )}
         </div>
-        <div className="flex basis-1/2 flex-col items-center gap-2 ps-2">
+        <div className="flex basis-1/3 flex-col items-center gap-2 ps-2">
           <div className="text-center text-foreground-2">
             Percentage on EigenLayer
           </div>
