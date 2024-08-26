@@ -6,10 +6,13 @@ import { Skeleton } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
+import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
-export default function LRTTotalValue() {
+export default function LRTTotalValue({ totalLRT }) {
   const { eigenlayerService, lrtService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {});
+
+  const compact = !useTailwindBreakpoint('md');
 
   useEffect(() => {
     async function fetchDelegations() {
@@ -77,7 +80,7 @@ export default function LRTTotalValue() {
   return (
     <>
       <div className="rd-box mb-4 flex flex-row items-center justify-between p-4">
-        <div className="flex basis-1/2 flex-col items-center gap-2 border-r border-outline">
+        <div className="flex basis-1/2 flex-col items-center gap-2 border-outline">
           <div className="text-foreground-2">TVL</div>
           {state.isLoadingDelegations && (
             <Skeleton
@@ -90,11 +93,30 @@ export default function LRTTotalValue() {
           {!state.isLoadingDelegations && state.delegations && (
             <div className="text-center">
               <div className="text-base text-foreground-1">
-                {formatUSD(state.delegations?.total * state.delegations?.rate)}
+                {formatUSD(
+                  state.delegations?.total * state.delegations?.rate,
+                  compact
+                )}
               </div>
               <div className="text-foreground-2">
-                {formatETH(state.delegations?.total)}
+                {formatETH(state.delegations?.total, compact)}
               </div>
+            </div>
+          )}
+        </div>
+        <div className="flex basis-1/3 flex-col items-center gap-2 border-x border-outline">
+          <div className="text-center text-foreground-2">Total LRT</div>
+          {state.isLoadingTVL && (
+            <Skeleton
+              classNames={{ base: 'h-4 w-20 rounded-md border-none' }}
+            />
+          )}
+          {state.error && (
+            <ErrorMessage message="Failed loading total number of LRT" />
+          )}
+          {!state.isLoadingTVL && (
+            <div className="text-center">
+              <div className="text-base text-foreground-1">{totalLRT}</div>
             </div>
           )}
         </div>
