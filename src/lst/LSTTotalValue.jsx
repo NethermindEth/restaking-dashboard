@@ -6,14 +6,17 @@ import { Skeleton } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
+import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
-export default function LSTTotalValue({ ethRate }) {
+export default function LSTTotalValue({ ethRate, totalLST }) {
   const { eigenlayerService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isLoadingTVL: true,
     error: undefined,
     percentage: undefined
   });
+
+  const compact = !useTailwindBreakpoint('md');
 
   useEffect(() => {
     async function fetchELTotal() {
@@ -48,7 +51,7 @@ export default function LSTTotalValue({ ethRate }) {
   return (
     <>
       <div className="rd-box mb-4 flex flex-row items-center justify-between p-4">
-        <div className="flex basis-1/2 flex-col items-center gap-2 border-r border-outline">
+        <div className="flex basis-1/3 flex-col items-center gap-2 border-outline">
           <div className="text-foreground-2">TVL</div>
           {state.isLoadingTVL && (
             <Skeleton
@@ -59,13 +62,31 @@ export default function LSTTotalValue({ ethRate }) {
           {!state.isLoadingTVL && state.lstTVL && (
             <div className="text-center">
               <div className="text-base text-foreground-1">
-                {formatUSD(state.lstTVL * ethRate)}
+                {formatUSD(state.lstTVL * ethRate, compact)}
               </div>
-              <div className="text-foreground-2">{formatETH(state.lstTVL)}</div>
+              <div className="text-foreground-2">
+                {formatETH(state.lstTVL, compact)}
+              </div>
             </div>
           )}
         </div>
-        <div className="flex basis-1/2 flex-col items-center gap-2 ps-2">
+        <div className="flex basis-1/3 flex-col items-center gap-2 border-x border-outline">
+          <div className="text-center text-foreground-2">Total LST</div>
+          {state.isLoadingTVL && (
+            <Skeleton
+              classNames={{ base: 'h-4 w-20 rounded-md border-none' }}
+            />
+          )}
+          {state.error && (
+            <ErrorMessage message="Failed loading total number of LST" />
+          )}
+          {!state.isLoadingTVL && (
+            <div className="text-center">
+              <div className="text-base text-foreground-1">{totalLST}</div>
+            </div>
+          )}
+        </div>
+        <div className="flex basis-1/3 flex-col items-center gap-2 ps-2">
           <div className="text-center text-foreground-2">
             Percentage on EigenLayer
           </div>
