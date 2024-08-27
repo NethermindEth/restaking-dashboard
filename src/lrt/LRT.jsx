@@ -87,5 +87,5 @@ const getNumberOfLRT = data => {
   }
 
   // converted by transformProtocols, is now an object
-  return Object.keys(data[latest].protocols).length;
+  return Object.keys(latest.protocols).length;
 };
