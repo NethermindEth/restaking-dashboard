@@ -368,7 +368,7 @@ function TokensBreakdownList({
   ethRate
 }) {
   const sortedTotalTokens = useMemo(() => {
-    const arr = Object.entries(totalTokens);
+    const arr = Object.entries(totalTokens).filter(t => t[0] !== 'eigen');
     arr.sort((a, b) => b[1] - a[1]);
     return arr;
   }, [totalTokens]);
@@ -429,34 +429,52 @@ function TokensBreakdownList({
                   />
                   <span className="truncate text-foreground-2">
                     {tokens[key].name}
-                  </span>{' '}
-                  <span className="text-foreground-1">
-                    {key !== 'lst' && tokens[key].symbol}
                   </span>
                   {sum > 0 && (
                     <span className="text-foreground-1">
-                      {((total / sum) * 100).toFixed(2)}%
+                      {`${((total / sum) * 100).toFixed(2)}%`}
                     </span>
                   )}
                 </div>
               </TableCell>
               <TableCell className="flex justify-end text-sm">
                 <div className="text-end">
-                  {key === 'eigen' ? (
-                    <EigenDisclaimer />
-                  ) : (
-                    <div>{formatUSD(total * ethRate, compact)}</div>
-                  )}
+                  <div>{formatUSD(total * ethRate, compact)}</div>
 
                   <div className="text-xs text-foreground-2">
-                    {key !== 'eigen'
-                      ? formatETH(total, compact)
-                      : `${formatNumber(total, compact)} EIGEN`}
+                    {formatETH(total, compact)}
                   </div>
                 </div>
               </TableCell>
             </TableRow>
           ))}
+        {!isOperatorLoading && (
+          <TableRow>
+            <TableCell className="pl-0 text-sm">
+              <div className="flex items-center gap-x-2 truncate">
+                <ThirdPartyLogo
+                  className="size-6 min-w-6"
+                  url={tokens['eigen'].logo}
+                />
+                <span className="truncate text-foreground-2">
+                  {tokens['eigen'].name}
+                </span>
+                <span className="text-foreground-1">
+                  {tokens['eigen'].symbol}
+                </span>
+                {<span className="text-foreground-1">N/A</span>}
+              </div>
+            </TableCell>
+            <TableCell className="flex justify-end text-sm">
+              <div className="text-end">
+                <EigenDisclaimer />
+                <div className="text-xs text-foreground-2">
+                  {`${formatNumber(totalTokens['eigen'], compact)} EIGEN`}
+                </div>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );

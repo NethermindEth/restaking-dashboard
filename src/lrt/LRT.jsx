@@ -54,7 +54,7 @@ export default function LRT() {
         restaking while maintaining liquidity, as the tokens can be traded,
         transferred, or used in various DeFi applications.
       </div>
-      <LRTTotalValue />
+      <LRTTotalValue totalLRT={getNumberOfLRT(state.lrtData)} />
       <div className="flex flex-col gap-4">
         {(state.isLoadingLRTData || state.error) && (
           <div className="rd-box flex h-[512px] w-full items-center justify-center p-4">
@@ -74,3 +74,18 @@ export default function LRT() {
     </>
   );
 }
+
+const getNumberOfLRT = data => {
+  if (!data || data.length === 0) {
+    return 0;
+  }
+
+  const latest = data[data.length - 1];
+
+  if (!latest.protocols) {
+    return 0;
+  }
+
+  // converted by transformProtocols, is now an object
+  return Object.keys(latest.protocols).length;
+};

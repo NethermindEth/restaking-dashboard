@@ -68,9 +68,12 @@ export default function LST() {
         staking protocol. They allow users to earn rewards from staking while
         maintaining liquidity, as the tokens can be traded, transferred, or used
         in various DeFi applications. LSTs can be restaked on EigenLayer to earn
-        restaking rewards, further maximizing yield for restaker
+        restaking rewards, further maximizing yield for restakers.
       </div>
-      <LSTTotalValue ethRate={state.ethRate} />
+      <LSTTotalValue
+        ethRate={state.ethRate}
+        totalLST={getNumberOfLST(state.lst)}
+      />
       <div className="flex flex-col gap-4">
         {(state.isLoadingLST || state.error) && (
           <div className="rd-box flex h-[512px] w-full items-center justify-center p-4">
@@ -100,3 +103,13 @@ export default function LST() {
     </div>
   );
 }
+
+const getNumberOfLST = data => {
+  if (data.length === 0) {
+    return 0;
+  }
+
+  const latest = data[data.length - 1];
+
+  return latest.strategies?.length ?? 0;
+};
