@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "build:production": "vite build --mode production",
+    "build:staging": "vite build --mode staging",
+    "build:development": "vite build --mode development",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
