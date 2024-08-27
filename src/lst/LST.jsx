@@ -111,5 +111,5 @@ const getNumberOfLST = data => {
 
   const latest = data[data.length - 1];
 
-  return data[latest].strategies?.length ?? 0;
+  return latest.strategies?.length ?? 0;
 };
