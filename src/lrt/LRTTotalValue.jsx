@@ -29,7 +29,7 @@ export default function LRTTotalValue({ totalLRT }) {
         log.debug('Fetched LRT delegations:', results.length);
 
         let total = Number(
-          results.protocols.reduce((acc, p) => (acc += p.amount), 0)
+          results.protocols.reduce((acc, p) => acc + p.amount, 0)
         );
 
         delegations = { rate: results.rate, total };
