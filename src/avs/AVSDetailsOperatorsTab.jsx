@@ -112,6 +112,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
     error: undefined,
     operators: [],
     promotedOperators: [],
+    promotedOperatorsRate: 1,
     isInputTouched: false,
     isTableLoading: true,
     totalPages: undefined,
@@ -217,7 +218,8 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
       try {
         const response = await rdService.getAVSPromotedOperators(address);
         dispatch({
-          promotedOperators: response.results
+          promotedOperators: response.results,
+          promotedOperatorsRate: response.rate
         });
       } catch (e) {
         //TODO: handle error
@@ -280,14 +282,16 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
             : `${((operator.strategiesTotal / tvl) * 100).toFixed(2)}%`}
         </TableCell>
         <TableCell className="pe-8 text-end">
-          <div>{formatUSD(operator.strategiesTotal * state.currentRate)}</div>
+          <div>
+            {formatUSD(operator.strategiesTotal * state.promotedOperatorsRate)}
+          </div>
           <div className="text-xs text-foreground-2">
             {formatETH(operator.strategiesTotal)}
           </div>
         </TableCell>
       </TableRow>
     ));
-  }, [navigate, state.currentRate, state.promotedOperators, tvl]);
+  }, [navigate, state.promotedOperators, state.promotedOperatorsRate, tvl]);
 
   return (
     <div className="rd-box text-sm">

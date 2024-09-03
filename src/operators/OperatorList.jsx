@@ -47,6 +47,7 @@ export default function OperatorList() {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     operators: [],
     promotedOperators: [],
+    promotedOperatorsRate: 1,
     isFetchingData: false,
     searchTerm: searchParams.get('search'),
     error: null,
@@ -106,7 +107,8 @@ export default function OperatorList() {
       try {
         const response = await rdService.getPromotedOperators();
         dispatch({
-          promotedOperators: response.results
+          promotedOperators: response.results,
+          promotedOperatorsRate: response.rate
         });
       } catch (e) {
         //TODO: handle error
@@ -188,14 +190,16 @@ export default function OperatorList() {
           {formatNumber(operator.stakerCount)}
         </TableCell>
         <TableCell className="pe-8 text-end">
-          <div>{formatUSD(operator.strategiesTotal * state.rate)}</div>
+          <div>
+            {formatUSD(operator.strategiesTotal * state.promotedOperatorsRate)}
+          </div>
           <div className="text-xs text-foreground-2">
             {formatETH(operator.strategiesTotal)}
           </div>
         </TableCell>
       </TableRow>
     ));
-  }, [navigate, state.promotedOperators, state.rate]);
+  }, [navigate, state.promotedOperators, state.promotedOperatorsRate]);
 
   return (
     <div className="flex h-full flex-col">
