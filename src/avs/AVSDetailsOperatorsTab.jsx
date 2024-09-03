@@ -252,7 +252,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
   const renderPromotedOperators = useCallback(() => {
     return state.promotedOperators?.map((operator, i) => (
       <TableRow
-        className="max-h-16 min-h-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
+        className="size-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
         key={`promoted-operator-item-${i}`}
         onClick={() =>
           navigate(`/operators/${operator.address}`, {
@@ -356,15 +356,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
               TVL
             </TableColumn>
           </TableHeader>
-          <TableBody
-            emptyContent={
-              <div className="flex h-[40rem] flex-col items-center justify-center">
-                <span className="text-lg text-foreground-2">
-                  No result found for {truncate(state.search ?? '')}
-                </span>
-              </div>
-            }
-          >
+          <TableBody>
             {searchParams.get('page') === '1' && renderPromotedOperators()}
 
             {(state.isTableLoading || isAVSLoading) &&
@@ -428,6 +420,22 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
                   </TableCell>
                 </TableRow>
               ))}
+
+            {!state.isTableLoading &&
+              !isAVSLoading &&
+              state.operators.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <div className="flex h-[40rem] flex-col items-center justify-center">
+                      <span className="text-lg text-foreground-2">
+                        No result found for {truncate(state.search ?? '')}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell hidden />
+                  <TableCell hidden />
+                </TableRow>
+              )}
 
             {!state.isTableLoading &&
               !isAVSLoading &&

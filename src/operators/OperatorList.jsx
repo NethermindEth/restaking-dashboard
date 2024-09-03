@@ -162,7 +162,7 @@ export default function OperatorList() {
   const renderPromotedOperators = useCallback(() => {
     return state.promotedOperators?.map((operator, i) => (
       <TableRow
-        className="max-h-16 min-h-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
+        className="size-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
         key={`promoted-operator-item-${i}`}
         onClick={() =>
           navigate(`/operators/${operator.address}`, {
@@ -336,8 +336,8 @@ export default function OperatorList() {
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell />
-                  <TableCell />
+                  <TableCell hidden />
+                  <TableCell hidden />
                 </TableRow>
               )}
             </TableBody>
