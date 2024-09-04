@@ -49,6 +49,7 @@ export default function Sidebar({ onOpenChange }) {
       <div className="basis-0 px-5 pb-5">
         <SignedOut>
           <Button
+            className="hover:!text-content1"
             color="primary"
             fullWidth
             onClick={() => clerk.redirectToSignIn()}
