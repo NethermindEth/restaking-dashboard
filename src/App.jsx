@@ -17,6 +17,7 @@ import NotFound from './shared/NotFound';
 import OperatorDetails from './operators/OperatorDetails';
 import OperatorList from './operators/OperatorList';
 import { ServiceProvider } from './@services/ServiceContext';
+import SubscriptionPlans from './subscription/SubscriptionPlans';
 import { ThemeProvider } from './shared/ThemeContext';
 
 const router = createBrowserRouter(
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
       <Route element={<OperatorList />} path="/operators" />
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<LST />} path="/lst" />
+      <Route element={<SubscriptionPlans />} path="/subscription" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )
