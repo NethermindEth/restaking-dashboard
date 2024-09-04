@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import AVSDetails from './avs/AVSDetails';
 import AVSList from './avs/AVSList';
+import { ClerkProvider } from '@clerk/clerk-react';
 import Home from './home/Home';
 import Layout from './shared/Layout';
 import log from './shared/logger';
@@ -40,9 +41,14 @@ export default function App() {
   return (
     <NextUIProvider navigate={router.navigate}>
       <ThemeProvider>
-        <ServiceProvider>
-          <RouterProvider router={router} />
-        </ServiceProvider>
+        <ClerkProvider
+          afterSignOutUrl="/"
+          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+        >
+          <ServiceProvider>
+            <RouterProvider router={router} />
+          </ServiceProvider>
+        </ClerkProvider>
       </ThemeProvider>
     </NextUIProvider>
   );
