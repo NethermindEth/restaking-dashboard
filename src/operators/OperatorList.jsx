@@ -40,12 +40,14 @@ const columns = [
 ];
 
 export default function OperatorList() {
-  const { operatorService } = useServices();
+  const { operatorService, rdService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const abortController = useRef(null);
   const [state, dispatch] = useMutativeReducer(reduceState, {
     operators: [],
+    promotedOperators: [],
+    promotedOperatorsRate: 1,
     isFetchingData: false,
     searchTerm: searchParams.get('search'),
     error: null,
@@ -100,6 +102,20 @@ export default function OperatorList() {
     [operatorService, dispatch]
   );
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await rdService.getPromotedOperators();
+        dispatch({
+          promotedOperators: response.results,
+          promotedOperatorsRate: response.rate
+        });
+      } catch (e) {
+        // swallow error because we don't need to show error message
+      }
+    })();
+  }, [dispatch, rdService]);
+
   const handlePageClick = useCallback(
     page => {
       setSearchParams({ page });
@@ -144,6 +160,46 @@ export default function OperatorList() {
       dispatch({ searchTriggered: true });
     }
   }, [dispatch, debouncedSearchTerm]);
+
+  const renderPromotedOperators = useCallback(() => {
+    return state.promotedOperators?.map((operator, i) => (
+      <TableRow
+        className="size-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
+        key={`promoted-operator-item-${i}`}
+        onClick={() =>
+          navigate(`/operators/${operator.address}`, {
+            state: { operator }
+          })
+        }
+      >
+        <TableCell className="p-4">
+          <div className="flex items-center gap-x-3">
+            <div className="flex size-5 items-center justify-center rounded-md bg-foreground-2 p-1 text-center text-xs text-content1">
+              ad
+            </div>
+            <ThirdPartyLogo
+              className="size-8 min-w-8"
+              url={operator.metadata?.logo}
+            />
+            <span className="truncate">
+              {operator.metadata?.name || operator.address}
+            </span>
+          </div>
+        </TableCell>
+        <TableCell className="pe-8 text-end">
+          {formatNumber(operator.stakerCount)}
+        </TableCell>
+        <TableCell className="pe-8 text-end">
+          <div>
+            {formatUSD(operator.strategiesTotal * state.promotedOperatorsRate)}
+          </div>
+          <div className="text-xs text-foreground-2">
+            {formatETH(operator.strategiesTotal)}
+          </div>
+        </TableCell>
+      </TableRow>
+    ));
+  }, [navigate, state.promotedOperators, state.promotedOperatorsRate]);
 
   return (
     <div className="flex h-full flex-col">
@@ -195,7 +251,11 @@ export default function OperatorList() {
               table: state.operators?.length === 0 ? 'h-full' : null,
               thead: '[&>tr:last-child]:hidden'
             }}
-            hideHeader={!state.isFetchingData && state.operators.length == 0}
+            hideHeader={
+              state.promotedOperators.length === 0 &&
+              !state.isFetchingData &&
+              state.operators.length == 0
+            }
             layout="fixed"
             onSortChange={e => dispatch({ sortDescriptor: e })}
             removeWrapper
@@ -212,19 +272,9 @@ export default function OperatorList() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody
-              emptyContent={
-                <div className="flex flex-col items-center justify-center">
-                  <span className="text-lg text-foreground-2">
-                    No operator found for &quot;
-                    {debouncedSearchTerm.length > 42
-                      ? `${debouncedSearchTerm.substring(0, 42)}...`
-                      : debouncedSearchTerm}
-                    &quot;
-                  </span>
-                </div>
-              }
-            >
+            <TableBody>
+              {searchParams.get('page') === '1' && renderPromotedOperators()}
+
               {state.isFetchingData
                 ? [...Array(10)].map((_, i) => (
                     <TableRow className="border-t border-outline" key={i}>
@@ -276,6 +326,24 @@ export default function OperatorList() {
                       </TableCell>
                     </TableRow>
                   ))}
+
+              {!state.isFetchingData && state.operators.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <div className="flex flex-col items-center justify-center">
+                      <span className="text-lg text-foreground-2">
+                        No operator found for &quot;
+                        {debouncedSearchTerm.length > 42
+                          ? `${debouncedSearchTerm.substring(0, 42)}...`
+                          : debouncedSearchTerm}
+                        &quot;
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell hidden />
+                  <TableCell hidden />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
           {state.totalPages > 1 && (

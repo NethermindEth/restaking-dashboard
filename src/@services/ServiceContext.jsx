@@ -3,6 +3,7 @@ import AVSService from './AVSService';
 import EigenLayerService from './EigenLayerService';
 import LRTService from './LRTService';
 import OperatorService from './OperatorService';
+import RestakingDashboardService from './RestakingDashboardService';
 
 export const ServiceContext = createContext();
 
@@ -21,5 +22,6 @@ const services = {
   avsService: new AVSService(),
   lrtService: new LRTService(),
   operatorService: new OperatorService(),
-  eigenlayerService: new EigenLayerService()
+  eigenlayerService: new EigenLayerService(),
+  rdService: new RestakingDashboardService()
 };
