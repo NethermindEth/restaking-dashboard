@@ -73,7 +73,6 @@ function UserMenu() {
   const navigate = useNavigate();
   const { user } = useUser();
 
-  console.log(user);
 
   const handleAccountAction = useCallback(
     key => {
