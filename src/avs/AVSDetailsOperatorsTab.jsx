@@ -222,7 +222,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
           promotedOperatorsRate: response.rate
         });
       } catch (e) {
-        //TODO: handle error
+        // swallow error because we don't need to show error message
       }
     })();
   }, [address, dispatch, rdService]);
