@@ -30,7 +30,7 @@ const router = createBrowserRouter(
       <Route element={<OperatorList />} path="/operators" />
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<LST />} path="/lst" />
-      <Route element={<SubscriptionPlans />} path="/subscription" />
+      <Route element={<SubscriptionPlans />} path="/subscriptions" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )
