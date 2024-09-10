@@ -1,5 +1,15 @@
 export default class BaseService {
-  static async #call(endpoint, options) {
+  #context;
+
+  constructor(context) {
+    if (!context) {
+      throw new Error('`context` is required');
+    }
+
+    this.#context = context;
+  }
+
+  async #call(endpoint, options) {
     const url = new URL(
       `${endpoint.startsWith('/') ? '' : '/'}${endpoint}`,
       import.meta.env.VITE_API_BASE_URL
@@ -22,7 +32,7 @@ export default class BaseService {
     const request = {
       credentials: 'include',
       headers: {
-        Accept: 'application/json',
+        accept: 'application/json',
         'accept-language': 'en-us',
         'content-type': `application/json; charset=utf-8`,
         ...options?.headers
@@ -30,6 +40,14 @@ export default class BaseService {
       method: options?.method?.toUpperCase() || 'get',
       signal: options?.signal
     };
+
+    if (this.#context.session) {
+      const token = await this.#context.session.getToken();
+
+      if (token) {
+        request.headers.authorization = `Bearer ${token}`;
+      }
+    }
 
     if (options?.body != null) {
       const isFormData = options.body instanceof FormData;
@@ -62,7 +80,7 @@ export default class BaseService {
    * @param {{body: object, headers: object, query: object}?} options
    * @returns {Promise<Response>}
    */
-  static _delete(endpoint, options) {
+  _delete(endpoint, options) {
     return this.#call(endpoint, { ...options, method: 'delete' });
   }
 
@@ -72,7 +90,7 @@ export default class BaseService {
    * @param {{body: object, headers: object, query: object}?} options
    * @returns {Promise<Response>}
    */
-  static _get(endpoint, options) {
+  _get(endpoint, options) {
     return this.#call(endpoint, { ...options, method: 'get' });
   }
 
@@ -82,7 +100,7 @@ export default class BaseService {
    * @param {{body: object, headers: object, query: object}?} options
    * @returns {Promise<Response>}
    */
-  static _patch(endpoint, options) {
+  _patch(endpoint, options) {
     return this.#call(endpoint, { ...options, method: 'patch' });
   }
 
@@ -92,7 +110,7 @@ export default class BaseService {
    * @param {{body: object, headers: object, query: object}?} options
    * @returns {Promise<Response>}
    */
-  static _post(endpoint, options) {
+  _post(endpoint, options) {
     return this.#call(endpoint, { ...options, method: 'post' });
   }
 
@@ -102,7 +120,7 @@ export default class BaseService {
    * @param {{body: object, headers: object, query: object}?} options
    * @returns {Promise<Response>}
    */
-  static _put(endpoint, options) {
+  _put(endpoint, options) {
     return this.#call(endpoint, { ...options, method: 'put' });
   }
 

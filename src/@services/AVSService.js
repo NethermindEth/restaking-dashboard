@@ -1,9 +1,13 @@
 import BaseService from './BaseService';
 
 export default class AVSService extends BaseService {
+  constructor(context) {
+    super(context);
+  }
+
   async getAll(pageNumber, pageSize = 10, search, sort, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
-    const response = await BaseService._get('/avs', {
+    const response = await this._get('/avs', {
       query: { 'page-index': pageIndex, 'page-size': pageSize, search, sort },
       signal
     });
@@ -16,7 +20,7 @@ export default class AVSService extends BaseService {
   }
 
   async getAVSDetails(address) {
-    const response = await BaseService._get(`/avs/${address}`);
+    const response = await this._get(`/avs/${address}`);
 
     if (response.ok) {
       return await response.json();
@@ -27,7 +31,7 @@ export default class AVSService extends BaseService {
 
   async getAVSOperators(address, pageNumber, search, sort, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
-    const response = await BaseService._get(`/avs/${address}/operators`, {
+    const response = await this._get(`/avs/${address}/operators`, {
       query: {
         'page-index': pageIndex,
         search,
@@ -44,7 +48,7 @@ export default class AVSService extends BaseService {
   }
 
   async getAVSTotalValue(address) {
-    const response = await BaseService._get(`/avs/${address}/tvl`);
+    const response = await this._get(`/avs/${address}/tvl`);
 
     if (response.ok) {
       return await response.json();
@@ -54,9 +58,7 @@ export default class AVSService extends BaseService {
   }
 
   async getAVSOperatorsOvertime(address) {
-    const response = await BaseService._get(
-      `/avs/${address}/operators/over-time`
-    );
+    const response = await this._get(`/avs/${address}/operators/over-time`);
 
     if (response.ok) {
       return await response.json();
