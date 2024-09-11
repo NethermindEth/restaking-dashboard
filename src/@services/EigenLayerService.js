@@ -1,8 +1,12 @@
 import BaseService from './BaseService';
 
 export default class EigenLayerService extends BaseService {
+  constructor(context) {
+    super(context);
+  }
+
   async getEigenLayerTVLOvertime() {
-    const response = await BaseService._get(`/eigenlayer/tvl`);
+    const response = await this._get(`/eigenlayer/tvl`);
 
     if (response.ok) {
       return await response.json();
@@ -12,7 +16,7 @@ export default class EigenLayerService extends BaseService {
   }
 
   async getEigenLayerLSTTotalValue() {
-    const response = await BaseService._get(`/eigenlayer/tvl/lst`);
+    const response = await this._get(`/eigenlayer/tvl/lst`);
 
     if (response.ok) {
       return await response.json();

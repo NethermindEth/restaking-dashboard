@@ -1,9 +1,13 @@
 import BaseService from './BaseService';
 
 export default class OperatorService extends BaseService {
+  constructor(context) {
+    super(context);
+  }
+
   async getAll(pageNumber, pageSize = 10, search, sort, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
-    const response = await BaseService._get(`operators`, {
+    const response = await this._get(`operators`, {
       query: {
         'page-index': pageIndex,
         'page-size': pageSize,
@@ -21,7 +25,7 @@ export default class OperatorService extends BaseService {
   }
 
   async getOperator(address) {
-    const response = await BaseService._get(`operators/${address}`);
+    const response = await this._get(`operators/${address}`);
 
     if (response.ok) {
       return await response.json();
@@ -31,7 +35,7 @@ export default class OperatorService extends BaseService {
   }
 
   async getOperatorTVL(address) {
-    const response = await BaseService._get(`operators/${address}/tvl`);
+    const response = await this._get(`operators/${address}/tvl`);
 
     if (response.ok) {
       return await response.json();
@@ -41,7 +45,7 @@ export default class OperatorService extends BaseService {
   }
 
   async getRestakerTrend(address) {
-    const response = await BaseService._get(`operators/${address}/restakers`);
+    const response = await this._get(`operators/${address}/restakers`);
 
     if (response.ok) {
       return await response.json();
