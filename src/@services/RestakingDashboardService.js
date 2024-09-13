@@ -1,12 +1,12 @@
 import BaseService from './BaseService';
 
-export default class EigenLayerService extends BaseService {
+export default class RestakingDashboardService extends BaseService {
   constructor(context) {
     super(context);
   }
 
-  async getEigenLayerTVLOvertime() {
-    const response = await this._get(`/eigenlayer/tvl`);
+  async getPromotedOperators() {
+    const response = await this._get('/rd/promotion/operators');
 
     if (response.ok) {
       return await response.json();
@@ -15,8 +15,8 @@ export default class EigenLayerService extends BaseService {
     throw await this._createError(response);
   }
 
-  async getEigenLayerLSTTotalValue() {
-    const response = await this._get(`/eigenlayer/tvl/lst`);
+  async getAVSPromotedOperators(address) {
+    const response = await this._get(`/rd/promotion/avs/${address}/operators`);
 
     if (response.ok) {
       return await response.json();

@@ -21,7 +21,7 @@ export default function LSTDistribution({ rankings, height, width, points }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     brushData: [],
     error: undefined,
-    filteredPoints: points,
+    filteredPoints: [],
     keys: [],
     maxX: 0,
     maxY: 0,
@@ -142,26 +142,6 @@ export default function LSTDistribution({ rankings, height, width, points }) {
     [showTooltip, scaleDate]
   );
 
-  useEffect(() => {
-    dispatch({
-      brushData: points?.map(d => {
-        let value = 0;
-
-        for (let strategy of d.strategies) {
-          value += strategy.value;
-        }
-
-        return { timestamp: d.timestamp, value, rate: d.rate };
-      }),
-      brushPosition: {
-        start: scaleBrushDate(points[points.length - 1 - 90].timestamp),
-        end: scaleBrushDate(points[points.length - 1].timestamp)
-      },
-      filteredPoints: points.slice(-90),
-      keys: rankings.map(ranking => ranking.address)
-    });
-  }, [dispatch, points, rankings, scaleBrushDate]);
-
   const getLatestTotal = useMemo(() => {
     const latest = points[points.length - 1];
 
@@ -194,6 +174,27 @@ export default function LSTDistribution({ rankings, height, width, points }) {
     [dispatch]
   );
 
+  useEffect(() => {
+    dispatch({
+      brushData: points?.map(d => {
+        let value = 0;
+
+        for (let strategy of d.strategies) {
+          value += strategy.value;
+        }
+
+        return { timestamp: d.timestamp, value, rate: d.rate };
+      }),
+      keys: rankings.map(ranking => ranking.address)
+    });
+  }, [dispatch, points, rankings, scaleBrushDate]);
+
+  useEffect(() => {
+    if (state.maxX > 0 && !state.filteredPoints.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredPoints, state.maxX]);
+
   return (
     <div>
       <div className="rd-box basis-full p-4 text-sm">
@@ -213,7 +214,7 @@ export default function LSTDistribution({ rankings, height, width, points }) {
           </Tabs>
           <Tabs
             classNames={tabs}
-            defaultSelectedKey="3m"
+            defaultSelectedKey={TIMELINE_DEFAULT}
             onSelectionChange={handleTimelineSelectionChange}
             size="sm"
           >
@@ -422,6 +423,7 @@ const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 40, bottom: 35, left: 1 };
+const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
   '1m': 30,

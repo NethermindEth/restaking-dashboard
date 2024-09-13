@@ -1,16 +1,28 @@
-import { Link } from '@nextui-org/react';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+  Image,
+  Link
+} from '@nextui-org/react';
+import { SignedIn, SignedOut, useClerk, useUser } from '@clerk/clerk-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import RestakingLogo from './ResatkingLogo';
-import { useLocation } from 'react-router-dom';
+import { useCallback } from 'react';
 
 export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
+  const clerk = useClerk();
 
   return (
-    <div>
-      <header className="flex-none border-l-4 border-transparent px-5 pb-8 pt-6">
+    <header className="flex h-full flex-col">
+      <div className="basis-0 border-l-4 border-transparent px-5 pb-8 pt-6">
         <RestakingLogo />
-      </header>
-      <nav className="flex-none">
+      </div>
+      <nav className="basis-full">
         {navItems.map((item, i) => {
           const selected = new RegExp(`(^|/)${item.href}(/|$)`).test(
             location.pathname
@@ -34,8 +46,112 @@ export default function Sidebar({ onOpenChange }) {
           );
         })}
       </nav>
+      <div className="basis-0 px-5 pb-5">
+        <SignedOut>
+          <Button
+            className="hover:!text-content1"
+            color="primary"
+            fullWidth
+            onClick={() => clerk.redirectToSignIn()}
+            radius="sm"
+            variant="ghost"
+          >
+            Sign in
+          </Button>
+        </SignedOut>
+        <SignedIn>
+          <UserMenu />
+        </SignedIn>
+      </div>
       {/* <Settings /> */}
-    </div>
+    </header>
+  );
+}
+
+function UserMenu() {
+  const clerk = useClerk();
+  const navigate = useNavigate();
+  const { user } = useUser();
+
+  const handleAccountAction = useCallback(
+    key => {
+      switch (key) {
+        case 'account':
+          clerk.openUserProfile();
+          break;
+
+        case 'subscriptions':
+          navigate('/subscriptions');
+          break;
+
+        case 'signout':
+          clerk.signOut();
+          break;
+      }
+    },
+    [clerk, navigate]
+  );
+
+  return (
+    <Dropdown className="border border-outline shadow-none">
+      <DropdownTrigger>
+        <Button
+          className="flex"
+          color="default"
+          fullWidth
+          size="md"
+          startContent={
+            <Image
+              className="min-w-5"
+              height={20}
+              src={user?.imageUrl}
+              width={20}
+            />
+          }
+          variant="light"
+        >
+          <span className="overflow-hidden text-ellipsis">
+            {user?.fullName ||
+              user?.username ||
+              user?.primaryEmailAddress?.emailAddress}
+          </span>
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu
+        aria-label="theme"
+        onAction={handleAccountAction}
+        selectionMode="none"
+      >
+        <DropdownSection classNames={{ divider: 'bg-outline' }} showDivider>
+          <DropdownItem
+            key="subscriptions"
+            startContent={
+              <span className="material-symbols-outlined">subscriptions</span>
+            }
+          >
+            Subscriptions
+          </DropdownItem>
+          <DropdownItem
+            key="account"
+            startContent={
+              <span className="material-symbols-outlined text-foreground">
+                manage_accounts
+              </span>
+            }
+          >
+            Manage account
+          </DropdownItem>
+        </DropdownSection>
+        <DropdownItem
+          key="signout"
+          startContent={
+            <span className="material-symbols-outlined">logout</span>
+          }
+        >
+          Sign out
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
   );
 }
 

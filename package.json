@@ -6,14 +6,16 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "build:stage": "vite build --mode staging",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.4.5",
     "@nextui-org/react": "^2.4.6",
     "@visx/axis": "^3.10.1",
     "@visx/curve": "^3.3.0",
     "@visx/event": "^3.3.0",
+    "@visx/gradient": "^3.3.0",
     "@visx/grid": "^3.5.0",
     "@visx/group": "^3.3.0",
     "@visx/hierarchy": "^3.3.0",

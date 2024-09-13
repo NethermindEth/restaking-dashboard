@@ -105,11 +105,14 @@ export default function AVSDetailsOperatorsTab({
 function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { rdService } = useServices();
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
     currentRate: 1,
     error: undefined,
     operators: [],
+    promotedOperators: [],
+    promotedOperatorsRate: 1,
     isInputTouched: false,
     isTableLoading: true,
     totalPages: undefined,
@@ -210,6 +213,20 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
     state.sort
   ]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await rdService.getAVSPromotedOperators(address);
+        dispatch({
+          promotedOperators: response.results,
+          promotedOperatorsRate: response.rate
+        });
+      } catch (e) {
+        // swallow error because we don't need to show error message
+      }
+    })();
+  }, [address, dispatch, rdService]);
+
   const handleSort = useCallback(
     e => {
       let sort = e.column;
@@ -233,6 +250,48 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
     page => dispatch({ page: page }),
     [dispatch]
   );
+
+  const renderPromotedOperators = useCallback(() => {
+    return state.promotedOperators?.map((operator, i) => (
+      <TableRow
+        className="size-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
+        key={`promoted-operator-item-${i}`}
+        onClick={() =>
+          navigate(`/operators/${operator.address}`, {
+            state: { operator }
+          })
+        }
+      >
+        <TableCell className="p-4">
+          <div className="flex items-center gap-x-3">
+            <div className="flex size-5 items-center justify-center rounded-md bg-foreground-2 p-1 text-center text-xs text-content1">
+              ad
+            </div>
+            <ThirdPartyLogo
+              className="size-8 min-w-8"
+              url={operator.metadata?.logo}
+            />
+            <span className="truncate">
+              {operator.metadata?.name || operator.address}
+            </span>
+          </div>
+        </TableCell>
+        <TableCell className="pe-8 text-end">
+          {tvl === 0
+            ? 'N/A'
+            : `${((operator.strategiesTotal / tvl) * 100).toFixed(2)}%`}
+        </TableCell>
+        <TableCell className="pe-8 text-end">
+          <div>
+            {formatUSD(operator.strategiesTotal * state.promotedOperatorsRate)}
+          </div>
+          <div className="text-xs text-foreground-2">
+            {formatETH(operator.strategiesTotal)}
+          </div>
+        </TableCell>
+      </TableRow>
+    ));
+  }, [navigate, state.promotedOperators, state.promotedOperatorsRate, tvl]);
 
   return (
     <div className="rd-box text-sm">
@@ -301,15 +360,9 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
               TVL
             </TableColumn>
           </TableHeader>
-          <TableBody
-            emptyContent={
-              <div className="flex h-[40rem] flex-col items-center justify-center">
-                <span className="text-lg text-foreground-2">
-                  No result found for {truncate(state.search ?? '')}
-                </span>
-              </div>
-            }
-          >
+          <TableBody>
+            {searchParams.get('page') === '1' && renderPromotedOperators()}
+
             {(state.isTableLoading || isAVSLoading) &&
               [...new Array(10)].map((_, i) => (
                 <TableRow className="border-t border-outline" key={i}>
@@ -352,7 +405,11 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
                     </div>
                   </TableCell>
                   <TableCell className="pe-8 text-end">
-                    <div>{((op.strategiesTotal / tvl) * 100).toFixed(2)}%</div>
+                    <div>
+                      {tvl === 0
+                        ? 'N/A'
+                        : `${((op.strategiesTotal / tvl) * 100).toFixed(2)}%`}
+                    </div>
                   </TableCell>
                   <TableCell className="pe-8 text-end">
                     <div>
@@ -367,6 +424,22 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
                   </TableCell>
                 </TableRow>
               ))}
+
+            {!state.isTableLoading &&
+              !isAVSLoading &&
+              state.operators.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <div className="flex h-[40rem] flex-col items-center justify-center">
+                      <span className="text-lg text-foreground-2">
+                        No result found for {truncate(state.search ?? '')}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell hidden />
+                  <TableCell hidden />
+                </TableRow>
+              )}
 
             {!state.isTableLoading &&
               !isAVSLoading &&

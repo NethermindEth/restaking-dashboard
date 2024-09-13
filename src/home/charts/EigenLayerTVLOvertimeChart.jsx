@@ -8,7 +8,6 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
 import { curveMonotoneX } from '@visx/curve';
-import { formatEther } from 'ethers';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import HBrush from '../../shared/HBrush';
@@ -59,9 +58,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           0,
           Math.max(
             ...eigenLayerTVL.map(d => {
-              const value = Number(
-                formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL))
-              );
+              const value = d.ethTVL + d.lstTVL;
 
               return value * (state.useRate ? d.rate : 1);
             })
@@ -92,9 +89,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           0,
           Math.max(
             ...state.filteredData.map(d => {
-              const value = Number(
-                formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL))
-              );
+              const value = d.ethTVL + d.lstTVL;
 
               return value * (state.useRate ? d.rate : 1);
             })
@@ -108,15 +103,13 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
 
   const getLatestTotal = useMemo(() => {
     const last = eigenLayerTVL[eigenLayerTVL.length - 1];
-    const total = Number(
-      formatEther(BigInt(last.ethTVL) + BigInt(last.lstTVL))
-    );
+    const total = Number(last.ethTVL + last.lstTVL);
 
     return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
   }, [eigenLayerTVL, state.useRate]);
 
   const getValue = useCallback(
-    (d, k) => Number(formatEther(d[k])) * (state.useRate ? d.rate : 1),
+    (d, k) => Number(d[k]) * (state.useRate ? d.rate : 1),
     [state.useRate]
   );
 
@@ -205,19 +198,18 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
   useEffect(() => {
     dispatch({
       brushData: eigenLayerTVL?.map(d => {
-        const value = Number(formatEther(BigInt(d.ethTVL) + BigInt(d.lstTVL)));
+        const value = Number(d.ethTVL + d.lstTVL);
 
         return { timestamp: d.timestamp, value, rate: d.rate };
-      }),
-      brushPosition: {
-        start: scaleBrushDate(
-          eigenLayerTVL[eigenLayerTVL.length - 1 - 90].timestamp
-        ),
-        end: scaleBrushDate(eigenLayerTVL[eigenLayerTVL.length - 1].timestamp)
-      },
-      filteredData: eigenLayerTVL.slice(-90)
+      })
     });
   }, [eigenLayerTVL, dispatch, scaleBrushDate]);
+
+  useEffect(() => {
+    if (state.maxX && !state.filteredData.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredData, state.maxX]);
 
   return (
     <div className="rd-box min-h-44 basis-full p-4" ref={rootRef}>
@@ -267,7 +259,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="3m"
+          defaultSelectedKey="all"
           onSelectionChange={handleTimelineSelectionChange}
           size="sm"
         >
@@ -443,7 +435,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 ETH
                 <span className="grow ps-4 text-end">
                   {formatTooltipValue(
-                    BigInt(tooltipData.data.ethTVL),
+                    tooltipData.data.ethTVL,
                     tooltipData.data.rate,
                     state.useRate
                   )}
@@ -463,7 +455,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 LST
                 <span className="grow ps-4 text-end">
                   {formatTooltipValue(
-                    BigInt(tooltipData.data.lstTVL),
+                    tooltipData.data.lstTVL,
                     tooltipData.data.rate,
                     state.useRate
                   )}
@@ -475,8 +467,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
             <span>Total</span>
             <span className="grow text-end">
               {formatTooltipValue(
-                BigInt(tooltipData.data.ethTVL) +
-                  BigInt(tooltipData.data.lstTVL),
+                tooltipData.data.ethTVL + tooltipData.data.lstTVL,
                 tooltipData.data.rate,
                 state.useRate
               )}
@@ -503,15 +494,14 @@ const formatDate = date => {
   return axisDateFormatter.format(date);
 };
 const formatTooltipValue = (value, rate, useRate) =>
-  useRate
-    ? formatUSD(Number(formatEther(value)) * rate)
-    : formatETH(Number(formatEther(value)));
+  useRate ? formatUSD(value * rate) : formatETH(value);
 
 const getDate = d => new Date(d.timestamp);
 const getY0 = d => d[0];
 const getY1 = d => d[1];
 const isDefined = d => !!d[1];
 const margin = { top: 8, right: 48, bottom: 1, left: 1 };
+const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
   '1m': 30,

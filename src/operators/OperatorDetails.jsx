@@ -1,33 +1,56 @@
 import {
-  allStrategyAssetMapping,
   BEACON_STRATEGY,
-  EIGEN_STRATEGY
+  EIGEN_STRATEGY,
+  lstStrategyAssetMapping
 } from '../shared/strategies';
+import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import { handleServiceError, reduceState } from '../shared/helpers';
-import { Link, Progress, Skeleton, Spinner } from '@nextui-org/react';
+import {
+  Link,
+  Skeleton,
+  Spinner,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Tabs,
+  Tooltip
+} from '@nextui-org/react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import CopyButton from '../shared/CopyButton';
 import ErrorMessage from '../shared/ErrorMessage';
-import { formatETH } from '../shared/formatters';
-import OperatorLSTPieChart from './charts/OperatorLSTPieChart';
+import { formatEther } from 'ethers';
 import OperatorRestakersLineChart from './charts/OperatorRestakersLineChart';
 import OperatorTVLLineChart from './charts/OperatorTVLLineChart';
 import { ParentSize } from '@visx/responsive';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
+import { tooltip } from '../shared/slots';
 import { truncateAddress } from '../shared/helpers';
-import { useEffect } from 'react';
+import TVLTabTreemap from '../avs/charts/TVLTabTreemap';
 import { useMutativeReducer } from 'use-mutative';
-import { useParams } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 export default function OperatorDetails() {
-  const { address } = useParams();
+  const { address, tab } = useParams();
+  const { pathname } = useLocation();
+
   const [state, dispatch] = useMutativeReducer(reduceState, {
     error: undefined,
     ethRate: undefined,
     operator: undefined,
     isOperatorLoading: true,
-    tvl: undefined
+    strategies: undefined,
+    tvl: undefined,
+    totalTokens: {
+      lst: 0,
+      eth: 0,
+      eigen: 0
+    }
   });
   const { operatorService } = useServices();
   const compact = !useTailwindBreakpoint('lg');
@@ -39,18 +62,33 @@ export default function OperatorDetails() {
       try {
         const operator = await operatorService.getOperator(address);
 
+        const totals = { lst: 0n, eth: 0n, eigen: 0n };
+        const strategies = Object.create(null);
+
         const tvl = operator.strategies?.reduce((acc, s) => {
           if (s.address === EIGEN_STRATEGY) {
+            totals.eigen += BigInt(s.tokens);
             return acc;
+          } else if (s.address === BEACON_STRATEGY) {
+            totals.eth += BigInt(s.tokens);
+          } else {
+            totals.lst += BigInt(s.tokens);
           }
+          strategies[s.address] = Number(formatEther(s.tokens));
           return (acc += BigInt(s.tokens));
         }, 0n);
+
+        totals.eigen = Number(formatEther(totals.eigen));
+        totals.eth = Number(formatEther(totals.eth));
+        totals.lst = Number(formatEther(totals.lst));
 
         dispatch({
           operator,
           tvl: parseFloat(tvl ?? 0) / 1e18,
           ethRate: operator.rate,
-          isOperatorLoading: false
+          isOperatorLoading: false,
+          strategies,
+          totalTokens: totals
         });
       } catch (e) {
         dispatch({
@@ -64,7 +102,7 @@ export default function OperatorDetails() {
   return (
     <>
       {state.isOperatorLoading && (
-        <div className="rd-box mb-4 min-h-[180px] w-full p-4">
+        <div className="rd-box min-h-[180px] w-full p-4">
           <div className="flex max-w-[300px] items-center">
             <Skeleton className="size-12 shrink-0 rounded-full border border-outline" />
             <Skeleton className="ml-2 h-8 w-full rounded-md" />
@@ -76,14 +114,14 @@ export default function OperatorDetails() {
       )}
 
       {state.error && (
-        <div className="rd-box mb-4 flex min-h-[180px] w-full items-center justify-center p-4">
+        <div className="rd-box flex min-h-[180px] w-full items-center justify-center p-4">
           <ErrorMessage error={state.error} />
         </div>
       )}
 
       {!state.isOperatorLoading && !state.error && (
         <>
-          <div className="rd-box mb-4 flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words p-4">
+          <div className="rd-box flex w-full flex-row flex-wrap items-center gap-x-5 gap-y-2 break-words p-4">
             <div className="flex basis-full items-center gap-4">
               <ThirdPartyLogo
                 className="size-12 min-w-12"
@@ -148,204 +186,501 @@ export default function OperatorDetails() {
               </Link>
             )}
           </div>
-          <div className="rd-box mb-4 flex flex-row items-center justify-between p-2">
-            <div className="flex basis-1/3 flex-col items-center gap-1">
-              <span className="text-sm text-foreground-2">TVL</span>
-              <span className="text-center">
-                {state.tvl && (
-                  <span className="text-foreground-1">
+        </>
+      )}
+
+      <Tabs
+        className="my-4 w-full"
+        classNames={{
+          cursor: 'rounded border border-outline shadow-none',
+          panel: 'p-0',
+          tab: 'h-fit p-2',
+          tabList: 'rd-box w-full !overflow-x-scroll p-2'
+        }}
+        radius="sm"
+        selectedKey={tab ? pathname : `${pathname}/tvl`}
+        size="lg"
+      >
+        <Tab
+          href={`/operators/${address}/tvl`}
+          key={`/operators/${address}/tvl`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+                TVL
+              </div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span className="text-foreground-1 group-aria-selected:text-foreground">
                     {formatETH(state.tvl, compact)}
                   </span>
                 )}
-              </span>
+              </div>
             </div>
-            <div className="flex h-full min-h-10 basis-1/3 flex-col items-center gap-2 border-x border-outline px-2">
-              <span className="text-center text-sm text-foreground-2">
-                AVS subscribed
-              </span>
-              <span className="text-foreground-1">
-                {state.operator?.avs?.length}
-              </span>
+          }
+        >
+          <OperatorTVLLineChart
+            currentTVL={state.tvl}
+            ethRate={state.ethRate}
+            isOperatorLoading={state.isOperatorLoading}
+            operatorError={state.error}
+          />
+          <div className="flex h-min w-full flex-col gap-4 md:flex-row">
+            <div className="flex w-full basis-1/2 flex-col gap-y-4 md:w-1/2">
+              <TokensBreakdownList
+                ethRate={state.ethRate}
+                isOperatorLoading={state.isOperatorLoading}
+                operatorError={state.error}
+                totalTokens={state.totalTokens}
+              />
+              <LSTBreakdownList
+                ethRate={state.ethRate}
+                isOperatorLoading={state.isOperatorLoading}
+                lst={state.strategies}
+                operatorError={state.error}
+              />
             </div>
-            <div className="flex basis-1/3 flex-col items-center gap-1">
-              <span className="text-sm text-foreground-2">Restakers</span>
-              <span className="text-foreground-1">
-                {state.operator?.stakerCount}
-              </span>
-            </div>
+            {(state.isOperatorLoading || state.error) && (
+              <div className="basis-1/2">
+                <div className="rd-box flex h-full min-h-[512px] w-full items-center justify-center p-4">
+                  {state.isOperatorLoading && (
+                    <Spinner color="primary" size="lg" />
+                  )}
+                  {state.error && <ErrorMessage error={state.error} />}
+                </div>
+              </div>
+            )}
+
+            {!state.isOperatorLoading && !state.error && (
+              <>
+                {' '}
+                <div className="w-full basis-1/2 md:w-1/2">
+                  <ParentSize className="h-full">
+                    {parent => (
+                      <TVLTabTreemap
+                        ethRate={state.ethRate}
+                        // the extra 88 is from 1px top/bottom border , 16px top/bottomp padding
+                        // 38px title and control, 16px margin bottom for title
+                        // otherwise we will have an infinitely growing SVG because there is no fixed height
+                        height={(parent.height || 512) - 2 - 32 - 38 - 16}
+                        lst={state.strategies}
+                        // 1px left/right border, 16px left/right padding
+                        width={parent.width - 2 - 32}
+                      />
+                    )}
+                  </ParentSize>
+                </div>
+              </>
+            )}
           </div>
-        </>
-      )}
-      <OperatorTVLLineChart
-        currentTVL={state.tvl}
-        ethRate={state.ethRate}
-        isOperatorLoading={state.isOperatorLoading}
-        operatorError={state.error}
-      />
-      <OperatorRestakersLineChart
-        isOperatorLoading={state.isOperatorLoading}
-        operatorError={state.error}
-        restakers={state.operator?.stakerCount}
-      />
-      <LSTDistribution
-        ethRate={state.ethRate}
-        isOperatorLoading={state.isOperatorLoading}
-        strategies={state.operator?.strategies}
-        tvl={state.tvl}
-      />
+        </Tab>
+
+        <Tab
+          href={`/operators/${address}/avs`}
+          key={`/operators/${address}/avs`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+                AVS secured
+              </div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span className="text-foreground-1 group-aria-selected:text-foreground">
+                    {state.operator?.avs?.length}
+                  </span>
+                )}
+              </div>
+            </div>
+          }
+        >
+          <AVSList
+            error={state.error}
+            isLoading={state.isOperatorLoading}
+            list={state.operator?.avs}
+          />
+        </Tab>
+
+        <Tab
+          href={`/operators/${address}/restakers`}
+          key={`/operators/${address}/restakers`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm">Restakers</div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span>{state.operator?.stakerCount}</span>
+                )}
+              </div>
+            </div>
+          }
+        >
+          <OperatorRestakersLineChart
+            isOperatorLoading={state.isOperatorLoading}
+            operatorError={state.error}
+            restakers={state.operator?.stakerCount}
+          />
+        </Tab>
+      </Tabs>
     </>
   );
 }
 
-function LSTDistribution({ ethRate, isOperatorLoading, strategies, tvl }) {
-  const [state, dispatch] = useMutativeReducer(reduceState, {
-    lstTVL: 1,
-    lstDistribution: []
-  });
+const tokens = {
+  eth: {
+    name: 'Beacon',
+    symbol: 'ETH',
+    logo: '/images/eth.png'
+  },
+  lst: {
+    name: 'Liquid Staking Tokens',
+    symbol: 'ETH',
+    logo: '/images/eth-multicolor.png'
+  },
+  eigen: {
+    name: 'Eigen',
+    symbol: 'EIGEN',
+    logo: '/images/eigen.png'
+  }
+};
 
-  useEffect(() => {
-    if (!strategies) {
-      return;
-    }
+function TokensBreakdownList({
+  operatorError,
+  totalTokens,
+  isOperatorLoading,
+  ethRate
+}) {
+  const sortedTotalTokens = useMemo(() => {
+    const arr = Object.entries(totalTokens).filter(t => t[0] !== 'eigen');
+    arr.sort((a, b) => b[1] - a[1]);
+    return arr;
+  }, [totalTokens]);
 
-    const filteredStrategies = [];
-    let excludeBeaconTVL = 0;
-    let totals = 0n;
+  const sum = useMemo(
+    // eslint-disable-next-line no-unused-vars
+    () => sortedTotalTokens.reduce((acc, [_, total]) => acc + total, 0),
+    [sortedTotalTokens]
+  );
 
-    for (const s of strategies) {
-      if (s.address !== EIGEN_STRATEGY && s.address !== BEACON_STRATEGY) {
-        filteredStrategies.push(s);
-      }
+  const compact = !useTailwindBreakpoint('md');
 
-      if (s.address === BEACON_STRATEGY) {
-        excludeBeaconTVL = parseFloat(s.tokens) / 1e18;
-      }
-
-      totals += BigInt(s.tokens);
-    }
-
-    // http://localhost:5173/operators/0x2514f445135d5e51bba6c33dd7f1898f070b8c62
-    // edge case where the operators used to have some stake in strategies, but now all of them are zero
-    // this will cause the pie chart to be empty so we should just display unavailable data
-    if (totals === 0n) {
-      return;
-    }
-
-    filteredStrategies.sort((a, b) => {
-      const tokensDiff = BigInt(b.tokens) - BigInt(a.tokens);
-      return parseFloat(tokensDiff);
-    });
-
-    const lstDistribution = filteredStrategies.slice(0, 6);
-
-    if (filteredStrategies.length > 7) {
-      const others = filteredStrategies.slice(6).reduce(
-        (acc, current) => {
-          acc.tokens += BigInt(current.tokens);
-          acc.shares += BigInt(current.shares);
-
-          return acc;
-        },
-        { tokens: BigInt(0), shares: BigInt(0) }
-      );
-
-      lstDistribution.push(others);
-    }
-
-    for (let i = 0; i < lstDistribution.length; i++) {
-      const lst = lstDistribution[i];
-
-      if (lst.address) {
-        const mapping = allStrategyAssetMapping[lst.address];
-
-        lst.logo = mapping.logo;
-        lst.name = mapping.name;
-        lst.symbol = mapping.symbol;
-      } else {
-        lst.logo = '/images/eth-multicolor.png';
-        lst.name = 'Others';
-        lst.symbol = ''; // needed as chart key
-      }
-
-      lst.tokensInETH = parseFloat(lst.tokens) / 1e18;
-    }
-
-    dispatch({
-      lstTVL: tvl - excludeBeaconTVL,
-      lstDistribution
-    });
-  }, [dispatch, strategies, tvl]);
-
-  if (isOperatorLoading) {
+  if (operatorError) {
     return (
-      <div className="rd-box flex h-[410px] w-full items-center justify-center p-4 lg:h-[410px]">
-        <Spinner color="primary" size="lg" />
+      <div className="rd-box flex w-full flex-1 flex-col items-center justify-center">
+        <ErrorMessage error={operatorError} />
       </div>
     );
   }
 
-  if (state.lstDistribution.length === 0) {
-    return (
-      <div className="rd-box flex h-[410px] items-center justify-center p-4">
-        <div>
-          <ErrorMessage message="No strategies available" />
-        </div>
-      </div>
-    );
-  }
   return (
-    <div className="rd-box flex flex-col gap-7 p-4">
-      <div className="text-foreground-1">LST distribution</div>
-      <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
-        <div className="flex w-full basis-3/4 flex-col gap-y-4">
-          {state.lstDistribution.map((strategy, i) => {
-            return (
-              <LSTShare
-                key={`lst-distribution-item-${i}`}
-                label={strategy.name}
-                logo={strategy.logo}
-                symbol={strategy.symbol}
-                value={(strategy.tokensInETH / state.lstTVL) * 100}
-              />
-            );
-          })}
-        </div>
-        <div className="w-full basis-1/4">
-          <ParentSize>
-            {parent => (
-              <OperatorLSTPieChart
-                ethRate={ethRate}
-                lstDistribution={state.lstDistribution}
-                lstTVL={state.lstTVL}
-                parent={parent}
-              />
-            )}
-          </ParentSize>
-        </div>
+    <Table
+      aria-label="Breakdown of ETH, EIGEN and Liquid Staking Tokens"
+      classNames={{
+        wrapper: 'rounded-lg border border-outline',
+        tr: 'border-b border-outline last:border-none'
+      }}
+      hideHeader
+      layout="fixed"
+      topContent={
+        <div className="text-medium text-foreground-1">Tokens distribution</div>
+      }
+    >
+      <TableHeader>
+        <TableColumn className="w-1/2">Token</TableColumn>
+        <TableColumn>Total</TableColumn>
+      </TableHeader>
+      <TableBody>
+        {isOperatorLoading &&
+          [...new Array(3)].map((_, i) => (
+            <TableRow key={i}>
+              <TableCell className="pl-0">
+                <Skeleton className="h-5 w-full rounded-md" />
+              </TableCell>
+              <TableCell className="flex justify-end">
+                <Skeleton className="h-10 w-20 rounded-md" />
+              </TableCell>
+            </TableRow>
+          ))}
+        {!isOperatorLoading &&
+          sortedTotalTokens.map(([key, total]) => (
+            <TableRow key={key}>
+              <TableCell className="pl-0 text-sm">
+                <div className="flex items-center gap-x-2 truncate">
+                  <ThirdPartyLogo
+                    className="size-6 min-w-6"
+                    url={tokens[key].logo}
+                  />
+                  <span className="truncate text-foreground-2">
+                    {tokens[key].name}
+                  </span>
+                  {sum > 0 && (
+                    <span className="text-foreground-1">
+                      {`${((total / sum) * 100).toFixed(2)}%`}
+                    </span>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="flex justify-end text-sm">
+                <div className="text-end">
+                  <div>{formatUSD(total * ethRate, compact)}</div>
+
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(total, compact)}
+                  </div>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        {!isOperatorLoading && (
+          <TableRow>
+            <TableCell className="pl-0 text-sm">
+              <div className="flex items-center gap-x-2 truncate">
+                <ThirdPartyLogo
+                  className="size-6 min-w-6"
+                  url={tokens['eigen'].logo}
+                />
+                <span className="truncate text-foreground-2">
+                  {tokens['eigen'].name}
+                </span>
+                <span className="text-foreground-1">
+                  {tokens['eigen'].symbol}
+                </span>
+                {<span className="text-foreground-1">N/A</span>}
+              </div>
+            </TableCell>
+            <TableCell className="flex justify-end text-sm">
+              <div className="text-end">
+                <EigenDisclaimer />
+                <div className="text-xs text-foreground-2">
+                  {`${formatNumber(totalTokens['eigen'], compact)} EIGEN`}
+                </div>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
+}
+
+function LSTBreakdownList({ operatorError, lst, ethRate, isOperatorLoading }) {
+  const sortedTokens = useMemo(() => {
+    if (isOperatorLoading || operatorError) {
+      return [];
+    }
+
+    const exclude = new Set([EIGEN_STRATEGY, BEACON_STRATEGY]);
+
+    const arr = Object.entries(lst);
+    arr.sort((a, b) => Number(b[1]) - Number(a[1]));
+    return arr.filter(([strategy]) => !exclude.has(strategy));
+  }, [operatorError, lst, isOperatorLoading]);
+
+  const compact = !useTailwindBreakpoint('md');
+
+  if (operatorError) {
+    return (
+      <div className="rd-box flex w-full flex-1 flex-col items-center justify-center">
+        <ErrorMessage error={operatorError} />
       </div>
+    );
+  }
+
+  if (!isOperatorLoading && sortedTokens.length === 0) {
+    return (
+      <div className="rd-box flex min-h-40 w-full flex-1 flex-col items-center justify-center">
+        <span className="text-lg text-foreground-2">
+          No strategies to display
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <Table
+      aria-label="Breakdown of Liquid Staking Tokens"
+      classNames={{
+        wrapper: 'rounded-lg border border-outline',
+        tr: 'border-b border-outline last:border-none'
+      }}
+      hideHeader
+      layout="fixed"
+      topContent={
+        <div className="text-medium text-foreground-1">LST distribution</div>
+      }
+    >
+      <TableHeader>
+        <TableColumn className="w-1/2">LST</TableColumn>
+        <TableColumn>ETH</TableColumn>
+      </TableHeader>
+      <TableBody>
+        {isOperatorLoading &&
+          [...new Array(12)].map((_, i) => (
+            <TableRow key={i}>
+              <TableCell className="pl-0">
+                <Skeleton className="h-5 w-full rounded-md" />
+              </TableCell>
+              <TableCell className="flex justify-end">
+                <Skeleton className="h-10 w-20 rounded-md" />
+              </TableCell>
+            </TableRow>
+          ))}
+        {!isOperatorLoading &&
+          sortedTokens.map(([key, total]) => (
+            <TableRow key={key}>
+              <TableCell className="pl-0 text-sm">
+                <div className="flex items-center gap-x-2">
+                  <ThirdPartyLogo
+                    className="size-6 min-w-6"
+                    url={lstStrategyAssetMapping[key].logo}
+                  />
+                  <span className="truncate text-foreground-2">
+                    {lstStrategyAssetMapping[key]?.name}
+                  </span>{' '}
+                  <span className="text-foreground-1">
+                    {lstStrategyAssetMapping[key]?.symbol}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell className="flex justify-end">
+                <div className="text-end">
+                  <div>{formatUSD(Number(total) * ethRate, compact)}</div>
+
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(Number(total), compact)}
+                  </div>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function EigenDisclaimer() {
+  const [isOpen, setOpen] = useState(false);
+
+  return (
+    <div className="inline-flex items-center gap-x-1">
+      N/A
+      <Tooltip
+        classNames={tooltip}
+        content={
+          <>
+            EIGEN is currently not listed on any exchanges so we are unable to
+            get its USD value. Information will be updated when the token is
+            available on centralized/decentralized exchanges.
+          </>
+        }
+        isOpen={isOpen}
+        onOpenChange={open => setOpen(open)}
+        placement="top"
+        showArrow={true}
+      >
+        <span
+          className="material-symbols-outlined cursor-pointer text-sm"
+          onPointerDown={() => setOpen(!isOpen)}
+          style={{
+            fontVariationSettings: `'FILL' 0`
+          }}
+        >
+          info
+        </span>
+      </Tooltip>
     </div>
   );
 }
 
-function LSTShare({ label, logo, symbol, value }) {
+function AVSList({ list, error, isLoading }) {
+  const navigate = useNavigate();
+
+  if (error) {
+    return (
+      <div className="rd-box flex h-[390px] w-full flex-1 flex-col items-center justify-center">
+        <ErrorMessage error={error} />
+      </div>
+    );
+  }
+
   return (
-    <Progress
-      classNames={{
-        track: 'border border-default bg-outline',
-        indicator: 'bg-foreground-2',
-        label: 'text-sm font-normal text-foreground-1',
-        value: 'text-sm font-normal text-foreground'
-      }}
-      label={
-        <div className="flex items-center gap-x-2">
-          <ThirdPartyLogo className="size-6 min-w-6" url={logo} />
-          <span className="text-foreground-2">{label}</span>
-          <span className="text-foreground-1">{symbol}</span>
-        </div>
-      }
-      radius="sm"
-      showValueLabel={true}
-      value={value}
-    />
+    <div className="rd-box text-sm">
+      <div className="flex flex-col justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
+        <div className="text-medium text-foreground-1">All AVS</div>
+      </div>
+
+      <Table
+        aria-label="List of AVS secured by operator"
+        classNames={{
+          base: 'h-full overflow-x-auto',
+          table: 'h-full'
+        }}
+        hideHeader
+        layout="fixed"
+        removeWrapper
+      >
+        <TableHeader>
+          <TableColumn className="text-foreground-active bg-transparent py-4 text-sm font-normal leading-5 data-[hover=true]:text-foreground-2 md:w-1/3">
+            AVS
+          </TableColumn>
+        </TableHeader>
+        <TableBody
+          emptyContent={
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-lg text-foreground-2">
+                No AVS is currently being secured
+              </span>
+            </div>
+          }
+        >
+          {isLoading &&
+            [...new Array(10)].map((_, i) => (
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-full p-4">
+                  <Skeleton className="h-4 rounded-md" />
+                </TableCell>
+              </TableRow>
+            ))}
+
+          {!isLoading &&
+            list.map(avs => (
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={avs.address}
+                onClick={() => navigate(`/avs/${avs.address}`)}
+              >
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={avs.metadata?.logo}
+                    />
+                    <span className="truncate">
+                      {avs.metadata?.name || avs.address}
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

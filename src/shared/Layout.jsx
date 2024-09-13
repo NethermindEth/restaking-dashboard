@@ -2,10 +2,22 @@ import Footer from './Footer';
 import Header from './Header';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import { Spinner } from '@nextui-org/react';
+import { useSession } from '@clerk/clerk-react';
 import { useTailwindBreakpoint } from './hooks/useTailwindBreakpoint';
 
 export default function Layout() {
   const showSidebar = useTailwindBreakpoint('lg');
+  const { isLoaded } = useSession();
+
+  // Don't render the main content until the auth session is loaded
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen flex-col content-center justify-center">
+        <Spinner color="primary" size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col gap-4 bg-background text-foreground">

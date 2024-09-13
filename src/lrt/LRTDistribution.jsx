@@ -141,9 +141,9 @@ export default function LRTDistribution({ data, height }) {
     },
     [showTooltip, scaleDate]
   );
-  const handleTabSelectionChange = useCallback(
+  const handleTimelineSelectionChange = useCallback(
     key => {
-      const start = Math.max(0, data.length - 1 - tabMap[key]);
+      const start = Math.max(0, data.length - 1 - timelines[key]);
 
       dispatch({
         brushPosition: {
@@ -203,16 +203,17 @@ export default function LRTDistribution({ data, height }) {
 
         return { timestamp: d.timestamp, value, rate: d.rate };
       }),
-      brushPosition: {
-        start: scaleBrushDate(data[data.length - 1 - 90].timestamp),
-        end: scaleBrushDate(data[data.length - 1].timestamp)
-      },
-      filteredData: data.slice(-90),
       keys: Object.entries(data?.[data.length - 1].protocols)
         .sort(sortProtocols)
         .map(([k]) => k)
     });
   }, [data, dispatch, scaleBrushDate]);
+
+  useEffect(() => {
+    if (state.maxX && !state.filteredData.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredData, state.maxX]);
 
   return (
     <div className="rd-box basis-full p-4 text-sm" ref={rootRef}>
@@ -232,8 +233,8 @@ export default function LRTDistribution({ data, height }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="3m"
-          onSelectionChange={handleTabSelectionChange}
+          defaultSelectedKey={TIMELINE_DEFAULT}
+          onSelectionChange={handleTimelineSelectionChange}
           size="sm"
         >
           <Tab key="1w" title="1W" />
@@ -451,7 +452,8 @@ const sortProtocols = ([, p1], [, p2]) => {
 
   return 0;
 };
-const tabMap = {
+const TIMELINE_DEFAULT = 'all';
+const timelines = {
   '1w': 7,
   '1m': 30,
   '3m': 90,

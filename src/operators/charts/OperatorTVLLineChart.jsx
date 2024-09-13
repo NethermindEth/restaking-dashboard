@@ -1,5 +1,5 @@
+import { AreaClosed, Circle, LinePath } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
-import { Circle, LinePath } from '@visx/shape';
 import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
 import {
   getGrowthPercentage,
@@ -15,6 +15,7 @@ import { curveMonotoneX } from '@visx/curve';
 import ErrorMessage from '../../shared/ErrorMessage';
 import { GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
+import { LinearGradient } from '@visx/gradient';
 import { localPoint } from '@visx/event';
 import { ParentSize } from '@visx/responsive';
 import { tabs } from '../../shared/slots';
@@ -101,24 +102,11 @@ function LineChart({ points, height, width }) {
   const compact = !useTailwindBreakpoint('sm');
 
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    filteredPoints: points,
-    maxX: Math.max(width - margin.left - margin.right, 0),
-    maxY: height - margin.top - margin.bottom,
+    filteredPoints: [],
+    maxX: 0,
+    maxY: 0,
     useRate: true
   });
-
-  useEffect(() => {
-    dispatch({
-      filteredPoints: points
-    });
-  }, [dispatch, points]);
-
-  useEffect(() => {
-    dispatch({
-      maxX: Math.max(width - margin.left - margin.right, 0),
-      maxY: height - margin.top - margin.bottom
-    });
-  }, [dispatch, width, height]);
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
@@ -169,6 +157,10 @@ function LineChart({ points, height, width }) {
   }, [compact, points, state.useRate]);
 
   const growthPercentage = useMemo(() => {
+    if (!state.filteredPoints.length) {
+      return null;
+    }
+
     const first = state.filteredPoints[0];
     const latest = state.filteredPoints[state.filteredPoints.length - 1];
 
@@ -223,6 +215,19 @@ function LineChart({ points, height, width }) {
     [getValue, showTooltip, scaleDate, scaleValue, state.filteredPoints]
   );
 
+  useEffect(() => {
+    dispatch({
+      maxX: Math.max(width - margin.left - margin.right, 0),
+      maxY: height - margin.top - margin.bottom
+    });
+  }, [dispatch, width, height]);
+
+  useEffect(() => {
+    if (state.maxX > 0 && !state.filteredPoints.length) {
+      handleTimelineSelectionChange(TIMELINE_DEFAULT);
+    }
+  }, [handleTimelineSelectionChange, state.filteredPoints, state.maxX]);
+
   return (
     <div className="rd-box p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
@@ -249,7 +254,7 @@ function LineChart({ points, height, width }) {
         </Tabs>
         <Tabs
           classNames={tabs}
-          defaultSelectedKey="3m"
+          defaultSelectedKey={TIMELINE_DEFAULT}
           disabledKeys={disabledKeys}
           onSelectionChange={handleTimelineSelectionChange}
           size="sm"
@@ -268,6 +273,13 @@ function LineChart({ points, height, width }) {
         ref={containerRef}
         width={width}
       >
+        <LinearGradient
+          from="hsl(var(--app-chart-9))"
+          fromOpacity={0.5}
+          id="area-gradient"
+          to="hsl(var(--app-chart-9))"
+          toOpacity={0}
+        />
         <Group left={margin.left} top={margin.top}>
           <GridRows
             className="opacity-25 [&_line]:stroke-foreground-2"
@@ -275,6 +287,22 @@ function LineChart({ points, height, width }) {
             numTicks={4}
             scale={scaleValue}
             width={state.maxX - margin.right}
+          />
+          <AreaClosed
+            curve={curveMonotoneX}
+            data={state.filteredPoints}
+            fill="url(#area-gradient)"
+            x={d => scaleDate(getDate(d)) ?? 0}
+            y={d => scaleValue(getValue(d)) ?? 0}
+            yScale={scaleValue}
+          />
+          <LinePath
+            className="stroke-chart-9 stroke-2"
+            curve={curveMonotoneX}
+            data={state.filteredPoints}
+            strokeLinecap="butt"
+            x={d => scaleDate(getDate(d)) ?? 0}
+            y={d => scaleValue(getValue(d)) ?? 0}
           />
           <AxisRight
             axisLineClassName="stroke-foreground-2"
@@ -304,14 +332,6 @@ function LineChart({ points, height, width }) {
             }}
             top={state.maxY}
           />
-          <LinePath
-            className="stroke-chart-9 stroke-2"
-            curve={curveMonotoneX}
-            data={state.filteredPoints}
-            x={d => scaleDate(getDate(d)) ?? 0}
-            y={d => scaleValue(getValue(d)) ?? 0}
-          />
-
           {tooltipOpen && (
             <Circle
               className="cursor-pointer fill-chart-9 stroke-2 dark:stroke-foreground"
@@ -357,7 +377,8 @@ function LineChart({ points, height, width }) {
   );
 }
 
-const margin = { top: 20, right: 40, bottom: 24, left: 0 };
+const margin = { top: 20, right: 40, bottom: 30, left: 0 };
+const TIMELINE_DEFAULT = 'all';
 const timelines = {
   '1w': 7,
   '1m': 30,
