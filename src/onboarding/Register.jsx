@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
-import { SignIn } from '@clerk/clerk-react';
+import { SignUp } from '@clerk/clerk-react';
 
-export default function Login() {
+export default function Register() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-y-9">
       <div className="flex flex-col gap-y-4 text-center">
         <h1 className="font-display text-3xl font-normal text-foreground-1">
-          Login
+          Register
         </h1>
         <p className="text-foreground-2">
           Lets create your account or if you have one already, sign up
         </p>
       </div>
       <div className="flex flex-col items-center justify-center rounded-xl border border-outline bg-content1">
-        <SignIn
+        <SignUp
           appearance={{
             layout: {
               socialButtonsPlacement: 'bottom'
@@ -42,12 +42,12 @@ export default function Login() {
             }
           }}
         />
-        <p className="text-foreground-2">Dont have an account?</p>
+        <p className="text-foreground-2">Already have an account?</p>
         <Link
           className="mb-7 cursor-pointer text-foreground-1 hover:underline"
-          to={'/register'}
+          to={'/login'}
         >
-          Create accuount
+          Log in
         </Link>
       </div>
     </div>
