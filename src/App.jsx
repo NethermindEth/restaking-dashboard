@@ -11,12 +11,14 @@ import { ClerkProvider } from '@clerk/clerk-react';
 import Home from './home/Home';
 import Layout from './shared/Layout';
 import log from './shared/logger';
+import Login from './onboarding/Login';
 import LRT from './lrt/LRT';
 import LST from './lst/LST';
 import { NextUIProvider } from '@nextui-org/react';
 import NotFound from './shared/NotFound';
 import OperatorDetails from './operators/OperatorDetails';
 import OperatorList from './operators/OperatorList';
+import Register from './onboarding/Register';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
 
@@ -30,6 +32,8 @@ const router = createBrowserRouter(
       <Route element={<OperatorList />} path="/operators" />
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<LST />} path="/lst" />
+      <Route element={<Login />} path="/login" />
+      <Route element={<Register />} path="/register" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )
