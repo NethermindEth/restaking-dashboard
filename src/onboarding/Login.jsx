@@ -33,7 +33,7 @@ export default function Login() {
                 'bg-transparent !border !border-outline text-white px-4 py-4 focus:!border-foreground-1',
               formFieldInputShowPasswordButton: 'text-foreground-2',
               formButtonPrimary:
-                'bg-transparent text-secondary after:!bg-none after:border py-3 after:border-secondary hover:bg-content1 hover:border hover:border-focus hover:text-focus',
+                '!border bg-transparent text-secondary after:!bg-none after:border py-3 after:border-secondary hover:bg-content1 hover:border hover:border-focus hover:text-focus',
               footer: 'hidden',
               footerAction: 'bg-content1',
               otpCodeFieldInput: '!border !border-outline text-white',
