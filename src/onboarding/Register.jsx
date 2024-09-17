@@ -9,7 +9,7 @@ export default function Register() {
           Register
         </h1>
         <p className="text-foreground-2">
-          Lets create your account or if you have one already, sign up
+          Let's create your account or if you have one already, sign in
         </p>
       </div>
       <div className="flex flex-col items-center justify-center rounded-xl border border-outline bg-content1">
@@ -19,8 +19,8 @@ export default function Register() {
               socialButtonsPlacement: 'bottom'
             },
             elements: {
-              rootBox: 'lg:w-[500px]',
-              cardBox: 'lg:w-[500px]',
+              rootBox: 'lg:w-[31rem]',
+              cardBox: 'lg:w-[31rem]',
               card: 'bg-content1 px-5',
               headerTitle:
                 'text-foreground-1 text-3xl font-display font-normal',
@@ -30,10 +30,10 @@ export default function Register() {
               dividerLine: 'bg-outline',
               formFieldLabel: 'text-foreground-1',
               formFieldInput:
-                'bg-transparent !border !border-outline text-white px-4 py-4',
+                'bg-transparent !border !border-outline text-white px-4 py-4 focus:!border-foreground-1',
               formFieldInputShowPasswordButton: 'text-foreground-2',
               formButtonPrimary:
-                'bg-transparent text-secondary after:!bg-none after:border py-3 after:border-secondary hover:bg-content1 hover:border hover:border-secondary',
+                'bg-transparent text-secondary after:!bg-none after:border py-3 after:border-secondary hover:bg-content1 hover:border hover:border-focus hover:text-focus',
               footer: 'hidden',
               footerAction: 'bg-content1',
               otpCodeFieldInput: '!border !border-outline text-white',
@@ -42,7 +42,7 @@ export default function Register() {
             }
           }}
         />
-        <p className="text-foreground-2">Already have an account?</p>
+        <p className="mb-2 text-foreground-2">Already have an account?</p>
         <Link
           className="mb-7 cursor-pointer text-foreground-1 hover:underline"
           to={'/login'}
