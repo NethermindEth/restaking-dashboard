@@ -2,25 +2,34 @@ import { Button, Checkbox, cn, Divider, Image, Input } from '@nextui-org/react';
 import { GoogleOneTap, useSignUp } from '@clerk/clerk-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { OTPInput } from 'input-otp';
+import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useMutativeReducer } from 'use-mutative';
 
 export default function Register() {
   const {
     register,
     handleSubmit,
     getValues,
+    setError,
+    clearErrors,
+    reset,
     formState: { errors }
   } = useForm();
   const { isLoaded, signUp, setActive } = useSignUp();
-  const [verifying, setVerifying] = useState(false);
-  const [code, setCode] = useState('');
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isLoading: false,
+    verifying: false,
+    code: '',
+    verificationError: undefined
+  });
   const navigate = useNavigate();
 
   const handleSignUp = async data => {
     if (!isLoaded) return;
 
     try {
+      dispatch({ isLoading: true });
       await signUp.create({
         emailAddress: data.email,
         password: data.password
@@ -30,19 +39,32 @@ export default function Register() {
         strategy: 'email_code'
       });
 
-      setVerifying(true);
+      dispatch({ verifying: true });
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      err.errors.forEach(e => {
+        if (e.meta.paramName === 'email_address') {
+          setError('email', {
+            message: e.message
+          });
+        }
+        if (e.meta.paramName === 'password') {
+          setError('password', {
+            message: e.message
+          });
+        }
+      });
+    } finally {
+      dispatch({ isLoading: false });
     }
   };
 
   const handleVerify = async e => {
     e.preventDefault();
-
     if (!isLoaded) return;
     try {
+      dispatch({ isLoading: true });
       const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code
+        code: state.code
       });
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
@@ -51,11 +73,26 @@ export default function Register() {
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
     } catch (err) {
-      console.error('Error:', JSON.stringify(err, null, 2));
+      err.errors.forEach(e => {
+        if (e.meta.paramName === 'code') {
+          dispatch({ verificationError: e.longMessage });
+        }
+      });
+    } finally {
+      dispatch({ isLoading: false });
     }
   };
 
   const handleGoogleLogin = async () => {
+    reset();
+    if (!getValues('terms')) {
+      setError('terms', {
+        message: 'Please accept terms and conditions',
+        type: 'required'
+      });
+      return;
+    }
+    clearErrors('terms');
     await signUp.authenticateWithRedirect({
       strategy: 'oauth_google',
       redirectUrl:
@@ -64,7 +101,7 @@ export default function Register() {
     });
   };
 
-  if (verifying) {
+  if (state.verifying) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-y-9">
         <div className="flex flex-col gap-y-4 text-center">
@@ -90,23 +127,28 @@ export default function Register() {
             containerClassName="group flex w-[20rem] items-center has-[:disabled]:opacity-30"
             maxLength={6}
             minLength={6}
-            onChange={e => setCode(e)}
+            onChange={e => dispatch({ code: e })}
             render={({ slots }) => (
               <>
                 <div className="flex w-full justify-between">
                   {slots.map((slot, i) => (
-                    <Slot key={i} {...slot} />
+                    <Slot error={state.verificationError} key={i} {...slot} />
                   ))}
                 </div>
               </>
             )}
             required
-            value={code}
+            value={state.code}
           />
+
+          {state.verificationError && !state.isLoading && (
+            <p className="text-sm text-danger">{state.verificationError}</p>
+          )}
 
           <Button
             className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
             fullWidth
+            isLoading={state.isLoading}
             type="submit"
             variant="bordered"
           >
@@ -210,7 +252,7 @@ export default function Register() {
           >
             Accept Terms & conditions
           </Checkbox>
-          <p className="text-xs text-danger-400">
+          <p className="text-xs text-danger">
             {errors?.terms && errors.terms.message}
           </p>
         </div>
@@ -218,6 +260,7 @@ export default function Register() {
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
           fullWidth
+          isLoading={state.isLoading}
           type="submit"
           variant="bordered"
         >
@@ -247,7 +290,8 @@ function Slot(props) {
         'transition-all duration-300',
         'rounded-md border border-outline',
         'outline-accent-foreground/20 outline outline-0',
-        { 'outline-2 outline-foreground-1': props.isActive }
+        { 'outline-2 outline-foreground-1': props.isActive },
+        { 'border-danger': props.error }
       )}
     >
       {props.char !== null && <div>{props.char}</div>}
@@ -258,7 +302,7 @@ function Slot(props) {
 
 function FakeCaret() {
   return (
-    <div className="animate-caret-blink pointer-events-none absolute inset-0 flex items-center justify-center">
+    <div className="pointer-events-none absolute inset-0 flex animate-caret-blink items-center justify-center">
       <div className="h-4 w-px bg-white" />
     </div>
   );

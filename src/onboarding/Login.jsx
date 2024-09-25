@@ -1,22 +1,29 @@
 import { Button, Divider, Image, Input } from '@nextui-org/react';
 import { GoogleOneTap, useSignIn } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
+import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
+import { useMutativeReducer } from 'use-mutative';
 
 export default function Login() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors }
   } = useForm();
 
   const { isLoaded, signIn, setActive } = useSignIn();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isLoading: false
+  });
 
   const handleLogin = async data => {
     if (!isLoaded) {
       return;
     }
     try {
+      dispatch({ isLoading: true });
       const signInAttempt = await signIn.create({
         identifier: data.email,
         password: data.password
@@ -27,7 +34,20 @@ export default function Login() {
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      err.errors.forEach(e => {
+        if (e.meta.paramName === 'identifier') {
+          setError('email', {
+            message: e.message
+          });
+        }
+        if (e.meta.paramName === 'password') {
+          setError('password', {
+            message: e.message
+          });
+        }
+      });
+    } finally {
+      dispatch({ isLoading: false });
     }
   };
 
@@ -124,6 +144,7 @@ export default function Login() {
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
           fullWidth
+          isLoading={state.isLoading}
           type="submit"
           variant="bordered"
         >

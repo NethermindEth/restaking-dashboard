@@ -72,7 +72,8 @@ export default {
             outline: '#293041',
             primary: '#cad7f9',
             secondary: '#ffcc80',
-            success: '#7ccb69'
+            success: '#7ccb69',
+            danger: '#d24646'
           }
         }
       }
