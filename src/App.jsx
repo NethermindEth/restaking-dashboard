@@ -17,7 +17,6 @@ import { NextUIProvider } from '@nextui-org/react';
 import NotFound from './shared/NotFound';
 import OperatorDetails from './operators/OperatorDetails';
 import OperatorList from './operators/OperatorList';
-import PrivateOutlet from './shared/PrivateOutlet';
 import { ServiceProvider } from './@services/ServiceContext';
 import SubscriptionPlans from './subscription/SubscriptionPlans';
 import { ThemeProvider } from './shared/ThemeContext';
@@ -32,9 +31,7 @@ const router = createBrowserRouter(
       <Route element={<OperatorList />} path="/operators" />
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<LST />} path="/lst" />
-      <Route element={<PrivateOutlet />} path="/subscriptions">
-        <Route element={<SubscriptionPlans />} index />
-      </Route>
+      <Route element={<SubscriptionPlans />} path="/subscriptions" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )
