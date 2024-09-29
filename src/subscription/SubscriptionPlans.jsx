@@ -16,29 +16,28 @@ export default function SubscriptionPlans() {
         Support plans
       </div>
       <div>
-        <div className="text-center text-sm text-foreground-2">
-          Support the development of our dashboard sp we can continue adding
+        <div className="w-full text-center text-foreground-2 md:w-[40rem]">
+          Support the development of our dashboard so we can continue adding
           more amazing features to help the restaking community
         </div>
       </div>{' '}
-      <div className="mt-4 flex w-full flex-col gap-6 sm:flex-row md:w-72">
-        <div className="rd-box flex w-full flex-col items-center justify-center gap-x-6 gap-y-4 p-4 sm:h-72">
-          <div className="text-2xl text-foreground-1">Monthly Plan</div>
-          <div className="gap-x-1 font-display text-xl text-foreground-1">
+      <div className="mt-4 flex w-full flex-col gap-6 sm:flex-row">
+        <div className="flex w-full flex-col items-center justify-center gap-x-6 gap-y-4 p-4 sm:h-80">
+          <div className="gap-x-1 font-display text-3xl text-foreground-1">
             $1.99/month
           </div>
 
           <FeatureItem
             description="Hide promotions throughout the dashboard"
-            heading=""
+            heading="Hide promotions"
           />
           <FeatureItem
-            description="Renews monthly, cancel anytime"
-            heading=""
+            description="Cancel it at anytime"
+            heading="Renews monthly"
           />
 
           <Button
-            className="h-12 w-full bg-focus text-black"
+            className="mt-4 h-12 w-44 border-secondary text-secondary hover:border-focus hover:text-focus"
             onPress={handleSubscribe}
             radius="sm"
             variant="bordered"
@@ -54,8 +53,8 @@ export default function SubscriptionPlans() {
 export function FeatureItem({ heading, description }) {
   return (
     <div className="text-center">
-      <div className="text-foreground-2">{heading}</div>
-      <div className="text-foreground-1">{description}</div>
+      <div className="text-foreground-1">{heading}</div>
+      <div className="text-foreground-2">{description}</div>
     </div>
   );
 }
