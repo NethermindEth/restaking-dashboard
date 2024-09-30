@@ -15,7 +15,7 @@ import { useCallback } from 'react';
 
 export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
-  const clerk = useClerk();
+  const navigate = useNavigate();
 
   return (
     <header className="flex h-full flex-col">
@@ -52,7 +52,7 @@ export default function Sidebar({ onOpenChange }) {
             className="hover:!text-content1"
             color="primary"
             fullWidth
-            onClick={() => clerk.redirectToSignIn()}
+            onClick={() => navigate('/login')}
             radius="sm"
             variant="ghost"
           >
