@@ -1,23 +1,25 @@
 import { useEffect, useState } from 'react';
 
-const useDebouncedSearch = (value, delay) => {
+export default function useDebouncedSearch(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
-  const validateSearchTerm = query => {
-    return query.length === 0 || query.length >= 3;
-  };
-
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (validateSearchTerm(value)) setDebouncedValue(value);
-    }, delay);
+    let timeout;
+
+    if (validateSearchTerm(value)) {
+      timeout = setTimeout(() => setDebouncedValue(value), delay);
+    }
 
     return () => {
-      clearTimeout(handler);
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
     };
   }, [value, delay]);
 
   return debouncedValue;
-};
+}
 
-export default useDebouncedSearch;
+const validateSearchTerm = query =>
+  (query?.length ?? 0) === 0 || query.length >= 3;
