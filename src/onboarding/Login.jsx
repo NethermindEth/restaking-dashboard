@@ -13,13 +13,13 @@ export default function Login() {
     formState: { errors }
   } = useForm();
 
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const { isLoaded: isClerkLoaded, signIn, setActive } = useSignIn();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isLoading: false
   });
 
   const handleLogin = async data => {
-    if (!isLoaded) {
+    if (!isClerkLoaded) {
       return;
     }
     try {

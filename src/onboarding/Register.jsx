@@ -16,7 +16,7 @@ export default function Register() {
     reset,
     formState: { errors }
   } = useForm();
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { isLoaded: isClerkLoaded, signUp, setActive } = useSignUp();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isLoading: false,
     verifying: false,
@@ -26,7 +26,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleSignUp = async data => {
-    if (!isLoaded) return;
+    if (!isClerkLoaded) return;
 
     try {
       dispatch({ isLoading: true });
@@ -60,7 +60,7 @@ export default function Register() {
 
   const handleVerify = async e => {
     e.preventDefault();
-    if (!isLoaded) return;
+    if (!isClerkLoaded) return;
     try {
       dispatch({ isLoading: true });
       const completeSignUp = await signUp.attemptEmailAddressVerification({
