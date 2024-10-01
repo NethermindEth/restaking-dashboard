@@ -1,12 +1,28 @@
 import { Button } from '@nextui-org/react';
+import { reduceState } from '../shared/helpers';
 import { useAuth } from '@clerk/clerk-react';
+import { useMutativeReducer } from 'use-mutative';
+import { useNavigate } from 'react-router-dom';
+import { useServices } from '../@services/ServiceContext';
 
 export default function SubscriptionPlans() {
   const { isSignedIn } = useAuth();
+  const navigate = useNavigate();
+  const { subscriptionService } = useServices();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isError: false
+  });
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     if (!isSignedIn) {
-      // TODO: navigate to login page
+      navigate('/login');
+    }
+    try {
+      dispatch({ isError: false });
+      const res = await subscriptionService.getPaymentLink('monthly_support');
+      window.location.href = res.paymentlink;
+    } catch {
+      dispatch({ isError: true });
     }
   };
 
@@ -36,6 +52,11 @@ export default function SubscriptionPlans() {
             heading="Renews monthly"
           />
 
+          {state.isError && (
+            <p className="text-error-800">
+              Some error occured. Please try again later
+            </p>
+          )}
           <Button
             className="mt-4 h-12 w-44 border-secondary text-secondary hover:border-focus hover:text-focus"
             onPress={handleSubscribe}
