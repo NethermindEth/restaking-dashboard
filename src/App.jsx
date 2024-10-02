@@ -20,6 +20,7 @@ import OperatorDetails from './operators/OperatorDetails';
 import OperatorList from './operators/OperatorList';
 import Register from './onboarding/Register';
 import { ServiceProvider } from './@services/ServiceContext';
+import SubscriptionPlans from './subscription/SubscriptionPlans';
 import { ThemeProvider } from './shared/ThemeContext';
 
 const router = createBrowserRouter(
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
       <Route element={<OperatorList />} path="/operators" />
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<LST />} path="/lst" />
+      <Route element={<SubscriptionPlans />} path="/subscriptions" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
       <Route element={<NotFound />} path="*" />

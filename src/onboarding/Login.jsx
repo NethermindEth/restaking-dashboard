@@ -1,4 +1,4 @@
-import { Button, Divider, Input } from '@nextui-org/react';
+import { Button, Input } from '@nextui-org/react';
 import { useSignIn } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { reduceState } from '../shared/helpers';
@@ -126,11 +126,11 @@ export default function Login() {
           })}
         />
 
-        <div className="flex w-full items-center gap-x-2">
+        {/* <div className="flex w-full items-center gap-x-2">
           <Divider className="w-[46.5%] bg-outline" />
           <p>or</p>
           <Divider className="w-[46.5%] bg-outline" />
-        </div>
+        </div> */}
         {/* <Button
           className="rounded-sm border border-outline"
           fullWidth
