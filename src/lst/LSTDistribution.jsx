@@ -2,7 +2,8 @@ import { AreaClosed, AreaStack } from '@visx/shape';
 import { AxisBottom, AxisRight } from '@visx/axis';
 import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 import { scaleLinear, scaleUtc } from '@visx/scale';
-import { Tab, Tabs } from '@nextui-org/react';
+import { Tab, Tabs, Tooltip } from '@nextui-org/react';
+import { tabs, tooltip } from '../shared/slots';
 import { useCallback, useEffect, useMemo } from 'react';
 import { allStrategyAssetMapping } from '../shared/strategies';
 import { bisector } from '@visx/vendor/d3-array';
@@ -12,7 +13,6 @@ import { Group } from '@visx/group';
 import HBrush from '../shared/HBrush';
 import { localPoint } from '@visx/event';
 import { reduceState } from '../shared/helpers';
-import { tabs } from '../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
 import { useTooltip } from '@visx/tooltip';
 import { useTooltipInPortal } from '@visx/tooltip';
@@ -200,7 +200,37 @@ export default function LSTDistribution({ rankings, height, width, points }) {
       <div className="rd-box basis-full p-4 text-sm">
         <div className="mb-6 flex flex-wrap items-end justify-end gap-2 md:items-start">
           <div className="flex-1">
-            <div className="text-base text-foreground-1">Volume trend</div>
+            <div className="flex content-center text-base text-foreground-1">
+              Volume trend
+              <Tooltip
+                classNames={tooltip}
+                content={
+                  <>
+                    Due to the expanding pool of Liquid Staking Tokens (LST) and
+                    Liquid Restaking Tokens (LRT), the TVL value on this
+                    dashboard may not always match the actual TVL of the entire
+                    token pool. Refer to the dashboard token list for the
+                    current LST and LRT data included in the TVL calculation.
+                  </>
+                }
+                isOpen={state.showTVLTooltip}
+                onOpenChange={open => dispatch({ showTVLTooltip: open })}
+                placement="bottom"
+                showArrow="true"
+              >
+                <span
+                  className="material-symbols-outlined ms-2 cursor-pointer text-base"
+                  onPointerDown={() =>
+                    dispatch({ showTVLTooltip: !state.showTVLTooltip })
+                  }
+                  style={{
+                    fontVariationSettings: `'FILL' 0`
+                  }}
+                >
+                  info
+                </span>
+              </Tooltip>
+            </div>
             <div className="text-foreground-2">{getLatestTotal}</div>
           </div>
           <Tabs
