@@ -1,5 +1,5 @@
-import { Button, Checkbox, cn, Divider, Image, Input } from '@nextui-org/react';
-import { GoogleOneTap, useSignUp } from '@clerk/clerk-react';
+import { Button, Checkbox, cn, Input } from '@nextui-org/react';
+import { useSignUp } from '@clerk/clerk-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { OTPInput } from 'input-otp';
 import { reduceState } from '../shared/helpers';
@@ -12,8 +12,8 @@ export default function Register() {
     handleSubmit,
     getValues,
     setError,
-    clearErrors,
-    reset,
+    // clearErrors,
+    // reset,
     formState: { errors }
   } = useForm();
   const { isLoaded: isClerkLoaded, signUp, setActive } = useSignUp();
@@ -83,23 +83,23 @@ export default function Register() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    reset();
-    if (!getValues('terms')) {
-      setError('terms', {
-        message: 'Please accept terms and conditions',
-        type: 'required'
-      });
-      return;
-    }
-    clearErrors('terms');
-    await signUp.authenticateWithRedirect({
-      strategy: 'oauth_google',
-      redirectUrl:
-        'https://hip-primate-84.clerk.accounts.dev/v1/oauth_callback',
-      redirectUrlComplete: '/'
-    });
-  };
+  // const handleGoogleLogin = async () => {
+  //   reset();
+  //   if (!getValues('terms')) {
+  //     setError('terms', {
+  //       message: 'Please accept terms and conditions',
+  //       type: 'required'
+  //     });
+  //     return;
+  //   }
+  //   clearErrors('terms');
+  //   await signUp.authenticateWithRedirect({
+  //     strategy: 'oauth_google',
+  //     redirectUrl:
+  //       'https://hip-primate-84.clerk.accounts.dev/v1/oauth_callback',
+  //     redirectUrlComplete: '/'
+  //   });
+  // };
 
   if (state.verifying) {
     return (
@@ -170,7 +170,7 @@ export default function Register() {
         </p>
       </div>
 
-      <GoogleOneTap />
+      {/* <GoogleOneTap /> */}
 
       <form
         className="flex w-full flex-col items-center justify-center gap-y-5 rounded-lg border border-outline bg-content1 p-5 md:w-[31rem]"
@@ -225,13 +225,13 @@ export default function Register() {
           })}
         />
 
-        <div className="flex w-full items-center gap-x-2">
+        {/* <div className="flex w-full items-center gap-x-2">
           <Divider className="w-[46.5%] bg-outline" />
           <p>or</p>
           <Divider className="w-[46.5%] bg-outline" />
-        </div>
+        </div> */}
 
-        <Button
+        {/* <Button
           className="rounded-sm border border-outline"
           fullWidth
           onPress={handleGoogleLogin}
@@ -239,7 +239,7 @@ export default function Register() {
           variant="bordered"
         >
           Continue with Google
-        </Button>
+        </Button> */}
 
         <div className="flex w-full flex-col">
           <Checkbox

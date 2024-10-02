@@ -1,5 +1,5 @@
-import { Button, Divider, Image, Input } from '@nextui-org/react';
-import { GoogleOneTap, useSignIn } from '@clerk/clerk-react';
+import { Button, Divider, Input } from '@nextui-org/react';
+import { useSignIn } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
@@ -51,14 +51,14 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    await signIn.authenticateWithRedirect({
-      strategy: 'oauth_google',
-      redirectUrl:
-        'https://hip-primate-84.clerk.accounts.dev/v1/oauth_callback',
-      redirectUrlComplete: '/'
-    });
-  };
+  // const handleGoogleLogin = async () => {
+  //   await signIn.authenticateWithRedirect({
+  //     strategy: 'oauth_google',
+  //     redirectUrl:
+  //       'https://hip-primate-84.clerk.accounts.dev/v1/oauth_callback',
+  //     redirectUrlComplete: '/'
+  //   });
+  // };
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-y-9">
@@ -71,7 +71,7 @@ export default function Login() {
         </p>
       </div>
 
-      <GoogleOneTap />
+      {/* <GoogleOneTap /> */}
 
       <form
         className="flex w-full flex-col items-center justify-center gap-y-5 rounded-lg border border-outline bg-content1 p-5 md:w-[31rem]"
@@ -131,7 +131,7 @@ export default function Login() {
           <p>or</p>
           <Divider className="w-[46.5%] bg-outline" />
         </div>
-        <Button
+        {/* <Button
           className="rounded-sm border border-outline"
           fullWidth
           onPress={handleGoogleLogin}
@@ -139,7 +139,7 @@ export default function Login() {
           variant="bordered"
         >
           Continue with Google
-        </Button>
+        </Button> */}
 
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
