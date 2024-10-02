@@ -7,7 +7,8 @@ import {
   reduceState
 } from '../../shared/helpers';
 import { scaleLinear, scaleUtc } from '@visx/scale';
-import { Spinner, Tab, Tabs } from '@nextui-org/react';
+import { Spinner, Tab, Tabs, Tooltip } from '@nextui-org/react';
+import { tabs, tooltip } from '../../shared/slots';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { bisector } from '@visx/vendor/d3-array';
@@ -18,7 +19,6 @@ import { Group } from '@visx/group';
 import { LinearGradient } from '@visx/gradient';
 import { localPoint } from '@visx/event';
 import { ParentSize } from '@visx/responsive';
-import { tabs } from '../../shared/slots';
 import { useMutativeReducer } from 'use-mutative';
 import { useParams } from 'react-router-dom';
 import { useServices } from '../../@services/ServiceContext';
@@ -232,7 +232,37 @@ function LineChart({ points, height, width }) {
     <div className="rd-box p-4">
       <div className="mb-6 flex flex-wrap justify-end gap-x-2 gap-y-4 sm:justify-between">
         <div className="flex-1">
-          <span className="text-foreground-1">TVL over time</span>
+          <div className="flex content-center text-base text-foreground-1">
+            TVL over time
+            <Tooltip
+              classNames={tooltip}
+              content={
+                <>
+                  Due to the expanding pool of Liquid Staking Tokens (LST) and
+                  Liquid Restaking Tokens (LRT), the TVL value on this dashboard
+                  may not always match the actual TVL of the entire token pool.
+                  Refer to the dashboard token list for the current LST and LRT
+                  data included in the TVL calculation.
+                </>
+              }
+              isOpen={state.showTVLTooltip}
+              onOpenChange={open => dispatch({ showTVLTooltip: open })}
+              placement="bottom"
+              showArrow="true"
+            >
+              <span
+                className="material-symbols-outlined ms-2 cursor-pointer text-base"
+                onPointerDown={() =>
+                  dispatch({ showTVLTooltip: !state.showTVLTooltip })
+                }
+                style={{
+                  fontVariationSettings: `'FILL' 0`
+                }}
+              >
+                info
+              </span>
+            </Tooltip>
+          </div>
           <div className="flex gap-x-2 text-sm text-foreground-2">
             <span>{getLatestTotals}</span>
             <span
