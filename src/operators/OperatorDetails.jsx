@@ -21,11 +21,12 @@ import {
 } from '@nextui-org/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
 import CopyButton from '../shared/CopyButton';
 import ErrorMessage from '../shared/ErrorMessage';
-import { formatEther } from 'ethers';
 import OperatorRestakersLineChart from './charts/OperatorRestakersLineChart';
 import OperatorTVLLineChart from './charts/OperatorTVLLineChart';
+import { formatEther, getBigInt } from 'ethers';
 import { ParentSize } from '@visx/responsive';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { tooltip } from '../shared/slots';
@@ -34,6 +35,9 @@ import TVLTabTreemap from '../avs/charts/TVLTabTreemap';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
+
+import RewardTotalValue from '../rewards/RewardTotalValue';
+import OperatorRewards from '../rewards/OperatorRewards';
 
 export default function OperatorDetails() {
   const { address, tab } = useParams();
@@ -50,6 +54,10 @@ export default function OperatorDetails() {
       lst: 0,
       eth: 0,
       eigen: 0
+    },
+    rewardsInfo: {
+      rewardsTotal: 0,
+      claimedTotal: 0
     }
   });
   const { operatorService } = useServices();
@@ -88,7 +96,11 @@ export default function OperatorDetails() {
           ethRate: operator.rate,
           isOperatorLoading: false,
           strategies,
-          totalTokens: totals
+          totalTokens: totals,
+          rewardsInfo: {
+            rewardsTotal: operator.rewardsInfo.rewardsTotal,
+            claimedTotal: operator.rewardsInfo.claimedTotal
+          }
         });
       } catch (e) {
         dispatch({
@@ -337,6 +349,52 @@ export default function OperatorDetails() {
             operatorError={state.error}
             restakers={state.operator?.stakerCount}
           />
+        </Tab>
+        <Tab
+          href={`/operators/${address}/rewards`}
+          key={`/operators/${address}/rewards`}
+          title={
+            <div className="flex flex-col items-center">
+              <div className="text-sm text-foreground-2 group-aria-selected:text-foreground-1">
+                Rewards
+              </div>
+              <div className="flex w-full justify-center">
+                {state.isOperatorLoading && (
+                  <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
+                )}
+
+                {state.error && <ErrorMessage error={state.error} />}
+
+                {!state.isOperatorLoading && !state.error && (
+                  <span className="text-foreground-1 group-aria-selected:text-foreground">
+                    {formatUSD(
+                      parseFloat(
+                        formatEther(
+                          getBigInt(state.rewardsInfo.rewardsTotal.toString())
+                        )
+                      ) * state.ethRate,
+                      compact
+                    )}
+                  </span>
+                )}
+              </div>
+            </div>
+          }
+        >
+          <OperatorTVLLineChart
+            currentTVL={state.tvl}
+            ethRate={state.ethRate}
+            isOperatorLoading={state.isOperatorLoading}
+            operatorError={state.error}
+          />
+          <RewardTotalValue
+            claimedTotal={state.rewardsInfo.claimedTotal}
+            error={state.error}
+            ethRate={state.ethRate}
+            isOperatorLoading={state.isOperatorLoading}
+            rewardsTotal={state.rewardsInfo.rewardsTotal}
+          />
+          <OperatorRewards address={address} ethRate={state.ethRate} />
         </Tab>
       </Tabs>
     </>

@@ -4,6 +4,7 @@ import EigenLayerService from './EigenLayerService';
 import LRTService from './LRTService';
 import OperatorService from './OperatorService';
 import RestakingDashboardService from './RestakingDashboardService';
+import RewardService from './RewardService';
 import { useSession } from '@clerk/clerk-react';
 
 export const ServiceContext = createContext();
@@ -31,5 +32,6 @@ const services = {
   lrtService: new LRTService(context),
   operatorService: new OperatorService(context),
   eigenlayerService: new EigenLayerService(context),
-  rdService: new RestakingDashboardService(context)
+  rdService: new RestakingDashboardService(context),
+  rewardService: new RewardService(context)
 };
