@@ -21,6 +21,7 @@ import OperatorList from './operators/OperatorList';
 import Register from './onboarding/Register';
 import { ServiceProvider } from './@services/ServiceContext';
 import { ThemeProvider } from './shared/ThemeContext';
+import Rewards from "./rewards/Rewards"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
       <Route element={<LRT />} path="/lrt" />
       <Route element={<OperatorList />} path="/operators" />
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
+      <Route element={<Rewards />} path="/rewards" />
       <Route element={<LST />} path="/lst" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
