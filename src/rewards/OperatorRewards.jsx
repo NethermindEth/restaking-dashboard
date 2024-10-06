@@ -26,12 +26,12 @@ const columns = [
   {
     key: 'rewardsTotal',
     label: 'Rewards received',
-    className: 'w-64 md:w-2/5 ps-4'
+    className: 'w-64 md:w-2/3 ps-4'
   },
   {
     key: 'timestamp',
     label: 'Snapshot date',
-    className: 'w-36 md:w-1/5'
+    className: 'w-36 md:w-1/3'
   }
 ];
 
@@ -213,7 +213,8 @@ export default function OperatorRewards({ address, ethRate }) {
             classNames={{
               base: `${state.rewards?.length === 0 ? 'h-full' : ''} overflow-x-auto`,
               table: state.rewards?.length === 0 ? 'h-full' : null,
-              thead: '[&>tr:last-child]:hidden'
+              thead: '[&>tr:last-child]:hidden',
+              sortIcon: "hidden",
             }}
             hideHeader={!state.isFetchingData && state.rewards.length == 0}
             layout="fixed"
@@ -229,6 +230,9 @@ export default function OperatorRewards({ address, ethRate }) {
                   key={column.key}
                 >
                   {column.label}
+                  <span className="material-symbols-outlined ml-1 text-sm align-middle text-default-2">
+                    swap_vert
+                  </span>
                 </TableColumn>
               )}
             </TableHeader>
@@ -250,7 +254,7 @@ export default function OperatorRewards({ address, ethRate }) {
                     key={`reward-item-${i}`}
                   >
                     <TableCell className="p-0" colSpan={2}>
-                      <Accordion itemClasses={{ trigger: "py-[10px] block" }} className='px-4 data-[open=true]:bg-white'>
+                      <Accordion itemClasses={{ trigger: "py-[10px] block" }} className='data-[open=true]:bg-white px-0'>
                         <AccordionItem key="1" aria-label="Accordion 1"
                           indicator={
                             ({ isOpen }) => (
@@ -260,13 +264,13 @@ export default function OperatorRewards({ address, ethRate }) {
                             )}
 
                           className='py-0 data-[open=true]:bg-[#191C2C]' title={<div className='grid grid-cols-12 items-center relative'>
-                            <div className="col-span-8">
+                            <div className="col-span-8 ps-4 pr-3">
                               <div>{formatUSD(reward.rewardsTotal * ethRate, compact)}</div>
                               <div className="text-xs text-foreground-2">
                                 {formatETH(reward.rewardsTotal, compact)}
                               </div>
                             </div>
-                            <div className='text-sm col-span-4'>
+                            <div className='text-sm col-span-4 px-3'>
                               {formatDate(reward.timestamp)}
                             </div>
                           </div>}>
@@ -274,12 +278,12 @@ export default function OperatorRewards({ address, ethRate }) {
                             <div className='mb-4'>
                               <div className='mb-3'>
                                 <div className='h-[9px] rounded flex w-full overflow-hidden relative'>
-                                  <div className={`h-full bg-[#C9A9E9]`} style={{width: "14%"}}></div>
-                                  <div className={`h-full bg-[#AE7EDE]`} style={{width: "18%"}}></div>
-                                  <div className={`h-full bg-[#7828C8]`} style={{width: "7%"}}></div>
-                                  <div className={`h-full bg-[#FFCC80]`} style={{width: "6%"}}></div>
-                                  <div className={`h-full bg-[#FB8C00]`} style={{width: "21%"}}></div>
-                                  <div className={`h-full bg-[#EF6C00]`} style={{width: "34%"}}></div>
+                                  <div className={`h-full bg-[#C9A9E9]`} style={{ width: "14%" }}></div>
+                                  <div className={`h-full bg-[#AE7EDE]`} style={{ width: "18%" }}></div>
+                                  <div className={`h-full bg-[#7828C8]`} style={{ width: "7%" }}></div>
+                                  <div className={`h-full bg-[#FFCC80]`} style={{ width: "6%" }}></div>
+                                  <div className={`h-full bg-[#FB8C00]`} style={{ width: "21%" }}></div>
+                                  <div className={`h-full bg-[#EF6C00]`} style={{ width: "34%" }}></div>
                                 </div>
                               </div>
 

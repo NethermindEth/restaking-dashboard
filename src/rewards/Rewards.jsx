@@ -1,9 +1,6 @@
 import React, { useCallback } from 'react';
 import {
-  Card,
-  CardBody,
   Input,
-  Skeleton,
   Tab,
   Table,
   TableBody,
@@ -492,15 +489,12 @@ export default function Rewards() {
         <Table
           aria-label="AVS list"
           classNames={{
-            // base: `${state.avs?.length === 0 ? 'h-full' : ''} overflow-x-auto`,
-            // table: state.avs?.length === 0 ? 'h-full' : null,
-            thead: '[&>tr:last-child]:hidden'
+            thead: '[&>tr:last-child]:hidden',
+            sortIcon: "hidden"
           }}
-          // hideHeader={!state.isFetchingData && state.avs.length == 0}
           layout="fixed"
           onSortChange={e => dispatch({ sortDescriptor: e })}
           removeWrapper
-        // sortDescriptor={state.sortDescriptor}
         >
           <TableHeader columns={columns}>
             {column => (
@@ -510,6 +504,9 @@ export default function Rewards() {
                 key={column.key}
               >
                 {column.label}
+                <span className="material-symbols-outlined ml-1 text-sm align-middle text-default-2">
+                  swap_vert
+                </span>
               </TableColumn>
             )}
           </TableHeader>
@@ -556,21 +553,19 @@ export default function Rewards() {
                     </TableCell>
 
                     <TableCell className="pe-8 text-end">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-6">
                         <p>
                           {reward.tokens[0].tokenName} + {reward.tokens.length}
                         </p>
 
                         <div className='flex items-center'>
-
                           {reward.tokens.map(token => {
                             return (
-                              <div className='w-4 h-4 rounded-full border border-outline'>
-                                <img src={token.tokenImgUrl} alt="token" />
+                              <div className='w-4 h-4 rounded-full border border-outline -ml-2'>
+                                <img src={token.tokenImgUrl} alt="token" className='w-full h-full rounded-full object-cover' />
                               </div>
                             )
                           })}
-
                         </div>
                       </div>
                     </TableCell>
