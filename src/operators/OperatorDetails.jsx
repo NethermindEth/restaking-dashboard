@@ -312,13 +312,17 @@ export default function OperatorDetails() {
           />
         </Tab>
 
+        {/* TODO: Enable the tab and show the restakers count when the numbers in the db are corrected */}
         <Tab
           href={`/operators/${address}/restakers`}
+          isDisabled
           key={`/operators/${address}/restakers`}
           title={
             <div className="flex flex-col items-center">
               <div className="text-sm">Restakers</div>
-              <div className="flex w-full justify-center">
+              <div>Coming Soon</div>
+
+              {/* <div className="flex w-full justify-center">
                 {state.isOperatorLoading && (
                   <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
@@ -328,7 +332,7 @@ export default function OperatorDetails() {
                 {!state.isOperatorLoading && !state.error && (
                   <span>{state.operator?.stakerCount}</span>
                 )}
-              </div>
+              </div> */}
             </div>
           }
         >
