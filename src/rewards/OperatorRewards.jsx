@@ -258,7 +258,7 @@ export default function OperatorRewards({ address, ethRate }) {
                         <AccordionItem key="1" aria-label="Accordion 1"
                           indicator={
                             ({ isOpen }) => (
-                              <span class={`material-symbols-outlined ${isOpen ? "-rotate-90" : "rotate-90"} text-default-2 absolute right-4 top-[18px] transition-transform`}>
+                              <span className={`material-symbols-outlined ${isOpen ? "-rotate-90" : "rotate-90"} text-default-2 absolute right-4 top-[18px] transition-transform`}>
                                 play_arrow
                               </span>
                             )}
@@ -396,7 +396,7 @@ export default function OperatorRewards({ address, ethRate }) {
           {state.totalPages > 1 && (
             <div className='w-full relative'>
               <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 left-4'>
-                <span class="material-symbols-outlined">
+                <span className="material-symbols-outlined">
                   arrow_back_ios
                 </span>
               </button>
@@ -407,7 +407,7 @@ export default function OperatorRewards({ address, ethRate }) {
                 total={state.totalPages}
               />
               <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 right-4'>
-                <span class="material-symbols-outlined">
+                <span className="material-symbols-outlined">
                   arrow_forward_ios
                 </span>
               </button>

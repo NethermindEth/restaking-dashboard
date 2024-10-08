@@ -6,6 +6,7 @@ export default class RewardService extends BaseService {
   }
 
   async getOperatorRewards(address, pageNumber, pageSize = 10, sort, signal) {
+    console.log('sort', sort);
     const pageIndex = Math.max(0, pageNumber - 1);
     const response = await this._get(`eigenlayer/rewards/earner/${address}`, {
       query: {

@@ -533,7 +533,7 @@ export default function Rewards() {
                         </span>
 
                         <button>
-                          <span class="material-symbols-outlined text-lg text-default-2" style={{
+                          <span className="material-symbols-outlined text-lg text-default-2" style={{
                             fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
                           }}>
                             content_copy
@@ -585,7 +585,7 @@ export default function Rewards() {
         {/* {state.totalPages > 1 && ( */}
         <div className='w-full relative'>
           <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 left-4'>
-            <span class="material-symbols-outlined">
+            <span className="material-symbols-outlined">
               arrow_back_ios
             </span>
           </button>
@@ -596,7 +596,7 @@ export default function Rewards() {
             total={state.totalPages}
           />
           <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 right-4'>
-            <span class="material-symbols-outlined">
+            <span className="material-symbols-outlined">
               arrow_forward_ios
             </span>
           </button>
