@@ -1,10 +1,10 @@
 import { Button, Checkbox, cn, Input } from '@nextui-org/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useSignUp, useUser } from '@clerk/clerk-react';
 import { OTPInput } from 'input-otp';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
 import { useMutativeReducer } from 'use-mutative';
-import { useSignUp } from '@clerk/clerk-react';
 
 export default function Register() {
   const {
@@ -17,6 +17,7 @@ export default function Register() {
     formState: { errors }
   } = useForm();
   const { isLoaded: isClerkLoaded, signUp, setActive } = useSignUp();
+  const { isSignedIn } = useUser();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isLoading: false,
     verifying: false,
@@ -106,6 +107,10 @@ export default function Register() {
   //     redirectUrlComplete: '/'
   //   });
   // };
+
+  if (isSignedIn) {
+    return <Navigate to={'/'} />;
+  }
 
   if (state.verifying) {
     return (

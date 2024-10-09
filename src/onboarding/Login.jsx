@@ -1,9 +1,9 @@
 import { Button, Input } from '@nextui-org/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useSignIn, useUser } from '@clerk/clerk-react';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
 import { useMutativeReducer } from 'use-mutative';
-import { useSignIn } from '@clerk/clerk-react';
 
 export default function Login() {
   const {
@@ -14,6 +14,7 @@ export default function Login() {
   } = useForm();
 
   const { isLoaded: isClerkLoaded, signIn, setActive } = useSignIn();
+  const { isSignedIn } = useUser();
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isLoading: false
   });
@@ -61,6 +62,10 @@ export default function Login() {
   //     redirectUrlComplete: '/'
   //   });
   // };
+
+  if (isSignedIn) {
+    return <Navigate to={'/'} />;
+  }
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-y-9">
