@@ -1,9 +1,9 @@
 import { Button, Input } from '@nextui-org/react';
-import { useSignIn } from '@clerk/clerk-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
 import { useMutativeReducer } from 'use-mutative';
+import { useSignIn } from '@clerk/clerk-react';
 
 export default function Login() {
   const {
@@ -17,6 +17,7 @@ export default function Login() {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     isLoading: false
   });
+  const navigate = useNavigate();
 
   const handleLogin = async data => {
     if (!isClerkLoaded) {
@@ -30,6 +31,7 @@ export default function Login() {
       });
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
+        navigate('/');
       } else {
         console.error(JSON.stringify(signInAttempt, null, 2));
       }

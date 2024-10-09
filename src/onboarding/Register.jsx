@@ -1,10 +1,10 @@
 import { Button, Checkbox, cn, Input } from '@nextui-org/react';
-import { useSignUp } from '@clerk/clerk-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { OTPInput } from 'input-otp';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
 import { useMutativeReducer } from 'use-mutative';
+import { useSignUp } from '@clerk/clerk-react';
 
 export default function Register() {
   const {
