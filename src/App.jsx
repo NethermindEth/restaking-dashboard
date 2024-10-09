@@ -23,7 +23,6 @@ import { ServiceProvider } from './@services/ServiceContext';
 import SubscriptionPlans from './subscription/SubscriptionPlans';
 import { ThemeProvider } from './shared/ThemeContext';
 import Thankyou from './shared/Thankyou';
-import ErrorPage from './shared/ErrorPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,7 +38,6 @@ const router = createBrowserRouter(
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
       <Route element={<Thankyou />} path="/thankyou" />
-      <Route element={<ErrorPage />} path="/error" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )

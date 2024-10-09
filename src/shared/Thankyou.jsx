@@ -1,47 +1,28 @@
-import { Button } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 
-export default function Thankyou() {
 
+export default function Thankyou() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-full items-center justify-center text-outline">
-      <div className="w-full max-w-xl mx-auto">
-        <div className="flex flex-col items-center pb-0 pt-6 px-4 mb-12">
-          <div className="text-4xl lg:text-8xl font-bold text-outline flex items-center">
-            <span className="whitespace-nowrap">Thank You</span>
-            <span className="material-symbols-outlined text-7xl mx-2 text-outline">
-              sentiment_very_satisfied
-            </span>
-          </div>
-        </div>
-        <div className="flex flex-col items-center pb-6 px-4">
-          <div className="text-center mb-6 text-default-700">
-            <p className="mb-4">
-              Thank You for Your Support!
-            </p>
-
-
-            <p className="text-default-2">
-              You've unlocked advanced Eigenlayer insights. Your journey to smarter restaking starts now, and we're grateful for your trust in us.
-            </p>
-          </div>
-
-          <Button
-            color="primary"
-            fullWidth
-            radius="sm"
-            variant="bordered"
-            onClick={() => {
-              navigate('/');
-            }}
-          >
-            Return Home
-          </Button>
-
-        </div>
+    <div className="py-20 text-default-700 text-center max-w-2xl mx-auto">
+      <h1 className="text-3xl font-medium mb-2">
+        Thanks for your support!
+      </h1>
+      <h2 className="text-xl mb-3">
+        You are now subscribed
+      </h2>
+      <p className="text-default-2 mb-6">
+        Thank you for supporting our work and helping us bring more transparency and insights to the restaking ecosystem.
+      </p>
+      <div className="w-12 h-12 rounded-full bg-success text-background mx-auto mb-12">
+        <span class="material-symbols-outlined text-4xl leading-[48px] font-semibold">
+          check
+        </span>
       </div>
+      <button className="text-sm text-default-2 underline" onClick={() => { navigate('/subscriptions') }}>
+        Take me to the subscription page
+      </button>
     </div>
   );
 }
