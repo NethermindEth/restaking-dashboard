@@ -22,6 +22,7 @@ import Register from './onboarding/Register';
 import { ServiceProvider } from './@services/ServiceContext';
 import SubscriptionPlans from './subscription/SubscriptionPlans';
 import { ThemeProvider } from './shared/ThemeContext';
+import Thankyou from './shared/Thankyou';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
       <Route element={<SubscriptionPlans />} path="/subscriptions" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
+      <Route element={<Thankyou />} path="/thankyou" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )
