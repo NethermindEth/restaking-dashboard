@@ -2,7 +2,7 @@ import './TermsConditions.css';
 
 export default function TermsConditions() {
   return (
-    <article>
+    <article className="terms-conditions">
       <div>
         <h1>
           <strong>NETHERMIND RESTAKING DASHBOARD - </strong>

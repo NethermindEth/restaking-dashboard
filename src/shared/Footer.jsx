@@ -18,7 +18,11 @@ export default function Footer() {
         <ul className="flex flex-col gap-2 md:flex-row md:gap-8">
           {mainLinks.map((item, i) => (
             <li className="flex h-6 items-center" key={`footer-main-${i}`}>
-              <Link className="text-xs text-foreground-2" href={item.href}>
+              <Link
+                className="text-xs text-foreground-2"
+                href={item.href}
+                target="_blank"
+              >
                 {item.title}
                 <span className="material-symbols-outlined hidden lg:inline">
                   arrow_right_alt
@@ -65,7 +69,7 @@ const mainLinks = [
   },
   {
     title: 'Legal',
-    href: 'https://nethermind.io/legal'
+    href: '/terms-and-conditions'
   },
   {
     title: 'API Docs',

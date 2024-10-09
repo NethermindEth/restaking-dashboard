@@ -1,32 +1,32 @@
-a,
-a.visited {
+.terms-conditions a,
+.terms-conditions a.visited {
   color: inherit;
   text-decoration: underline;
 }
-h1,
-h2,
-h3 {
+.terms-conditions h1,
+.terms-conditions h2,
+.terms-conditions h3 {
   letter-spacing: -0.01em;
   line-height: 1.2;
   font-weight: 600;
   margin-bottom: 0;
 }
-h1 {
+.terms-conditions h1 {
   font-size: 1.875rem;
   margin-top: 1.875rem;
 }
 
-h2 {
+.terms-conditions h2 {
   font-size: 1.5rem;
   margin-top: 1.5rem;
 }
 
-h3 {
+.terms-conditions h3 {
   font-size: 1.25rem;
   margin-top: 1.25rem;
 }
 
-hr {
+.terms-conditions hr {
   background: transparent;
   display: block;
   width: 100%;
@@ -36,12 +36,12 @@ hr {
   border-bottom: 1px solid rgba(55, 53, 47, 0.09);
 }
 
-img {
+.terms-conditions img {
   max-width: 100%;
 }
 
 @media only print {
-  img {
+  .terms-conditions img {
     max-height: 100vh;
     object-fit: contain;
   }
@@ -51,45 +51,45 @@ img {
   margin: 1in;
 }
 
-table,
-th,
-td {
+.terms-conditions table,
+.terms-conditions th,
+.terms-conditions td {
   @apply border border-foreground-1 p-2;
 }
 
-ol,
-ul {
+.terms-conditions ol,
+.terms-conditions ul {
   margin: 0;
   margin-block-start: 0.6em;
   margin-block-end: 0.6em;
 }
 
-li > ol:first-child,
-li > ul:first-child {
+.terms-conditions li > ol:first-child,
+.terms-conditions li > ul:first-child {
   margin-block-start: 0.6em;
 }
 
-ul > li {
+.terms-conditions ul > li {
   list-style: disc;
 }
 
-ul {
+.terms-conditions ul {
   padding-inline-start: 1.7em;
 }
 
-ul > li {
+.terms-conditions ul > li {
   padding-left: 0.1em;
 }
 
-ol {
+.terms-conditions ol {
   padding-inline-start: 1.6em;
 }
 
-ol > li {
+.terms-conditions ol > li {
   padding-left: 0.2em;
 }
 
-p {
+.terms-conditions p {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
 }
