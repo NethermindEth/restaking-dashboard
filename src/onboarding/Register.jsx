@@ -26,6 +26,12 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleSignUp = async data => {
+    window._paq.push([
+      'trackEvent',
+      'Sign Up',
+      'Sign Up button clicked',
+      data.email
+    ]);
     if (!isClerkLoaded) return;
 
     try {
