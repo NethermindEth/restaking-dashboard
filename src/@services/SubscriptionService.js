@@ -18,4 +18,24 @@ export default class SubscriptionService extends BaseService {
 
     throw await this._createError(response);
   }
+
+  async getUserSubscription() {
+    const response = await this._get('/subscriptions');
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    throw await this._createError(response);
+  }
+
+  async getCustomerPortalLink() {
+    const response = await this._get('/subscriptions/customer-portal-link');
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    throw await this._createError(response);
+  }
 }
