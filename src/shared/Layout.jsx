@@ -23,7 +23,7 @@ export default function Layout() {
     <div className="flex min-h-screen flex-col gap-4 bg-background text-foreground">
       <div className="flex flex-1">
         {showSidebar && (
-          <div className="sticky top-0 flex max-h-screen w-64 flex-col overflow-y-scroll rounded-br-lg border-b border-e border-outline bg-content1 lg:overflow-hidden">
+          <div className="sticky top-0 flex max-h-screen w-80 flex-col overflow-y-scroll rounded-br-lg border-b border-e border-outline bg-content1 lg:overflow-hidden">
             <Sidebar />
           </div>
         )}
