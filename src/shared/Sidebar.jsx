@@ -82,10 +82,10 @@ export default function Sidebar({ onOpenChange }) {
 
       {!state.isLoading && !state.isSubscribed && (
         <div className="mx-5 mb-5 flex flex-col gap-y-2 rounded-sm bg-content2 p-3">
-          <span className="text-foreground-1">Support Us</span>
+          <span className="text-foreground-1">Like what you see?</span>
           <p className="text-xs text-foreground-2">
-            take advantage of all the features in one glanceand any other text.
-            Lets add another line here.
+            If you find our dashboard helpful and would like to help our ongoing
+            development, your support would be massive!
           </p>
 
           <Button
