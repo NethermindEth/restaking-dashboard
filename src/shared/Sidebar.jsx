@@ -9,7 +9,13 @@ import {
   Link,
   Spinner
 } from '@nextui-org/react';
-import { SignedIn, SignedOut, useClerk, useUser } from '@clerk/clerk-react';
+import {
+  SignedIn,
+  SignedOut,
+  useAuth,
+  useClerk,
+  useUser
+} from '@clerk/clerk-react';
 import { useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { reduceState } from './helpers';
@@ -25,6 +31,7 @@ export default function Sidebar({ onOpenChange }) {
     isSubscribed: false,
     isLoading: true
   });
+  const { isSignedIn } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -39,7 +46,7 @@ export default function Sidebar({ onOpenChange }) {
         dispatch({ isLoading: false });
       }
     })();
-  }, [dispatch, subscriptionService]);
+  }, [dispatch, subscriptionService, isSignedIn]);
 
   return (
     <header className="flex h-full flex-col">
