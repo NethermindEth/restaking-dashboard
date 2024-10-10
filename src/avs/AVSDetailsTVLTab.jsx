@@ -3,7 +3,7 @@ import {
   EIGEN_STRATEGY,
   lstStrategyAssetMapping
 } from '../shared/strategies';
-import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import { formatETH, formatUSD } from '../shared/formatters';
 import { handleServiceError, reduceState } from '../shared/helpers';
 import {
   Skeleton,
@@ -13,14 +13,12 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
-  Tooltip
+  TableRow
 } from '@nextui-org/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import ErrorMessage from '../shared/ErrorMessage';
 import { ParentSize } from '@visx/responsive';
 import ThirdPartyLogo from '../shared/ThirdPartyLogo';
-import { tooltip } from '../shared/slots';
 import TVLTabLineChart from './charts/TVLTabLineChart';
 import TVLTabTreemap from './charts/TVLTabTreemap';
 import { useMutativeReducer } from 'use-mutative';
@@ -168,7 +166,7 @@ const tokens = {
 
 function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
   const sortedTotalTokens = useMemo(() => {
-    const arr = Object.entries(totalTokens).filter(t => t[0] !== 'eigen');
+    const arr = Object.entries(totalTokens);
     arr.sort((a, b) => b[1] - a[1]);
     return arr;
   }, [totalTokens]);
@@ -225,7 +223,7 @@ function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
                 <div className="flex items-center gap-x-2 truncate">
                   <ThirdPartyLogo
                     className="size-6 min-w-6"
-                    url={tokens[key].logo}
+                    url={tokens[key]?.logo}
                   />
                   <span className="truncate text-foreground-2">
                     {tokens[key].name}
@@ -247,34 +245,6 @@ function TokensBreakdownList({ avsError, totalTokens, isAVSLoading, ethRate }) {
               </TableCell>
             </TableRow>
           ))}
-        {!isAVSLoading && (
-          <TableRow>
-            <TableCell className="pl-0 text-sm">
-              <div className="flex items-center gap-x-2 truncate">
-                <ThirdPartyLogo
-                  className="size-6 min-w-6"
-                  url={tokens['eigen'].logo}
-                />
-                <span className="truncate text-foreground-2">
-                  {tokens['eigen'].name}
-                </span>
-                <span className="text-foreground-1">
-                  {tokens['eigen'].symbol}
-                </span>
-                {<span className="text-foreground-1">N/A</span>}
-              </div>
-            </TableCell>
-            <TableCell className="flex justify-end text-sm">
-              <div className="text-end">
-                <EigenDisclaimer />
-
-                <div className="text-xs text-foreground-2">
-                  {`${formatNumber(totalTokens['eigen'], compact)} EIGEN`}
-                </div>
-              </div>
-            </TableCell>
-          </TableRow>
-        )}
       </TableBody>
     </Table>
   );
@@ -290,7 +260,13 @@ function LSTBreakdownList({ avsError, lst, ethRate, isAVSLoading }) {
 
     const arr = Object.entries(lst);
     arr.sort((a, b) => Number(b[1]) - Number(a[1]));
-    return arr.filter(([strategy]) => !exclude.has(strategy));
+    // TODO(vincenthongzy): Stop-gap measure to make sure
+    // permissionless tokens do not distrupt UI.
+    // We should revert and handle it properly soon.
+    return arr.filter(
+      ([strategy]) =>
+        !exclude.has(strategy) && strategy in lstStrategyAssetMapping
+    );
   }, [avsError, lst, isAVSLoading]);
 
   const compact = !useTailwindBreakpoint('md');
@@ -339,7 +315,7 @@ function LSTBreakdownList({ avsError, lst, ethRate, isAVSLoading }) {
                 <div className="flex items-center gap-x-2">
                   <ThirdPartyLogo
                     className="size-6 min-w-6"
-                    url={lstStrategyAssetMapping[key].logo}
+                    url={lstStrategyAssetMapping[key]?.logo}
                   />
                   <span className="truncate text-foreground-2">
                     {lstStrategyAssetMapping[key]?.name}
@@ -362,39 +338,5 @@ function LSTBreakdownList({ avsError, lst, ethRate, isAVSLoading }) {
           ))}
       </TableBody>
     </Table>
-  );
-}
-
-function EigenDisclaimer() {
-  const [isOpen, setOpen] = useState(false);
-
-  return (
-    <div className="inline-flex items-center gap-x-1">
-      N/A
-      <Tooltip
-        classNames={tooltip}
-        content={
-          <>
-            EIGEN is currently not listed on any exchanges so we are unable to
-            get its USD value. Information will be updated when the token is
-            available on centralized/decentralized exchanges.
-          </>
-        }
-        isOpen={isOpen}
-        onOpenChange={open => setOpen(open)}
-        placement="top"
-        showArrow={true}
-      >
-        <span
-          className="material-symbols-outlined cursor-pointer text-sm"
-          onPointerDown={() => setOpen(!isOpen)}
-          style={{
-            fontVariationSettings: `'FILL' 0`
-          }}
-        >
-          info
-        </span>
-      </Tooltip>
-    </div>
   );
 }
