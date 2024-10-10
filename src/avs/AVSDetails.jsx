@@ -185,7 +185,10 @@ export default function AVSDetails() {
           title={
             <div className="flex flex-col items-center">
               <div className="text-sm">Restakers</div>
-              <div className="flex w-full justify-center">
+              <div>Coming Soon</div>
+
+              {/* TODO: Show the restakers count when the numbers in the db are corrected */}
+              {/* <div className="flex w-full justify-center">
                 {state.isAVSLoading && (
                   <Skeleton className="mt-2 h-4 w-full min-w-16 rounded-md" />
                 )}
@@ -195,7 +198,7 @@ export default function AVSDetails() {
                 {!state.isAVSLoading && !state.error && (
                   <span>{formatNumber(state.avs.stakers)}</span>
                 )}
-              </div>
+              </div> */}
             </div>
           }
         />

@@ -25,6 +25,7 @@ export default function Footer() {
                   item.matomoEventData &&
                   window._paq.push(['trackEvent', ...item.matomoEventData])
                 }
+                target="_blank"
               >
                 {item.title}
                 <span className="material-symbols-outlined hidden lg:inline">
@@ -44,6 +45,7 @@ export default function Footer() {
                   item.matomoEventData &&
                   window._paq.push(['trackEvent', ...item.matomoEventData])
                 }
+                target="_blank"
               >
                 <span className="icon"></span>
                 {item.title}
@@ -86,7 +88,7 @@ const mainLinks = [
   },
   {
     title: 'Legal',
-    href: 'https://nethermind.io/legal'
+    href: '/terms-and-conditions'
   },
   {
     title: 'API Docs',

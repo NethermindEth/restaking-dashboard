@@ -43,8 +43,8 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     return Object.entries(lst)
       .filter(([strategy]) => !filters.has(strategy))
       .map(([strategy, value]) => ({
-        name: allStrategyAssetMapping[strategy].name,
-        symbol: allStrategyAssetMapping[strategy].symbol,
+        name: allStrategyAssetMapping[strategy]?.name,
+        symbol: allStrategyAssetMapping[strategy]?.symbol,
         value: Number(value)
       }));
   }, [lst, state.useAllStrategies]);
