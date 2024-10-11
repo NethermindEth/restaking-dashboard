@@ -6,8 +6,7 @@ import {
   DropdownSection,
   DropdownTrigger,
   Image,
-  Link,
-  Spinner
+  Link
 } from '@nextui-org/react';
 import {
   SignedIn,
@@ -28,8 +27,7 @@ export default function Sidebar({ onOpenChange }) {
   const navigate = useNavigate();
   const { subscriptionService } = useServices();
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    isSubscribed: false,
-    isLoading: true
+    isSubscribed: true
   });
   const { isSignedIn } = useAuth();
 
@@ -42,8 +40,6 @@ export default function Sidebar({ onOpenChange }) {
         }
       } catch (e) {
         dispatch({ isSubscribed: false });
-      } finally {
-        dispatch({ isLoading: false });
       }
     })();
   }, [dispatch, subscriptionService, isSignedIn]);
@@ -78,9 +74,7 @@ export default function Sidebar({ onOpenChange }) {
         })}
       </nav>
 
-      {state.isLoading && <Spinner classNames={{ base: 'mb-10' }} size="sm" />}
-
-      {!state.isLoading && !state.isSubscribed && (
+      {!state.isSubscribed && (
         <div className="mx-5 mb-5 flex flex-col gap-y-2 rounded-sm bg-content2 p-3">
           <span className="text-foreground-1">Like what you see?</span>
           <p className="text-xs text-foreground-2">
