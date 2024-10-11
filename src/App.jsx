@@ -23,6 +23,7 @@ import { ServiceProvider } from './@services/ServiceContext';
 import SubscriptionPlans from './subscription/SubscriptionPlans';
 import TermsConditions from './TermsConditions/TermsConditions';
 import { ThemeProvider } from './shared/ThemeContext';
+import ThankYou from './shared/ThankYou';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,6 +38,7 @@ const router = createBrowserRouter(
       <Route element={<SubscriptionPlans />} path="/subscriptions" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
+      <Route element={<ThankYou />} path="/thankyou" />
       <Route element={<TermsConditions />} path="/terms-and-conditions" />
       <Route element={<NotFound />} path="*" />
     </Route>
