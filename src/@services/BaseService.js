@@ -9,7 +9,20 @@ export default class BaseService {
     this.#context = context;
   }
 
+  // Clerk takes few miliseconds to inititalize the session, so we wait till session is initialized to make sure every request has JWT token is user is signed in
+  async waitForContext(retries = 1, delay = 100) {
+    while (!this.#context && retries > 0) {
+      await new Promise(res => setTimeout(res, delay));
+      retries--;
+    }
+
+    if (!this.#context) {
+      throw new Error('Context is still unavailable after retries');
+    }
+  }
+
   async #call(endpoint, options) {
+    await this.waitForContext();
     const url = new URL(
       `${endpoint.startsWith('/') ? '' : '/'}${endpoint}`,
       import.meta.env.VITE_API_BASE_URL
