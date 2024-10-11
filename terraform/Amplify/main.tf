@@ -1,5 +1,5 @@
 resource "aws_amplify_app" "main" {
-  name       = "restaking-dashboard"
+  name       = "restaking-dashboard-app"
   repository = "https://github.com/NethermindEth/restaking-dashboard"
 
   environment_variables = {
@@ -16,11 +16,23 @@ resource "aws_amplify_app" "main" {
     status = "200"
     target = "/index.html"
   }
+  # It is required when first time to deploy the app
+  #  oauth_token = var.github_oauth_token
+
 }
 
 resource "aws_amplify_branch" "main" {
   app_id      = aws_amplify_app.main.id
   branch_name = "main"
+  stage       = "DEVELOPMENT"
+
+  enable_auto_build = false
+}
+
+# Release branch for production environment
+resource "aws_amplify_branch" "release" {
+  app_id      = aws_amplify_app.main.id
+  branch_name = "release/v0.1.0"
   stage       = "PRODUCTION"
 
   enable_auto_build = false
@@ -37,6 +49,17 @@ resource "aws_amplify_domain_association" "main" {
     branch_name = aws_amplify_branch.main.branch_name
     prefix      = "stage"
   }
+
+  sub_domain {
+    branch_name = aws_amplify_branch.release.branch_name
+    prefix      = "prod"
+  }
+
+#  sub_domain {
+#    branch_name = aws_amplify_branch.release.branch_name
+#    prefix      = ""
+#  }
+
 }
 
 
@@ -46,3 +69,9 @@ resource "aws_amplify_webhook" "stage" {
   description = "stage"
 }
 
+
+resource "aws_amplify_webhook" "release" {
+  app_id      = aws_amplify_app.main.id
+  branch_name = aws_amplify_branch.release.branch_name
+  description = "release"
+}
