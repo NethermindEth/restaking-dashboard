@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function Thankyou() {
+export default function ThankYou() {
   const navigate = useNavigate();
 
   return (
