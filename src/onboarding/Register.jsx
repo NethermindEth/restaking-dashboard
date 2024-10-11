@@ -26,6 +26,12 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleSignUp = async data => {
+    window._paq.push([
+      'trackEvent',
+      'Sign Up',
+      'Sign Up button clicked',
+      data.email
+    ]);
     if (!isClerkLoaded) return;
 
     try {
@@ -250,7 +256,10 @@ export default function Register() {
               required: 'Please accept terms and conditions'
             })}
           >
-            Accept Terms & conditions
+            Accept{' '}
+            <Link target="_blank" to="/terms-and-conditions">
+              Terms & Conditions and Privacy Policy
+            </Link>
           </Checkbox>
           <p className="text-xs text-danger">
             {errors?.terms && errors.terms.message}

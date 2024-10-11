@@ -18,7 +18,15 @@ export default function Footer() {
         <ul className="flex flex-col gap-2 md:flex-row md:gap-8">
           {mainLinks.map((item, i) => (
             <li className="flex h-6 items-center" key={`footer-main-${i}`}>
-              <Link className="text-xs text-foreground-2" href={item.href}>
+              <Link
+                className="text-xs text-foreground-2"
+                href={item.href}
+                onPress={() =>
+                  item.matomoEventData &&
+                  window._paq.push(['trackEvent', ...item.matomoEventData])
+                }
+                target="_blank"
+              >
                 {item.title}
                 <span className="material-symbols-outlined hidden lg:inline">
                   arrow_right_alt
@@ -33,6 +41,11 @@ export default function Footer() {
               <Link
                 className={`${item.className} text-xs text-foreground-2`}
                 href={item.href}
+                onPress={() =>
+                  item.matomoEventData &&
+                  window._paq.push(['trackEvent', ...item.matomoEventData])
+                }
+                target="_blank"
               >
                 <span className="icon"></span>
                 {item.title}
@@ -57,19 +70,34 @@ export default function Footer() {
 const mainLinks = [
   {
     title: 'Audit smart contract',
-    href: 'https://www.nethermind.io/smart-contract-audits'
+    href: 'https://www.nethermind.io/smart-contract-audits',
+    matomoEventData: [
+      'Contact',
+      'Audit smart contract',
+      'https://www.nethermind.io/smart-contract-audits'
+    ]
   },
   {
     title: 'Nethermind operator',
-    href: 'https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e'
+    href: 'https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e',
+    matomoEventData: [
+      'Contact',
+      'Nethermind operator',
+      'https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e'
+    ]
   },
   {
     title: 'Legal',
-    href: 'https://nethermind.io/legal'
+    href: '/terms-and-conditions'
   },
   {
     title: 'API Docs',
-    href: `${import.meta.env.VITE_API_BASE_URL}/swagger`
+    href: `${import.meta.env.VITE_API_BASE_URL}/swagger`,
+    matomoEventData: [
+      'Contact',
+      'API Docs',
+      `${import.meta.env.VITE_API_BASE_URL}/swagger`
+    ]
   }
 ];
 
@@ -77,11 +105,17 @@ const socialLinks = [
   {
     title: 'Follow us',
     className: 'footer-x',
-    href: 'https://x.com/NethermindEth'
+    href: 'https://x.com/NethermindEth',
+    matomoEventData: ['Social Media', 'X', 'https://x.com/NethermindEth']
   },
   {
     title: 'Join us',
     className: 'footer-discord',
-    href: 'https://discord.com/invite/PaCMRFdvWT'
+    href: 'https://discord.com/invite/PaCMRFdvWT',
+    matomoEventData: [
+      'Social Media',
+      'Discord',
+      'https://discord.com/invite/PaCMRFdvWT'
+    ]
   }
 ];

@@ -21,6 +21,7 @@ import OperatorList from './operators/OperatorList';
 import Register from './onboarding/Register';
 import { ServiceProvider } from './@services/ServiceContext';
 import SubscriptionPlans from './subscription/SubscriptionPlans';
+import TermsConditions from './TermsConditions/TermsConditions';
 import { ThemeProvider } from './shared/ThemeContext';
 import Thankyou from './shared/Thankyou';
 
@@ -38,6 +39,7 @@ const router = createBrowserRouter(
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
       <Route element={<Thankyou />} path="/thankyou" />
+      <Route element={<TermsConditions />} path="/terms-and-conditions" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )

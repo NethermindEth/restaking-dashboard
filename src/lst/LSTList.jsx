@@ -48,14 +48,14 @@ export default function LSTList({ data, latestRate }) {
                     </span>
                     <ThirdPartyLogo
                       className="size-6 min-w-6"
-                      url={lstStrategyAssetMapping[address].logo}
+                      url={lstStrategyAssetMapping[address]?.logo}
                     />
                     <span className="truncate text-foreground-2">
-                      {lstStrategyAssetMapping[address].name}
+                      {lstStrategyAssetMapping[address]?.name}
                     </span>
 
                     <span className="mx-1 text-foreground-1">
-                      {lstStrategyAssetMapping[address].symbol}
+                      {lstStrategyAssetMapping[address]?.symbol}
                     </span>
                   </div>
                 </TableCell>
