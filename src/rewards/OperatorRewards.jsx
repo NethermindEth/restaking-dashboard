@@ -9,11 +9,11 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
-import ThirdPartyLogo from '../shared/ThirdPartyLogo';
+// import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { formatDate } from './helpers';
@@ -84,20 +84,6 @@ const reward_sub_data = [
   },
 ]
 
-
-const SeparateToken = ({ name, percentage, bgColor }) => {
-  return (
-    <div className='flex items-center gap-1'>
-      <div className={`w-2 h-2 bg-[${bgColor}] rounded-full`}></div>
-      <div>
-        <p>
-          {name} <span className='text-[#7A86A5]'>({percentage}%)</span>
-        </p>
-      </div>
-    </div>
-
-  )
-}
 
 const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium'
@@ -171,6 +157,7 @@ export default function OperatorRewards({ address, ethRate }) {
     [setSearchParams]
   );
 
+
   useEffect(() => {
     const page = searchParams.get('page') ?? 1;
     const params = {};
@@ -194,6 +181,7 @@ export default function OperatorRewards({ address, ethRate }) {
     state.searchTriggered,
     state.sortDescriptor
   ]);
+  const currentPage = parseInt(searchParams.get('page') || '1')
 
   return (
     <div className="flex h-full flex-col">
@@ -275,26 +263,7 @@ export default function OperatorRewards({ address, ethRate }) {
                             </div>
                           </div>}>
                           <div>
-                            <div className='mb-4'>
-                              <div className='mb-3'>
-                                <div className='h-[9px] rounded flex w-full overflow-hidden relative'>
-                                  <div className={`h-full bg-[#C9A9E9]`} style={{ width: "14%" }}></div>
-                                  <div className={`h-full bg-[#AE7EDE]`} style={{ width: "18%" }}></div>
-                                  <div className={`h-full bg-[#7828C8]`} style={{ width: "7%" }}></div>
-                                  <div className={`h-full bg-[#FFCC80]`} style={{ width: "6%" }}></div>
-                                  <div className={`h-full bg-[#FB8C00]`} style={{ width: "21%" }}></div>
-                                  <div className={`h-full bg-[#EF6C00]`} style={{ width: "34%" }}></div>
-                                </div>
-                              </div>
-
-                              <div className='text-sm flex items-center justify-between'>
-                                <SeparateToken name="Token 1" bgColor="#C9A9E9" percentage="14" />
-                                <SeparateToken name="Token 2" bgColor="#AE7EDE" percentage="14" />
-                                <SeparateToken name="Token 3" bgColor="#7828C8" percentage="14" />
-                                <SeparateToken name="Token 4" bgColor="#FFCC80" percentage="14" />
-                                <SeparateToken name="Token 5" bgColor="#FB8C00" percentage="14" />
-                              </div>
-                            </div>
+                            <RewardVisualizer reward={reward} />
 
                             <div>
                               <Table
@@ -325,37 +294,41 @@ export default function OperatorRewards({ address, ethRate }) {
                                 </TableHeader>
 
                                 <TableBody>
-                                  {reward_sub_data.map((reward, i) => {
+                                  {console.log("rewards", state.rewards)}
+                                  {console.log("rewards tokens", reward.tokens)}
+                                  {reward.tokens.map((token, i) => {
                                     return (
-                                      <TableRow className="border-t border-outline text-foreground-2" key={`reward ${i}`}>
+                                      <TableRow className="border-t border-outline text-foreground-2" key={`token ${i}`}>
                                         <TableCell>
                                           <div className='flex items-center gap-2 text-foreground-2'>
-                                            <div>
+                                            <div className='w-4 h-4 rounded-full'>
+
                                               <img
-                                                alt="stake ETH"
-                                                src={reward.logoUrl}
+                                                alt={token.symbol ? token.symbol.toLowerCase() : ""}
+                                                src={`/images/${token.symbol.toLowerCase()}.png`}
+                                                className='w-full h-full rounded-full object-cover'
                                               />
                                             </div>
 
 
                                             <p>
                                               <span className='mr-2'>
-                                                {reward.name}
+                                                {token.name}
                                               </span>
                                               <span className="text-foreground">
-                                                {reward.symbol}
+                                                {token.symbol}
                                               </span>
                                             </p>
                                           </div>
                                         </TableCell>
-                                        <TableCell className='text-center'>{reward.totalAmount}</TableCell>
-                                        <TableCell className='text-right'>{reward.valueChange}</TableCell>
+                                        <TableCell className='text-center'>{token.amount}</TableCell>
+                                        <TableCell className='text-right'>+0.00</TableCell>
                                       </TableRow>
                                     )
                                   })
                                   }
 
-                                  <TableRow className="border-t border-outline text-foreground-2" key={`reward ${i}`}>
+                                  {/* <TableRow className="border-t border-outline text-foreground-2" key={`reward ${i}`}>
                                     <TableCell className='hidden'></TableCell>
                                     <TableCell className='hidden'></TableCell>
                                     <TableCell align='right' colSpan={3}>
@@ -363,7 +336,7 @@ export default function OperatorRewards({ address, ethRate }) {
                                         <button>View More</button>
                                       </div>
                                     </TableCell>
-                                  </TableRow>
+                                  </TableRow> */}
                                 </TableBody>
 
                               </Table>
@@ -395,7 +368,7 @@ export default function OperatorRewards({ address, ethRate }) {
           </Table>
           {state.totalPages > 1 && (
             <div className='w-full relative'>
-              <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 left-4'>
+              <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 left-4' disabled={currentPage === 1} onClick={() => { handlePageClick(currentPage - 1) }}>
                 <span className="material-symbols-outlined">
                   arrow_back_ios
                 </span>
@@ -403,10 +376,10 @@ export default function OperatorRewards({ address, ethRate }) {
 
               <ListPagination
                 onChange={handlePageClick}
-                page={parseInt(searchParams.get('page') || '1')}
+                page={currentPage}
                 total={state.totalPages}
               />
-              <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 right-4'>
+              <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 right-4' disabled={!(currentPage < state.totalPages)} onClick={() => { handlePageClick(currentPage + 1) }}>
                 <span className="material-symbols-outlined">
                   arrow_forward_ios
                 </span>
@@ -419,3 +392,56 @@ export default function OperatorRewards({ address, ethRate }) {
     </div>
   );
 }
+
+const RewardVisualizer = ({ reward }) => {
+  const colors = ['#C9A9E9', '#AE7EDE', '#7828C8', '#FFCC80', '#FB8C00', '#EF6C00'];
+
+  const totalAmount = useMemo(() => {
+    return reward.tokens.reduce((sum, token) => +sum + +token.amount, 0);
+  }, [reward.tokens]);
+
+  const TokenPercentages = () => (
+    <>
+      {reward.tokens.map((token, i) => {
+        const percentage = ((token.amount / totalAmount) * 100).toFixed(2);
+        const bgColor = colors[i % colors.length];
+        return (
+          <div
+            key={`percentage-${i}`}
+            className='h-full'
+            style={{ width: `${percentage}%`, backgroundColor: bgColor }}
+          ></div>
+        );
+      })}
+    </>
+  );
+
+  return (
+    <div className='mb-4 px-4'>
+      <div className='mb-3'>
+        <div className='h-[9px] rounded flex w-full overflow-hidden relative'>
+          <TokenPercentages />
+        </div>
+      </div>
+
+      <div className='text-sm flex items-center justify-between'>
+        {reward.tokens.map((token, i) => {
+          const percentage = ((token.amount / totalAmount) * 100).toFixed(2);
+          const bgColor = colors[i % colors.length] ;
+          return (
+
+            <div className='flex items-center gap-1' key={`token-${i}`}>
+              <div className={`w-2 h-2 bg-[${bgColor}] rounded-full`}></div>
+              <div>
+                <p>
+                  {token.name} <span className='text-[#7A86A5]'>({percentage}%)</span>
+                </p>
+              </div>
+            </div>
+
+          );
+        })}
+      </div>
+    </div>
+  );
+};
