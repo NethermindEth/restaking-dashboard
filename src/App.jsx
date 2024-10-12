@@ -20,8 +20,11 @@ import OperatorDetails from './operators/OperatorDetails';
 import OperatorList from './operators/OperatorList';
 import Register from './onboarding/Register';
 import { ServiceProvider } from './@services/ServiceContext';
+import SubscriptionPlans from './subscription/SubscriptionPlans';
+import TermsConditions from './TermsConditions/TermsConditions';
 import { ThemeProvider } from './shared/ThemeContext';
 import Rewards from "./rewards/Rewards"
+import ThankYou from './shared/ThankYou';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,8 +37,11 @@ const router = createBrowserRouter(
       <Route element={<OperatorDetails />} path="/operators/:address/:tab?" />
       <Route element={<Rewards />} path="/rewards" />
       <Route element={<LST />} path="/lst" />
+      <Route element={<SubscriptionPlans />} path="/subscriptions" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
+      <Route element={<ThankYou />} path="/thankyou" />
+      <Route element={<TermsConditions />} path="/terms-and-conditions" />
       <Route element={<NotFound />} path="*" />
     </Route>
   )

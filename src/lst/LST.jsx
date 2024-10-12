@@ -1,3 +1,8 @@
+import {
+  BEACON_STRATEGY,
+  EIGEN_STRATEGY,
+  lstStrategyAssetMapping
+} from '../shared/strategies';
 import { handleServiceError, reduceState } from '../shared/helpers';
 import ErrorMessage from '../shared/ErrorMessage';
 import LSTDistribution from './LSTDistribution';
@@ -39,8 +44,17 @@ export default function LST() {
             return 0;
           });
 
+          const exclude = new Set([EIGEN_STRATEGY, BEACON_STRATEGY]);
+
+          // TODO(vincenthongzy): Stop-gap measure to make sure
+          // permissionless tokens do not distrupt UI.
+          // We should revert and handle it properly soon.
           dispatch({
-            rankings,
+            rankings: rankings.filter(
+              ranking =>
+                !exclude.has(ranking.address) &&
+                ranking.address in lstStrategyAssetMapping
+            ),
             ethRate: current.rate,
             lst: data,
             isLoadingLST: false

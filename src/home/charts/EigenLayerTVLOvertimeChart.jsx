@@ -18,7 +18,7 @@ import { useMutativeReducer } from 'use-mutative';
 export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
   const [state, dispatch] = useMutativeReducer(reduceState, {
     filteredData: [],
-    keys: ['ethTVL', 'lstTVL'],
+    keys: ['ethTVL', 'lstTVL', 'eigenTVL'],
     maxX: 0,
     maxY: 0,
     useRate: true
@@ -58,7 +58,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           0,
           Math.max(
             ...eigenLayerTVL.map(d => {
-              const value = d.ethTVL + d.lstTVL;
+              const value = d.ethTVL + d.lstTVL + d.eigenTVL;
 
               return value * (state.useRate ? d.rate : 1);
             })
@@ -89,7 +89,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
           0,
           Math.max(
             ...state.filteredData.map(d => {
-              const value = d.ethTVL + d.lstTVL;
+              const value = d.ethTVL + d.lstTVL + d.eigenTVL;
 
               return value * (state.useRate ? d.rate : 1);
             })
@@ -103,7 +103,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
 
   const getLatestTotal = useMemo(() => {
     const last = eigenLayerTVL[eigenLayerTVL.length - 1];
-    const total = Number(last.ethTVL + last.lstTVL);
+    const total = Number(last.ethTVL + last.lstTVL + last.eigenTVL);
 
     return state.useRate ? formatUSD(total * last.rate) : formatETH(total);
   }, [eigenLayerTVL, state.useRate]);
@@ -198,7 +198,7 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
   useEffect(() => {
     dispatch({
       brushData: eigenLayerTVL?.map(d => {
-        const value = Number(d.ethTVL + d.lstTVL);
+        const value = Number(d.ethTVL + d.lstTVL + d.eigenTVL);
 
         return { timestamp: d.timestamp, value, rate: d.rate };
       })
@@ -407,6 +407,15 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
               LST
             </div>
           </li>
+          <li className="me-4 inline-block">
+            <div className="flex flex-row items-center gap-1 text-sm">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: 'hsl(var(--app-chart-3))' }}
+              ></span>
+              EIGEN
+            </div>
+          </li>
         </ul>
       </div>
       {tooltipOpen && (
@@ -462,12 +471,34 @@ export default function EigenLayerTVLOvertimeChart({ eigenLayerTVL, height }) {
                 </span>
               </div>
             </li>
+            <li>
+              <div
+                className={`${'eigenTVL' === tooltipData.key ? 'dark:bg-white/25' : ''} flex flex-row items-center gap-1 px-2 py-1`}
+              >
+                <span
+                  className="inline-block h-3 w-3 rounded-full"
+                  style={{
+                    backgroundColor: 'hsl(var(--app-chart-3))'
+                  }}
+                ></span>
+                EIGEN
+                <span className="grow ps-4 text-end">
+                  {formatTooltipValue(
+                    tooltipData.data.eigenTVL,
+                    tooltipData.data.rate,
+                    state.useRate
+                  )}
+                </span>
+              </div>
+            </li>
           </ul>
           <div className="mt-2 flex flex-row px-2">
             <span>Total</span>
             <span className="grow text-end">
               {formatTooltipValue(
-                tooltipData.data.ethTVL + tooltipData.data.lstTVL,
+                tooltipData.data.ethTVL +
+                  tooltipData.data.lstTVL +
+                  tooltipData.data.eigenTVL,
                 tooltipData.data.rate,
                 state.useRate
               )}

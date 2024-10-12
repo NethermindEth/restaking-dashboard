@@ -3,7 +3,7 @@ import {
   EIGEN_STRATEGY,
   lstStrategyAssetMapping
 } from '../../shared/strategies';
-import { formatETH, formatNumber, formatUSD } from '../../shared/formatters';
+import { formatETH, formatUSD } from '../../shared/formatters';
 import { hierarchy, Treemap, treemapBinary } from '@visx/hierarchy';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -43,8 +43,8 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
     return Object.entries(lst)
       .filter(([strategy]) => !filters.has(strategy))
       .map(([strategy, value]) => ({
-        name: allStrategyAssetMapping[strategy].name,
-        symbol: allStrategyAssetMapping[strategy].symbol,
+        name: allStrategyAssetMapping[strategy]?.name,
+        symbol: allStrategyAssetMapping[strategy]?.symbol,
         value: Number(value)
       }));
   }, [lst, state.useAllStrategies]);
@@ -212,14 +212,9 @@ export default function TVLTabTreemap({ width, height, ethRate, lst }) {
             {`${tooltipData.name} (${tooltipData.symbol})`}
           </div>
           <div>
-            <div>
-              {tooltipData.symbol !== 'EIGEN' &&
-                formatUSD(tooltipData.value * ethRate, compact)}
-            </div>
+            <div>{formatUSD(tooltipData.value * ethRate, compact)}</div>
             <div className="text-xs text-foreground-1">
-              {tooltipData.symbol !== 'EIGEN'
-                ? formatETH(tooltipData.value, compact)
-                : `${formatNumber(tooltipData.value, compact)} EIGEN`}
+              {formatETH(tooltipData.value, compact)}
             </div>
           </div>
         </TooltipInPortal>

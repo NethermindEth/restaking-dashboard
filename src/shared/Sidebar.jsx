@@ -8,14 +8,41 @@ import {
   Image,
   Link
 } from '@nextui-org/react';
-import { SignedIn, SignedOut, useClerk, useUser } from '@clerk/clerk-react';
+import {
+  SignedIn,
+  SignedOut,
+  useAuth,
+  useClerk,
+  useUser
+} from '@clerk/clerk-react';
+import { useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { reduceState } from './helpers';
 import RestakingLogo from './ResatkingLogo';
-import { useCallback } from 'react';
+import { useMutativeReducer } from 'use-mutative';
+import { useServices } from '../@services/ServiceContext';
 
 export default function Sidebar({ onOpenChange }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { subscriptionService } = useServices();
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    isSubscribed: true
+  });
+  const { isSignedIn } = useAuth();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const subscription = await subscriptionService.getUserSubscription();
+        if (subscription.subscription.status === 'active') {
+          dispatch({ isSubscribed: true });
+        }
+      } catch (e) {
+        dispatch({ isSubscribed: false });
+      }
+    })();
+  }, [dispatch, subscriptionService, isSignedIn]);
 
   return (
     <header className="flex h-full flex-col">
@@ -47,6 +74,25 @@ export default function Sidebar({ onOpenChange }) {
           );
         })}
       </nav>
+
+      {!state.isSubscribed && (
+        <div className="mx-5 mb-5 flex flex-col gap-y-2 rounded-sm bg-content2 p-3">
+          <span className="text-foreground-1">Like what you see?</span>
+          <p className="text-xs text-foreground-2">
+            If you find our dashboard helpful and would like to help our ongoing
+            development, your support would be massive!
+          </p>
+
+          <Button
+            className="rounded-md border border-foreground-2"
+            onPress={() => navigate('/subscriptions')}
+            variant="bordered"
+          >
+            Support Us
+          </Button>
+        </div>
+      )}
+
       <div className="basis-0 px-5 pb-5">
         <SignedOut>
           <Button
