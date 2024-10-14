@@ -1,4 +1,4 @@
-import { Button, Checkbox, cn, Input } from '@nextui-org/react';
+import { Button, Checkbox, cn, Divider, Image, Input } from '@nextui-org/react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useSignUp, useUser } from '@clerk/clerk-react';
 import { OTPInput } from 'input-otp';
@@ -12,8 +12,8 @@ export default function Register() {
     handleSubmit,
     getValues,
     setError,
-    // clearErrors,
-    // reset,
+    clearErrors,
+    reset,
     formState: { errors }
   } = useForm();
   const { isLoaded: isClerkLoaded, signUp, setActive } = useSignUp();
@@ -90,23 +90,22 @@ export default function Register() {
     }
   };
 
-  // const handleGoogleLogin = async () => {
-  //   reset();
-  //   if (!getValues('terms')) {
-  //     setError('terms', {
-  //       message: 'Please accept terms and conditions',
-  //       type: 'required'
-  //     });
-  //     return;
-  //   }
-  //   clearErrors('terms');
-  //   await signUp.authenticateWithRedirect({
-  //     strategy: 'oauth_google',
-  //     redirectUrl:
-  //       'https://hip-primate-84.clerk.accounts.dev/v1/oauth_callback',
-  //     redirectUrlComplete: '/'
-  //   });
-  // };
+  const handleGoogleLogin = async () => {
+    reset();
+    if (!getValues('terms')) {
+      setError('terms', {
+        message: 'Please accept terms and conditions',
+        type: 'required'
+      });
+      return;
+    }
+    clearErrors('terms');
+    await signUp.authenticateWithRedirect({
+      strategy: 'oauth_google',
+      redirectUrl: import.meta.env.VITE_GOOGLE_REDIRECT_URL,
+      redirectUrlComplete: '/'
+    });
+  };
 
   if (isSignedIn) {
     return <Navigate to={'/'} />;
@@ -181,8 +180,6 @@ export default function Register() {
         </p>
       </div>
 
-      {/* <GoogleOneTap /> */}
-
       <form
         className="flex w-full flex-col items-center justify-center gap-y-5 rounded-lg border border-outline bg-content1 p-5 md:w-[31rem]"
         onSubmit={handleSubmit(handleSignUp)}
@@ -236,21 +233,25 @@ export default function Register() {
           })}
         />
 
-        {/* <div className="flex w-full items-center gap-x-2">
-          <Divider className="w-[46.5%] bg-outline" />
-          <p>or</p>
-          <Divider className="w-[46.5%] bg-outline" />
-        </div> */}
+        {localStorage.getItem('isGoogleOAuthEnabled') && (
+          <div className="flex w-full items-center gap-x-2">
+            <Divider className="w-[46.5%] bg-outline" />
+            <p>or</p>
+            <Divider className="w-[46.5%] bg-outline" />
+          </div>
+        )}
 
-        {/* <Button
-          className="rounded-sm border border-outline"
-          fullWidth
-          onPress={handleGoogleLogin}
-          startContent={<Image src="/images/google.svg" />}
-          variant="bordered"
-        >
-          Continue with Google
-        </Button> */}
+        {localStorage.getItem('isGoogleOAuthEnabled') && (
+          <Button
+            className="rounded-sm border border-outline"
+            fullWidth
+            onPress={handleGoogleLogin}
+            startContent={<Image src="/images/google.svg" />}
+            variant="bordered"
+          >
+            Continue with Google
+          </Button>
+        )}
 
         <div className="flex w-full flex-col">
           <Checkbox

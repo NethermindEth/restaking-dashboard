@@ -19,10 +19,10 @@ export default function ThankYou() {
       <button
         className="text-sm text-default-2 underline"
         onClick={() => {
-          navigate('/subscriptions');
+          navigate('/');
         }}
       >
-        Take me to the subscription page
+        Take me to the overview page
       </button>
     </div>
   );

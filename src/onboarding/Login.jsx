@@ -1,4 +1,4 @@
-import { Button, Input } from '@nextui-org/react';
+import { Button, Divider, Image, Input } from '@nextui-org/react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useSignIn, useUser } from '@clerk/clerk-react';
 import { reduceState } from '../shared/helpers';
@@ -54,14 +54,13 @@ export default function Login() {
     }
   };
 
-  // const handleGoogleLogin = async () => {
-  //   await signIn.authenticateWithRedirect({
-  //     strategy: 'oauth_google',
-  //     redirectUrl:
-  //       'https://hip-primate-84.clerk.accounts.dev/v1/oauth_callback',
-  //     redirectUrlComplete: '/'
-  //   });
-  // };
+  const handleGoogleLogin = async () => {
+    await signIn.authenticateWithRedirect({
+      strategy: 'oauth_google',
+      redirectUrl: import.meta.env.VITE_GOOGLE_REDIRECT_URL,
+      redirectUrlComplete: '/'
+    });
+  };
 
   if (isSignedIn) {
     return <Navigate to={'/'} />;
@@ -77,8 +76,6 @@ export default function Login() {
           Let's sign in to your account or if you don't have one, sign up
         </p>
       </div>
-
-      {/* <GoogleOneTap /> */}
 
       <form
         className="flex w-full flex-col items-center justify-center gap-y-5 rounded-lg border border-outline bg-content1 p-5 md:w-[31rem]"
@@ -133,20 +130,24 @@ export default function Login() {
           })}
         />
 
-        {/* <div className="flex w-full items-center gap-x-2">
-          <Divider className="w-[46.5%] bg-outline" />
-          <p>or</p>
-          <Divider className="w-[46.5%] bg-outline" />
-        </div> */}
-        {/* <Button
-          className="rounded-sm border border-outline"
-          fullWidth
-          onPress={handleGoogleLogin}
-          startContent={<Image src="/images/google.svg" />}
-          variant="bordered"
-        >
-          Continue with Google
-        </Button> */}
+        {localStorage.getItem('isGoogleOAuthEnabled') && (
+          <div className="flex w-full items-center gap-x-2">
+            <Divider className="w-[46.5%] bg-outline" />
+            <p>or</p>
+            <Divider className="w-[46.5%] bg-outline" />
+          </div>
+        )}
+        {localStorage.getItem('isGoogleOAuthEnabled') && (
+          <Button
+            className="rounded-sm border border-outline"
+            fullWidth
+            onPress={handleGoogleLogin}
+            startContent={<Image src="/images/google.svg" />}
+            variant="bordered"
+          >
+            Continue with Google
+          </Button>
+        )}
 
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
