@@ -1,7 +1,7 @@
 import { Pagination } from '@nextui-org/react';
 
 /** @param {{ onChange: ((page: number) => void), page: number, total: number }} props */
-export default function ListPagination({ onChange, page, total }) {
+export default function ListPagination({ onChange, page, total, showControls }) {
   return (
     <div className="flex items-center justify-center border-t border-outline p-4">
       <Pagination
@@ -14,7 +14,7 @@ export default function ListPagination({ onChange, page, total }) {
         color="default"
         onChange={onChange}
         page={page}
-        showControls={total >= 8}
+        showControls={showControls === false ? false : total >= 8}
         total={total}
         variant="light"
       />

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@nextui-org/react';
 
-export default function CopyButton({ className, color, value }) {
+export default function CopyButton({ className, color, value, variant }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef(null);
 
@@ -37,9 +37,13 @@ export default function CopyButton({ className, color, value }) {
       size="sm"
       variant="light"
     >
-      <span className="material-symbols-outlined text-xl">
+      <span className="material-symbols-outlined text-xl"
+        style={variant === "outlined" ? {
+          fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
+        } : {}}
+      >
         {copied ? 'check' : 'content_copy'}
       </span>
-    </Button>
+    </Button >
   );
 }

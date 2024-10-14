@@ -36,6 +36,7 @@ import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
 
 import RewardTotalValue from '../rewards/RewardTotalValue';
 import OperatorRewards from '../rewards/OperatorRewards';
+import { RewardsEarnedGraph } from '../rewards/RewardsEarnedGraph';
 
 export default function OperatorDetails() {
   const { address, tab } = useParams();
@@ -381,12 +382,14 @@ export default function OperatorDetails() {
             </div>
           }
         >
-          <OperatorTVLLineChart
+
+          <RewardsEarnedGraph />
+          {/* <OperatorTVLLineChart
             currentTVL={state.tvl}
             ethRate={state.ethRate}
             isOperatorLoading={state.isOperatorLoading}
             operatorError={state.error}
-          />
+          /> */}
           <RewardTotalValue
             claimedTotal={state.rewardsInfo.claimedTotal}
             error={state.error}

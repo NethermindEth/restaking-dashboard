@@ -203,7 +203,7 @@ export default function DistributedRewardChart() {
 
   return (
     <div ref={containerRef}>
-      <svg width={width} height={height}>
+      <svg width={width} height={height} fill='none'>
         <rect x={0} y={0} width={width} height={height} rx={14} />
         <Grid
           top={margin.top}

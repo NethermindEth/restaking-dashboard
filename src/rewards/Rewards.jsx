@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Input,
   Tab,
@@ -15,6 +15,12 @@ import { useMutativeReducer } from 'use-mutative';
 import { reduceState } from '../shared/helpers';
 import DistributedRewardPieChart from '../home/charts/DistributedRewardPieChart';
 import ListPagination from '../shared/ListPagination';
+import CopyButton from '../shared/CopyButton';
+import { Accordion, AccordionItem } from "@nextui-org/react";
+import { RewardVisualizer } from "./RewardVisualizer"
+import { RewardAccordianContent } from './RewardAccordianContent';
+import { useServices } from '../@services/ServiceContext';
+import { handleServiceError } from '../shared/helpers';
 
 const reward_leaderboard_data = [
   {
@@ -243,9 +249,35 @@ const reward_leaderboard_data = [
   },
 ]
 
+// reward.tokens
+
+const reward_data = {
+  tokens: [
+    {
+      "token": "0xba50933c268f567bdc86e1ac131be072c6b0b71a",
+      "amount": "73.83006979873986",
+      "name": "ARPA",
+      "symbol": "ARPA",
+      "amountETH": "0.0012189741112128448"
+    },
+    {
+      "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "amount": "0.06445221548885045",
+      "name": "Wrapped Ether",
+      "symbol": "WETH",
+      "amountETH": "0.06446634396751785"
+    }
+  ]
+}
+
 export default function Rewards() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { rewardService } = useServices();
+  const abortController = useRef(null);
   const [state, dispatch] = useMutativeReducer(reduceState, {
+    totalRewards: 0,
+    totalClaimed: 0,
+    rewardTokens: 0,
     operators: [],
     promotedOperators: [],
     promotedOperatorsRate: 1,
@@ -264,6 +296,36 @@ export default function Rewards() {
       : { column: 'tvl', direction: 'descending' }
   });
 
+  useEffect(() => {
+    dispatch({ isFetchingData: true, error: null });
+
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+    abortController.current = new AbortController();
+
+    rewardService.getRewardsInfo(
+      abortController.current.signal
+    ).then(response => {
+      const { rewardTokens, totalRewards, totalClaimed } = response
+      dispatch({
+        isFetchingData: false,
+        error: null,
+        rewardTokens,
+        totalRewards,
+        totalClaimed
+      });
+      abortController.current = null;
+    }).catch(e => {
+      if (e.name !== 'AbortError') {
+        dispatch({
+          error: handleServiceError(e),
+          isFetchingData: false
+        });
+      }
+    })
+  }, [])
+
   const handleSearch = () => {
     //TODO: Implement search
   };
@@ -272,7 +334,7 @@ export default function Rewards() {
     {
       key: 'address',
       label: 'Address',
-      className: 'w-64 md:1/5 ps-4'
+      className: 'w-64 md:w-1/5 ps-4'
     },
     {
       key: 'token_amount',
@@ -282,11 +344,6 @@ export default function Rewards() {
     {
       key: 'address_type',
       label: 'Address type',
-      className: 'text-end w-36 md:w-1/5'
-    },
-    {
-      key: 'tokens',
-      label: 'Tokens',
       className: 'text-end w-36 md:w-1/5'
     },
     {
@@ -345,7 +402,7 @@ export default function Rewards() {
           </h3>
 
           <p>
-            34,554,567 EL
+            {Number(state.totalRewards).toFixed(4)} ETH
           </p>
         </div>
 
@@ -355,7 +412,7 @@ export default function Rewards() {
           </h3>
 
           <p>
-            26,554,567 EL
+            {Number(state.totalClaimed).toFixed(4)} ETH
           </p>
         </div>
 
@@ -366,7 +423,7 @@ export default function Rewards() {
           </h3>
 
           <p>
-            4
+            {state.rewardTokens}
           </p>
         </div>
 
@@ -526,53 +583,77 @@ export default function Rewards() {
                     key={`reward-leaderboard ${i}`}
                     className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                   >
-                    <TableCell className="p-4">
-                      <div className="flex items-center gap-x-3">
-                        <span className="truncate">
-                          {reward.address}
-                        </span>
 
-                        <button>
-                          <span className="material-symbols-outlined text-lg text-default-2" style={{
-                            fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
-                          }}>
-                            content_copy
-                          </span>
-                        </button>
-                      </div>
-                    </TableCell>
+                    <TableCell colSpan={5} className="p-0">
+                      <Accordion itemClasses={{ trigger: "py-4 block" }} className='data-[open=true]:bg-white px-0'>
+                        <AccordionItem key="1" aria-label="Accordion 1"
+                          indicator={
+                            ({ isOpen }) => (
+                              <span className={`material-symbols-outlined ${isOpen ? "-rotate-90" : "rotate-90"} text-default-2 absolute right-4 top-[18px] transition-transform`}>
+                                play_arrow
+                              </span>
+                            )}
 
-                    <TableCell className="pe-8 text-end">
-                      {reward.totalAmount} EL
-                    </TableCell>
-
-                    <TableCell className="pe-8">
-                      <div className='flex justify-end'>
-                        <div className='bg-default-2 w-fit rounded p-1 text-content1 text-sm ms-2'>Operator</div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="pe-8 text-end">
-                      <div className="flex items-center justify-end gap-6">
-                        <p>
-                          {reward.tokens[0].tokenName} + {reward.tokens.length}
-                        </p>
-
-                        <div className='flex items-center'>
-                          {reward.tokens.map(token => {
-                            return (
-                              <div className='w-4 h-4 rounded-full border border-outline -ml-2'>
-                                <img src={token.tokenImgUrl} alt="token" className='w-full h-full rounded-full object-cover' />
+                          title={
+                            <div className='grid grid-cols-5 px-4'>
+                              <div className="text-end w-64 md:w-auto pr-3">
+                                <div className="flex items-center gap-x-3">
+                                  <span className="truncate">
+                                    {reward.address}
+                                  </span>
+                                  <CopyButton className="text-default-2" value={reward.address} variant="outlined" />
+                                </div>
                               </div>
-                            )
-                          })}
-                        </div>
-                      </div>
+
+                              <div className='text-end w-36 md:w-auto px-3'>
+                                {reward.totalAmount}
+                              </div>
+
+                              <div className='flex justify-end w-36 md:w-auto items-center px-3'>
+                                <div className='bg-default-2 w-fit rounded p-1 text-content1 text-sm ms-2'>Operator</div>
+                              </div>
+
+                              <div className="px-3 w-40 md:w-auto text-end">
+                                {/* <div className="flex items-center justify-end gap-6">
+                                  <p>
+                                    {reward.tokens[0].tokenName} + {reward.tokens.length}
+                                  </p>
+      
+                                  <div className='flex items-center'>
+                                    {reward.tokens.map(token => {
+                                      return (
+                                        <div className='w-4 h-4 rounded-full border border-outline -ml-2'>
+                                          <img src={token.tokenImgUrl} alt="token" className='w-full h-full rounded-full object-cover' />
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
+      
+                                <div className='pe-8 text-end'>
+                                  {reward.unclaimed}
+                                </div> */}
+                                234
+                              </div>
+                              <div></div>
+
+                            </div>
+                          }
+
+                          className='py-0 data-[open=true]:bg-[#191C2C]' >
+                          <div>
+                            <RewardVisualizer reward={reward_data} />
+                            <RewardAccordianContent reward={reward_data} ethRate={233} />
+                          </div>
+                        </AccordionItem>
+                      </Accordion>
+
+
                     </TableCell>
 
-                    <TableCell className="pe-8 text-end">
-                      {reward.unclaimed}
-                    </TableCell>
+                    <TableCell className='hidden'></TableCell>
+                    <TableCell className='hidden'></TableCell>
+                    <TableCell className='hidden'></TableCell>
                   </TableRow>
                 )
               })
