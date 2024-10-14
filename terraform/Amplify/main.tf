@@ -16,8 +16,6 @@ resource "aws_amplify_app" "main" {
     status = "200"
     target = "/index.html"
   }
-  # It is required when first time to deploy the app
-  #  oauth_token = var.github_oauth_token
 
 }
 
