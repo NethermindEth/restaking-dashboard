@@ -371,9 +371,7 @@ export default function OperatorDetails() {
                   <span className="text-foreground-1 group-aria-selected:text-foreground">
                     {formatUSD(
                       parseFloat(
-                        formatEther(
-                          getBigInt(state.rewardsInfo.rewardsTotal.toString())
-                        )
+                        state.rewardsInfo.rewardsTotal
                       ) * state.ethRate,
                       compact
                     )}

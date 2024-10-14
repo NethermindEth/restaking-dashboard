@@ -28,7 +28,7 @@ export default function RewardTotalValue({
             <div className="text-center">
               <div className="text-base text-foreground-1">
                 {formatUSD(
-                  parseFloat(formatEther(getBigInt(rewardsTotal.toString()))) *
+                  parseFloat(rewardsTotal) *
                   ethRate,
                   compact
                 )}
@@ -48,7 +48,7 @@ export default function RewardTotalValue({
             <div className="text-center">
               <div className="text-base text-foreground-1">
                 {formatUSD(
-                  parseFloat(formatEther(getBigInt(claimedTotal.toString()))) *
+                  parseFloat(claimedTotal) *
                   ethRate,
                   compact
                 )}
@@ -69,9 +69,7 @@ export default function RewardTotalValue({
               <div className="text-base text-foreground-1">
                 {formatUSD(
                   parseFloat(
-                    formatEther(
-                      getBigInt((rewardsTotal - claimedTotal).toString())
-                    )
+                    rewardsTotal - claimedTotal
                   ) * ethRate,
                   compact
                 )}
