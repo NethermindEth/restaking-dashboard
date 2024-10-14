@@ -255,7 +255,7 @@ export default function OperatorRewards({ address, ethRate }) {
                             <div className="col-span-8 ps-4 pr-3">
                               <div>{formatUSD(reward.rewardsTotal * ethRate, compact)}</div>
                               <div className="text-xs text-foreground-2">
-                                {formatETH(reward.rewardsTotal, compact)}
+                                {`${Number(reward.rewardsTotal).toFixed(5)} ETH`}
                               </div>
                             </div>
                             <div className='text-sm col-span-4 px-3'>
@@ -294,20 +294,21 @@ export default function OperatorRewards({ address, ethRate }) {
                                 </TableHeader>
 
                                 <TableBody>
-                                  {console.log("rewards", state.rewards)}
-                                  {console.log("rewards tokens", reward.tokens)}
                                   {reward.tokens.map((token, i) => {
                                     return (
                                       <TableRow className="border-t border-outline text-foreground-2" key={`token ${i}`}>
                                         <TableCell>
                                           <div className='flex items-center gap-2 text-foreground-2'>
                                             <div className='w-4 h-4 rounded-full'>
-
-                                              <img
-                                                alt={token.symbol ? token.symbol.toLowerCase() : ""}
-                                                src={`/images/${token.symbol.toLowerCase()}.png`}
-                                                className='w-full h-full rounded-full object-cover'
-                                              />
+                                              {
+                                                !!token.symbol && (
+                                                  <img
+                                                    alt={token.symbol.toLowerCase()}
+                                                    src={`/images/${token.symbol.toLowerCase()}.png`}
+                                                    className='w-full h-full rounded-full object-cover'
+                                                  />
+                                                )
+                                              }
                                             </div>
 
 
@@ -321,8 +322,8 @@ export default function OperatorRewards({ address, ethRate }) {
                                             </p>
                                           </div>
                                         </TableCell>
-                                        <TableCell className='text-center'>{token.amount}</TableCell>
-                                        <TableCell className='text-right'>+0.00</TableCell>
+                                        <TableCell className='text-center'>{Number(token.amount).toFixed(3)}</TableCell>
+                                        <TableCell className='text-right'>+ $ {parseFloat(token.amountETH * ethRate).toFixed(2)}</TableCell>
                                       </TableRow>
                                     )
                                   })
@@ -427,7 +428,7 @@ const RewardVisualizer = ({ reward }) => {
       <div className='text-sm flex items-center justify-between'>
         {reward.tokens.map((token, i) => {
           const percentage = ((token.amount / totalAmount) * 100).toFixed(2);
-          const bgColor = colors[i % colors.length] ;
+          const bgColor = colors[i % colors.length];
           return (
 
             <div className='flex items-center gap-1' key={`token-${i}`}>
