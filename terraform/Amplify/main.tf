@@ -50,15 +50,19 @@ resource "aws_amplify_domain_association" "main" {
     prefix      = "stage"
   }
 
+  # add this for pre-production domain
+  # https://prod.restaking.info
   sub_domain {
     branch_name = aws_amplify_branch.release.branch_name
     prefix      = "prod"
   }
 
-#  sub_domain {
-#    branch_name = aws_amplify_branch.release.branch_name
-#    prefix      = ""
-#  }
+  # add this for production domain
+  # https://restaking.info
+  sub_domain {
+    branch_name = aws_amplify_branch.release.branch_name
+    prefix      = ""
+  }
 
 }
 
