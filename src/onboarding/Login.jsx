@@ -1,6 +1,6 @@
 import { Button, Divider, Image, Input } from '@nextui-org/react';
-import { GoogleOneTap, useSignIn, useUser } from '@clerk/clerk-react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useSignIn, useUser } from '@clerk/clerk-react';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
 import { useMutativeReducer } from 'use-mutative';
@@ -76,10 +76,6 @@ export default function Login() {
           Let's sign in to your account or if you don't have one, sign up
         </p>
       </div>
-
-      {localStorage.getItem('isGoogleOAuthEnabled') && (
-        <GoogleOneTap signInForceRedirectUrl={'/'} />
-      )}
 
       <form
         className="flex w-full flex-col items-center justify-center gap-y-5 rounded-lg border border-outline bg-content1 p-5 md:w-[31rem]"

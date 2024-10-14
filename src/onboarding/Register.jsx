@@ -1,6 +1,6 @@
 import { Button, Checkbox, cn, Divider, Image, Input } from '@nextui-org/react';
-import { GoogleOneTap, useSignUp, useUser } from '@clerk/clerk-react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useSignUp, useUser } from '@clerk/clerk-react';
 import { OTPInput } from 'input-otp';
 import { reduceState } from '../shared/helpers';
 import { useForm } from 'react-hook-form';
@@ -179,8 +179,6 @@ export default function Register() {
           Let's create your account or if you have one already, sign in
         </p>
       </div>
-
-      {localStorage.getItem('isGoogleOAuthEnabled') && <GoogleOneTap />}
 
       <form
         className="flex w-full flex-col items-center justify-center gap-y-5 rounded-lg border border-outline bg-content1 p-5 md:w-[31rem]"
