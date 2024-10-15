@@ -54,7 +54,6 @@ export default function AVSList() {
     searchTerm: searchParams.get('search'),
     error: null,
     rate: 1,
-    searchTriggered: false,
     sortDescriptor: searchParams.get('sort')
       ? {
           column: searchParams.get('sort').replace('-', ''),
@@ -65,7 +64,7 @@ export default function AVSList() {
       : { column: 'tvl', direction: 'descending' }
   });
 
-  const debouncedSearchTerm = useDebouncedSearch(state.searchTerm ?? '', 300);
+  const debouncedSearchTerm = useDebouncedSearch(state.searchTerm, 300);
 
   const fetchAVS = useCallback(
     async (pageNumber, search, sort) => {
@@ -75,6 +74,7 @@ export default function AVSList() {
         if (abortController.current) {
           abortController.current.abort();
         }
+
         abortController.current = new AbortController();
 
         const response = await avsService.getAll(
@@ -107,44 +107,49 @@ export default function AVSList() {
 
   const handlePageClick = useCallback(
     page => {
-      setSearchParams({ page: page.toString() });
+      searchParams.set('page', page.toString());
+
+      setSearchParams(searchParams);
     },
-    [setSearchParams]
+    [setSearchParams, searchParams]
   );
 
-  const handleSearch = e => {
-    dispatch({ searchTerm: e.target.value });
-  };
-
   useEffect(() => {
-    const page = searchParams.get('page') ?? 1;
-
     const params = {};
-    params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
-    if (debouncedSearchTerm) params.search = debouncedSearchTerm;
-    if (state.sortDescriptor) {
-      params.sort =
-        state.sortDescriptor.direction === 'ascending'
-          ? state.sortDescriptor.column
-          : `-${state.sortDescriptor.column}`;
+
+    if (debouncedSearchTerm) {
+      params.page = 1; // If search term changed, reset the page number
+      params.search = debouncedSearchTerm;
+    } else {
+      params.page = searchParams.get('page') ?? 1;
     }
 
-    setSearchParams(params, { replace: true });
-    fetchAVS(params.page, params.search, params.sort);
-    dispatch({ searchTriggered: false });
+    if (state.sortDescriptor) {
+      params.sort =
+        (state.sortDescriptor.direction === 'ascending' ? '' : '-') +
+        state.sortDescriptor.column;
+    }
+
+    setSearchParams(params);
   }, [
     debouncedSearchTerm,
-    dispatch,
-    fetchAVS,
     searchParams,
     setSearchParams,
-    state.searchTriggered,
     state.sortDescriptor
   ]);
 
   useEffect(() => {
-    if (debouncedSearchTerm) dispatch({ searchTriggered: true });
-  }, [dispatch, debouncedSearchTerm]);
+    // If search params are empty, wait for them to be set
+    if (searchParams.keys().next().done) {
+      return;
+    }
+
+    const page = searchParams.get('page') ?? 1;
+    const search = searchParams.get('search');
+    const sort = searchParams.get('sort');
+
+    fetchAVS(page, search, sort);
+  }, [fetchAVS, searchParams]);
 
   return (
     <div className="flex h-full flex-col">
@@ -168,7 +173,7 @@ export default function AVSList() {
               search
             </span>
           }
-          onChange={handleSearch}
+          onChange={e => dispatch({ searchTerm: e.target.value })}
           placeholder="Search by name/address"
           radius="sm"
           startContent={<SearchTooltip />}
@@ -215,7 +220,7 @@ export default function AVSList() {
                 <div className="flex flex-col items-center justify-center">
                   <span className="text-lg text-foreground-2">
                     No AVS found for &quot;
-                    {debouncedSearchTerm.length > 42
+                    {debouncedSearchTerm?.length > 42
                       ? `${debouncedSearchTerm.substring(0, 42)}...`
                       : debouncedSearchTerm}
                     &quot;
