@@ -257,7 +257,7 @@ function AVSOperatorsList({ address, avsError, isAVSLoading, tvl }) {
         className="size-16 cursor-pointer border-t border-outline bg-black/100 transition-colors hover:bg-default"
         key={`promoted-operator-item-${i}`}
         onClick={() =>
-          navigate(`/operators/${operator.address}`, {
+          navigate(`/operators/${operator.operator}`, {
             state: { operator }
           })
         }
