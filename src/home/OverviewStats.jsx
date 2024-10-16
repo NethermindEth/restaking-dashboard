@@ -39,7 +39,8 @@ export default function OverviewStats({
 
   const calculateEigenLayerTVL = () =>
     eigenLayerTVL[eigenLayerTVL.length - 1].ethTVL +
-    eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL;
+    eigenLayerTVL[eigenLayerTVL.length - 1].lstTVL +
+    eigenLayerTVL[eigenLayerTVL.length - 1].eigenTVL;
 
   useEffect(() => {
     const fetchOperators = async () => {
