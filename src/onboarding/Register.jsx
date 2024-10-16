@@ -72,7 +72,7 @@ export default function Register() {
         window._paq.push([
           'trackEvent',
           'Sign Up',
-          'Sign Up button clicked',
+          'New account created',
           getValues('email')
         ]);
         navigate('/');
