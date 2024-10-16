@@ -55,7 +55,6 @@ export const RewardAccordianContent = ({ reward, ethRate }) => {
                       }
                     </div>
 
-
                     <p>
                       <span className='mr-2'>
                         {token.name}
@@ -67,21 +66,22 @@ export const RewardAccordianContent = ({ reward, ethRate }) => {
                   </div>
                 </TableCell>
                 <TableCell className='text-center'>{Number(token.amount).toFixed(3)}</TableCell>
-                <TableCell className='text-right'>+ $ {parseFloat(token.amountETH * ethRate).toFixed(2)}</TableCell>
+                <TableCell className='text-right'>+ $ {parseFloat(token.amountETH * ethRate).toFixed(2)} - {parseFloat(token.amountETH).toFixed(2)} ETH</TableCell>
               </TableRow>
             )
           })
           }
 
+          //TODO: uncomment below code when make view more
           {/* <TableRow className="border-t border-outline text-foreground-2" key={`reward ${i}`}>
-                                    <TableCell className='hidden'></TableCell>
-                                    <TableCell className='hidden'></TableCell>
-                                    <TableCell align='right' colSpan={3}>
-                                      <div className="w-full flex items-center justify-end">
-                                        <button>View More</button>
-                                      </div>
-                                    </TableCell>
-                                  </TableRow> */}
+              <TableCell className='hidden'></TableCell>
+              <TableCell className='hidden'></TableCell>
+              <TableCell align='right' colSpan={3}>
+                <div className="w-full flex items-center justify-end">
+                  <button>View More</button>
+                </div>
+              </TableCell>
+           </TableRow> */}
         </TableBody>
 
       </Table>

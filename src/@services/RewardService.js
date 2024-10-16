@@ -34,4 +34,24 @@ export default class RewardService extends BaseService {
     }
     throw await this._createError(response);
   }
+  async getAllRewards(pageNumber, pageSize = 10, search, sort, filter, signal) {
+    console.log('sort', sort);
+    const pageIndex = Math.max(0, pageNumber - 1);
+    const response = await this._get(`eigenlayer/rewards/earners`, {
+      query: {
+        'page-index': pageIndex,
+        'page-size': pageSize,
+        search,
+        sort,
+        filter
+      },
+      signal
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    throw await this._createError(response);
+  }
 }

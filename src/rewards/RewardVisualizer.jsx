@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 
 export const RewardVisualizer = ({ reward = { tokens: [] } }) => {
-  const colors = ['#C9A9E9', '#AE7EDE', '#7828C8', '#FFCC80', '#FB8C00', '#EF6C00'];
+  const colors = ['#FB8C00', '#C9A9E9', '#7828C8', '#FFCC80', '#FB8C00', '#AE7EDE', '#EF6C00'];
 
   const totalAmount = useMemo(() => {
-    return reward.tokens.reduce((sum, token) => +sum + +token.amount, 0);
+    return reward.tokens.reduce((sum, token) => +sum + +token.amountETH, 0);
   }, [reward.tokens]);
 
   const TokenPercentages = () => (
     <>
       {reward.tokens.map((token, i) => {
-        const percentage = ((token.amount / totalAmount) * 100).toFixed(2);
+        const percentage = ((token.amountETH / totalAmount) * 100).toFixed(2);
         const bgColor = colors[i % colors.length];
         return (
           <div
@@ -33,7 +33,7 @@ export const RewardVisualizer = ({ reward = { tokens: [] } }) => {
 
       <div className='text-sm flex items-center justify-between'>
         {reward.tokens.map((token, i) => {
-          const percentage = ((token.amount / totalAmount) * 100).toFixed(2);
+          const percentage = parseFloat((token.amountETH / totalAmount) * 100).toFixed(2);
           const bgColor = colors[i % colors.length];
           return (
 
