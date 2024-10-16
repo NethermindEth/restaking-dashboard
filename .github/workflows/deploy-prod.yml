@@ -9,7 +9,7 @@ on:
         type: string
         required: true
         description: Git ref
-        default: main
+        default: release/v0.1.0
 
 jobs:
   deploy:
