@@ -2,7 +2,7 @@ name: Deploy to Amplify Prod
 
 on:
   push:
-    branches: [main]
+    branches: [release/v0.1.0]
   workflow_dispatch:
     inputs:
       ref:
