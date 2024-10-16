@@ -1,5 +1,5 @@
 import { formatETH, formatUSD } from '../shared/formatters';
-import { handleServiceError, reduceState } from '../shared/helpers';
+import { handleServiceError, reduceState, truncateAddressLg } from '../shared/helpers';
 import {
   Skeleton,
   Table,
@@ -17,6 +17,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
+import CopyButton from '../shared/CopyButton';
 
 export default function OverviewStats({
   isFetchingEigenLayerTVL,
@@ -90,7 +91,7 @@ export default function OverviewStats({
     <>
       <div className="rd-box flex min-h-28 basis-full flex-row items-center justify-between py-4">
         <div className="flex basis-1/3 flex-col items-center gap-1 px-2">
-          <span className="text-xs text-foreground-1 md:text-sm">
+          <span className="text-xs text-default-2 md:text-sm">
             EigenLayer TVL
           </span>
 
@@ -120,6 +121,24 @@ export default function OverviewStats({
               </span>
             )}
         </div>
+        {/* //TODO: uncomment this code to see static design of total rewards supplied */}
+        {/* <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
+          <span className="text-xs text-default-2 md:text-sm ">
+            Total Rewards Supplied
+          </span>
+
+          <span className="text-center">
+            <span className="font-display text-lg md:text-2xl ">
+              $ 1,479,349
+            </span>
+          </span>
+
+          <span className="text-sm text-success">
+            ETH 3,120,070,554
+          </span>
+
+
+        </div> */}
         <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
           <span className="text-xs text-foreground-1 md:text-sm">
             Total AVS
@@ -173,6 +192,12 @@ export default function OverviewStats({
         operators={state.operators}
         rate={state.rate}
       />
+
+
+      {/* //TODO: uncomment this code to see static design of top rewards */}
+      {/* <TopRewards
+        isLoading={false}
+      /> */}
     </>
   );
 }
@@ -235,50 +260,50 @@ function TopAVS({ isLoading, avs, rate, error }) {
         <TableBody>
           {isLoading
             ? [...Array(3)].map((_, i) => (
-                <TableRow className="border-t border-outline" key={i}>
-                  <TableCell className="w-2/5 py-6 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-1/5 py-6 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-2/5 py-6 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                </TableRow>
-              ))
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-2/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-1/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-2/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+              </TableRow>
+            ))
             : avs?.map((item, i) => (
-                <TableRow
-                  className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                  key={`operator-item-${i}`}
-                  onClick={() =>
-                    navigate(`/avs/${item.address}`, {
-                      state: { item }
-                    })
-                  }
-                >
-                  <TableCell className="p-4">
-                    <div className="flex items-center gap-x-3">
-                      <ThirdPartyLogo
-                        className="size-8 min-w-8"
-                        url={item.metadata?.logo}
-                      />
-                      <span className="truncate">
-                        {item.metadata?.name || item.address}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {formatNumber(item.operators, compact)}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
-                    <div className="text-xs text-foreground-2">
-                      {formatETH(item.strategiesTotal, compact)}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={`operator-item-${i}`}
+                onClick={() =>
+                  navigate(`/avs/${item.address}`, {
+                    state: { item }
+                  })
+                }
+              >
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={item.metadata?.logo}
+                    />
+                    <span className="truncate">
+                      {item.metadata?.name || item.address}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-end">
+                  {formatNumber(item.operators, compact)}
+                </TableCell>
+                <TableCell className="text-end">
+                  <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(item.strategiesTotal, compact)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>
@@ -343,54 +368,172 @@ function TopOperators({ isLoading, operators, rate, error }) {
         <TableBody>
           {isLoading
             ? [...Array(3)].map((_, i) => (
-                <TableRow className="border-t border-outline" key={i}>
-                  <TableCell className="w-2/5 py-6 pe-8 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-2/5 py-6 pe-8 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                </TableRow>
-              ))
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-2/5 py-6 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-2/5 py-6 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+              </TableRow>
+            ))
             : operators?.map((operator, i) => (
-                <TableRow
-                  className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                  key={`operator-item-${i}`}
-                  onClick={() =>
-                    navigate(`/operators/${operator.address}`, {
-                      state: { operator }
-                    })
-                  }
-                >
-                  <TableCell className="p-4">
-                    <div className="flex items-center gap-x-3">
-                      <ThirdPartyLogo
-                        className="size-8 min-w-8"
-                        url={operator.metadata?.logo}
-                      />
-                      <span className="truncate">
-                        {operator.metadata?.name || operator.address}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {formatNumber(operator.stakerCount, compact)}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    <div>
-                      {formatUSD(operator.strategiesTotal * rate, compact)}
-                    </div>
-                    <div className="text-xs text-foreground-2">
-                      {formatETH(operator.strategiesTotal, compact)}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={`operator-item-${i}`}
+                onClick={() =>
+                  navigate(`/operators/${operator.address}`, {
+                    state: { operator }
+                  })
+                }
+              >
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={operator.metadata?.logo}
+                    />
+                    <span className="truncate">
+                      {operator.metadata?.name || operator.address}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-end">
+                  {formatNumber(operator.stakerCount, compact)}
+                </TableCell>
+                <TableCell className="text-end">
+                  <div>
+                    {formatUSD(operator.strategiesTotal * rate, compact)}
+                  </div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(operator.strategiesTotal, compact)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>
+  );
+}
+
+function TopRewards({ isLoading = false }) {
+  const columns = [
+    {
+      key: 'top_rewarded_earners',
+      label: 'Top rewarded earners',
+      className: 'w-44 md:w-1/2 ps-4'
+    },
+
+    {
+      key: 'value',
+      label: 'Value',
+      className: 'text-end md:w-1/2'
+    }
+  ];
+
+  if (false) {
+    return (
+      <div className="rd-box flex min-h-44 max-w-full basis-full items-center justify-center lg:grow lg:basis-0">
+        <ErrorMessage error={error} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rd-box min-h-44 max-w-full basis-full lg:grow lg:basis-0">
+      <div className="w-full p-4">
+        <span className="text-foreground-1">Rewards</span>
+      </div>
+      <Table
+        aria-label="Operator list"
+        classNames={{
+          base: `overflow-x-auto`,
+          thead: '[&>tr:last-child]:hidden'
+        }}
+        // hideHeader={!isLoading}
+        layout="fixed"
+        removeWrapper
+      >
+        <TableHeader columns={columns}>
+          {column => (
+            <TableColumn
+              className={`bg-transparent py-4 text-sm font-normal leading-5 text-foreground-1 transition-colors data-[hover=true]:text-foreground-2 ${column.className}`}
+              key={column.key}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody>
+
+          <TableRow className="cursor-pointer border-t border-outline transition-colors hover:bg-default">
+            <TableCell className="p-4">
+              <div className="text-end w-64 md:w-auto pr-3">
+                <div className="flex items-center justify-between pr-1 w-[172px]">
+                  <span className="truncate text-sm">
+                    {truncateAddressLg("0xbf0aaf43144eca99503860d8c5ac16e0875184f6")}
+                  </span>
+                  <CopyButton className="text-default-2 flex-shrink-0" value={"0xbf0aaf43144eca99503860d8c5ac16e0875184f6"} variant="outlined" />
+                </div>
+              </div>
+            </TableCell>
+            <TableCell className="text-end">
+              <div>
+                $4,567
+              </div>
+              <div className="text-xs text-foreground-2">
+                1.204  ETH
+              </div>
+            </TableCell>
+          </TableRow >
+
+          <TableRow className="cursor-pointer border-t border-outline transition-colors hover:bg-default">
+            <TableCell className="p-4">
+              <div className="text-end w-64 md:w-auto pr-3">
+                <div className="flex items-center justify-between pr-1 w-[172px]">
+                  <span className="truncate text-sm">
+                    {truncateAddressLg("0xbf0aaf43144eca99503860d8c5ac16e0875184f6")}
+                  </span>
+                  <CopyButton className="text-default-2 flex-shrink-0" value={"0xbf0aaf43144eca99503860d8c5ac16e0875184f6"} variant="outlined" />
+                </div>
+              </div>
+            </TableCell>
+            <TableCell className="text-end">
+              <div>
+                $4,567
+              </div>
+              <div className="text-xs text-foreground-2">
+                1.204  ETH
+              </div>
+            </TableCell>
+          </TableRow >
+
+          <TableRow className="cursor-pointer border-t border-outline transition-colors hover:bg-default">
+            <TableCell className="p-4">
+              <div className="text-end w-64 md:w-auto pr-3">
+                <div className="flex items-center justify-between pr-1 w-[172px]">
+                  <span className="truncate text-sm">
+                    {truncateAddressLg("0xbf0aaf43144eca99503860d8c5ac16e0875184f6")}
+                  </span>
+                  <CopyButton className="text-default-2 flex-shrink-0" value={"0xbf0aaf43144eca99503860d8c5ac16e0875184f6"} variant="outlined" />
+                </div>
+              </div>
+            </TableCell>
+            <TableCell className="text-end">
+              <div>
+                $4,567
+              </div>
+              <div className="text-xs text-foreground-2">
+                1.204  ETH
+              </div>
+            </TableCell>
+          </TableRow >
+        </TableBody>
+      </Table>
+    </div >
   );
 }
