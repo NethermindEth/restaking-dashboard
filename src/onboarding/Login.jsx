@@ -35,8 +35,7 @@ export default function Login() {
         window._paq.push([
           'trackEvent',
           'Login',
-          'User logged in successfully',
-          data.email
+          'User logged in successfully'
         ]);
         navigate('/');
       } else {
@@ -157,6 +156,7 @@ export default function Login() {
 
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
+          data-matomo-id="login-btn"
           fullWidth
           isLoading={state.isLoading}
           type="submit"
