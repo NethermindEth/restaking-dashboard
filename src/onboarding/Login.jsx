@@ -32,6 +32,12 @@ export default function Login() {
       });
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
+        window._paq.push([
+          'trackEvent',
+          'Login',
+          'User logged in successfully',
+          data.email
+        ]);
         navigate('/');
       } else {
         console.error(JSON.stringify(signInAttempt, null, 2));
