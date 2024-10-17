@@ -189,7 +189,7 @@ export default function Rewards() {
   return (
     <div className="flex h-full flex-col gap-4">
 
-      <div div className="mt-3 mb-4 flex w-full flex-col items-end justify-between gap-4 lg:flex-row lg:gap-16" >
+      <div className="mt-3 mb-4 flex w-full flex-col items-end justify-between gap-4 lg:flex-row lg:gap-16" >
         <div className='flex lg:flex-col justify-between items-center lg:items-start w-full'>
           <h1 className="font-display text-3xl font-medium text-foreground-1 mb-1">
             Rewards
@@ -227,14 +227,14 @@ export default function Rewards() {
             Total rewards
           </h3>
 
-          <p>
+          <div>
             {state.isRewardsInfoFetching ?
               <Skeleton
                 classNames={{ base: 'h-4 w-20 rounded-md border-none md:w-28 mt-2' }}
               />
               : <>{Number(state.totalRewards).toFixed(4)} ETH</>}
 
-          </p>
+          </div>
         </div>
 
         <div className='flex flex-col items-center border-x border-x-outline'>
@@ -242,13 +242,13 @@ export default function Rewards() {
             Claimed rewards
           </h3>
 
-          <p>
+          <div>
             {state.isRewardsInfoFetching ?
               <Skeleton
                 classNames={{ base: 'h-4 w-20 rounded-md border-none md:w-28 mt-2' }}
               />
               : <>{Number(state.totalClaimed).toFixed(4)} ETH</>}
-          </p>
+          </div>
         </div>
 
 
@@ -257,13 +257,13 @@ export default function Rewards() {
             Nª of Rewards tokens
           </h3>
 
-          <p>
+          <div>
             {state.isRewardsInfoFetching ?
               <Skeleton
                 classNames={{ base: 'h-4 w-20 rounded-md border-none md:w-28 mt-2' }}
               />
               : <> {state.rewardTokens}</>}
-          </p>
+          </div>
         </div>
 
 
