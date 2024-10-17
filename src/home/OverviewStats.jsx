@@ -122,7 +122,7 @@ export default function OverviewStats({
             )}
         </div>
         {/* //TODO: uncomment this code to see static design of total rewards supplied */}
-        {/* <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
+        <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
           <span className="text-xs text-default-2 md:text-sm ">
             Total Rewards Supplied
           </span>
@@ -138,7 +138,7 @@ export default function OverviewStats({
           </span>
 
 
-        </div> */}
+        </div>
         <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
           <span className="text-xs text-foreground-1 md:text-sm">
             Total AVS
@@ -195,9 +195,9 @@ export default function OverviewStats({
 
 
       {/* //TODO: uncomment this code to see static design of top rewards */}
-      {/* <TopRewards
-        isLoading={false}
-      /> */}
+      <TopRewards
+        isLoading={state.isFetchingOperators}
+      />
     </>
   );
 }
@@ -420,7 +420,7 @@ function TopOperators({ isLoading, operators, rate, error }) {
   );
 }
 
-function TopRewards({ isLoading = false }) {
+function TopRewards({ isLoading }) {
   const columns = [
     {
       key: 'top_rewarded_earners',

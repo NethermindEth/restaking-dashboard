@@ -24,6 +24,21 @@ export default class RewardService extends BaseService {
     throw await this._createError(response);
   }
 
+  async getOperatorAllRewards(address, all, signal) {
+
+    const response = await this._get(`eigenlayer/rewards/earner/${address}`, {
+      query: {
+        all
+      },
+      signal
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+
+    throw await this._createError(response);
+  }
+
   async getRewardsInfo(signal) {
     const response = await this._get(`eigenlayer/rewards/info`,
       signal

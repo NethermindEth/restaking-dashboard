@@ -37,62 +37,6 @@ const columns = [
   }
 ];
 
-const reward_sub_data = [
-  {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  },
-
-  {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  },
-  {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  }, {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  }, {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  }, {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  }, {
-    logoUrl: "/images/stakeETHLogo.png",
-    name: "StakeWise Staked Ether",
-    symbol: "osETH",
-    totalAmount: "1,234.60",
-    valueChange: "+ $ 0,45"
-  },
-]
-
-
-const tooltipDateFormatter = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium'
-});
-
-// const subtable_data = []
-
 export default function OperatorRewards({ address, ethRate }) {
   const { rewardService } = useServices();
   const [searchParams, setSearchParams] = useSearchParams();

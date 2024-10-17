@@ -14,7 +14,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState, truncateAddressLg } from '../shared/helpers';
-import { DistributedRewardBarChart } from '../home/charts/DistributedRewardPieChart';
+import { DistributedRewardBarChart } from '../home/charts/DistributedRewardBarChart';
 import ListPagination from '../shared/ListPagination';
 import CopyButton from '../shared/CopyButton';
 import { Accordion, AccordionItem } from "@nextui-org/react";
@@ -90,7 +90,7 @@ export default function Rewards() {
   const columns = [
     {
       key: 'earner',
-      label: 'address',
+      label: 'Address',
       className: 'w-64 md:w-1/5 ps-4'
     },
     {

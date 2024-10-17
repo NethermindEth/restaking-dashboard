@@ -6,8 +6,8 @@ export default function ListPagination({ onChange, page, total, showControls }) 
     <div className="flex items-center justify-center border-t border-outline p-4">
       <Pagination
         classNames={{
-          cursor: 'text-foreground-1',
-          item: styles,
+          cursor: 'text-foreground-1 w-auto px-3',
+          item: `${styles} w-auto px-3`,
           next: styles,
           prev: styles
         }}
