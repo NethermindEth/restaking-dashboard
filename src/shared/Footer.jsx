@@ -21,6 +21,7 @@ export default function Footer() {
               <Link
                 className="text-xs text-foreground-2"
                 href={item.href}
+                id={item.id}
                 onPress={() =>
                   item.matomoEventData &&
                   window._paq.push(['trackEvent', ...item.matomoEventData])
@@ -41,6 +42,7 @@ export default function Footer() {
               <Link
                 className={`${item.className} text-xs text-foreground-2`}
                 href={item.href}
+                id={item.id}
                 onPress={() =>
                   item.matomoEventData &&
                   window._paq.push(['trackEvent', ...item.matomoEventData])
@@ -69,6 +71,7 @@ export default function Footer() {
 
 const mainLinks = [
   {
+    id: 'audit-smart-contract',
     title: 'Audit smart contract',
     href: 'https://www.nethermind.io/smart-contract-audits',
     matomoEventData: [
@@ -78,6 +81,7 @@ const mainLinks = [
     ]
   },
   {
+    id: 'nethermind-operator',
     title: 'Nethermind operator',
     href: 'https://app.eigenlayer.xyz/operator/0x110af279aaffb0d182697d7fc87653838aa5945e',
     matomoEventData: [
@@ -87,10 +91,12 @@ const mainLinks = [
     ]
   },
   {
+    id: 'legal',
     title: 'Legal',
     href: '/terms-and-conditions'
   },
   {
+    id: 'api-docs',
     title: 'API Docs',
     href: `${import.meta.env.VITE_API_BASE_URL}/swagger`,
     matomoEventData: [
@@ -103,12 +109,14 @@ const mainLinks = [
 
 const socialLinks = [
   {
+    id: 'social-x',
     title: 'Follow us',
     className: 'footer-x',
     href: 'https://x.com/NethermindEth',
     matomoEventData: ['Social Media', 'X', 'https://x.com/NethermindEth']
   },
   {
+    id: 'social-discord',
     title: 'Join us',
     className: 'footer-discord',
     href: 'https://discord.com/invite/PaCMRFdvWT',

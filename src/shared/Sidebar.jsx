@@ -84,6 +84,7 @@ export default function Sidebar({ onOpenChange }) {
 
           <Button
             className="rounded-md border border-foreground-2"
+            id="support-us-btn"
             onPress={() => {
               window._paq.push([
                 'trackEvent',
@@ -106,6 +107,7 @@ export default function Sidebar({ onOpenChange }) {
             className="hover:!text-content1"
             color="primary"
             fullWidth
+            id="signin-nav-btn"
             onClick={() => {
               window._paq.push([
                 'trackEvent',

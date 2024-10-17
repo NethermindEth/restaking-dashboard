@@ -157,6 +157,7 @@ export default function Login() {
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
           fullWidth
+          id="login-btn"
           isLoading={state.isLoading}
           type="submit"
           variant="bordered"
