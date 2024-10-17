@@ -20,8 +20,8 @@ export default function Footer() {
             <li className="flex h-6 items-center" key={`footer-main-${i}`}>
               <Link
                 className="text-xs text-foreground-2"
+                data-matomo-id={item.id}
                 href={item.href}
-                id={item.id}
                 onPress={() =>
                   item.matomoEventData &&
                   window._paq.push(['trackEvent', ...item.matomoEventData])
@@ -41,8 +41,8 @@ export default function Footer() {
             <li className="flex h-6 items-center" key={`footer-social-${i}`}>
               <Link
                 className={`${item.className} text-xs text-foreground-2`}
+                data-matomo-id={item.id}
                 href={item.href}
-                id={item.id}
                 onPress={() =>
                   item.matomoEventData &&
                   window._paq.push(['trackEvent', ...item.matomoEventData])

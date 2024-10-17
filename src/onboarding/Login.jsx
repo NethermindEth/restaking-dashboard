@@ -156,8 +156,8 @@ export default function Login() {
 
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
+          data-matomo-id="login-btn"
           fullWidth
-          id="login-btn"
           isLoading={state.isLoading}
           type="submit"
           variant="bordered"
