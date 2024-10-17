@@ -69,12 +69,7 @@ export default function Register() {
       });
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
-        window._paq.push([
-          'trackEvent',
-          'Sign Up',
-          'New account created',
-          getValues('email')
-        ]);
+        window._paq.push(['trackEvent', 'Sign Up', 'New account created']);
         navigate('/');
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
@@ -274,6 +269,7 @@ export default function Register() {
 
         <Button
           className="rounded-sm border border-secondary text-secondary hover:border-focus hover:text-focus"
+          data-matomo-id="create-acc-btn"
           fullWidth
           isLoading={state.isLoading}
           type="submit"

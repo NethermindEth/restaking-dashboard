@@ -84,6 +84,7 @@ export default function Sidebar({ onOpenChange }) {
 
           <Button
             className="rounded-md border border-foreground-2"
+            data-matomo-id="support-us-btn"
             onPress={() => {
               window._paq.push([
                 'trackEvent',
@@ -105,6 +106,7 @@ export default function Sidebar({ onOpenChange }) {
           <Button
             className="hover:!text-content1"
             color="primary"
+            data-matomo-id="signin-nav-btn"
             fullWidth
             onClick={() => {
               window._paq.push([
