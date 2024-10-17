@@ -84,7 +84,15 @@ export default function Sidebar({ onOpenChange }) {
 
           <Button
             className="rounded-md border border-foreground-2"
-            onPress={() => navigate('/subscriptions')}
+            onPress={() => {
+              window._paq.push([
+                'trackEvent',
+                'Support us',
+                'Support us button clicked',
+                ''
+              ]);
+              navigate('/subscriptions');
+            }}
             variant="bordered"
           >
             Support Us
@@ -98,7 +106,15 @@ export default function Sidebar({ onOpenChange }) {
             className="hover:!text-content1"
             color="primary"
             fullWidth
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              window._paq.push([
+                'trackEvent',
+                'Sign In',
+                'Sign In button clicked',
+                ''
+              ]);
+              navigate('/login');
+            }}
             radius="sm"
             variant="ghost"
           >
