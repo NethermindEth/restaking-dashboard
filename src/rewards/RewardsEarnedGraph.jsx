@@ -1,12 +1,39 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Tab,
   Tabs
 } from '@nextui-org/react';
-import DistributedRewardPieChart from '../home/charts/DistributedRewardPieChart';
+import { DistributedRewardBarChart } from '../home/charts/DistributedRewardPieChart';
+import { useMutativeReducer } from 'use-mutative';
+import {
+  reduceState
+} from '../shared/helpers';
+import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
+import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
 
 
-export const RewardsEarnedGraph = () => {
+export const RewardsEarnedGraph = ({ ethRate, rewardsTotal }) => {
+  const compact = !useTailwindBreakpoint('sm');
+  const [state, dispatch] = useMutativeReducer(reduceState, {
+    error: undefined,
+    isChartLoading: true,
+    points: undefined,
+    useRate: true
+  });
+
+  const handleRateSelectionChange = useCallback(
+    key => {
+      dispatch({ useRate: key === 'usd' });
+    },
+    [dispatch]
+  );
+
+  const getLatestTotals = useMemo(() => {
+    return state.useRate
+      ? formatUSD(ethRate * rewardsTotal, compact)
+      : `${Number(rewardsTotal).toFixed(4)} ETH`;
+  }, [compact, ethRate, rewardsTotal, state.useRate]);
+
   return (
     <div className='border rd-box border-outline px-4 pt-4 pb-6 text-default-700 rounded-lg mb-4'>
       <div className='flex items-center justify-between flex-wrap'>
@@ -24,7 +51,7 @@ export const RewardsEarnedGraph = () => {
           </div>
 
           <p className='text-default-2'>
-            1,479,349 ETH
+            {getLatestTotals}
           </p>
 
         </div>
@@ -40,13 +67,10 @@ export const RewardsEarnedGraph = () => {
             }}
             radius="sm"
             size="lg"
+            onSelectionChange={handleRateSelectionChange}
           >
-            <Tab key="ETH" title="ETH">
-              ETH content
-            </Tab>
-            <Tab key="USD" title="USD">
-              USD
-            </Tab>
+            <Tab key="eth" title="ETH" />
+            <Tab key="usd" title="USD" />
           </Tabs>
         </div>
 
@@ -63,27 +87,17 @@ export const RewardsEarnedGraph = () => {
             radius="sm"
             size="lg"
           >
-            <Tab key="1D" title="1D">
-              1d content
-            </Tab>
-            <Tab key="7D" title="7D">
-              7d content
-            </Tab>
+            <Tab key="7D" title="7D" />
             <Tab key="1m" title="1m">
-              1m content
             </Tab>
-
             <Tab key="3m" title="3m">
-              3m content
             </Tab>
-
             <Tab key="All" title="All">
-              all content
             </Tab>
           </Tabs>
         </div>
       </div>
-      <DistributedRewardPieChart />
+      <DistributedRewardBarChart />
 
       <div className='text-default-700 text-xs flex items-center justify-between mt-2'>
         <div className='flex items-center gap-1 '>
@@ -101,8 +115,6 @@ export const RewardsEarnedGraph = () => {
           <div className='w-2 h-2 bg-[#481878] rounded-full'></div>
           <p>EIGEN Token 10,334,122 ETH</p>
         </div>
-
-
       </div>
     </div>
   )

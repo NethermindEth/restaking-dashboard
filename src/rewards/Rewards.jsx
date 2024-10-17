@@ -14,7 +14,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { useMutativeReducer } from 'use-mutative';
 import { reduceState, truncateAddressLg } from '../shared/helpers';
-import DistributedRewardPieChart from '../home/charts/DistributedRewardPieChart';
+import { DistributedRewardBarChart } from '../home/charts/DistributedRewardPieChart';
 import ListPagination from '../shared/ListPagination';
 import CopyButton from '../shared/CopyButton';
 import { Accordion, AccordionItem } from "@nextui-org/react";
@@ -321,7 +321,7 @@ export default function Rewards() {
             </Tabs>
           </div>
         </div>
-        <DistributedRewardPieChart />
+        <DistributedRewardBarChart />
 
         <div className='text-default-700 text-xs flex items-center justify-between mt-2'>
           <div className='flex items-center gap-1 '>

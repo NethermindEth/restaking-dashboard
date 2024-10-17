@@ -160,7 +160,7 @@ const colorScale = scaleOrdinal({
   range: [purple1, purple2, purple3],
 });
 
-export default function DistributedRewardChart() {
+export function DistributedRewardBarChart() {
   const [width, setWidth] = useState(0);
   const containerRef = useRef(null);
   const { tooltipOpen, tooltipLeft, tooltipTop, tooltipData, hideTooltip, showTooltip } =
@@ -239,8 +239,8 @@ export default function DistributedRewardChart() {
                       const eventSvgCoords = localPoint(event);
                       showTooltip({
                         tooltipData: bar,
-                        tooltipTop: eventSvgCoords?.y*2,
-                        tooltipLeft: eventSvgCoords?.x*1.2,
+                        tooltipTop: eventSvgCoords?.y * 2,
+                        tooltipLeft: eventSvgCoords?.x * 1.2,
                       });
                     }}
                   />

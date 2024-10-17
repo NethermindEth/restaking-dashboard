@@ -382,14 +382,8 @@ export default function OperatorDetails() {
             </div>
           }
         >
-
-          <RewardsEarnedGraph />
-          {/* <OperatorTVLLineChart
-            currentTVL={state.tvl}
-            ethRate={state.ethRate}
-            isOperatorLoading={state.isOperatorLoading}
-            operatorError={state.error}
-          /> */}
+          <RewardsEarnedGraph ethRate={state.ethRate} rewardsTotal={state.rewardsInfo.rewardsTotal} isOperatorLoading={state.isOperatorLoading}
+            operatorError={state.error} />
           <RewardTotalValue
             claimedTotal={state.rewardsInfo.claimedTotal}
             error={state.error}
