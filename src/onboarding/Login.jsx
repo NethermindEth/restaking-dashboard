@@ -35,8 +35,7 @@ export default function Login() {
         window._paq.push([
           'trackEvent',
           'Login',
-          'User logged in successfully',
-          data.email
+          'User logged in successfully'
         ]);
         navigate('/');
       } else {

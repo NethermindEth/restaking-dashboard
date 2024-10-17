@@ -69,12 +69,7 @@ export default function Register() {
       });
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
-        window._paq.push([
-          'trackEvent',
-          'Sign Up',
-          'New account created',
-          getValues('email')
-        ]);
+        window._paq.push(['trackEvent', 'Sign Up', 'New account created']);
         navigate('/');
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
