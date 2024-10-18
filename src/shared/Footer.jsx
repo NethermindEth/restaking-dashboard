@@ -112,8 +112,8 @@ const socialLinks = [
     id: 'social-x',
     title: 'Follow us',
     className: 'footer-x',
-    href: 'https://x.com/NethermindEth',
-    matomoEventData: ['Social Media', 'X', 'https://x.com/NethermindEth']
+    href: 'https://x.com/restakinginfo',
+    matomoEventData: ['Social Media', 'X', 'https://x.com/restakinginfo']
   },
   {
     id: 'social-discord',
