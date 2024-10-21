@@ -28,14 +28,16 @@ export default function OverviewStats({
   const compact = !useTailwindBreakpoint('md');
   const [state, dispatch] = useMutativeReducer(reduceState, {
     operators: [],
-    avs: [],
+    avsByTvl: [],
+    avsByRewards: [],
     isFetchingOperators: false,
     isFetchingAVS: false,
     operatorError: null,
     avsError: null,
     rate: 1,
     totalOperators: 0,
-    totalAVS: 0
+    totalAVS: 0,
+    rewardsTotal: 0
   });
 
   const calculateEigenLayerTVL = () =>
@@ -47,13 +49,14 @@ export default function OverviewStats({
       try {
         dispatch({ isFetchingOperators: true, operatorError: null });
 
-        const response = await operatorService.getAll(1, 3, null, '-tvl');
+        const response = await operatorService.getAll(1, 3, null, '-tvl', true);
 
         dispatch({
           operators: response.results,
           isFetchingOperators: false,
           rate: response.rate,
-          totalOperators: response.totalCount
+          totalOperators: response.totalCount,
+          rewardsTotal: response.rewardsTotal
         });
       } catch (e) {
         dispatch({
@@ -67,13 +70,15 @@ export default function OverviewStats({
       try {
         dispatch({ isFetchingAVS: true, avsError: null });
 
-        const response = await avsService.getAll(1, 3, null, '-tvl');
+        const [avsByTvl, avsByRewards] = await Promise.all([avsService.getAll(1, 3, null, '-tvl'), avsService.getAll(1, 3, null, '-distributed_rewards')]);
+
 
         dispatch({
-          avs: response.results,
+          avsByTvl: avsByTvl.results,
+          avsByRewards: avsByRewards.results,
           isFetchingAVS: false,
-          rate: response.rate,
-          totalAVS: response.totalCount
+          rate: avsByTvl.rate,
+          totalAVS: avsByTvl.totalCount
         });
       } catch (e) {
         dispatch({
@@ -126,16 +131,26 @@ export default function OverviewStats({
           <span className="text-xs text-default-2 md:text-sm ">
             Total Rewards Supplied
           </span>
+          {state.isFetchingOperators && (
+            <Skeleton
+              classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
+            />
+          )}
+          {
+            !state.isFetchingOperators && (
+              <>
+                <span className="text-center">
+                  <span className="font-display text-lg md:text-2xl ">
+                    {formatUSD(state.rewardsTotal * state.rate, compact)}
+                  </span>
+                </span>
 
-          <span className="text-center">
-            <span className="font-display text-lg md:text-2xl ">
-              $ 1,479,349
-            </span>
-          </span>
-
-          <span className="text-sm text-success">
-            ETH 3,120,070,554
-          </span>
+                <span className="text-sm text-success">
+                  {formatETH(state.rewardsTotal, compact)}
+                </span>
+              </>
+            )
+          }
 
 
         </div>
@@ -153,7 +168,7 @@ export default function OverviewStats({
             <ErrorMessage message="Failed loading Total AVS" />
           )}
 
-          {!state.isFetchingAVS && state.avs.length > 0 && (
+          {!state.isFetchingAVS && state.avsByTvl.length > 0 && (
             <span className="font-display text-lg md:text-2xl">
               {formatNumber(state.totalAVS)}
             </span>
@@ -181,7 +196,7 @@ export default function OverviewStats({
         </div>
       </div>
       <TopAVS
-        avs={state.avs}
+        avs={state.avsByTvl}
         error={state.avsError}
         isLoading={state.isFetchingAVS}
         rate={state.rate}
@@ -193,10 +208,11 @@ export default function OverviewStats({
         rate={state.rate}
       />
 
-
-      {/* //TODO: uncomment this code to see static design of top rewards */}
       <TopRewards
         isLoading={state.isFetchingOperators}
+        avs={state.avsByRewards}
+        error={state.avsError}
+        rate={state.rate}
       />
     </>
   );
@@ -420,11 +436,13 @@ function TopOperators({ isLoading, operators, rate, error }) {
   );
 }
 
-function TopRewards({ isLoading }) {
+function TopRewards({ isLoading, avs, rate, error }) {
+  const compact = !useTailwindBreakpoint('sm');
+
   const columns = [
     {
-      key: 'top_rewarded_earners',
-      label: 'Top rewarded earners',
+      key: 'top_reward_distributor',
+      label: 'Top Reward Distributor',
       className: 'w-44 md:w-1/2 ps-4'
     },
 
@@ -435,7 +453,7 @@ function TopRewards({ isLoading }) {
     }
   ];
 
-  if (false) {
+  if (error) {
     return (
       <div className="rd-box flex min-h-44 max-w-full basis-full items-center justify-center lg:grow lg:basis-0">
         <ErrorMessage error={error} />
@@ -469,69 +487,45 @@ function TopRewards({ isLoading }) {
           )}
         </TableHeader>
         <TableBody>
-
-          <TableRow className="cursor-pointer border-t border-outline transition-colors hover:bg-default">
-            <TableCell className="p-4">
-              <div className="text-end w-64 md:w-auto pr-3">
-                <div className="flex items-center justify-between pr-1 w-[172px]">
-                  <span className="truncate text-sm">
-                    {truncateAddressLg("0xbf0aaf43144eca99503860d8c5ac16e0875184f6")}
-                  </span>
-                  <CopyButton className="text-default-2 flex-shrink-0" value={"0xbf0aaf43144eca99503860d8c5ac16e0875184f6"} variant="outlined" />
-                </div>
-              </div>
-            </TableCell>
-            <TableCell className="text-end">
-              <div>
-                $4,567
-              </div>
-              <div className="text-xs text-foreground-2">
-                1.204  ETH
-              </div>
-            </TableCell>
-          </TableRow >
-
-          <TableRow className="cursor-pointer border-t border-outline transition-colors hover:bg-default">
-            <TableCell className="p-4">
-              <div className="text-end w-64 md:w-auto pr-3">
-                <div className="flex items-center justify-between pr-1 w-[172px]">
-                  <span className="truncate text-sm">
-                    {truncateAddressLg("0xbf0aaf43144eca99503860d8c5ac16e0875184f6")}
-                  </span>
-                  <CopyButton className="text-default-2 flex-shrink-0" value={"0xbf0aaf43144eca99503860d8c5ac16e0875184f6"} variant="outlined" />
-                </div>
-              </div>
-            </TableCell>
-            <TableCell className="text-end">
-              <div>
-                $4,567
-              </div>
-              <div className="text-xs text-foreground-2">
-                1.204  ETH
-              </div>
-            </TableCell>
-          </TableRow >
-
-          <TableRow className="cursor-pointer border-t border-outline transition-colors hover:bg-default">
-            <TableCell className="p-4">
-              <div className="text-end w-64 md:w-auto pr-3">
-                <div className="flex items-center justify-between pr-1 w-[172px]">
-                  <span className="truncate text-sm">
-                    {truncateAddressLg("0xbf0aaf43144eca99503860d8c5ac16e0875184f6")}
-                  </span>
-                  <CopyButton className="text-default-2 flex-shrink-0" value={"0xbf0aaf43144eca99503860d8c5ac16e0875184f6"} variant="outlined" />
-                </div>
-              </div>
-            </TableCell>
-            <TableCell className="text-end">
-              <div>
-                $4,567
-              </div>
-              <div className="text-xs text-foreground-2">
-                1.204  ETH
-              </div>
-            </TableCell>
-          </TableRow >
+          {isLoading
+            ? [...Array(3)].map((_, i) => (
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-2/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-1/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+              </TableRow>
+            ))
+            : avs?.map((item, i) => (
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={`operator-item-${i}`}
+                onClick={() =>
+                  navigate(`/avs/${item.address}`, {
+                    state: { item }
+                  })
+                }
+              >
+                <TableCell className="p-4">
+                  <div className="text-end w-64 md:w-auto pr-3">
+                    <div className="flex items-center justify-between pr-1 w-[172px]">
+                      <span className="truncate text-sm">
+                        {truncateAddressLg(item.address)}
+                      </span>
+                      <CopyButton className="text-default-2 flex-shrink-0" value={item.address} variant="outlined" />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="text-end">
+                  <div>{formatUSD(item.rewardsTotal * rate, compact)}</div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(item.rewardsTotal, compact)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div >

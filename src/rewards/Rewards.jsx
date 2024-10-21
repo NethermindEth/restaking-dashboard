@@ -24,6 +24,31 @@ import { useServices } from '../@services/ServiceContext';
 import { handleServiceError } from '../shared/helpers';
 import { formatUSD } from '../shared/formatters';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
+import useDebouncedSearch from '../shared/hooks/useDebouncedSearch';
+
+
+const columns = [
+  {
+    key: 'earner',
+    label: 'Address',
+    className: 'w-64 md:w-1/5 ps-4'
+  },
+  {
+    key: 'total',
+    label: 'Rewards Value',
+    className: 'text-end w-36 md:w-1/5'
+  },
+  {
+    key: 'address_type',
+    label: 'Address type',
+    className: 'text-end w-36 md:w-1/5'
+  },
+  {
+    key: 'unclaimed',
+    label: 'Unclaimed',
+    className: 'text-end w-40 md:w-1/5'
+  }
+];
 
 export default function Rewards() {
   const compact = !useTailwindBreakpoint('md');
@@ -56,6 +81,8 @@ export default function Rewards() {
       : { column: 'total', direction: 'descending' }
   });
 
+  const debouncedSearchTerm = useDebouncedSearch(state.searchTerm ?? '', 300);
+
   useEffect(() => {
     dispatch({ isRewardsInfoFetching: true, error: null });
 
@@ -87,29 +114,6 @@ export default function Rewards() {
     })
   }, [])
 
-  const columns = [
-    {
-      key: 'earner',
-      label: 'Address',
-      className: 'w-64 md:w-1/5 ps-4'
-    },
-    {
-      key: 'total',
-      label: 'Rewards Value',
-      className: 'text-end w-36 md:w-1/5'
-    },
-    {
-      key: 'address_type',
-      label: 'Address type',
-      className: 'text-end w-36 md:w-1/5'
-    },
-    {
-      key: 'unclaimed',
-      label: 'Unclaimed',
-      className: 'text-end w-40 md:w-1/5'
-    }
-  ];
-
   const fetchRewards = useCallback(
     async (pageNumber, pageSize, search, sort, filter) => {
       try {
@@ -128,7 +132,7 @@ export default function Rewards() {
           filter,
           abortController.current.signal
         );
-        console.log('all rewards response', response);
+
         dispatch({
           rewards: response.results,
           isFetchingData: false,
@@ -149,23 +153,29 @@ export default function Rewards() {
     [rewardService, dispatch]
   );
 
+  const handleSearch = e => {
+    dispatch({ searchTerm: e.target.value });
+  };
+
+
   useEffect(() => {
     const page = searchParams.get('page') ?? 1;
     const params = {};
 
     params.page = state.searchTriggered ? 1 : page; // If user has searched something update the page number to 1
+    if (debouncedSearchTerm) params.search = debouncedSearchTerm;
 
-    console.log("params", params)
     if (state.sortDescriptor) {
       params.sort =
         state.sortDescriptor.direction === 'ascending'
           ? state.sortDescriptor.column
           : `-${state.sortDescriptor.column}`;
     }
-    console.log("sort param", params.sort, state.sortDescriptor)
+    setSearchParams(params, { replace: true });
     fetchRewards(params.page, 10, state.searchTerm, params.sort, state.filter);
     dispatch({ searchTriggered: false });
   }, [
+    debouncedSearchTerm,
     dispatch,
     fetchRewards,
     searchParams,
@@ -212,7 +222,7 @@ export default function Rewards() {
               search
             </span>
           }
-          onChange={(e) => { dispatch({ searchTerm: e.target.value.toLowerCase() }) }}
+          onChange={handleSearch}
           placeholder="Search by address"
           radius="sm"
           type="text"
