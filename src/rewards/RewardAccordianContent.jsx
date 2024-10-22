@@ -7,6 +7,7 @@ import {
   TableRow
 } from '@nextui-org/react';
 
+
 export const RewardAccordianContent = ({ reward, ethRate }) => {
   return (
     <div>
@@ -14,14 +15,12 @@ export const RewardAccordianContent = ({ reward, ethRate }) => {
         aria-label="Rewards sub list text-foreground-2"
         removeWrapper
       >
-
         <TableHeader className='py-4'>
           <TableColumn
             className={`bg-transparent border-t border-outline text-sm my-2 font-normal leading-5 text-foreground-2 transition-colors data-[hover=true]:text-foreground-2`}
           >
             Asset
           </TableColumn>
-
           <TableColumn
             className={`bg-transparent text-center border-t border-outline text-sm my-2 font-normal leading-5 text-foreground-2 transition-colors data-[hover=true]:text-foreground-2`}
           >
@@ -36,7 +35,6 @@ export const RewardAccordianContent = ({ reward, ethRate }) => {
             Value
           </TableColumn>
         </TableHeader>
-
         <TableBody>
           {reward.tokens.map((token, i) => {
             return (
@@ -54,7 +52,6 @@ export const RewardAccordianContent = ({ reward, ethRate }) => {
                         )
                       }
                     </div>
-
                     <p>
                       <span className='mr-2'>
                         {token.name}
@@ -71,19 +68,7 @@ export const RewardAccordianContent = ({ reward, ethRate }) => {
             )
           })
           }
-
-          //TODO: uncomment below code when make view more
-          {/* <TableRow className="border-t border-outline text-foreground-2" key={`reward ${i}`}>
-              <TableCell className='hidden'></TableCell>
-              <TableCell className='hidden'></TableCell>
-              <TableCell align='right' colSpan={3}>
-                <div className="w-full flex items-center justify-end">
-                  <button>View More</button>
-                </div>
-              </TableCell>
-           </TableRow> */}
         </TableBody>
-
       </Table>
     </div>
   )

@@ -1,8 +1,8 @@
-import { formatEther, getBigInt } from 'ethers';
+import { Skeleton } from '@nextui-org/react';
 import ErrorMessage from '../shared/ErrorMessage';
 import { formatUSD } from '../shared/formatters';
-import { Skeleton } from '@nextui-org/react';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
+
 
 export default function RewardTotalValue({
   rewardsTotal,

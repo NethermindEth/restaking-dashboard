@@ -1,4 +1,4 @@
-import { formatETH, formatNumber, formatUSD } from '../shared/formatters';
+import { formatUSD } from '../shared/formatters';
 import { handleServiceError, reduceState } from '../shared/helpers';
 import {
   Skeleton,
@@ -9,11 +9,10 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ErrorMessage from '../shared/ErrorMessage';
 import ListPagination from '../shared/ListPagination';
-// import ThirdPartyLogo from '../shared/ThirdPartyLogo';
 import { useMutativeReducer } from 'use-mutative';
 import { useServices } from '../@services/ServiceContext';
 import { formatDate } from './helpers';
@@ -62,7 +61,6 @@ export default function OperatorRewards({ address, ethRate }) {
     async (pageNumber, sort) => {
       try {
         dispatch({ isFetchingData: true, error: null });
-
         if (abortController.current) {
           abortController.current.abort();
         }
@@ -75,7 +73,7 @@ export default function OperatorRewards({ address, ethRate }) {
           sort,
           abortController.current.signal
         );
-        console.log('response', response);
+
         dispatch({
           rewards: response.results,
           isFetchingData: false,
@@ -136,7 +134,6 @@ export default function OperatorRewards({ address, ethRate }) {
           <ErrorMessage error={state.error} />
         </div>
       )}
-
       {!state.error && (
         <div className="rd-box flex flex-1 flex-col text-sm p-4">
           <div className="w-full py-3">
@@ -196,28 +193,27 @@ export default function OperatorRewards({ address, ethRate }) {
                                 play_arrow
                               </span>
                             )}
-
                           className='py-0 data-[open=true]:bg-[#191C2C]'
-                          title={<div className='grid grid-cols-12 items-center relative'>
-                            <div className="col-span-8 ps-4 pr-3">
-                              <div>{formatUSD(reward.rewardsTotal * ethRate, compact)}</div>
-                              <div className="text-xs text-foreground-2">
-                                {`${Number(reward.rewardsTotal).toFixed(5)} ETH`}
+                          title={
+                            <div className='grid grid-cols-12 items-center relative'>
+                              <div className="col-span-8 ps-4 pr-3">
+                                <div>{formatUSD(reward.rewardsTotal * ethRate, compact)}</div>
+                                <div className="text-xs text-foreground-2">
+                                  {`${Number(reward.rewardsTotal).toFixed(5)} ETH`}
+                                </div>
+                              </div>
+                              <div className='text-sm col-span-4 px-3'>
+                                {formatDate(reward.timestamp)}
                               </div>
                             </div>
-                            <div className='text-sm col-span-4 px-3'>
-                              {formatDate(reward.timestamp)}
-                            </div>
-                          </div>}>
+                          }>
                           <div>
                             <RewardVisualizer reward={reward} />
                             <RewardAccordianContent reward={reward} ethRate={ethRate} />
                           </div>
                         </AccordionItem>
                       </Accordion>
-
                     </TableCell>
-
                     <TableCell className='hidden' />
                   </TableRow>
                 ))}

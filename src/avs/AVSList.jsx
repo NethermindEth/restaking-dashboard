@@ -274,7 +274,7 @@ export default function AVSList() {
                     <TableCell className="pe-8 text-end">
                       <div>{formatUSD(avs.rewardsTotal * state.rate)}</div>
                       <div className="text-xs text-foreground-2">
-                        {formatETH(avs.rewardsTotal)}
+                        {`${avs.rewardsTotal === 0 ? 0 : Number(avs.rewardsTotal).toFixed(2)} ETH`}
                       </div>
                     </TableCell>
 

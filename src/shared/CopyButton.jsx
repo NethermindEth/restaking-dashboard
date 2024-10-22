@@ -44,6 +44,6 @@ export default function CopyButton({ className, color, value, variant }) {
       >
         {copied ? 'check' : 'content_copy'}
       </span>
-    </Button >
+    </Button>
   );
 }

@@ -56,19 +56,16 @@ export default function Rewards() {
   const { rewardService } = useServices();
   const abortController = useRef(null);
   const [state, dispatch] = useMutativeReducer(reduceState, {
-    ethRate: undefined,
+    ethRate: 1,
     rewards: [],
     totalRewards: 0,
     totalClaimed: 0,
     rewardTokens: 0,
     operators: [],
-    promotedOperators: [],
-    promotedOperatorsRate: 1,
     isFetchingData: false,
     isRewardsInfoFetching: false,
     searchTerm: searchParams.get('search'),
     error: null,
-    rate: 1,
     searchTriggered: false,
     filter: "all",
     sortDescriptor: searchParams.get('sort')
@@ -85,7 +82,6 @@ export default function Rewards() {
 
   useEffect(() => {
     dispatch({ isRewardsInfoFetching: true, error: null });
-
     if (abortController.current) {
       abortController.current.abort();
     }
@@ -136,7 +132,6 @@ export default function Rewards() {
         dispatch({
           rewards: response.results,
           isFetchingData: false,
-          rate: response.rate,
           totalPages: Math.ceil(response.totalCount / 10)
         });
 
@@ -198,7 +193,6 @@ export default function Rewards() {
 
   return (
     <div className="flex h-full flex-col gap-4">
-
       <div className="mt-3 mb-4 flex w-full flex-col items-end justify-between gap-4 lg:flex-row lg:gap-16" >
         <div className='flex lg:flex-col justify-between items-center lg:items-start w-full'>
           <h1 className="font-display text-3xl font-medium text-foreground-1 mb-1">
@@ -236,14 +230,12 @@ export default function Rewards() {
           <h3 className='text-default-2 text-sm '>
             Total rewards
           </h3>
-
           <div>
             {state.isRewardsInfoFetching ?
               <Skeleton
                 classNames={{ base: 'h-4 w-20 rounded-md border-none md:w-28 mt-2' }}
               />
               : <>{Number(state.totalRewards).toFixed(4)} ETH</>}
-
           </div>
         </div>
 
@@ -251,13 +243,12 @@ export default function Rewards() {
           <h3 className='text-default-2 text-sm'>
             Claimed rewards
           </h3>
-
           <div>
             {state.isRewardsInfoFetching ?
               <Skeleton
                 classNames={{ base: 'h-4 w-20 rounded-md border-none md:w-28 mt-2' }}
               />
-              : <>{Number(state.totalClaimed).toFixed(4)} ETH</>}
+              : <span>{Number(state.totalClaimed).toFixed(4)} ETH</span>}
           </div>
         </div>
 
@@ -272,11 +263,9 @@ export default function Rewards() {
               <Skeleton
                 classNames={{ base: 'h-4 w-20 rounded-md border-none md:w-28 mt-2' }}
               />
-              : <> {state.rewardTokens}</>}
+              : <span> {state.rewardTokens}</span>}
           </div>
         </div>
-
-
       </div>
       <div className='border border-outline px-4 pt-4 pb-6 text-default-700 rounded-lg'>
         <div className='flex items-center justify-between flex-wrap'>
@@ -285,7 +274,6 @@ export default function Rewards() {
               <h2 className='text-default-700'>
                 Distributed reward by token
               </h2>
-
               <span className="material-symbols-outlined text-xs" style={{
                 fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
               }}>
@@ -294,6 +282,7 @@ export default function Rewards() {
             </div>
 
             <p className='text-default-2'>
+              {/**Replace this with original value */}
               1,479,349 ETH
             </p>
 
@@ -324,7 +313,6 @@ export default function Rewards() {
               <Tab key="3m" title="3m">
                 3m content
               </Tab>
-
               <Tab key="All" title="All">
                 all content
               </Tab>
@@ -423,7 +411,6 @@ export default function Rewards() {
               </div>
             }
           >
-
             {
               state.isFetchingData ?
                 [...Array(10)].map((_, i) => (
@@ -448,7 +435,6 @@ export default function Rewards() {
                       key={`reward-leaderboard ${i}`}
                       className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
                     >
-
                       <TableCell colSpan={5} className="p-0">
                         <Accordion itemClasses={{ trigger: "py-2 block" }} className='data-[open=true]:bg-white px-0'>
                           <AccordionItem key="1" aria-label="Accordion 1"
@@ -458,7 +444,6 @@ export default function Rewards() {
                                   play_arrow
                                 </span>
                               )}
-
                             title={
                               <div className='grid grid-cols-5 px-4'>
                                 <div className="text-end w-64 md:w-auto pr-3">
@@ -469,7 +454,6 @@ export default function Rewards() {
                                     <CopyButton className="text-default-2 flex-shrink-0" value={reward.earner} variant="outlined" />
                                   </div>
                                 </div>
-
                                 <div className='text-end w-36 md:w-auto px-3 text-sm'>
                                   <p className="mb-1">
                                     {formatUSD(reward.rewardsTotal * state.ethRate, compact)}
@@ -478,41 +462,18 @@ export default function Rewards() {
                                     {reward.rewardsTotal.toFixed(3)} ETH
                                   </p>
                                 </div>
-
                                 <div className='flex justify-end w-36 md:w-auto items-center px-3 text-sm'>
                                   {
                                     reward.isOperator ? <div className='bg-default-2 w-fit rounded p-1 text-content1 ms-2 text-xs'>Operator</div> : "Restaker"
                                   }
-
                                 </div>
-
                                 <div className="px-3 w-40 md:w-auto text-end text-sm flex items-center justify-end">
-                                  {/* <div className="flex items-center justify-end gap-6">
-                                  <p>
-                                    {reward.tokens[0].tokenName} + {reward.tokens.length}
-                                  </p>
-      
-                                  <div className='flex items-center'>
-                                    {reward.tokens.map(token => {
-                                      return (
-                                        <div className='w-4 h-4 rounded-full border border-outline -ml-2'>
-                                          <img src={token.tokenImgUrl} alt="token" className='w-full h-full rounded-full object-cover' />
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-      
-                                <div className='pe-8 text-end'>
-                                  {reward.unclaimed}
-                                </div> */}
                                   <p>
                                     {formatUSD((reward.rewardsTotal - reward.claimedTotal) * state.ethRate)}
                                   </p>
                                 </div>
                               </div>
                             }
-
                             className='py-0 data-[open=true]:bg-[#191C2C]' >
                             <div>
                               <RewardVisualizer reward={reward} />
@@ -520,10 +481,7 @@ export default function Rewards() {
                             </div>
                           </AccordionItem>
                         </Accordion>
-
-
                       </TableCell>
-
                       <TableCell className='hidden'></TableCell>
                       <TableCell className='hidden'></TableCell>
                       <TableCell className='hidden'></TableCell>
@@ -531,17 +489,14 @@ export default function Rewards() {
                   )
                 })
             }
-
           </TableBody>
         </Table>
-        {/* {state.totalPages > 1 && ( */}
         <div className='w-full relative'>
           <button className='absolute text-[#52525B] hover:bg-default rounded-full w-8 h-8 flex items-center justify-end top-1/2 -translate-y-1/2 left-4' disabled={currentPage === 1} onClick={() => { handlePageClick(currentPage - 1) }}>
             <span className="material-symbols-outlined">
               arrow_back_ios
             </span>
           </button>
-
           <ListPagination
             onChange={handlePageClick}
             page={parseInt(searchParams.get('page') || '1')}
@@ -553,9 +508,7 @@ export default function Rewards() {
               arrow_forward_ios
             </span>
           </button>
-
         </div>
-        {/* )} */}
       </div>
     </div >
   );
