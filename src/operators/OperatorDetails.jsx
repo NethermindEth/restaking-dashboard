@@ -385,7 +385,6 @@ export default function OperatorDetails() {
           <RewardsEarnedGraph
             ethRate={state.ethRate}
             address={address}
-            rewardsTotal={state.rewardsInfo.rewardsTotal}
             isOperatorLoading={state.isOperatorLoading}
             operatorError={state.error}
           />
