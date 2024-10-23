@@ -13,7 +13,7 @@ export const RewardVisualizer = ({ reward = { tokens: [] } }) => {
     <div className='mb-4 px-4'>
       <div className='mb-3'>
         <div className='h-[9px] rounded flex w-full overflow-hidden relative'>
-          <TokenPercentagesLineGraph tokens={reward.tokens} />
+          <TokenPercentagesLineGraph tokens={reward.tokens} totalAmount={totalAmount} />
         </div>
       </div>
       <div className='text-sm flex items-center justify-between'>
@@ -39,7 +39,7 @@ export const RewardVisualizer = ({ reward = { tokens: [] } }) => {
 };
 
 
-const TokenPercentagesLineGraph = ({ tokens }) => (
+const TokenPercentagesLineGraph = ({ tokens, totalAmount }) => (
   <>
     {tokens.map((token, i) => {
       const percentage = ((token.amountETH / totalAmount) * 100).toFixed(2);
