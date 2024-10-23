@@ -42,6 +42,12 @@ export default [
       'react/no-unescaped-entities': 'off',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': 'warn',
+      "rules": {
+        "indent": ["error", 2],
+        "prettier/prettier": ["error", {
+          "tabWidth": 2
+        }]
+      },
       ...reactHooks.configs.recommended.rules
     },
     settings: { react: { version: '18.2' } }

@@ -79,6 +79,7 @@ export default function OperatorList() {
           10,
           search,
           sort,
+          false,
           abortController.current.signal
         );
 

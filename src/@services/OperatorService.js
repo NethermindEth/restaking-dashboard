@@ -5,14 +5,15 @@ export default class OperatorService extends BaseService {
     super(context);
   }
 
-  async getAll(pageNumber, pageSize = 10, search, sort, signal) {
+  async getAll(pageNumber, pageSize = 10, search, sort, showRewardsTotal, signal) {
     const pageIndex = Math.max(0, pageNumber - 1);
     const response = await this._get(`operators`, {
       query: {
         'page-index': pageIndex,
         'page-size': pageSize,
         search,
-        sort
+        sort,
+        showRewardsTotal
       },
       signal
     });

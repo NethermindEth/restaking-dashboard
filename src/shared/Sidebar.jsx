@@ -69,6 +69,7 @@ export default function Sidebar({ onOpenChange }) {
             >
               <span className="material-symbols-outlined">{item.icon}</span>
               {item.title}
+              {item.isNew && <div className='bg-default-2 rounded p-1 text-content1 text-sm ms-2'>New</div>}
             </Link>
           );
         })}
@@ -244,5 +245,11 @@ const navItems = [
     title: 'LST',
     href: '/lst',
     icon: 'bar_chart_4_bars'
+  },
+  {
+    title: 'Rewards',
+    href: '/rewards',
+    icon: 'stars',
+    isNew: true,
   }
 ];

@@ -1,5 +1,5 @@
 import { formatETH, formatUSD } from '../shared/formatters';
-import { handleServiceError, reduceState } from '../shared/helpers';
+import { handleServiceError, reduceState, truncateAddressLg } from '../shared/helpers';
 import {
   Skeleton,
   Table,
@@ -17,6 +17,7 @@ import { useMutativeReducer } from 'use-mutative';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '../@services/ServiceContext';
 import { useTailwindBreakpoint } from '../shared/hooks/useTailwindBreakpoint';
+import CopyButton from '../shared/CopyButton';
 
 export default function OverviewStats({
   isFetchingEigenLayerTVL,
@@ -27,14 +28,16 @@ export default function OverviewStats({
   const compact = !useTailwindBreakpoint('md');
   const [state, dispatch] = useMutativeReducer(reduceState, {
     operators: [],
-    avs: [],
+    avsByTvl: [],
+    avsByRewards: [],
     isFetchingOperators: false,
     isFetchingAVS: false,
     operatorError: null,
     avsError: null,
     rate: 1,
     totalOperators: 0,
-    totalAVS: 0
+    totalAVS: 0,
+    rewardsTotal: 0
   });
 
   const calculateEigenLayerTVL = () =>
@@ -47,13 +50,14 @@ export default function OverviewStats({
       try {
         dispatch({ isFetchingOperators: true, operatorError: null });
 
-        const response = await operatorService.getAll(1, 3, null, '-tvl');
+        const response = await operatorService.getAll(1, 3, null, '-tvl', true);
 
         dispatch({
           operators: response.results,
           isFetchingOperators: false,
           rate: response.rate,
-          totalOperators: response.totalCount
+          totalOperators: response.totalCount,
+          rewardsTotal: response.rewardsTotal
         });
       } catch (e) {
         dispatch({
@@ -67,13 +71,15 @@ export default function OverviewStats({
       try {
         dispatch({ isFetchingAVS: true, avsError: null });
 
-        const response = await avsService.getAll(1, 3, null, '-tvl');
+        const [avsByTvl, avsByRewards] = await Promise.all([avsService.getAll(1, 3, null, '-tvl'), avsService.getAll(1, 3, null, '-distributed_rewards')]);
+
 
         dispatch({
-          avs: response.results,
+          avsByTvl: avsByTvl.results,
+          avsByRewards: avsByRewards.results,
           isFetchingAVS: false,
-          rate: response.rate,
-          totalAVS: response.totalCount
+          rate: avsByTvl.rate,
+          totalAVS: avsByTvl.totalCount
         });
       } catch (e) {
         dispatch({
@@ -91,7 +97,7 @@ export default function OverviewStats({
     <>
       <div className="rd-box flex min-h-28 basis-full flex-row items-center justify-between py-4">
         <div className="flex basis-1/3 flex-col items-center gap-1 px-2">
-          <span className="text-xs text-foreground-1 md:text-sm">
+          <span className="text-xs text-default-2 md:text-sm">
             EigenLayer TVL
           </span>
 
@@ -122,6 +128,33 @@ export default function OverviewStats({
             )}
         </div>
         <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
+          <span className="text-xs text-default-2 md:text-sm ">
+            Total Rewards Supplied
+          </span>
+          {state.isFetchingOperators && (
+            <Skeleton
+              classNames={{ base: 'h-6 w-20 rounded-md border-none md:w-28' }}
+            />
+          )}
+          {
+            !state.isFetchingOperators && (
+              <>
+                <span className="text-center">
+                  <span className="font-display text-lg md:text-2xl ">
+                    {formatUSD(state.rewardsTotal * state.rate, compact)}
+                  </span>
+                </span>
+
+                <span className="text-sm text-success">
+                  {formatETH(state.rewardsTotal, compact)}
+                </span>
+              </>
+            )
+          }
+
+
+        </div>
+        <div className="flex min-h-10 basis-1/3 flex-col items-center gap-1 border-x border-outline px-2">
           <span className="text-xs text-foreground-1 md:text-sm">
             Total AVS
           </span>
@@ -135,7 +168,7 @@ export default function OverviewStats({
             <ErrorMessage message="Failed loading Total AVS" />
           )}
 
-          {!state.isFetchingAVS && state.avs.length > 0 && (
+          {!state.isFetchingAVS && state.avsByTvl.length > 0 && (
             <span className="font-display text-lg md:text-2xl">
               {formatNumber(state.totalAVS)}
             </span>
@@ -163,7 +196,7 @@ export default function OverviewStats({
         </div>
       </div>
       <TopAVS
-        avs={state.avs}
+        avs={state.avsByTvl}
         error={state.avsError}
         isLoading={state.isFetchingAVS}
         rate={state.rate}
@@ -172,6 +205,13 @@ export default function OverviewStats({
         error={state.operatorError}
         isLoading={state.isFetchingOperators}
         operators={state.operators}
+        rate={state.rate}
+      />
+
+      <TopRewards
+        isLoading={state.isFetchingOperators}
+        avs={state.avsByRewards}
+        error={state.avsError}
         rate={state.rate}
       />
     </>
@@ -236,50 +276,50 @@ function TopAVS({ isLoading, avs, rate, error }) {
         <TableBody>
           {isLoading
             ? [...Array(3)].map((_, i) => (
-                <TableRow className="border-t border-outline" key={i}>
-                  <TableCell className="w-2/5 py-6 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-1/5 py-6 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-2/5 py-6 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                </TableRow>
-              ))
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-2/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-1/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-2/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+              </TableRow>
+            ))
             : avs?.map((item, i) => (
-                <TableRow
-                  className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                  key={`operator-item-${i}`}
-                  onClick={() =>
-                    navigate(`/avs/${item.address}`, {
-                      state: { item }
-                    })
-                  }
-                >
-                  <TableCell className="p-4">
-                    <div className="flex items-center gap-x-3">
-                      <ThirdPartyLogo
-                        className="size-8 min-w-8"
-                        url={item.metadata?.logo}
-                      />
-                      <span className="truncate">
-                        {item.metadata?.name || item.address}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {formatNumber(item.operators, compact)}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
-                    <div className="text-xs text-foreground-2">
-                      {formatETH(item.strategiesTotal, compact)}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={`operator-item-${i}`}
+                onClick={() =>
+                  navigate(`/avs/${item.address}`, {
+                    state: { item }
+                  })
+                }
+              >
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={item.metadata?.logo}
+                    />
+                    <span className="truncate">
+                      {item.metadata?.name || item.address}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-end">
+                  {formatNumber(item.operators, compact)}
+                </TableCell>
+                <TableCell className="text-end">
+                  <div>{formatUSD(item.strategiesTotal * rate, compact)}</div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(item.strategiesTotal, compact)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>
@@ -344,54 +384,150 @@ function TopOperators({ isLoading, operators, rate, error }) {
         <TableBody>
           {isLoading
             ? [...Array(3)].map((_, i) => (
-                <TableRow className="border-t border-outline" key={i}>
-                  <TableCell className="w-2/5 py-6 pe-8 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                  <TableCell className="w-2/5 py-6 pe-8 ps-4">
-                    <Skeleton className="h-4 rounded-md bg-default" />
-                  </TableCell>
-                </TableRow>
-              ))
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-2/5 py-6 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-2/5 py-6 pe-8 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+              </TableRow>
+            ))
             : operators?.map((operator, i) => (
-                <TableRow
-                  className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                  key={`operator-item-${i}`}
-                  onClick={() =>
-                    navigate(`/operators/${operator.address}`, {
-                      state: { operator }
-                    })
-                  }
-                >
-                  <TableCell className="p-4">
-                    <div className="flex items-center gap-x-3">
-                      <ThirdPartyLogo
-                        className="size-8 min-w-8"
-                        url={operator.metadata?.logo}
-                      />
-                      <span className="truncate">
-                        {operator.metadata?.name || operator.address}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {formatNumber(operator.stakerCount, compact)}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    <div>
-                      {formatUSD(operator.strategiesTotal * rate, compact)}
-                    </div>
-                    <div className="text-xs text-foreground-2">
-                      {formatETH(operator.strategiesTotal, compact)}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={`operator-item-${i}`}
+                onClick={() =>
+                  navigate(`/operators/${operator.address}`, {
+                    state: { operator }
+                  })
+                }
+              >
+                <TableCell className="p-4">
+                  <div className="flex items-center gap-x-3">
+                    <ThirdPartyLogo
+                      className="size-8 min-w-8"
+                      url={operator.metadata?.logo}
+                    />
+                    <span className="truncate">
+                      {operator.metadata?.name || operator.address}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-end">
+                  {formatNumber(operator.stakerCount, compact)}
+                </TableCell>
+                <TableCell className="text-end">
+                  <div>
+                    {formatUSD(operator.strategiesTotal * rate, compact)}
+                  </div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(operator.strategiesTotal, compact)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>
+  );
+}
+
+function TopRewards({ isLoading, avs, rate, error }) {
+  const compact = !useTailwindBreakpoint('sm');
+
+  const columns = [
+    {
+      key: 'top_reward_distributor',
+      label: 'Top Reward Distributor',
+      className: 'w-44 md:w-1/2 ps-4'
+    },
+
+    {
+      key: 'value',
+      label: 'Value',
+      className: 'text-end md:w-1/2'
+    }
+  ];
+
+  if (error) {
+    return (
+      <div className="rd-box flex min-h-44 max-w-full basis-full items-center justify-center lg:grow lg:basis-0">
+        <ErrorMessage error={error} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rd-box min-h-44 max-w-full basis-full lg:grow lg:basis-0">
+      <div className="w-full p-4">
+        <span className="text-foreground-1">Rewards</span>
+      </div>
+      <Table
+        aria-label="Operator list"
+        classNames={{
+          base: `overflow-x-auto`,
+          thead: '[&>tr:last-child]:hidden'
+        }}
+        // hideHeader={!isLoading}
+        layout="fixed"
+        removeWrapper
+      >
+        <TableHeader columns={columns}>
+          {column => (
+            <TableColumn
+              className={`bg-transparent py-4 text-sm font-normal leading-5 text-foreground-1 transition-colors data-[hover=true]:text-foreground-2 ${column.className}`}
+              key={column.key}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody>
+          {isLoading
+            ? [...Array(3)].map((_, i) => (
+              <TableRow className="border-t border-outline" key={i}>
+                <TableCell className="w-2/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+                <TableCell className="w-1/5 py-6 ps-4">
+                  <Skeleton className="h-4 rounded-md bg-default" />
+                </TableCell>
+              </TableRow>
+            ))
+            : avs?.map((item, i) => (
+              <TableRow
+                className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                key={`operator-item-${i}`}
+                onClick={() =>
+                  navigate(`/avs/${item.address}`, {
+                    state: { item }
+                  })
+                }
+              >
+                <TableCell className="p-4">
+                  <div className="text-end w-64 md:w-auto pr-3">
+                    <div className="flex items-center justify-between pr-1 w-[172px]">
+                      <span className="truncate text-sm">
+                        {truncateAddressLg(item.address)}
+                      </span>
+                      <CopyButton className="text-default-2 flex-shrink-0" value={item.address} variant="outlined" />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="text-end">
+                  <div>{formatUSD(item.rewardsTotal * rate, compact)}</div>
+                  <div className="text-xs text-foreground-2">
+                    {formatETH(item.rewardsTotal, compact)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </div >
   );
 }

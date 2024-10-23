@@ -27,6 +27,11 @@ const columns = [
     className: 'w-64 md:w-2/5 ps-12'
   },
   {
+    key: 'distributed_rewards',
+    label: 'Distributed Rewards',
+    className: 'text-end w-36 md:w-1/5'
+  },
+  {
     key: 'staker',
     label: 'Restakers',
     className: 'text-end w-36 md:w-1/5'
@@ -57,11 +62,11 @@ export default function AVSList() {
     searchTriggered: false,
     sortDescriptor: searchParams.get('sort')
       ? {
-          column: searchParams.get('sort').replace('-', ''),
-          direction: searchParams.get('sort').startsWith('-')
-            ? 'descending'
-            : 'ascending'
-        }
+        column: searchParams.get('sort').replace('-', ''),
+        direction: searchParams.get('sort').startsWith('-')
+          ? 'descending'
+          : 'ascending'
+      }
       : { column: 'tvl', direction: 'descending' }
   });
 
@@ -225,57 +230,68 @@ export default function AVSList() {
             >
               {state.isFetchingData
                 ? [...Array(10)].map((_, i) => (
-                    <TableRow className="border-t border-outline" key={i}>
-                      <TableCell className="w-2/5 py-6 pe-8 ps-4">
-                        <Skeleton className="h-4 rounded-md bg-default" />
-                      </TableCell>
-                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                        <Skeleton className="h-4 rounded-md bg-default" />
-                      </TableCell>
-                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                        <Skeleton className="h-4 rounded-md bg-default" />
-                      </TableCell>
-                      <TableCell className="w-1/5 py-6 pe-8 ps-4">
-                        <Skeleton className="h-4 rounded-md bg-default" />
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <TableRow className="border-t border-outline" key={i}>
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
+                    </TableCell>
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
+                    </TableCell>
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
+                    </TableCell>
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
+                    </TableCell>
+                    <TableCell className="w-1/5 py-6 pe-8 ps-4">
+                      <Skeleton className="h-4 rounded-md bg-default" />
+                    </TableCell>
+                  </TableRow>
+                ))
                 : state.avs?.map((avs, i) => (
-                    <TableRow
-                      className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
-                      key={`avs-item-${i}`}
-                      onClick={() =>
-                        navigate(`/avs/${avs.address}`, { state: { avs } })
-                      }
-                    >
-                      <TableCell className="p-4">
-                        <div className="flex items-center gap-x-3">
-                          <span className="min-w-5 text-foreground-2">
-                            {(searchParams.get('page') - 1) * 10 + i + 1}
-                          </span>
-                          <ThirdPartyLogo
-                            className="size-8 min-w-8"
-                            url={avs.metadata?.logo}
-                          />
-                          <span className="truncate">
-                            {avs.metadata?.name || avs.address}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="pe-8 text-end">
-                        {formatNumber(avs.stakers)}
-                      </TableCell>
-                      <TableCell className="pe-8 text-end">
-                        {formatNumber(avs.operators)}
-                      </TableCell>
-                      <TableCell className="pe-8 text-end">
-                        <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
-                        <div className="text-xs text-foreground-2">
-                          {formatETH(avs.strategiesTotal)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  <TableRow
+                    className="cursor-pointer border-t border-outline transition-colors hover:bg-default"
+                    key={`avs-item-${i}`}
+                    onClick={() =>
+                      navigate(`/avs/${avs.address}`, { state: { avs } })
+                    }
+                  >
+                    <TableCell className="p-4">
+                      <div className="flex items-center gap-x-3">
+                        <span className="min-w-5 text-foreground-2">
+                          {(searchParams.get('page') - 1) * 10 + i + 1}
+                        </span>
+                        <ThirdPartyLogo
+                          className="size-8 min-w-8"
+                          url={avs.metadata?.logo}
+                        />
+                        <span className="truncate">
+                          {avs.metadata?.name || avs.address}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="pe-8 text-end">
+                      <div>{formatUSD(avs.rewardsTotal * state.rate)}</div>
+                      <div className="text-xs text-foreground-2">
+                        {`${avs.rewardsTotal === 0 ? 0 : Number(avs.rewardsTotal).toFixed(2)} ETH`}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="pe-8 text-end">
+                      {formatNumber(avs.stakers)}
+                    </TableCell>
+                    <TableCell className="pe-8 text-end">
+                      {formatNumber(avs.operators)}
+                    </TableCell>
+                    <TableCell className="pe-8 text-end">
+                      <div>{formatUSD(avs.strategiesTotal * state.rate)}</div>
+                      <div className="text-xs text-foreground-2">
+                        {formatETH(avs.strategiesTotal)}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
           {state.totalPages > 1 && (
